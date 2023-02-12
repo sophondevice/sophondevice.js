@@ -1,0 +1,48 @@
+{
+  "name": "test",
+  "version": "0.0.1",
+  "description": "sophondevice test cases",
+  "homepage": "https://github.com/sophondevice/sophondevice#readme",
+  "private": "true",
+  "files": [
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sophondevice/sophondevice.git"
+  },
+  "scripts": {
+    "build-js": "node build.js",
+    "copy-assets": "shx mkdir -p dist/js && shx cp dist-tmp/*.js dist-tmp/*.js.map dist/js && shx cp dist-tmp/*.html dist && shx cp -R src/assets dist && shx cp src/index.html dist && shx cp ../libs/sophondevice/dist/sophondevice.modern.js ../libs/sophondevice/dist/sophondevice.modern.js.map dist/js",
+    "build": "shx rm -rf dist dist-tmp && npm run build-js && npm run copy-assets && shx rm -rf dist-tmp",
+    "dev-test": "web-dev-server --port 8000 --open dist/index.html",
+    "lint": "eslint src --ext .ts",
+    "lint-fix": "eslint src --ext .ts --fix"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.51.0",
+    "@typescript-eslint/parser": "^5.51.0",
+    "@web/dev-server": "^0.1.35",
+    "eslint": "^8.33.0",
+    "eslint-config-prettier": "^8.6.0",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-tsdoc": "^0.2.17",
+    "typedoc": "^0.23.24",
+    "microbundle": "^0.15.1",
+    "prettier": "^2.8.4",
+    "replace": "^1.2.2",
+    "run-script-os": "^1.1.6",
+    "shx": "^0.3.4",
+    "typescript": "^4.7.3",
+    "tslib": "^2.5.0"
+  },
+  "dependencies": {
+    "@types/colors": "^1.2.1",
+    "@types/diff": "^5.0.2",
+    "@webgpu/types": "^0.1.26",
+    "colors": "^1.4.0",
+    "diff": "^5.0.0",
+    "sophondevice": "workspace:*"
+  }
+}
