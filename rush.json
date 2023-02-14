@@ -424,10 +424,6 @@
     //   "tags": [ "tools" ]
     // }
     {
-      "packageName": "sophon-dummy",
-      "projectFolder": "libs/dummy"
-    },
-    {
       "packageName": "@sophon/base",
       "projectFolder": "libs/base"
     },
