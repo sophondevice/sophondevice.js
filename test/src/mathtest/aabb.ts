@@ -1,28 +1,28 @@
-import * as chaospace from 'balloon-device';
+import * as chaos from '@sophon/device';
 import { assert, rand } from './common';
 
 export function testAABB() {
   function randAABB() {
-    const v1 = new chaospace.Vector3(rand(-1000, 1000), rand(-1000, 1000), rand(-1000, 1000));
-    const v2 = new chaospace.Vector3(rand(-1000, 1000), rand(-1000, 1000), rand(-1000, 1000));
-    const [min, max] = [chaospace.Vector3.min(v1, v2), chaospace.Vector3.max(v1, v2)];
-    return new chaospace.AABB(min, max);
+    const v1 = new chaos.Vector3(rand(-1000, 1000), rand(-1000, 1000), rand(-1000, 1000));
+    const v2 = new chaos.Vector3(rand(-1000, 1000), rand(-1000, 1000), rand(-1000, 1000));
+    const [min, max] = [chaos.Vector3.min(v1, v2), chaos.Vector3.max(v1, v2)];
+    return new chaos.AABB(min, max);
   }
-  function getCorners(box: chaospace.AABB): chaospace.Vector3[] {
+  function getCorners(box: chaos.AABB): chaos.Vector3[] {
     const [minx, miny, minz] = box.minPoint;
     const [maxx, maxy, maxz] = box.maxPoint;
     return [
-      new chaospace.Vector3(minx, miny, minz),
-      new chaospace.Vector3(maxx, miny, minz),
-      new chaospace.Vector3(maxx, maxy, minz),
-      new chaospace.Vector3(minx, maxy, minz),
-      new chaospace.Vector3(minx, miny, maxz),
-      new chaospace.Vector3(maxx, miny, maxz),
-      new chaospace.Vector3(maxx, maxy, maxz),
-      new chaospace.Vector3(minx, maxy, maxz)
+      new chaos.Vector3(minx, miny, minz),
+      new chaos.Vector3(maxx, miny, minz),
+      new chaos.Vector3(maxx, maxy, minz),
+      new chaos.Vector3(minx, maxy, minz),
+      new chaos.Vector3(minx, miny, maxz),
+      new chaos.Vector3(maxx, miny, maxz),
+      new chaos.Vector3(maxx, maxy, maxz),
+      new chaos.Vector3(minx, maxy, maxz)
     ]
   }
-  function classifyPoints(box: chaospace.AABB, points: chaospace.Vector3[]) {
+  function classifyPoints(box: chaos.AABB, points: chaos.Vector3[]) {
     let inside = 0;
     let outside = 0;
     for (const p of points) {

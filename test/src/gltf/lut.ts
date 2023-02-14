@@ -1,4 +1,4 @@
-import { Vector2, Vector3, Device, Texture2D, TextureFormat, GPUResourceUsageFlags, Vector4, Matrix3x3 } from "balloon-device";
+import { Vector2, Vector3, Device, Texture2D, TextureFormat, GPUResourceUsageFlags, Vector4, Matrix3x3 } from "@sophon/device";
 
 interface MicrofacetDistributionSample {
   pdf?: number;

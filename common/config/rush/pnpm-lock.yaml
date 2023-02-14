@@ -5,13 +5,99 @@ importers:
   .:
     specifiers: {}
 
-  ../../libs/sophondevice:
+  ../../libs/base:
     specifiers:
       '@typescript-eslint/eslint-plugin': ^5.51.0
       '@typescript-eslint/parser': ^5.51.0
       '@web/dev-server': ^0.1.35
+      dts-bundle-generator: ^7.2.0
+      eslint: ^8.33.0
+      eslint-config-prettier: ^8.6.0
+      eslint-plugin-import: ^2.27.5
+      eslint-plugin-prettier: ^4.2.1
+      eslint-plugin-tsdoc: ^0.2.17
+      microbundle: ^0.15.1
+      prettier: ^2.8.4
+      replace: ^1.2.2
+      run-script-os: ^1.1.6
+      shx: ^0.3.4
+      tslib: ^2.5.0
+      typedoc: ^0.23.24
+      typescript: ^4.7.3
+    devDependencies:
+      '@typescript-eslint/eslint-plugin': 5.51.0_0fb7d53160f0e41e16372a0eab719cf9
+      '@typescript-eslint/parser': 5.51.0_eslint@8.33.0+typescript@4.9.5
+      '@web/dev-server': 0.1.35
+      dts-bundle-generator: 7.2.0
+      eslint: 8.33.0
+      eslint-config-prettier: 8.6.0_eslint@8.33.0
+      eslint-plugin-import: 2.27.5_eslint@8.33.0
+      eslint-plugin-prettier: 4.2.1_80353385657558523d8688bf9d3ac177
+      eslint-plugin-tsdoc: 0.2.17
+      microbundle: 0.15.1
+      prettier: 2.8.4
+      replace: 1.2.2
+      run-script-os: 1.1.6
+      shx: 0.3.4
+      tslib: 2.5.0
+      typedoc: 0.23.24_typescript@4.9.5
+      typescript: 4.9.5
+
+  ../../libs/device:
+    specifiers:
+      '@sophon/base': workspace:*
+      '@types/node': ^18.13.0
+      '@typescript-eslint/eslint-plugin': ^5.51.0
+      '@typescript-eslint/parser': ^5.51.0
+      '@web/dev-server': ^0.1.35
       '@webgpu/types': ^0.1.26
-      dts-bundle-generator: ^6.11.0
+      dts-bundle-generator: ^7.2.0
+      eslint: ^8.33.0
+      eslint-config-prettier: ^8.6.0
+      eslint-plugin-import: ^2.27.5
+      eslint-plugin-prettier: ^4.2.1
+      eslint-plugin-tsdoc: ^0.2.17
+      microbundle: ^0.15.1
+      prettier: ^2.8.4
+      replace: ^1.2.2
+      run-script-os: ^1.1.6
+      shx: ^0.3.4
+      sophon-dummy: workspace:*
+      tslib: ^2.5.0
+      typedoc: ^0.23.24
+      typescript: ^4.7.3
+    dependencies:
+      '@sophon/base': link:../base
+      '@types/node': 18.13.0
+      '@webgpu/types': 0.1.26
+      sophon-dummy: link:../dummy
+    devDependencies:
+      '@typescript-eslint/eslint-plugin': 5.51.0_0fb7d53160f0e41e16372a0eab719cf9
+      '@typescript-eslint/parser': 5.51.0_eslint@8.33.0+typescript@4.9.5
+      '@web/dev-server': 0.1.35
+      dts-bundle-generator: 7.2.0
+      eslint: 8.33.0
+      eslint-config-prettier: 8.6.0_eslint@8.33.0
+      eslint-plugin-import: 2.27.5_eslint@8.33.0
+      eslint-plugin-prettier: 4.2.1_80353385657558523d8688bf9d3ac177
+      eslint-plugin-tsdoc: 0.2.17
+      microbundle: 0.15.1
+      prettier: 2.8.4
+      replace: 1.2.2
+      run-script-os: 1.1.6
+      shx: 0.3.4
+      tslib: 2.5.0
+      typedoc: 0.23.24_typescript@4.9.5
+      typescript: 4.9.5
+
+  ../../libs/dom:
+    specifiers:
+      '@sophon/base': workspace:*
+      '@sophon/device': workspace:*
+      '@typescript-eslint/eslint-plugin': ^5.51.0
+      '@typescript-eslint/parser': ^5.51.0
+      '@web/dev-server': ^0.1.35
+      dts-bundle-generator: ^7.2.0
       eslint: ^8.33.0
       eslint-config-prettier: ^8.6.0
       eslint-plugin-import: ^2.27.5
@@ -26,12 +112,51 @@ importers:
       typedoc: ^0.23.24
       typescript: ^4.7.3
     dependencies:
-      '@webgpu/types': 0.1.26
+      '@sophon/base': link:../base
+      '@sophon/device': link:../device
     devDependencies:
       '@typescript-eslint/eslint-plugin': 5.51.0_0fb7d53160f0e41e16372a0eab719cf9
       '@typescript-eslint/parser': 5.51.0_eslint@8.33.0+typescript@4.9.5
       '@web/dev-server': 0.1.35
-      dts-bundle-generator: 6.13.0
+      dts-bundle-generator: 7.2.0
+      eslint: 8.33.0
+      eslint-config-prettier: 8.6.0_eslint@8.33.0
+      eslint-plugin-import: 2.27.5_eslint@8.33.0
+      eslint-plugin-prettier: 4.2.1_80353385657558523d8688bf9d3ac177
+      eslint-plugin-tsdoc: 0.2.17
+      microbundle: 0.15.1
+      prettier: 2.8.4
+      replace: 1.2.2
+      run-script-os: 1.1.6
+      shx: 0.3.4
+      tslib: 2.5.0
+      typedoc: 0.23.24_typescript@4.9.5
+      typescript: 4.9.5
+
+  ../../libs/dummy:
+    specifiers:
+      '@typescript-eslint/eslint-plugin': ^5.51.0
+      '@typescript-eslint/parser': ^5.51.0
+      '@web/dev-server': ^0.1.35
+      dts-bundle-generator: ^7.2.0
+      eslint: ^8.33.0
+      eslint-config-prettier: ^8.6.0
+      eslint-plugin-import: ^2.27.5
+      eslint-plugin-prettier: ^4.2.1
+      eslint-plugin-tsdoc: ^0.2.17
+      microbundle: ^0.15.1
+      prettier: ^2.8.4
+      replace: ^1.2.2
+      run-script-os: ^1.1.6
+      shx: ^0.3.4
+      tslib: ^2.5.0
+      typedoc: ^0.23.24
+      typescript: ^4.7.3
+    devDependencies:
+      '@typescript-eslint/eslint-plugin': 5.51.0_0fb7d53160f0e41e16372a0eab719cf9
+      '@typescript-eslint/parser': 5.51.0_eslint@8.33.0+typescript@4.9.5
+      '@web/dev-server': 0.1.35
+      dts-bundle-generator: 7.2.0
       eslint: 8.33.0
       eslint-config-prettier: 8.6.0_eslint@8.33.0
       eslint-plugin-import: 2.27.5_eslint@8.33.0
@@ -48,6 +173,8 @@ importers:
 
   ../../test:
     specifiers:
+      '@sophon/device': workspace:*
+      '@sophon/dom': workspace:*
       '@types/colors': ^1.2.1
       '@types/diff': ^5.0.2
       '@typescript-eslint/eslint-plugin': ^5.51.0
@@ -66,17 +193,17 @@ importers:
       replace: ^1.2.2
       run-script-os: ^1.1.6
       shx: ^0.3.4
-      sophondevice: workspace:*
       tslib: ^2.5.0
       typedoc: ^0.23.24
       typescript: ^4.7.3
     dependencies:
+      '@sophon/device': link:../libs/device
+      '@sophon/dom': link:../libs/dom
       '@types/colors': 1.2.1
       '@types/diff': 5.0.2
       '@webgpu/types': 0.1.26
       colors: 1.4.0
       diff: 5.1.0
-      sophondevice: link:../libs/sophondevice
     devDependencies:
       '@typescript-eslint/eslint-plugin': 5.51.0_0fb7d53160f0e41e16372a0eab719cf9
       '@typescript-eslint/parser': 5.51.0_eslint@8.33.0+typescript@4.9.5
@@ -1717,7 +1844,6 @@ packages:
 
   /@types/node/18.13.0:
     resolution: {integrity: sha512-gC3TazRzGoOnoKAhUx+Q0t8S9Tzs74z7m0ipwGpSqQrleP14hKxP4/JUeEQcD3W1/aIpnWl8pHowI7WokuZpXg==}
-    dev: true
 
   /@types/parse-json/4.0.0:
     resolution: {integrity: sha512-//oorEZjL6sbPcKUaCdIGlIUeH26mgzimjBB77G6XRgnDl/L5wOnpyBGRe/Mmf5CVW3PwEBE1NjiMZ/ssFh4wA==}
@@ -2717,9 +2843,9 @@ packages:
       domhandler: 4.3.1
     dev: true
 
-  /dts-bundle-generator/6.13.0:
-    resolution: {integrity: sha512-v4mXZ08dnKO4RKUW2x4DNrb1cJyvtmxAzreV/zF1CZIXMKfe8GrQg6JDmTcikrK05/LMkdMuUrDe8N6w+6krsw==}
-    engines: {node: '>=12.0.0'}
+  /dts-bundle-generator/7.2.0:
+    resolution: {integrity: sha512-pHjRo52hvvLDRijzIYRTS9eJR7vAOs3gd/7jx+7YVnLU8ay3yPUWGtHXPtuMBSlJYk/s4nq1SvXObDCZVguYMg==}
+    engines: {node: '>=14.0.0'}
     hasBin: true
     dependencies:
       typescript: 4.9.5

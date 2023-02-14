@@ -1,4 +1,4 @@
-import * as chaos from 'balloon-device';
+import * as chaos from '@sophon/device';
 
 const defaultVS =
   `this.$inputs.pos = pb.vec3().attrib('position');

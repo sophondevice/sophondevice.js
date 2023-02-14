@@ -1,4 +1,4 @@
-import * as chaos from 'balloon-device';
+import * as chaos from '@sophon/device';
 
 export async function testBufferReadWrite(device: chaos.Device) {
   const readBuffer = device.createBuffer(4, chaos.GPUResourceUsageFlags.BF_READ);

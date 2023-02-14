@@ -1,0 +1,28 @@
+{
+  "files": {
+    "libs/base/.rush/temp/shrinkwrap-deps.json": "8ea3a3ef179fc8b7efd7677d9926027b190e0a12",
+    "libs/base/.rush/temp/operation/build/state.json": "9862f48dc74a278f2f7e88420a94a5aae75b843f",
+    "libs/base/.rush/temp/package-deps_build.json": "3928b39b8f20ecf5fb0e251d863767db3a1fdad6",
+    "libs/base/package.json": "46166a612ead586166a26a55a6c2efa1de13e351",
+    "libs/base/src/asset/asseturl.ts": "4e6240951897cb380705e8b43afc3b6ef2b0e802",
+    "libs/base/src/asset/file_loader.ts": "74ebdaa31f36b531a694fde8a1d0013cad5c8404",
+    "libs/base/src/asset/graph.ts": "66642020c34e8344449dcdc38eb5a403aaaa54eb",
+    "libs/base/src/asset/image_loader.ts": "6f60e32274596328fe2509d5940ffd47a313ef57",
+    "libs/base/src/asset/index.ts": "c31b70b7523334fc0cdb643e659ba2ff4b929012",
+    "libs/base/src/asset/load_manager.ts": "09db70aa0e5ebf77ff6c0d26a43935d0f00a252a",
+    "libs/base/src/asset/loader.ts": "a016e020e06c0fa85b1f3bd0ebadf0e3be6eed4e",
+    "libs/base/src/event.ts": "a6571a8a6b86b224309f1ec7ca0c35d956327ca1",
+    "libs/base/src/font.ts": "d8a0235f491f530e22c1f2861644ac804ec28a56",
+    "libs/base/src/heap.ts": "94ae7bc091e2273aa6eb98a44fc5c7630e2807fa",
+    "libs/base/src/index.ts": "7163bc42e1ee41fd21b171b55f50eb0c73874d88",
+    "libs/base/src/linkedlist.ts": "b9d71de373c65e23087eea14d1ac737cdfa8df54",
+    "libs/base/src/misc.ts": "367619395108153a4efabc6a4df78f3bd367eed8",
+    "libs/base/src/serialization.ts": "0cd8d2cc0f0e0f7786b39148773680c353250c90",
+    "libs/base/src/treap.ts": "2196dd8c450b14e93e52a5d675ee594ea73ad144",
+    "libs/base/src/utils.ts": "b3a78bbf5644b4b020438e2d58c9157b7d1e881c",
+    "libs/base/src/values.ts": "e60f6060f07ea8ed27006c40410ad107de294fe7",
+    "libs/base/src/visitor.ts": "129226995a1d0a0f63bb2f50b27e5e362ef6cf0a",
+    "libs/base/tsconfig.json": "891e09d26dce76e4253915130ef288d7ed321eb5"
+  },
+  "arguments": "shx rm -rf ./dist && npm run build-modern && npm run build-types "
+}

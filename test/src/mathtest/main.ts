@@ -1,4 +1,4 @@
-import * as chaospace from 'balloon-device';
+import * as chaos from '@sophon/device';
 import { ITestCase, doTest } from '../common';
 import { testVectorType, testMatrixType, testQuaternion, testXForm } from './vector';
 import { testPlane } from './plane';
@@ -10,15 +10,15 @@ import { testSH } from './sh';
 const testCases: ITestCase[] = [{
   caseName: 'Vector2 test',
   times: 100,
-  execute: () => testVectorType(chaospace.Vector2, 2)
+  execute: () => testVectorType(chaos.Vector2, 2)
 }, {
   caseName: 'Vector3 test',
   times: 100,
-  execute: () => testVectorType(chaospace.Vector3, 3)
+  execute: () => testVectorType(chaos.Vector3, 3)
 }, {
   caseName: 'Vector4 test',
   times: 100,
-  execute: () => testVectorType(chaospace.Vector4, 4)
+  execute: () => testVectorType(chaos.Vector4, 4)
 }, {
   caseName: 'Quaternion test',
   times: 100,
@@ -26,11 +26,11 @@ const testCases: ITestCase[] = [{
 }, {
   caseName: 'Matrix3x3 test',
   times: 100,
-  execute: () => testMatrixType(chaospace.Matrix3x3, 3, 3)
+  execute: () => testMatrixType(chaos.Matrix3x3, 3, 3)
 }, {
   caseName: 'Matrix4x4 test',
   times: 100,
-  execute: () => testMatrixType(chaospace.Matrix4x4, 4, 4)
+  execute: () => testMatrixType(chaos.Matrix4x4, 4, 4)
 }, {
   caseName: 'XForm test',
   times: 100,
@@ -53,7 +53,7 @@ const testCases: ITestCase[] = [{
   execute: () => testSH()
 }];
 
-class E extends chaospace.REvent {
+class E extends chaos.REvent {
   constructor() {
     super('xyz', false, false);
   }

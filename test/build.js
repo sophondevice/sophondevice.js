@@ -32,8 +32,7 @@ fs.mkdirSync(path.join(__dirname, 'dist-tmp'), {
 });
 
 for (const file of srcfiles) {
-  // const cmd = `--no-compress -o "${file[1]}" --external "./chaospace.modern.js" --alias "chaospace=./chaospace.modern.js"`;
-  const cmd = `microbundle -i "${file[0]}" --no-pkg-main -f modern --target web -o "${file[1]}" --external __balloon__ --alias balloon-device=__balloon__ --no-compress && replace '__balloon__' './balloon-device.modern.js' "${file[1]}"`;
+  const cmd = `microbundle -i "${file[0]}" --no-pkg-main -f modern --target web -o "${file[1]}" --external @sophon/device,@sophon/dom --no-compress`;
   console.log(`exec: ${cmd}`);
   child_process.execSync(cmd);
   fs.copyFileSync(file[2], file[3]);

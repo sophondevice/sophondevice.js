@@ -1,4 +1,4 @@
-import * as chaos from 'balloon-device';
+import * as chaos from '@sophon/device';
 import * as common from '../common';
 import { TestTexture2D, TestTexture2DArray, TestTexture3D, TestTextureCube, TestTextureCubeSH, TestTextureVideo } from './case';
 

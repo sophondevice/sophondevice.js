@@ -1,4 +1,4 @@
-import * as chaos from 'balloon-device';
+import * as chaos from '@sophon/device';
 import * as common from '../common';
 import { GLTFViewer } from './gltfviewer';
 

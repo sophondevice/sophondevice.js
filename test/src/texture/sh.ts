@@ -1,4 +1,4 @@
-import * as chaos from 'balloon-device';
+import * as chaos from '@sophon/device';
 
 class SphericalHarmonicsBasis {
   static Y0(v: chaos.Vector3): number {

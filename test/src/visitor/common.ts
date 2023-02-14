@@ -1,5 +1,5 @@
 // Common test utilities
-import * as chaos from 'balloon-device';
+import * as chaos from '@sophon/device';
 
 export interface ITestCase {
   caseName: string;

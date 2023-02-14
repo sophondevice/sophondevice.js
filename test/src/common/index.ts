@@ -1,4 +1,4 @@
-import * as chaos from 'balloon-device';
+import * as chaos from '@sophon/device';
 
 export function getQueryString(name: string) {
   return (new URL(window.location.toString())).searchParams.get(name) || null;

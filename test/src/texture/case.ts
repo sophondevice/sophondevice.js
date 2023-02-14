@@ -1,4 +1,4 @@
-import * as chaos from 'balloon-device';
+import * as chaos from '@sophon/device';
 import { projectCubemapCPU } from './sh';
 
 export abstract class TextureTestCase {

@@ -1,0 +1,71 @@
+{
+  "name": "@sophon/device",
+  "version": "0.0.1",
+  "description": "javascript 3d rendering library for webgl and webGPU",
+  "homepage": "https://github.com/sophondevice/sophondevice#readme",
+  "type": "module",
+  "main": "./dist/sophon.device.umd.js",
+  "module": "./dist/sophon.device.module.js",
+  "directories": {
+    "lib": "dist"
+  },
+  "source": "./src/index.ts",
+  "types": "./dist/sophon.device.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build-modern": "microbundle -i src/index.ts --no-generateTypes --no-compress --no-pkg-main --external none -f modern -o dist/sophon.device.modern.js",
+    "build-esm": "microbundle -i src/index.ts --no-generateTypes --no-pkg-main -f esm -o dist/sophon.device.module.js",
+    "build-umd": "microbundle -i src/index.ts --no-generateTypes --no-pkg-main -f umd -o dist/sophon.device.umd.js",
+    "build-cjs": "microbundle -i src/index.ts --no-generateTypes --no-pkg-main -f cjs -o dist/sophon.device.cjs",
+    "build-types": "dts-bundle-generator --project ./tsconfig.json --umd-module-name sophonDevice -o ./dist/sophon.device.d.ts ./src/index.ts",
+    "build-doc": "typedoc --out dist/doc src/index.ts",
+    "build": "shx rm -rf ./dist && npm run build-modern && npm run build-types",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sophondevice/sophondevice.git"
+  },
+  "keywords": [
+    "javascript",
+    "3d",
+    "rendering",
+    "engine",
+    "webgl",
+    "webgpu",
+    "canvas",
+    "sophon",
+    "device"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sophondevice/sophondevice/issues"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.51.0",
+    "@typescript-eslint/parser": "^5.51.0",
+    "@web/dev-server": "^0.1.35",
+    "dts-bundle-generator": "^7.2.0",
+    "eslint": "^8.33.0",
+    "eslint-config-prettier": "^8.6.0",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-tsdoc": "^0.2.17",
+    "typedoc": "^0.23.24",
+    "microbundle": "^0.15.1",
+    "prettier": "^2.8.4",
+    "replace": "^1.2.2",
+    "run-script-os": "^1.1.6",
+    "shx": "^0.3.4",
+    "typescript": "^4.7.3",
+    "tslib": "^2.5.0"
+  },
+  "dependencies": {
+    "@webgpu/types": "^0.1.26",
+    "@types/node": "^18.13.0",
+    "@sophon/base": "workspace:*",
+    "sophon-dummy": "workspace:*"
+  }
+}

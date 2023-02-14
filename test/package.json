@@ -1,5 +1,5 @@
 {
-  "name": "test",
+  "name": "@sophon/test",
   "version": "0.0.1",
   "description": "sophondevice test cases",
   "homepage": "https://github.com/sophondevice/sophondevice#readme",
@@ -43,6 +43,7 @@
     "@webgpu/types": "^0.1.26",
     "colors": "^1.4.0",
     "diff": "^5.0.0",
-    "sophondevice": "workspace:*"
+    "@sophon/device": "workspace:*",
+    "@sophon/dom": "workspace:*"
   }
 }

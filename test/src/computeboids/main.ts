@@ -1,4 +1,4 @@
-import * as chaos from 'balloon-device';
+import * as chaos from '@sophon/device';
 
 (async function () {
   const viewer = new chaos.Viewer(document.getElementById('canvas') as HTMLCanvasElement);

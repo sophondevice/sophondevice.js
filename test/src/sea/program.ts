@@ -1,4 +1,4 @@
-import * as chaos from 'balloon-device';
+import * as chaos from '@sophon/device';
 
 export function createSeaProgram(device: chaos.Device) {
   const pb = new chaos.ProgramBuilder(device);
