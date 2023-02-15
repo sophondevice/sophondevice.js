@@ -1,8 +1,9 @@
 import * as chaos from '@sophon/device';
+import * as dom from '@sophon/dom';
 
 export class GLTFViewer {
-  private _gui: chaos.GUI;
-  private _animationSelector: chaos.Select;
+  private _gui: dom.GUI;
+  private _animationSelector: dom.Select;
   private _currentAnimation: string;
   private _modelNode: chaos.Model;
   private _assetManager: chaos.AssetManager;
@@ -13,9 +14,9 @@ export class GLTFViewer {
   private _fov: number;
   private _aspect: number;
   private _nearPlane: number;
-  constructor(GUI: chaos.GUI, scene: chaos.Scene) {
+  constructor(GUI: dom.GUI, scene: chaos.Scene) {
     this._gui = GUI;
-    this._animationSelector = this._gui.document.querySelector<chaos.Select>('#animation');
+    this._animationSelector = this._gui.document.querySelector<dom.Select>('#animation');
     this._currentAnimation = null;
     this._modelNode = null;
     this._scene = scene;
@@ -92,14 +93,14 @@ export class GLTFViewer {
             while (this._animationSelector.firstChild) {
               this._animationSelector.removeChild(this._animationSelector.firstChild);
             }
-            const optionNoAnimation = this._gui.document.createElement<chaos.Option>('option');
+            const optionNoAnimation = this._gui.document.createElement<dom.Option>('option');
             optionNoAnimation.textContent = 'No animation';
             optionNoAnimation.setAttribute('value', 'none');
             this._animationSelector.appendChild(optionNoAnimation);
             let activeAnimation: string = null;
             for (let i = 0; i < this.animations.length; i++) {
               const name = this.animations[i];
-              const option = this._gui.document.createElement<chaos.Option>('option');
+              const option = this._gui.document.createElement<dom.Option>('option');
               option.textContent = name;
               option.setAttribute('value', name);
               if (i === 0) {

@@ -37,3 +37,14 @@ export const ESM_DEPTH_SCALE = 50;
 // current shadow tech
 // eslint-disable-next-line prefer-const
 export let SHADOW_TECHNIQUE = SHADOW_TECH_HARD_ESM_SHADOW;
+
+// light types
+export const LIGHT_TYPE_NONE = 0;
+export const LIGHT_TYPE_DIRECTIONAL = 1;
+export const LIGHT_TYPE_POINT = 2;
+export const LIGHT_TYPE_SPOT = 3;
+export const LIGHT_TYPE_HEMISPHERIC = 4;
+export const LIGHT_TYPE_ENVIRONMENT = 5;
+
+// builtin texture names
+export const BUILTIN_ASSET_TEXTURE_SHEEN_LUT = 'LUT_Sheen';

@@ -12,13 +12,13 @@ import { SkinnedBoundingBox } from '../animation';
 import { Vector3 } from '../../math';
 import { BoundingBox } from '../bounding_volume';
 import { GammaBlitter } from '../blitter';
-import { getSheenLutLoader, sheenLUTTextureName } from './builtin';
+import { getSheenLutLoader } from './builtin';
 import { GraphNode } from '../graph_node';
 import type { Scene } from '../scene';
 import type { AbstractTextureLoader, AbstractModelLoader } from './loaders/loader';
+import { BUILTIN_ASSET_TEXTURE_SHEEN_LUT } from '../values';
 
 export class AssetManager {
-  static readonly BUILTIN_TEXTURE_SHEEN_LUT = sheenLUTTextureName;
   /** @internal */
   static _builtinTextures: {
     [name: string]: Promise<BaseTexture>
@@ -27,7 +27,7 @@ export class AssetManager {
   static _builtinTextureLoaders: {
     [name: string]: (device: Device, texture?: BaseTexture) => Promise<BaseTexture>
   } = {
-      [sheenLUTTextureName]: getSheenLutLoader(64)
+      [BUILTIN_ASSET_TEXTURE_SHEEN_LUT]: getSheenLutLoader(64)
     };
   /** @internal */
   private _device: Device;
@@ -272,19 +272,19 @@ export class AssetManager {
     }
     throw new Error(`Can not find loader for asset ${url}`);
   }
-  static async fetchBuiltinTexture<T extends BaseTexture>(device: Device, name: string): Promise<T> {
-    let P = this._builtinTextures[name];
-    const loader = this._builtinTextureLoaders[name];
+  async fetchBuiltinTexture<T extends BaseTexture>(name: string): Promise<T> {
+    let P = AssetManager._builtinTextures[name];
+    const loader = AssetManager._builtinTextureLoaders[name];
     if (!P) {
       if (!loader) {
         throw new Error(`Unknown builtin texture name: ${name}`);
       }
-      P = loader(device);
-      this._builtinTextures[name] = P;
+      P = loader(this.device);
+      AssetManager._builtinTextures[name] = P;
     }
     const tex = await P;
     tex.restoreHandler = async tex => {
-      await loader(device, tex as Texture2D);
+      await loader(this.device, tex as Texture2D);
     }
     return tex as T;
   }

@@ -2,7 +2,7 @@ import { MAX_TEXCOORD_INDEX_COUNT, Device, Texture2D, BindGroup, ProgramBuilder,
 import { Material } from '../material';
 import { ShaderLib } from './shaderlib';
 import { Matrix4x4 } from '../../math';
-import { forwardComputeLighting, forwardComputeLightingMultiPass } from '../renderers/forward.shaderlib';
+import { forwardComputeLighting } from '../renderers/forward.shaderlib';
 import * as values from '../values';
 import type { LightModel } from './lightmodel';
 import type { DrawContext } from '../drawable';

@@ -1,11 +1,12 @@
 import { Material } from '../material';
-import { ShaderLib } from '../materiallib';
+import { ShaderLib } from '../materiallib/shaderlib';
 import { TerrainLightModel } from './terrainlightmodel';
 import { Device, Texture2D, BindGroup, GPUProgram, PBGlobalScope, ProgramBuilder } from '../../device';
-import { forwardComputeLighting, forwardComputeLightingMultiPass, ShadowMapPass } from '../renderers';
+import { forwardComputeLighting } from '../renderers/forward.shaderlib';
 import * as values from '../values';
 import type { DrawContext } from '../drawable';
 import type { Vector2 } from '../../math';
+import type { ShadowMapPass } from '../renderers';
 
 export enum TerrainRenderMode {
   UNKNOWN = 0,

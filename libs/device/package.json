@@ -4,24 +4,27 @@
   "description": "javascript 3d rendering library for webgl and webGPU",
   "homepage": "https://github.com/sophondevice/sophondevice#readme",
   "type": "module",
-  "main": "./dist/sophon.device.umd.js",
-  "module": "./dist/sophon.device.module.js",
+  "main": "./dist/sophon-device.cjs",
+  "umd:main": "./dist/sophon-device.umd.js",
+  "module": "./dist/sophon-device.module.js",
+  "exports": {
+    "types": "./dist/sophon-device.d.ts",
+    "require": "./dist/sophon-device.cjs",
+    "default": "./dist/sophon-device.modern.js"
+  },
   "directories": {
     "lib": "dist"
   },
   "source": "./src/index.ts",
-  "types": "./dist/sophon.device.d.ts",
+  "types": "./dist/sophon-device.d.ts",
   "files": [
     "dist"
   ],
   "scripts": {
-    "build-modern": "microbundle -i src/index.ts --no-generateTypes --no-compress --no-pkg-main --external none -f modern -o dist/sophon.device.modern.js",
-    "build-esm": "microbundle -i src/index.ts --no-generateTypes --no-pkg-main -f esm -o dist/sophon.device.module.js",
-    "build-umd": "microbundle -i src/index.ts --no-generateTypes --no-pkg-main -f umd -o dist/sophon.device.umd.js",
-    "build-cjs": "microbundle -i src/index.ts --no-generateTypes --no-pkg-main -f cjs -o dist/sophon.device.cjs",
-    "build-types": "dts-bundle-generator --project ./tsconfig.json --umd-module-name sophonDevice -o ./dist/sophon.device.d.ts ./src/index.ts",
+    "build:source": "microbundle -i src/index.ts --no-generateTypes --no-compress --external none",
+    "build-types": "dts-bundle-generator --disable-symlinks-following --project ./tsconfig.json --umd-module-name sophonDevice -o ./dist/sophon-device.d.ts ./src/index.ts",
     "build-doc": "typedoc --out dist/doc src/index.ts",
-    "build": "shx rm -rf ./dist && npm run build-modern && npm run build-types",
+    "build": "shx rm -rf ./dist && npm run build:source && npm run build-types",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

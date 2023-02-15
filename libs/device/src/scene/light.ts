@@ -1,8 +1,9 @@
-import { Vector3, Vector4, Matrix4x4, Frustum, AABB } from '../math';
+import { Vector3, Vector4, Matrix4x4 } from '../math';
 import { GraphNode } from './graph_node';
 import { BoundingVolume, BoundingBox } from './bounding_volume';
 import { TextureCube } from '../device';
 import { ShadowMapper } from './shadow/shadowmapper';
+import { LIGHT_TYPE_DIRECTIONAL, LIGHT_TYPE_ENVIRONMENT, LIGHT_TYPE_HEMISPHERIC, LIGHT_TYPE_POINT, LIGHT_TYPE_SPOT } from './values';
 import type { Scene } from './scene';
 
 export enum LightingFalloffMode {
@@ -12,19 +13,10 @@ export enum LightingFalloffMode {
   QUADRATIC = 3,
 }
 
-export enum LightType {
-  NONE = 0,
-  DIRECTIONAL = 1,
-  POINT = 2,
-  SPOT = 3,
-  HEMISPHERIC = 4,
-  ENVIRONMENT = 5,
-}
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export abstract class BaseLight extends GraphNode {
   /** @internal */
-  protected _type: LightType;
+  protected _type: number;
   /** @internal */
   protected _intensity: number;
   /** @internal */
@@ -33,7 +25,7 @@ export abstract class BaseLight extends GraphNode {
   protected _directionCutoff: Vector4;
   /** @internal */
   protected _diffuseIntensity: Vector4;
-  constructor(scene: Scene, type: LightType) {
+  constructor(scene: Scene, type: number) {
     super(scene);
     this._intensity = 1;
     this._type = type;
@@ -44,7 +36,7 @@ export abstract class BaseLight extends GraphNode {
       this.invalidateUniforms();
     });
   }
-  get lightType(): LightType {
+  get lightType(): number {
     return this._type;
   }
   get intensity() {
@@ -116,7 +108,7 @@ export abstract class BaseLight extends GraphNode {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export abstract class AmbientLight extends BaseLight {
-  constructor(scene: Scene, type: LightType) {
+  constructor(scene: Scene, type: number) {
     super(scene, type);
   }
   isAmbientLight(): this is AmbientLight {
@@ -130,7 +122,7 @@ export class EnvironmentLight extends AmbientLight {
   /** @internal */
   protected _irradianceMap: TextureCube;
   constructor(scene: Scene, radianceMap?: TextureCube, irradianceMap?: TextureCube) {
-    super(scene, LightType.ENVIRONMENT);
+    super(scene, LIGHT_TYPE_ENVIRONMENT);
     this._radianceMap = radianceMap || null;
     this._irradianceMap = irradianceMap || null;
   }
@@ -155,7 +147,7 @@ export class HemiSphericLight extends AmbientLight {
   /** @internal */
   protected _colorDown: Vector4;
   constructor(scene: Scene) {
-    super(scene, LightType.HEMISPHERIC);
+    super(scene, LIGHT_TYPE_HEMISPHERIC);
     this._colorUp = Vector4.zero();
     this._colorDown = Vector4.zero();
   }
@@ -202,7 +194,7 @@ export abstract class PunctualLight extends BaseLight {
   protected _lightViewProjectionMatrix: Matrix4x4;
   /** @internal */
   protected _shadowMapper: ShadowMapper;
-  constructor(scene: Scene, type: LightType) {
+  constructor(scene: Scene, type: number) {
     super(scene, type);
     this._color = Vector4.one();
     this._castShadow = false;
@@ -254,7 +246,7 @@ export abstract class PunctualLight extends BaseLight {
 
 export class DirectionalLight extends PunctualLight {
   constructor(scene: Scene) {
-    super(scene, LightType.DIRECTIONAL);
+    super(scene, LIGHT_TYPE_DIRECTIONAL);
   }
   isDirectionLight(): this is DirectionalLight {
     return true;
@@ -448,7 +440,7 @@ export class PointLight extends PunctualLight {
   /** @internal */
   protected _range: number;
   constructor(scene: Scene) {
-    super(scene, LightType.POINT);
+    super(scene, LIGHT_TYPE_POINT);
     this._range = 1;
     this.invalidateBoundingVolume();
   }
@@ -492,7 +484,7 @@ export class SpotLight extends PunctualLight {
   /** @internal */
   protected _cutoff: number;
   constructor(scene: Scene) {
-    super(scene, LightType.SPOT);
+    super(scene, LIGHT_TYPE_SPOT);
     this._range = 1;
     this._cutoff = Math.cos(Math.PI / 4);
     this.invalidateBoundingVolume();

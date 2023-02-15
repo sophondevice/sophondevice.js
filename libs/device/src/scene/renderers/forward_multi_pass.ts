@@ -3,8 +3,8 @@ import { RenderQueue } from '../render_queue';
 import { Camera } from '../camera';
 import { RenderPass } from './renderpass';
 import { ShaderLib } from '../materiallib';
-import { RENDER_PASS_TYPE_MULTI_FORWARD, MATERIAL_FUNC_NORMAL } from '../values';
-import { LightType, PunctualLight } from '../light';
+import { RENDER_PASS_TYPE_MULTI_FORWARD, MATERIAL_FUNC_NORMAL, LIGHT_TYPE_NONE } from '../values';
+import { PunctualLight } from '../light';
 import type { DrawContext } from '../drawable';
 import type { RenderScheme } from './renderscheme';
 
@@ -33,7 +33,7 @@ export class ForwardMultiRenderPass extends RenderPass {
   /** @internal */
   protected _getGlobalBindGroupHash(ctx: DrawContext) {
     const shadowMapHash = ctx.shadowMapper ? ctx.shadowMapper.shaderHash : '';
-    return `${this._currentLight?.lightType || LightType.NONE}:${ctx.environment?.constructor.name || ''}:${shadowMapHash}`;
+    return `${this._currentLight?.lightType || LIGHT_TYPE_NONE}:${ctx.environment?.constructor.name || ''}:${shadowMapHash}`;
   }
   /** @internal */
   protected setLightUniforms(bindGroup: BindGroup, ctx: DrawContext, light: PunctualLight) {

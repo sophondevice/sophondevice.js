@@ -1,5 +1,5 @@
 // Common test utilities
-import * as chaos from '@sophon/device';
+import * as base from '@sophon/base';
 
 export interface ITestCase {
   caseName: string;
@@ -22,12 +22,12 @@ class Bar {
 class SuperBar extends Bar {
 }
 
-class Visitor2 extends chaos.Visitor {
-  @chaos.visitor(Foo)
+class Visitor2 extends base.Visitor {
+  @base.visitor(Foo)
   visitFoo() {
     return 'Foo';
   }
-  @chaos.visitor(Bar)
+  @base.visitor(Bar)
   visitBar() {
     return 'Bar';
   }
@@ -60,7 +60,7 @@ export function testVisitor() {
 }
 
 export function testMaxHeap() {
-  const maxHeap = new chaos.Heap<number>((a, b) => a < b);
+  const maxHeap = new base.Heap<number>((a, b) => a < b);
   for (let i = 0; i < 100; i++) {
     maxHeap.add(Math.random() * 100);
   }
@@ -73,7 +73,7 @@ export function testMaxHeap() {
 }
 
 export function testMinHeap() {
-  const minHeap = new chaos.Heap<number>((a, b) => a > b);
+  const minHeap = new base.Heap<number>((a, b) => a > b);
   for (let i = 0; i < 100; i++) {
     minHeap.add(Math.random() * 100);
   }

@@ -4,23 +4,26 @@
   "description": "base types for sophon device",
   "homepage": "https://github.com/sophondevice/sophondevice#readme",
   "type": "module",
-  "main": "./dist/sophon.base.umd.js",
-  "module": "./dist/sophon.base.module.js",
+  "main": "./dist/sophon-base.cjs",
+  "umd:main": "./dist/sophon-base.umd.js",
+  "module": "./dist/sophon-base.module.js",
+  "exports": {
+    "types": "./dist/sophon-base.d.ts",
+    "require": "./dist/sophon-base.cjs",
+    "default": "./dist/sophon-base.modern.js"
+  },
   "directories": {
     "lib": "dist"
   },
   "source": "./src/index.ts",
-  "types": "./dist/sophon.base.d.ts",
+  "types": "./dist/sophon-base.d.ts",
   "files": [
     "dist"
   ],
   "scripts": {
-    "build-modern": "microbundle -i src/index.ts --no-generateTypes --no-compress --no-pkg-main --external none -f modern -o dist/sophon.base.modern.js",
-    "build-esm": "microbundle -i src/index.ts --no-generateTypes --no-pkg-main -f esm -o dist/sophon.base.module.js",
-    "build-umd": "microbundle -i src/index.ts --no-generateTypes --no-pkg-main -f umd -o dist/sophon.base.umd.js",
-    "build-cjs": "microbundle -i src/index.ts --no-generateTypes --no-pkg-main -f cjs -o dist/sophon.base.cjs",
-    "build-types": "dts-bundle-generator --project ./tsconfig.json --umd-module-name sophonBase -o ./dist/sophon.base.d.ts ./src/index.ts",
-    "build": "shx rm -rf ./dist && npm run build-modern && npm run build-types",
+    "build:source": "microbundle -i src/index.ts --no-generateTypes --no-compress --external none",
+    "build-types": "dts-bundle-generator --disable-symlinks-following --project ./tsconfig.json --umd-module-name sophonBase -o ./dist/sophon-base.d.ts ./src/index.ts",
+    "build": "shx rm -rf ./dist && npm run build:source && npm run build-types",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

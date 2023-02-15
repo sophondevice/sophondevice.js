@@ -1,11 +1,13 @@
+import * as base from '@sophon/base';
 import * as chaos from '@sophon/device';
+import * as dom from '@sophon/dom';
 import * as common from '../common';
 
 (async function () {
   const viewer = new chaos.Viewer(document.getElementById('canvas') as HTMLCanvasElement);
   await viewer.initDevice(common.getQueryString('dev') as chaos.DeviceType || 'webgl', { msaa: true });
-  const guiRenderer = new chaos.GUIRenderer(viewer.device);
-  const GUI = new chaos.GUI(guiRenderer);
+  const guiRenderer = new dom.GUIRenderer(viewer.device);
+  const GUI = new dom.GUI(guiRenderer);
   await GUI.deserializeFromXML(document.querySelector('#main-ui').innerHTML);
   const sceneView = GUI.document.querySelector('#scene-view');
   const group = GUI.document.querySelector('#button-group');
@@ -42,7 +44,7 @@ import * as common from '../common';
     .setColor(new chaos.Vector4(1, 1, 1, 1))
     .setRotation(chaos.Quaternion.fromAxisAngle(new chaos.Vector3(1, 1, 0).inplaceNormalize(), Math.PI * 2 / 3));
 
-  sceneView.addEventListener('draw', function (this: chaos.RElement, evt: chaos.REvent) {
+  sceneView.addEventListener('draw', function (this: dom.RElement, evt: base.REvent) {
     evt.preventDefault();
     scheme.renderScene(scene, camera);
   });

@@ -1,10 +1,12 @@
+import * as base from '@sophon/base';
 import * as chaos from '@sophon/device';
+import * as dom from '@sophon/dom';
 
 (async function () {
   const viewer = new chaos.Viewer(document.getElementById('canvas') as HTMLCanvasElement);
   await viewer.initDevice('webgpu', { msaa: true });
-  const guiRenderer = new chaos.GUIRenderer(viewer.device);
-  const GUI = new chaos.GUI(guiRenderer);
+  const guiRenderer = new dom.GUIRenderer(viewer.device);
+  const GUI = new dom.GUI(guiRenderer);
   await GUI.deserializeFromXML(document.querySelector('#main-ui').innerHTML);
   const sceneView = GUI.document.querySelector('#scene-view');
   sceneView.customDraw = true;
@@ -96,8 +98,8 @@ import * as chaos from '@sophon/device';
   let blockDim: number;
   const tileDim = 128;
   const batch = [4, 4];
-  const sliderFilterSize = sceneView.querySelector('#filter-size') as chaos.ScrollBar;
-  const sliderIterations = sceneView.querySelector('#iterations') as chaos.ScrollBar;
+  const sliderFilterSize = sceneView.querySelector('#filter-size') as dom.ScrollBar;
+  const sliderIterations = sceneView.querySelector('#iterations') as dom.ScrollBar;
   const settings = {
     filterSize: Number(sliderFilterSize.value),
     iterations: Number(sliderIterations.value),
@@ -109,16 +111,16 @@ import * as chaos from '@sophon/device';
       blockDim: blockDim
     });
   };
-  sliderFilterSize.addEventListener(chaos.RValueChangeEvent.NAME, function () {
+  sliderFilterSize.addEventListener(dom.RValueChangeEvent.NAME, function () {
     settings.filterSize = sliderFilterSize.value;
     updateSettings();
   });
-  sliderIterations.addEventListener(chaos.RValueChangeEvent.NAME, function () {
+  sliderIterations.addEventListener(dom.RValueChangeEvent.NAME, function () {
     settings.iterations = sliderIterations.value;
     updateSettings();
   });
   updateSettings();
-  sceneView.addEventListener('draw', function (this: chaos.RElement, evt: chaos.REvent) {
+  sceneView.addEventListener('draw', function (this: dom.RElement, evt: base.REvent) {
     evt.preventDefault();
     viewer.device.setProgram(blurProgram);
     viewer.device.setBindGroup(0, computeUniforms);

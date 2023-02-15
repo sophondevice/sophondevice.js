@@ -1,12 +1,14 @@
+import * as base from '@sophon/base';
 import * as chaos from '@sophon/device';
+import * as dom from '@sophon/dom';
 import * as common from '../common';
 import { createSeaProgram } from './program';
 
 (async function () {
   const viewer = new chaos.Viewer(document.getElementById('canvas') as HTMLCanvasElement);
   await viewer.initDevice(common.getQueryString('dev') as chaos.DeviceType || 'webgl', { msaa: true });
-  const guiRenderer = new chaos.GUIRenderer(viewer.device);
-  const GUI = new chaos.GUI(guiRenderer);
+  const guiRenderer = new dom.GUIRenderer(viewer.device);
+  const GUI = new dom.GUI(guiRenderer);
   await GUI.deserializeFromXML(document.querySelector('#main-ui').innerHTML);
   const sceneView = GUI.document.querySelector('#scene-view');
   sceneView.customDraw = true;
@@ -23,7 +25,7 @@ import { createSeaProgram } from './program';
   const program = createSeaProgram(viewer.device);
   const bindGroup = viewer.device.createBindGroup(program.bindGroupLayouts[0]);
 
-  sceneView.addEventListener('draw', function (this: chaos.RElement, evt: chaos.REvent) {
+  sceneView.addEventListener('draw', function (this: dom.RElement, evt: base.REvent) {
     evt.preventDefault();
     bindGroup.setValue('uniforms', new chaos.Vector4(viewer.device.frameInfo.elapsedOverall * 0.001, 0, viewer.device.getDrawingBufferWidth(), viewer.device.getDrawingBufferHeight()));
     viewer.device.setProgram(program);

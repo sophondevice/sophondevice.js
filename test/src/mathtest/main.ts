@@ -53,12 +53,6 @@ const testCases: ITestCase[] = [{
   execute: () => testSH()
 }];
 
-class E extends chaos.REvent {
-  constructor() {
-    super('xyz', false, false);
-  }
-}
-
 (async function () {
   await doTest('math test', testCases);
 } ());

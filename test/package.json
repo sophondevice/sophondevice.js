@@ -13,7 +13,7 @@
   },
   "scripts": {
     "build-js": "node build.js",
-    "copy-assets": "shx mkdir -p dist/js && shx cp dist-tmp/*.js dist-tmp/*.js.map dist/js && shx cp dist-tmp/*.html dist && shx cp -R src/assets dist && shx cp src/index.html dist && shx cp ../libs/sophondevice/dist/sophondevice.modern.js ../libs/sophondevice/dist/sophondevice.modern.js.map dist/js",
+    "copy-assets": "shx mkdir -p dist/js && shx cp dist-tmp/*.js dist-tmp/*.js.map dist/js && shx cp dist-tmp/*.html dist && shx cp -R src/assets dist && shx cp src/index.html dist",
     "build": "shx rm -rf dist dist-tmp && npm run build-js && npm run copy-assets && shx rm -rf dist-tmp",
     "dev-test": "web-dev-server --port 8000 --open dist/index.html",
     "lint": "eslint src --ext .ts",
@@ -44,6 +44,7 @@
     "colors": "^1.4.0",
     "diff": "^5.0.0",
     "@sophon/device": "workspace:*",
-    "@sophon/dom": "workspace:*"
+    "@sophon/dom": "workspace:*",
+    "@sophon/base": "workspace:*"
   }
 }

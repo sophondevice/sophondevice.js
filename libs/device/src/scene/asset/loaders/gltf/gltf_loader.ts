@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { TypedArray } from '@sophon/base';
 import {
-  Device,
   GPUDataBuffer,
   TextureFilter,
   TextureWrapping,
@@ -46,10 +45,10 @@ import { Primitive } from '../../../primitive';
 import { StandardMaterial, UnlitMaterial, PBRMetallicRoughnessMaterial, PBRSpecularGlossinessMaterial } from '../../../materiallib';
 import { ComponentType, GLTFAccessor } from './helpers';
 import { Interpolator, InterpolationMode, InterpolationTarget } from '../../../interpolator';
-import { AssetManager } from '../../assetmanager';
 import { AbstractModelLoader } from '../loader';
+import { BUILTIN_ASSET_TEXTURE_SHEEN_LUT } from '../../../values';
+import type { AssetManager } from '../../assetmanager';
 import type { AnimationChannel, AnimationSampler, GlTf, Material, TextureInfo } from './gltf';
-
 
 export interface GLTFContent extends GlTf {
   _manager: AssetManager;
@@ -446,10 +445,10 @@ export class GLTFLoader extends AbstractModelLoader {
     }
     return mesh;
   }
-  private async _createMaterial(device: Device, assetMaterial: AssetMaterial): Promise<StandardMaterial> {
+  private async _createMaterial(assetManager: AssetManager, assetMaterial: AssetMaterial): Promise<StandardMaterial> {
     if (assetMaterial.type === 'unlit') {
       const unlitAssetMaterial = assetMaterial as AssetUnlitMaterial;
-      const unlitMaterial = new UnlitMaterial(device);
+      const unlitMaterial = new UnlitMaterial(assetManager.device);
       unlitMaterial.lightModel.albedo = unlitAssetMaterial.diffuse ?? Vector4.one();
       if (unlitAssetMaterial.diffuseMap) {
         unlitMaterial.lightModel.setAlbedoMap(unlitAssetMaterial.diffuseMap.texture, unlitAssetMaterial.diffuseMap.sampler, unlitAssetMaterial.diffuseMap.texCoord, unlitAssetMaterial.diffuseMap.transform);
@@ -468,7 +467,7 @@ export class GLTFLoader extends AbstractModelLoader {
       return unlitMaterial;
     } else if (assetMaterial.type === 'pbrSpecularGlossiness') {
       const assetPBRMaterial = assetMaterial as AssetPBRMaterialSG;
-      const pbrMaterial = new PBRSpecularGlossinessMaterial(device);
+      const pbrMaterial = new PBRSpecularGlossinessMaterial(assetManager.device);
       pbrMaterial.lightModel.ior = assetPBRMaterial.ior;
       pbrMaterial.lightModel.albedo = assetPBRMaterial.diffuse;
       pbrMaterial.lightModel.specularFactor = new Vector4(assetPBRMaterial.specular.x, assetPBRMaterial.specular.y, assetPBRMaterial.specular.z, 1);
@@ -507,7 +506,7 @@ export class GLTFLoader extends AbstractModelLoader {
       return pbrMaterial;
     } else if (assetMaterial.type === 'pbrMetallicRoughness') {
       const assetPBRMaterial = assetMaterial as AssetPBRMaterialMR;
-      const pbrMaterial = new PBRMetallicRoughnessMaterial(device);
+      const pbrMaterial = new PBRMetallicRoughnessMaterial(assetManager.device);
       pbrMaterial.lightModel.ior = assetPBRMaterial.ior;
       pbrMaterial.lightModel.albedo = assetPBRMaterial.diffuse;
       pbrMaterial.lightModel.metallic = assetPBRMaterial.metallic;
@@ -545,7 +544,7 @@ export class GLTFLoader extends AbstractModelLoader {
         pbrMaterial.lightModel.useSheen = true;
         pbrMaterial.lightModel.sheenColorFactor = sheen.sheenColorFactor;
         pbrMaterial.lightModel.sheenRoughnessFactor = sheen.sheenRoughnessFactor;
-        pbrMaterial.lightModel.setSheenLut(await AssetManager.fetchBuiltinTexture(device, AssetManager.BUILTIN_TEXTURE_SHEEN_LUT));
+        pbrMaterial.lightModel.setSheenLut(await assetManager.fetchBuiltinTexture(BUILTIN_ASSET_TEXTURE_SHEEN_LUT));
         if (sheen.sheenColorMap) {
           pbrMaterial.lightModel.setSheenColorMap(sheen.sheenColorMap.texture, sheen.sheenColorMap.sampler, sheen.sheenColorMap.texCoord, sheen.sheenColorMap.transform);
         }
@@ -701,7 +700,7 @@ export class GLTFLoader extends AbstractModelLoader {
         };
       }
     }
-    return await this._createMaterial(gltf._manager.device, assetMaterial);
+    return await this._createMaterial(gltf._manager, assetMaterial);
   }
   /** @internal */
   private async _loadTexture(gltf: GLTFContent, info: Partial<TextureInfo>, sRGB: boolean): Promise<MaterialTextureInfo> {

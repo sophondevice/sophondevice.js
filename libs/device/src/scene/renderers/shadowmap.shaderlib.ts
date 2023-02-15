@@ -1,6 +1,6 @@
-import { LightType } from "../light";
 import { ShaderLib } from "../materiallib";
 import { TextureFormat, PBInsideFunctionScope, PBShaderExp, isDepthTextureFormat, PBGlobalScope, PBIfScope } from "../../device";
+import { LIGHT_TYPE_DIRECTIONAL, LIGHT_TYPE_POINT, LIGHT_TYPE_SPOT } from "../values";
 
 const PCF_KERNEL_3x3 = [
   [0.5, 1.0, 0.5],
@@ -130,9 +130,9 @@ export function computeShadowMapDepth(scope: PBInsideFunctionScope, targetFormat
         this.$return(pb.vec4(pb.emulateDepthClamp ? pb.clamp(scope.$inputs.clamppedDepth, 0, 1) : scope.$builtins.fragCoord.z, 0, 0, 1));
       } else {
         this.$l.depth = pb.float();
-        this.$if(pb.equal(this.global.light.lightType, LightType.DIRECTIONAL), function () {
+        this.$if(pb.equal(this.global.light.lightType, LIGHT_TYPE_DIRECTIONAL), function () {
           this.depth = pb.emulateDepthClamp ? pb.clamp(this.$inputs.clamppedDepth, 0, 1) : this.$builtins.fragCoord.z;
-        }).$elseif(pb.equal(this.global.light.lightType, LightType.POINT), function () {
+        }).$elseif(pb.equal(this.global.light.lightType, LIGHT_TYPE_POINT), function () {
           this.$l.lightSpacePos = pb.mul(this.global.light.viewMatrix, pb.vec4(this.$query(ShaderLib.USAGE_WORLD_POSITION).xyz, 1));
           this.depth = pb.clamp(pb.div(pb.length(this.lightSpacePos.xyz), this.global.light.positionRange.w), 0, 1);
         }).$else(function () {
@@ -233,14 +233,14 @@ function sampleShadowMapPCF(scope: PBInsideFunctionScope, shadowMapFormat: Textu
     ...(receiverPlaneDepthBias ? [receiverPlaneDepthBias] : []));
 }
 
-function sampleShadowMap(scope: PBInsideFunctionScope, lightType: LightType, shadowMapFormat: TextureFormat, pos: PBShaderExp, depth: PBShaderExp, cascade?: PBShaderExp): PBShaderExp {
+function sampleShadowMap(scope: PBInsideFunctionScope, lightType: number, shadowMapFormat: TextureFormat, pos: PBShaderExp, depth: PBShaderExp, cascade?: PBShaderExp): PBShaderExp {
   const funcNameSampleShadowMap = 'lib_sampleShadowMap';
   const pb = scope.$builder;
   const lib = new ShaderLib(pb);
   const nativeShadowMap = isDepthTextureFormat(shadowMapFormat);
   if (!pb.getFunction(funcNameSampleShadowMap)) {
-    pb.globalScope.$function(funcNameSampleShadowMap, [lightType === LightType.POINT ? pb.vec3('coords') : pb.vec2('coords'), pb.float('z'), ...(cascade ? [pb.int('cascade')] : [])], function () {
-      if (lightType === LightType.POINT) {
+    pb.globalScope.$function(funcNameSampleShadowMap, [lightType === LIGHT_TYPE_POINT ? pb.vec3('coords') : pb.vec2('coords'), pb.float('z'), ...(cascade ? [pb.int('cascade')] : [])], function () {
+      if (lightType === LIGHT_TYPE_POINT) {
         if (nativeShadowMap) {
           this.$return(pb.clamp(pb.textureSampleCompareLevel(this.shadowMap, this.coords, this.z), 0, 1));
         } else {
@@ -290,7 +290,7 @@ function chebyshevUpperBound(scope: PBInsideFunctionScope, distance: PBShaderExp
   return pb.globalScope[funcNameChebyshevUpperBound](distance, occluder);
 }
 
-export function filterShadowVSM(scope: PBInsideFunctionScope, lightType: LightType, shadowMapFormat: TextureFormat, texCoord: PBShaderExp, cascade?: PBShaderExp): PBShaderExp {
+export function filterShadowVSM(scope: PBInsideFunctionScope, lightType: number, shadowMapFormat: TextureFormat, texCoord: PBShaderExp, cascade?: PBShaderExp): PBShaderExp {
   const funcNameFilterShadowVSM = 'lib_filterShadowVSM';
   const pb = scope.$builder;
   const lib = new ShaderLib(pb);
@@ -299,7 +299,7 @@ export function filterShadowVSM(scope: PBInsideFunctionScope, lightType: LightTy
       pb.vec4('texCoord'),
       ...(cascade ? [pb.int('cascade')] : [])
     ], function () {
-      if (lightType === LightType.POINT) {
+      if (lightType === LIGHT_TYPE_POINT) {
         this.$l.shadowTex = pb.textureSampleLevel(this.shadowMap, this.texCoord.xyz, 0);
         this.$return(chebyshevUpperBound(this, this.texCoord.w, shadowMapFormat === TextureFormat.RGBA8UNORM ? lib.decode2HalfFromRGBA(this.shadowTex) : this.shadowTex.rg));
       } else {
@@ -315,7 +315,7 @@ export function filterShadowVSM(scope: PBInsideFunctionScope, lightType: LightTy
   return pb.globalScope[funcNameFilterShadowVSM](texCoord, ...(cascade ? [cascade] : []));
 }
 
-export function filterShadowESM(scope: PBInsideFunctionScope, lightType: LightType, shadowMapFormat: TextureFormat, texCoord: PBShaderExp, cascade?: PBShaderExp): PBShaderExp {
+export function filterShadowESM(scope: PBInsideFunctionScope, lightType: number, shadowMapFormat: TextureFormat, texCoord: PBShaderExp, cascade?: PBShaderExp): PBShaderExp {
   const funcNameFilterShadowESM = 'lib_filterShadowESM';
   const pb = scope.$builder;
   const lib = new ShaderLib(pb);
@@ -324,7 +324,7 @@ export function filterShadowESM(scope: PBInsideFunctionScope, lightType: LightTy
       pb.vec4('texCoord'),
       ...(cascade ? [pb.int('cascade')] : [])
     ], function () {
-      if (lightType === LightType.POINT) {
+      if (lightType === LIGHT_TYPE_POINT) {
         this.$l.depth = pb.div(pb.length(this.shadowVertex.xyz), this.global.light.lightParams[0].w);
         this.$l.shadowTex = pb.textureSampleLevel(this.shadowMap, this.texCoord.xyz, 0);
         if (shadowMapFormat === TextureFormat.RGBA8UNORM) {
@@ -339,7 +339,7 @@ export function filterShadowESM(scope: PBInsideFunctionScope, lightType: LightTy
         if (shadowMapFormat === TextureFormat.RGBA8UNORM) {
           this.shadowTex.x = lib.decodeNormalizedFloatFromRGBA(this.shadowTex);
         }
-        if (lightType === LightType.SPOT) {
+        if (lightType === LIGHT_TYPE_SPOT) {
           this.$l.nearFar = pb.getDeviceType() === 'webgl' ? this.global.light.shadowCameraParams.xy : this.global.light.lightParams[5].xy;
           this.$l.depth = lib.nonLinearDepthToLinearNormalized(this.texCoord.z, this.nearFar);
         } else {
@@ -356,7 +356,7 @@ export function filterShadowESM(scope: PBInsideFunctionScope, lightType: LightTy
   );
 }
 
-export function filterShadowPCF(scope: PBInsideFunctionScope, lightType: LightType, shadowMapFormat: TextureFormat, kernelSize: number, texCoord: PBShaderExp, receiverPlaneDepthBias?: PBShaderExp, cascade?: PBShaderExp): PBShaderExp {
+export function filterShadowPCF(scope: PBInsideFunctionScope, lightType: number, shadowMapFormat: TextureFormat, kernelSize: number, texCoord: PBShaderExp, receiverPlaneDepthBias?: PBShaderExp, cascade?: PBShaderExp): PBShaderExp {
   const funcNameFilterShadowPCF = `lib_filterShadowPCF${kernelSize}x${kernelSize}`;
   const pb = scope.$builder;
   if (!pb.getFunction(funcNameFilterShadowPCF)) {
@@ -442,7 +442,7 @@ export function filterShadowPCF(scope: PBInsideFunctionScope, lightType: LightTy
   return pb.globalScope[funcNameFilterShadowPCF](texCoord, ...(receiverPlaneDepthBias ? [receiverPlaneDepthBias] : []), ...(cascade ? [cascade] : []));
 }
 
-export function filterShadowPoissonDisc(scope: PBInsideFunctionScope, lightType: LightType, shadowMapFormat: TextureFormat, tapCount: number, texCoord: PBShaderExp, receiverPlaneDepthBias?: PBShaderExp, cascade?: PBShaderExp): PBShaderExp {
+export function filterShadowPoissonDisc(scope: PBInsideFunctionScope, lightType: number, shadowMapFormat: TextureFormat, tapCount: number, texCoord: PBShaderExp, receiverPlaneDepthBias?: PBShaderExp, cascade?: PBShaderExp): PBShaderExp {
   const funcNameFilterShadowPoissonDisc = 'lib_filterShadowPoissonDisc';
   const pb = scope.$builder;
   if (!pb.getFunction(funcNameFilterShadowPoissonDisc)) {

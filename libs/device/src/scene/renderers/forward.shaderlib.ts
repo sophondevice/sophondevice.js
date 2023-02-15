@@ -1,10 +1,9 @@
-import { PBInsideFunctionScope, PBShaderExp, ProgramBuilder, TextureFormat, typeTexCube } from "../../device";
-import { LightType } from "../light";
-import { ShaderLib } from "../materiallib";
-import { DEBUG_CASCADED_SHADOW_MAPS, RENDER_PASS_TYPE_FORWARD, RENDER_PASS_TYPE_MULTI_FORWARD } from "../values";
+import { PBInsideFunctionScope, PBShaderExp } from "../../device";
+import { ShaderLib } from "../materiallib/shaderlib";
+import { DEBUG_CASCADED_SHADOW_MAPS, LIGHT_TYPE_DIRECTIONAL, LIGHT_TYPE_POINT, LIGHT_TYPE_SPOT, RENDER_PASS_TYPE_FORWARD, RENDER_PASS_TYPE_MULTI_FORWARD } from "../values";
 import { DrawContext } from "../drawable";
 import { ForwardMultiRenderPass } from "./forward_multi_pass";
-import type { LightModel } from "../materiallib";
+import type { LightModel } from "../materiallib/lightmodel";
 
 export function forwardComputeLighting(scope: PBInsideFunctionScope, lm: LightModel, ctx: DrawContext): PBShaderExp {
   const env = ctx.environment;
@@ -83,24 +82,24 @@ export function forwardComputeLighting(scope: PBInsideFunctionScope, lm: LightMo
   }
   function illumLight(scope: PBInsideFunctionScope, lightType: number | PBShaderExp, lm: LightModel, surfaceData: PBShaderExp, ...args: PBShaderExp[]) {
     if (typeof lightType === 'number') {
-      if (lightType === LightType.DIRECTIONAL) {
+      if (lightType === LIGHT_TYPE_DIRECTIONAL) {
         illumDirectionalLight(lm, surfaceData, ...args);
-      } else if (lightType === LightType.POINT) {
+      } else if (lightType === LIGHT_TYPE_POINT) {
         illumPointLight(lm, surfaceData, ...args);
-      } else if (lightType === LightType.SPOT) {
+      } else if (lightType === LIGHT_TYPE_SPOT) {
         illumSpotLight(lm, surfaceData, ...args);
       }
     } else {
-      scope.$if(pb.equal(lightType, LightType.DIRECTIONAL), function () {
+      scope.$if(pb.equal(lightType, LIGHT_TYPE_DIRECTIONAL), function () {
         illumDirectionalLight(lm, surfaceData, ...args);
-      }).$elseif(pb.equal(lightType, LightType.POINT), function () {
+      }).$elseif(pb.equal(lightType, LIGHT_TYPE_POINT), function () {
         illumPointLight(lm, surfaceData, ...args);
-      }).$elseif(pb.equal(lightType, LightType.SPOT), function () {
+      }).$elseif(pb.equal(lightType, LIGHT_TYPE_SPOT), function () {
         illumSpotLight(lm, surfaceData, ...args);
       });
     }
   }
-  function illumDirectionalShadowLight(lightType: LightType, lm: LightModel, surfaceData: PBShaderExp) {
+  function illumDirectionalShadowLight(lightType: number, lm: LightModel, surfaceData: PBShaderExp) {
     if (!pb.getFunction(funcNameIllumDirectionalShadowLight)) {
       pb.globalScope.$function(funcNameIllumDirectionalShadowLight, [pb.struct(surfaceData.getTypeName(), 'surfaceData')], function () {
         this.$l.positionRange = this.global.light.lightParams[0];
@@ -110,7 +109,7 @@ export function forwardComputeLighting(scope: PBInsideFunctionScope, lm: LightMo
         this.$l.lightDir = pb.vec3();
         this.$l.nl = pb.float();
         this.$l.NdotL = pb.float();
-        if (lightType === LightType.DIRECTIONAL) {
+        if (lightType === LIGHT_TYPE_DIRECTIONAL) {
           this.lightDir = this.directionCutoff.xyz;
           this.nl = pb.dot(this.surfaceData.normal, this.lightDir);
           this.NdotL = pb.clamp(pb.neg(this.nl), 0, 1);
@@ -164,7 +163,7 @@ export function forwardComputeLighting(scope: PBInsideFunctionScope, lm: LightMo
         this.$l.shadow = ctx.shadowMapper.computeShadow(this, this.shadowVertex, this.NdotL);
         this.$if(pb.greaterThan(this.NdotL, 0), function(){
           this.$l.attenuation = pb.min(pb.mul(this.lightcolor, this.NdotL), pb.vec3(this.shadow));
-          illumLight(this, LightType.POINT, lm, this.surfaceData, this.positionRange, this.directionCutoff, this.lightDir, this.attenuation);
+          illumLight(this, LIGHT_TYPE_POINT, lm, this.surfaceData, this.positionRange, this.directionCutoff, this.lightDir, this.attenuation);
         });
       });
     }
@@ -215,7 +214,7 @@ export function forwardComputeLighting(scope: PBInsideFunctionScope, lm: LightMo
           if (DEBUG_CASCADED_SHADOW_MAPS) {
             this.attenuation = pb.mul(this.attenuation, this.shadowDebugColor);
           }
-          illumLight(this, LightType.DIRECTIONAL, lm, this.surfaceData, this.positionRange, this.directionCutoff, this.lightDir, this.attenuation);
+          illumLight(this, LIGHT_TYPE_DIRECTIONAL, lm, this.surfaceData, this.positionRange, this.directionCutoff, this.lightDir, this.attenuation);
         });
       });
     }
@@ -235,7 +234,7 @@ export function forwardComputeLighting(scope: PBInsideFunctionScope, lm: LightMo
           this.$l.lightDir = pb.vec3();
           this.$l.nl = pb.float();
           this.$l.NdotL = pb.float();
-          this.$if(pb.equal(this.lightType, LightType.DIRECTIONAL), function () {
+          this.$if(pb.equal(this.lightType, LIGHT_TYPE_DIRECTIONAL), function () {
             this.lightDir = this.directionCutoff.xyz;
             this.nl = pb.dot(this.surfaceData.normal, this.lightDir);
             this.NdotL = pb.clamp(pb.neg(this.nl), 0, 1);
@@ -352,10 +351,10 @@ export function forwardComputeLightingMultiPass(scope: PBInsideFunctionScope, lm
     }
     pb.globalScope[funcNameIllumSpotLight](surfaceData, ...args);
   }
-  function illumLight(scope: PBInsideFunctionScope, lightType: LightType, lm: LightModel, surfaceData: PBShaderExp, ...args: PBShaderExp[]) {
-    if (lightType === LightType.DIRECTIONAL) {
+  function illumLight(scope: PBInsideFunctionScope, lightType: number, lm: LightModel, surfaceData: PBShaderExp, ...args: PBShaderExp[]) {
+    if (lightType === LIGHT_TYPE_DIRECTIONAL) {
       illumDirectionalLight(lm, surfaceData, ...args);
-    } else if (lightType === LightType.POINT) {
+    } else if (lightType === LIGHT_TYPE_POINT) {
       illumPointLight(lm, surfaceData, ...args);
     } else {
       illumSpotLight(lm, surfaceData, ...args);
@@ -372,7 +371,7 @@ export function forwardComputeLightingMultiPass(scope: PBInsideFunctionScope, lm
         this.$l.lightDir = pb.vec3();
         this.$l.nl = pb.float();
         this.$l.NdotL = pb.float();
-        if (lightType === LightType.DIRECTIONAL) {
+        if (lightType === LIGHT_TYPE_DIRECTIONAL) {
           this.lightDir = this.directionCutoff.xyz;
           this.nl = pb.dot(this.surfaceData.normal, this.lightDir);
           this.NdotL = pb.clamp(pb.neg(this.nl), 0, 1);

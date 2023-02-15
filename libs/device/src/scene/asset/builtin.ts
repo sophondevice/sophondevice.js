@@ -1,5 +1,6 @@
 import { Device, Texture2D, TextureFormat, GPUResourceUsageFlags, BaseTexture } from "../../device";
 import { Vector2, Vector3, Vector4, Matrix3x3 } from "../../math";
+import { BUILTIN_ASSET_TEXTURE_SHEEN_LUT } from "../values";
 
 const data = [
   0x28ff, 0x3ba9, 0x4891, 0x2f2b, 0x3b1a, 0x434a, 0x31c9, 0x3a8e, 0x3e0f, 0x33d9, 0x3a0a, 0x38f7,
@@ -1035,7 +1036,6 @@ interface MicrofacetDistributionSample {
   phi?: number;
 }
 
-export const sheenLUTTextureName = 'LUT_Sheen';
 export function getSheenLutLoader(textureSize: number): (device: Device) => Promise<Texture2D> {
   const xi = new Vector2();
   const localSpaceDirection = new Vector3();
@@ -1201,7 +1201,7 @@ export function getSheenLutLoader(textureSize: number): (device: Device) => Prom
       }
     }
     tex.update(image, 0, 0, textureSize, textureSize);
-    tex.name = `builtin:${sheenLUTTextureName}`;
+    tex.name = `builtin:${BUILTIN_ASSET_TEXTURE_SHEEN_LUT}`;
     return tex;
   }
 
@@ -1402,7 +1402,7 @@ export function getSheenLutLoader(textureSize: number): (device: Device) => Prom
       image[i * 4 + 3] = one;
     }
     tex.update(image, 0, 0, textureSize, textureSize);
-    tex.name = `builtin:${sheenLUTTextureName}`;
+    tex.name = `builtin:${BUILTIN_ASSET_TEXTURE_SHEEN_LUT}`;
     return tex;
   }
 
@@ -1436,7 +1436,7 @@ export function getSheenLutLoader(textureSize: number): (device: Device) => Prom
       }
     }
     tex.update(image, 0, 0, textureSize, textureSize);
-    tex.name = `builtin:${sheenLUTTextureName}`;
+    tex.name = `builtin:${BUILTIN_ASSET_TEXTURE_SHEEN_LUT}`;
     return tex;
   }
 

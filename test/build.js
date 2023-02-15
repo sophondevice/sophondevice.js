@@ -32,7 +32,7 @@ fs.mkdirSync(path.join(__dirname, 'dist-tmp'), {
 });
 
 for (const file of srcfiles) {
-  const cmd = `microbundle -i "${file[0]}" --no-pkg-main -f modern --target web -o "${file[1]}" --external @sophon/device,@sophon/dom --no-compress`;
+  const cmd = `microbundle build -i "${file[0]}" -f modern --no-pkg-main ---target web -o "${file[1]}" --external none --no-compress`;
   console.log(`exec: ${cmd}`);
   child_process.execSync(cmd);
   fs.copyFileSync(file[2], file[3]);

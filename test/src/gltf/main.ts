@@ -1,4 +1,6 @@
+import * as base from '@sophon/base';
 import * as chaos from '@sophon/device';
+import * as dom from '@sophon/dom';
 import * as common from '../common';
 import { GLTFViewer } from './gltfviewer';
 
@@ -6,8 +8,8 @@ import { GLTFViewer } from './gltfviewer';
   const canvas = document.getElementById('canvas') as HTMLCanvasElement;
   const viewer = new chaos.Viewer(canvas);
   await viewer.initDevice(common.getQueryString('dev') as chaos.DeviceType || 'webgl', { msaa: true });
-  const guiRenderer = new chaos.GUIRenderer(viewer.device);
-  const GUI = new chaos.GUI(guiRenderer);
+  const guiRenderer = new dom.GUIRenderer(viewer.device);
+  const GUI = new dom.GUI(guiRenderer);
   await GUI.deserializeFromXML(document.querySelector('#main-ui').innerHTML);
   const sceneView = GUI.document.querySelector('#scene-view');
   sceneView.customDraw = true;
@@ -38,12 +40,12 @@ import { GLTFViewer } from './gltfviewer';
     width: '200px'
   });
   */
-  sceneView.addEventListener('layout', function (this: chaos.RElement) {
+  sceneView.addEventListener('layout', function (this: dom.RElement) {
     const rect = this.getClientRect();
     gltfViewer.aspect = rect.width / rect.height;
   });
 
-  sceneView.addEventListener('draw', function (this: chaos.RElement, evt: chaos.REvent) {
+  sceneView.addEventListener('draw', function (this: dom.RElement, evt: base.REvent) {
     evt.preventDefault();
     gltfViewer.render();
   });

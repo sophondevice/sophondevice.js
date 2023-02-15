@@ -1,6 +1,6 @@
 import { ShadowImpl } from "./shadow_impl";
-import { TextureFormat, PBInsideFunctionScope, PBShaderExp, TextureSampler, TextureFilter } from "../../device";
-import { ShaderLib } from "../materiallib";
+import { TextureFormat, PBInsideFunctionScope, PBShaderExp, TextureSampler } from "../../device";
+import { ShaderLib } from "../materiallib/shaderlib";
 import type { ShadowMapper, ShadowMapType, ShadowMode } from "./shadowmapper";
 
 export class SSM extends ShadowImpl {

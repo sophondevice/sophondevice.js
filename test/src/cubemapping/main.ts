@@ -1,4 +1,6 @@
+import * as base from '@sophon/base';
 import * as chaos from '@sophon/device';
+import * as dom from '@sophon/dom';
 import * as common from '../common';
 
 class MyRenderScheme extends chaos.ForwardRenderScheme {
@@ -71,8 +73,8 @@ class ReflectLightModel extends chaos.UnlitLightModel {
 (async function () {
   const viewer = new chaos.Viewer(document.getElementById('canvas') as HTMLCanvasElement);
   await viewer.initDevice(common.getQueryString('dev') as chaos.DeviceType || 'webgl', { msaa: true });
-  const guiRenderer = new chaos.GUIRenderer(viewer.device);
-  const GUI = new chaos.GUI(guiRenderer);
+  const guiRenderer = new dom.GUIRenderer(viewer.device);
+  const GUI = new dom.GUI(guiRenderer);
 
   await GUI.deserializeFromXML(document.querySelector('#main-ui').innerHTML);
   const sceneView = GUI.document.querySelector('#scene-view');
@@ -117,13 +119,13 @@ class ReflectLightModel extends chaos.UnlitLightModel {
   sphere4.material = stdMat;
   sphere4.scaling = new chaos.Vector3(3, 3, 3);
 
-  sceneView.addEventListener('layout', function (this: chaos.RElement) {
+  sceneView.addEventListener('layout', function (this: dom.RElement) {
     const rect = this.getClientRect();
     camera.setProjectionMatrix(chaos.Matrix4x4.perspective(camera.getFOV(), rect.width / rect.height, camera.getNearPlane(), camera.getFarPlane()));
   });
 
-  sceneView.addEventListener('keyup', function (evt: chaos.REvent) {
-    const keyEvent = evt as chaos.RKeyEvent;
+  sceneView.addEventListener('keyup', function (evt: base.REvent) {
+    const keyEvent = evt as dom.RKeyEvent;
     console.log(keyEvent.code, keyEvent.key);
     if (keyEvent.code === 'Space') {
       if (sphere2.attached) {
@@ -139,7 +141,7 @@ class ReflectLightModel extends chaos.UnlitLightModel {
     }
   });
 
-  sceneView.addEventListener('draw', function (this: chaos.RElement, evt: chaos.REvent) {
+  sceneView.addEventListener('draw', function (this: dom.RElement, evt: base.REvent) {
     evt.preventDefault();
     const elapsed = viewer.device.frameInfo.elapsedOverall;
     sphere2.position.set(20 * Math.sin(elapsed * 0.003), 0, 20 * Math.cos(elapsed * 0.003));
