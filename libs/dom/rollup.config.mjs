@@ -16,7 +16,7 @@ function getTargetES6() {
       banner: '/** sophon dom library */',
       file: "dist/sophon-dom.module.js",
       preserveModules: false,
-      format: 'es',
+      format: 'esm',
       sourcemap: true,
     },
     plugins: [
