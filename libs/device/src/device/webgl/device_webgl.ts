@@ -1,4 +1,3 @@
-import { TypedArray } from '@sophon/base';
 import { Vector4 } from '../../math';
 import { TextureFormat, WebGLContext, PrimitiveType, hasAlphaChannel, hasRedChannel, hasGreenChannel, hasBlueChannel, isIntegerTextureFormat, isSignedTextureFormat, isFloatTextureFormat, getTextureFormatBlockSize, isCompressedTextureFormat, isDepthTextureFormat } from '../base_types';
 import { isWebGL2, WebGLError } from './utils';
@@ -46,6 +45,7 @@ import { WebGLStructuredBuffer } from './structuredbuffer_webgl';
 import { PBStructTypeInfo, typeU16 } from '../builder';
 import type { ITimer } from '../timer';
 import type { VertexData } from '../vertexdata';
+import type { TypedArray } from '../../misc';
 
 declare global {
   interface WebGLRenderingContext {
@@ -278,11 +278,6 @@ export class WebGLDevice extends Device {
     tex.loadFromElement(element, creationFlags);
     return tex;
   }
-  async loadTexture2DFromURL(url: string, mimeType?: string, creationFlags?: number): Promise<Texture2D> {
-    const tex = new WebGLTexture2D(this);
-    await tex.loadFromURL(url, mimeType, creationFlags);
-    return tex;
-  }
   createTexture2DArray(format: TextureFormat, width: number, height: number, depth: number, creationFlags?: number): Texture2DArray {
     const tex = new WebGLTexture2DArray(this);
     tex.createEmpty(format, width, height, depth, creationFlags);
@@ -305,11 +300,6 @@ export class WebGLDevice extends Device {
   createCubeTextureFromMipmapData(data: TextureMipmapData, creationFlags?: number): TextureCube {
     const tex = new WebGLTextureCube(this);
     tex.createWithMipmapData(data, creationFlags);
-    return tex;
-  }
-  async loadCubeTextureFromURL(url: string, mimeType?: string, creationFlags?: number): Promise<TextureCube> {
-    const tex = new WebGLTextureCube(this);
-    await tex.loadFromURL(url, mimeType, creationFlags);
     return tex;
   }
   createTextureVideo(el: HTMLVideoElement): TextureVideo {

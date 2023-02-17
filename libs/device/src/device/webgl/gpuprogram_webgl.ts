@@ -1,15 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { TypedArrayConstructor } from '@sophon/base';
 import { WebGLGPUObject } from './gpuobject_webgl';
 import { isWebGL2 } from './utils';
 import { WebGLEnum } from './webgl_enum';
 import { ShaderType } from '../base_types';
 import { GPUProgram, semanticList, BindGroupLayout, BindPointInfo } from '../gpuobject';
+import { WebGLTextureSampler } from './sampler_webgl';
 import type { WebGLBaseTexture } from './basetexture_webgl';
 import type { WebGLGPUBuffer } from './buffer_webgl';
 import type { WebGLDevice } from './device_webgl';
 import type { WebGLStructuredBuffer } from './structuredbuffer_webgl';
-import { WebGLTextureSampler } from './sampler_webgl';
+import type { TypedArrayConstructor } from '../../misc';
 
 type UniformBlockArray = Int32Array | Uint32Array | Float32Array;
 export interface IAttributeSetter {

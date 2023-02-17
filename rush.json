@@ -424,10 +424,6 @@
     //   "tags": [ "tools" ]
     // }
     {
-      "packageName": "@sophon/base",
-      "projectFolder": "libs/base"
-    },
-    {
       "packageName": "@sophon/device",
       "projectFolder": "libs/device"
     },

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { REventTarget, REvent, REventListener, REventHandlerOptions, assert, Font } from '@sophon/base';
+import { REventTarget, REvent, REventListener, REventHandlerOptions } from '../../base';
 import { RCoord, RColor, GUIEventPathBuilder } from './types';
 import { RRectPrimitive, RPolygonPrimitive, RPrimitiveBatchList } from './primitive';
 import { RNodeList, RLiveNodeList } from './nodelist';
@@ -7,6 +7,7 @@ import { UIRect, UILayout } from './layout';
 import { unescapeCSSString, ElementStyle, IStyleSheet } from './style';
 import { RValueChangeEvent, RElementLayoutEvent, RDOMTreeEvent, RElementDrawEvent, RElementBuildContentEvent, RTextContentChangeEvent, RMouseEvent } from './events';
 import { NodeType } from './values';
+import { Font } from './font';
 import type { RText } from './components/text';
 import type { RElement } from './element';
 import type { RDocument } from './document';
@@ -359,7 +360,7 @@ export class RNode extends REventTarget {
     if (this._parent) {
       parent = this._parent;
       const index = this._parent._childNodes.indexOf(this);
-      assert(index >= 0, 'remove: node is not child', true);
+      console.assert(index >= 0, 'remove: node is not child');
       const focus = this._uiscene.getFocus();
       if (focus && focus._isSucceedingOf(this)) {
         this._uiscene.setFocus(null);
@@ -380,8 +381,8 @@ export class RNode extends REventTarget {
   }
   /** @internal */
   protected _before(...nodes: (RNode | string)[]): void {
-    assert(!!this.parentNode, 'Failed to execute before: parent element must not be null', true);
-    assert(nodes.indexOf(this) < 0, 'Failed to execute before: cannot insert self node', true);
+    console.assert(!!this.parentNode, 'Failed to execute before: parent element must not be null');
+    console.assert(nodes.indexOf(this) < 0, 'Failed to execute before: cannot insert self node');
     let first: RNode = this;
     for (let i = nodes.length - 1; i >= 0; i--) {
       const node = nodes[i];
@@ -402,8 +403,8 @@ export class RNode extends REventTarget {
   }
   /** @internal */
   protected _after(...nodes: (RNode | string)[]): void {
-    assert(!!this.parentNode, 'Failed to execute after: parent element must not be null', true);
-    assert(nodes.indexOf(this) < 0, 'Failed to execute after: cannot insert self node', true);
+    console.assert(!!this.parentNode, 'Failed to execute after: parent element must not be null');
+    console.assert(nodes.indexOf(this) < 0, 'Failed to execute after: cannot insert self node');
     const next: RNode = this.nextSibling;
     if (next) {
       next._before(...nodes);
@@ -448,48 +449,38 @@ export class RNode extends REventTarget {
     return root;
   }
   appendChild(child: RNode): RNode {
-    assert(!!child, `Failed to appendChild: element to be append is ${child}`, true);
-    assert(
+    console.assert(!!child, `Failed to appendChild: element to be append is ${child}`);
+    console.assert(
       !this._isSucceedingOf(child),
-      `Failed to appendChild: cannot append parent element`,
-      true,
-    );
+      `Failed to appendChild: cannot append parent element`);
     const ref = this.lastChild?._layout.nextSibling()?.element;
     child._reparent(this, ref);
     return child;
   }
   insertBefore(newElement: RNode, referenceElement: RNode) {
-    assert(
+    console.assert(
       referenceElement && this === referenceElement.parentNode,
-      'Failed to insertBefore: reference element is not a valid elememnt or is not a child of this node',
-      true,
-    );
-    assert(!!newElement, `Failed to insertBefore: element to be insert is ${newElement}`, true);
-    assert(
+      'Failed to insertBefore: reference element is not a valid elememnt or is not a child of this node');
+    console.assert(!!newElement, `Failed to insertBefore: element to be insert is ${newElement}`);
+    console.assert(
       !this._isSucceedingOf(newElement),
-      `Failed to insertBefore: cannot insert parent element`,
-      true,
-    );
+      `Failed to insertBefore: cannot insert parent element`);
     newElement._reparent(this, referenceElement);
     return newElement;
   }
   removeChild(child: RNode) {
-    assert(!!child, `Failed to removeChild: element to be remove is ${child}`, true);
-    assert(
+    console.assert(!!child, `Failed to removeChild: element to be remove is ${child}`);
+    console.assert(
       this === child.parentNode,
-      'Failed to removeChild: element to be remove is not a child of this node',
-      true,
-    );
+      'Failed to removeChild: element to be remove is not a child of this node');
     return child._remove();
   }
   replaceChild(newChild: RNode, oldChild: RNode) {
-    assert(!!newChild, `Failed to replaceChild: element to be insert is ${newChild}`, true);
-    assert(!!oldChild, `Failed to replaceChild: element to be replaced is ${oldChild}`, true);
-    assert(
+    console.assert(!!newChild, `Failed to replaceChild: element to be insert is ${newChild}`);
+    console.assert(!!oldChild, `Failed to replaceChild: element to be replaced is ${oldChild}`);
+    console.assert(
       this === oldChild.parentNode,
-      'Failed to replaceChild: element to be replaced is not a child of this node',
-      true,
-    );
+      'Failed to replaceChild: element to be replaced is not a child of this node');
     if (newChild !== oldChild) {
       const next = oldChild.nextSibling;
       this.removeChild(oldChild);

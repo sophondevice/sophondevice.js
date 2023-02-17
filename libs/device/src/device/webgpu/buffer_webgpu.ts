@@ -1,8 +1,8 @@
-import { TypedArray, TypedArrayConstructor } from '@sophon/base';
 import { WebGPUObject } from './gpuobject_webgpu';
 import { UploadRingBuffer, UploadBuffer } from './uploadringbuffer';
 import { GPUResourceUsageFlags, GPUDataBuffer } from '../gpuobject';
 import type { WebGPUDevice } from './device';
+import type { TypedArray, TypedArrayConstructor } from '../../misc';
 
 export class WebGPUBuffer extends WebGPUObject<GPUBuffer> implements GPUDataBuffer<GPUBuffer> {
   private _size: number;

@@ -44,7 +44,6 @@
     "colors": "^1.4.0",
     "diff": "^5.0.0",
     "@sophon/device": "workspace:*",
-    "@sophon/dom": "workspace:*",
-    "@sophon/base": "workspace:*"
+    "@sophon/dom": "workspace:*"
   }
 }

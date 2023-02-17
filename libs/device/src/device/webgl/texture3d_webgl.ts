@@ -1,10 +1,10 @@
-import { TypedArray } from '@sophon/base';
 import { TextureTarget, TextureFormat, linearTextureFormatToSRGB } from '../base_types';
 import { textureTargetMap } from './constants_webgl';
 import { WebGLBaseTexture } from './basetexture_webgl';
 import { GPUResourceUsageFlags, Texture3D, GPUDataBuffer } from '../gpuobject';
 import type { WebGLDevice } from './device_webgl';
 import type { WebGLTextureCap } from './capabilities_webgl';
+import type { TypedArray } from '../../misc';
 
 export class WebGLTexture3D extends WebGLBaseTexture implements Texture3D<WebGLTexture> {
   constructor(device: WebGLDevice) {

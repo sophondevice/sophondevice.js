@@ -1,4 +1,3 @@
-import * as base from '@sophon/base';
 import * as chaos from '@sophon/device';
 import * as dom from '@sophon/dom';
 import * as common from '../common';
@@ -46,7 +45,7 @@ import { loadEarthSculptorMap } from './earthscuptor';
       camera.lookAt(eyePos, destPos, chaos.Vector3.axisPY());
       let timer: number = null;
       let rot = 0;
-      sceneView.addEventListener('keydown', function (evt: base.REvent) {
+      sceneView.addEventListener('keydown', function (evt: chaos.REvent) {
         const keyEvent = evt as dom.RKeyEvent;
         if (keyEvent.code === 'Space') {
           terrain.wireframe = !terrain.wireframe;
@@ -77,7 +76,7 @@ import { loadEarthSculptorMap } from './earthscuptor';
     camera.setProjectionMatrix(chaos.Matrix4x4.perspective(camera.getFOV(), rect.width / rect.height, camera.getNearPlane(), camera.getFarPlane()));
   });
 
-  sceneView.addEventListener('draw', function (this: dom.RElement, evt: base.REvent) {
+  sceneView.addEventListener('draw', function (this: dom.RElement, evt: chaos.REvent) {
     evt.preventDefault();
     scheme.renderScene(scene, camera);
   });

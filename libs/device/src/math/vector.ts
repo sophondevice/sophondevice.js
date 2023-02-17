@@ -2,7 +2,38 @@
  *  Math type definitions
  */
 
-import { IterableWrapper, formatNumber, numberEquals, numberClamp } from '@sophon/base';
+import { formatNumber, numberEquals, numberClamp } from './misc';
+
+export class IterableWrapper implements Iterable<number> {
+  protected _v: Float32Array;
+  [Symbol.iterator](): Iterator<number> {
+    return this._v[Symbol.iterator]();
+  }
+  constructor(nOrArray: number | Float32Array) {
+    if (typeof nOrArray === 'number') {
+      this._v = new Float32Array(nOrArray);
+    } else {
+      this._v = nOrArray;
+    }
+  }
+  get size() {
+    return this._v.length;
+  }
+  assign(other: ArrayLike<number>) {
+    this._v.set((other as any)._v || other);
+    return this;
+  }
+  getArray(): Float32Array {
+    return this._v;
+  }
+  setArray(arr: Float32Array): this {
+    if (!arr || arr.length !== this._v.length) {
+      throw new Error(`IterableWrapper.setArray() failed: invalid array or array length: ${arr?.length}`);
+    }
+    this._v = arr;
+    return this;
+  }
+}
 
 export enum CubeFace {
   PX = 0,

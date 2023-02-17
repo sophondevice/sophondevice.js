@@ -1,11 +1,30 @@
-import {Constructor, superClassOf} from './utils';
-
 type VisitFuncMap = Map<Constructor<object>, (t: unknown) => unknown>;
+
+export interface GenConstructor<T> {
+  new (...args: any[]): T;
+}
+
+export type Constructor<T = any> = T extends Int8Array ? Int8ArrayConstructor
+  : T extends Uint8Array ? Uint8ArrayConstructor
+  : T extends Uint8ClampedArray ? Uint8ClampedArrayConstructor
+  : T extends Int16Array ? Int16ArrayConstructor
+  : T extends Uint16Array ? Uint16ArrayConstructor
+  : T extends Int32Array ? Int32ArrayConstructor
+  : T extends Uint32Array ? Uint32ArrayConstructor
+  : T extends BigInt64Array ? BigInt64ArrayConstructor
+  : T extends BigUint64Array ? BigUint64ArrayConstructor
+  : T extends Float32Array ? Float32ArrayConstructor
+  : T extends Float64Array ? Float64ArrayConstructor
+  : GenConstructor<T>;
 
 export function visitor(ctor: Constructor) {
   return function (target: Visitor, propertyKey: string) {
     Visitor.setVisitFunc(target.constructor as Constructor<Visitor>, ctor, target[propertyKey]);
   };
+}
+
+export function superClassOf(cls: Constructor) {
+  return Object.getPrototypeOf(cls.prototype).constructor;
 }
 
 export class Visitor {

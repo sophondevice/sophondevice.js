@@ -1,6 +1,5 @@
-import { nextPowerOf2 } from "@sophon/base";
+import { Matrix4x4, Vector3, nextPowerOf2 } from "../math";
 import { Device, GPUResourceUsageFlags, Texture2D, TextureFormat } from "../device";
-import { Matrix4x4, Vector3 } from "../math";
 import { SkinnedBoundingBox } from "./animation";
 import type { SceneNode } from "./scene_node";
 

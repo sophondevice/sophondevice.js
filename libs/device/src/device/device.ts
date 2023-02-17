@@ -1,7 +1,8 @@
-import { REventTarget, REvent, TypedArray } from '@sophon/base';
+import { REventTarget, REvent } from '../../../base';
 import { Vector4 } from '../math';
 import { PrimitiveType, TextureFormat } from './base_types';
 import { CPUTimer, ITimer } from './timer';
+import type { TypedArray } from '../misc';
 import type { RenderStateSet } from './render_states';
 import type { VertexData } from './vertexdata';
 import type {
@@ -274,12 +275,10 @@ export abstract class Device extends REventTarget {
   abstract createTexture2D(format: TextureFormat, width: number, height: number, creationFlags?: number): Texture2D;
   abstract createTexture2DFromMipmapData(data: TextureMipmapData, creationFlags?: number): Texture2D;
   abstract createTexture2DFromImage(element: TextureImageElement, creationFlags?: number): Texture2D;
-  abstract loadTexture2DFromURL(url: string, mimeType?: string, creationFlags?: number): Promise<Texture2D>;
   abstract createTexture2DArray(format: TextureFormat, width: number, height: number, depth: number, creationFlags?: number): Texture2DArray;
   abstract createTexture3D(format: TextureFormat, width: number, height: number, depth: number, creationFlags?: number): Texture3D;
   abstract createCubeTexture(format: TextureFormat, size: number, creationFlags?: number): TextureCube;
   abstract createCubeTextureFromMipmapData(data: TextureMipmapData, creationFlags?: number): TextureCube;
-  abstract loadCubeTextureFromURL(url: string, mimeType?: string, creationFlags?: number): Promise<TextureCube>;
   abstract createTextureVideo(el: HTMLVideoElement): TextureVideo;
   abstract reverseVertexWindingOrder(reverse: boolean): void;
   abstract isWindingOrderReversed(): boolean;

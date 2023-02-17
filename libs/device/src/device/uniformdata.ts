@@ -1,6 +1,6 @@
-import { TypedArray, TypedArrayConstructor } from '@sophon/base';
 import { PBPrimitiveType } from './builder/types';
 import type { StructuredValue, UniformBufferLayout, StructuredBuffer } from './gpuobject';
+import type { TypedArray, TypedArrayConstructor } from '../misc';
 
 
 export class StructuredBufferData {

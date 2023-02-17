@@ -1,5 +1,4 @@
 import * as chaos from '@sophon/device';
-import * as base from '@sophon/base';
 import * as dom from '@sophon/dom';
 
 export function getQueryString(name: string) {
@@ -640,7 +639,7 @@ export function initTextureViewPanel(device: chaos.Device, el: dom.RElement, wid
     const texture = device.getGPUObjectById(Number(textureSelect.value));
     (textureViewer as any).viewer.texture = texture;
   });
-  function onDeviceAddGPUObject(this: chaos.Device, e: base.REvent) {
+  function onDeviceAddGPUObject(this: chaos.Device, e: chaos.REvent) {
     const evt = e as chaos.DeviceGPUObjectAddedEvent;
     if (evt.object.isTexture2D()) {
       const option = textureSelect.ownerDocument.createElement<dom.Option>('option');
@@ -649,7 +648,7 @@ export function initTextureViewPanel(device: chaos.Device, el: dom.RElement, wid
       textureSelect.prepend(option);
     }
   }
-  function onDeviceRemoveGPUObject(this: chaos.Device, e: base.REvent) {
+  function onDeviceRemoveGPUObject(this: chaos.Device, e: chaos.REvent) {
     const evt = e as chaos.DeviceGPUObjectRemovedEvent;
     if (evt.object.isTexture2D()) {
       const options = textureSelect.querySelectorAll('option');
@@ -662,7 +661,7 @@ export function initTextureViewPanel(device: chaos.Device, el: dom.RElement, wid
       }
     }
   }
-  function onRenameGPUObject(this: chaos.Device, e: base.REvent) {
+  function onRenameGPUObject(this: chaos.Device, e: chaos.REvent) {
     const evt = e as chaos.DeviceGPUObjectRenameEvent;
     if (evt.object.isTexture2D()) {
       const options = textureSelect.querySelectorAll('option');
@@ -704,7 +703,7 @@ export class TextureView {
     this._mode = 0;
     this.init();
     const that = this;
-    this._el.addEventListener('draw', function (this: dom.RElement, evt: base.REvent) {
+    this._el.addEventListener('draw', function (this: dom.RElement, evt: chaos.REvent) {
       evt.preventDefault();
       that._device.setBindGroup(0, null);
       that._device.setBindGroup(1, null);

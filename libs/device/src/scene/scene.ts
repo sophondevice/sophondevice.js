@@ -1,4 +1,4 @@
-import { REventTarget, REvent } from '@sophon/base';
+import { REventTarget, REvent } from '../../../base';
 import { Vector3, Vector4, Matrix4x4, Ray, AABB, XFormChangeEvent } from '../math';
 import { Device, TextureCube } from '../device';
 import { SkyboxMaterial } from './materiallib';

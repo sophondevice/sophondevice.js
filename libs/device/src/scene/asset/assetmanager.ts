@@ -1,4 +1,4 @@
-import { isPowerOf2, nextPowerOf2 } from '@sophon/base';
+import { isPowerOf2, nextPowerOf2, Vector3 } from '../../math';
 import { Device, BaseTexture, TextureFilter, TextureWrapping, GPUResourceUsageFlags, TextureFormat, Texture2D, GPUObject } from '../../device'
 import { AssetHierarchyNode, AssetSkeleton, AssetSubMeshData, SharedModel } from './model';
 import { GLTFLoader } from './loaders/gltf';
@@ -9,7 +9,6 @@ import { Mesh } from '../mesh';
 import { Model } from '../model';
 import { Skeleton } from '../skeleton';
 import { SkinnedBoundingBox } from '../animation';
-import { Vector3 } from '../../math';
 import { BoundingBox } from '../bounding_volume';
 import { GammaBlitter } from '../blitter';
 import { getSheenLutLoader } from './builtin';
@@ -65,6 +64,8 @@ export class AssetManager {
   private _textDatas: {
     [url: string]: Promise<string>
   };
+  /** @internal */
+  private static _tempElement: HTMLAnchorElement = null;
   constructor(device: Device) {
     this._device = device;
     this._urlResolver = null;
@@ -88,12 +89,19 @@ export class AssetManager {
     return this._device;
   }
   async request(url: string, headers: Record<string, string> = {}, crossOrigin = 'anonymous'): Promise<Response> {
-    url = this._urlResolver ? this._urlResolver(url) : url;
+    url = this._urlResolver ? this._urlResolver(url) : this.resolveURL(url);
     return url ? fetch(url, {
       credentials: crossOrigin === 'anonymous' ? 'same-origin' : 'include',
       headers: headers
     }) : null;
   }
+  resolveURL(url: string): string {
+    if (!AssetManager._tempElement) {
+      AssetManager._tempElement = document.createElement('a');
+    }
+    AssetManager._tempElement.href = url;
+    return AssetManager._tempElement.href;
+  }  
   clearCache() {
     this._textures = {};
     this._textures_nomipmap = {};

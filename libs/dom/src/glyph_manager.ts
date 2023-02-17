@@ -1,8 +1,8 @@
-import { Font, FontCanvas } from '@sophon/base';
-import { Texture2D } from '@sophon/device';
+import { Font, FontCanvas } from './font';
 import { GUIRenderer } from './renderer';
 import { RColor } from './types';
 import { AtlasManager } from './atlas_manager';
+import type { Texture2D } from '@sophon/device';
 
 export interface IGlyphInfo {
   atlasIndex: number;

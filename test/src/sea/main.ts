@@ -1,4 +1,3 @@
-import * as base from '@sophon/base';
 import * as chaos from '@sophon/device';
 import * as dom from '@sophon/dom';
 import * as common from '../common';
@@ -25,7 +24,7 @@ import { createSeaProgram } from './program';
   const program = createSeaProgram(viewer.device);
   const bindGroup = viewer.device.createBindGroup(program.bindGroupLayouts[0]);
 
-  sceneView.addEventListener('draw', function (this: dom.RElement, evt: base.REvent) {
+  sceneView.addEventListener('draw', function (this: dom.RElement, evt: chaos.REvent) {
     evt.preventDefault();
     bindGroup.setValue('uniforms', new chaos.Vector4(viewer.device.frameInfo.elapsedOverall * 0.001, 0, viewer.device.getDrawingBufferWidth(), viewer.device.getDrawingBufferHeight()));
     viewer.device.setProgram(program);

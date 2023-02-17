@@ -1,4 +1,4 @@
-import { REventTarget } from '@sophon/base';
+import { REventTarget } from '../../base';
 import { 
   VERTEX_ATTRIB_POSITION,
   BindGroup,
@@ -12,15 +12,13 @@ import {
   GPUResourceUsageFlags,
   PrimitiveType,
   TextureFormat,
-  encodePixelToArray,
-  formatToTypedArray,
   makeVertexBufferType,
   TextureSampler,
   TextureFilter,
   Primitive,
   Matrix4x4,
   Vector3,
-  Vector4
+  Vector4,
 } from '@sophon/device';
 import { RMouseEvent, RDragEvent, RKeyEvent } from './events';
 import type { RColor } from './types';
@@ -154,18 +152,8 @@ export class GUIRenderer extends REventTarget {
   }
   updateTextureWithImage(texture: Texture2D, bitmap: ImageData, x: number, y: number): void {
     const originValues = new Uint8Array(bitmap.data.buffer);
-    if (texture.format === TextureFormat.RGBA8UNORM) {
-      texture.update(originValues, x, y, bitmap.width, bitmap.height);
-    } else {
-      const pixels: number[] = [];
-      for (let i = 0; i < bitmap.width * bitmap.height * 4; i += 4) {
-        encodePixelToArray(texture.format, originValues[i] / 255, originValues[i + 1] / 255, originValues[i + 2] / 255, originValues[i + 3] / 255, pixels);
-      }
-      const c = formatToTypedArray(texture.format);
-      if (c) {
-        texture.update(new c(pixels), x, y, bitmap.width, bitmap.height);
-      }
-    }
+    console.assert(texture.format === TextureFormat.RGBA8UNORM);
+    texture.update(originValues, x, y, bitmap.width, bitmap.height);
   }
   updateTextureWithCanvas(texture: Texture2D, ctx: CanvasRenderingContext2D, cvsOffsetX: number, cvsOffsetY: number, w: number, h: number, x: number, y: number): void {
     texture.updateFromElement(ctx.canvas, x, y, cvsOffsetX, cvsOffsetY, w, h);

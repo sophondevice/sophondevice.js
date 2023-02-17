@@ -1,4 +1,4 @@
-import { ListIterator } from '@sophon/base';
+import { ListIterator } from '../../../base';
 import { XForm, Frustum, Matrix4x4 } from '../math';
 import { SceneNode } from './scene_node';
 import { WorldBoundingVolume } from './world_bounding_volume';

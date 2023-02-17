@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { TypedArray } from '@sophon/base';
 import {
   GPUDataBuffer,
   TextureFilter,
@@ -49,6 +48,7 @@ import { AbstractModelLoader } from '../loader';
 import { BUILTIN_ASSET_TEXTURE_SHEEN_LUT } from '../../../values';
 import type { AssetManager } from '../../assetmanager';
 import type { AnimationChannel, AnimationSampler, GlTf, Material, TextureInfo } from './gltf';
+import type { TypedArray } from '../../../../misc';
 
 export interface GLTFContent extends GlTf {
   _manager: AssetManager;

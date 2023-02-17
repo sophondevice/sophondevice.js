@@ -1,4 +1,4 @@
-import { List, ListIterator } from '@sophon/base';
+import { List, ListIterator } from '../../../base';
 import { Geometry, BindGroup, GPUProgram, RenderStateSet, Device, ProgramBuilder, BindGroupLayout, TextureSampler, TextureFilter } from '../device';
 import { ShaderLib } from './materiallib/shaderlib';
 import type { Matrix4x4 } from '../math';

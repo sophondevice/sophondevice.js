@@ -1,9 +1,9 @@
-import type { TypedArray } from "@sophon/base";
 import { Matrix4x4, Quaternion, Vector3, Vector4 } from "../../math";
 import type { Primitive } from "../primitive";
 import type { Texture2D, TextureSampler } from "../../device";
 import type { StandardMaterial } from "../materiallib";
 import type { Interpolator } from "../interpolator";
+import type { TypedArray } from "../../misc";
 
 export class AssetModelObject {
   name: string;

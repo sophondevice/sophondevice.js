@@ -1,4 +1,3 @@
-import * as base from '@sophon/base';
 import * as chaos from '@sophon/device';
 import * as dom from '@sophon/dom';
 
@@ -158,7 +157,7 @@ import * as dom from '@sophon/dom';
   }
   updateSimParams();
   let t = 0;
-  sceneView.addEventListener('draw', function (this: dom.RElement, evt: base.REvent) {
+  sceneView.addEventListener('draw', function (this: dom.RElement, evt: chaos.REvent) {
     evt.preventDefault();
     viewer.device.setProgram(spriteUpdateProgram);
     viewer.device.setBindGroup(0, particleBindGroups[t % 2]);

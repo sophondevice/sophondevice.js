@@ -1,5 +1,3 @@
-import { assert } from './utils';
-
 export class FontCanvas {
   private static _canvas: HTMLCanvasElement = null;
   private static _context: CanvasRenderingContext2D = null;
@@ -135,9 +133,9 @@ export class Font {
     const oldFillStyle = FontCanvas.context.fillStyle;
 
     const fontParts = fontName.split(/\s+/);
-    assert(fontParts.length >= 2, 'normalize font failed', true);
+    console.assert(fontParts.length >= 2, 'normalize font failed');
     const sizePart = fontParts[fontParts.length - 2];
-    assert(sizePart.slice(sizePart.length - 2) === 'px', 'normalize font failed', true);
+    console.assert(sizePart.slice(sizePart.length - 2) === 'px', 'normalize font failed');
     const size = parseInt(sizePart.substring(0, sizePart.length - 2));
     const family = fontParts[fontParts.length - 1];
 

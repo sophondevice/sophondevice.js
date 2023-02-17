@@ -1,4 +1,4 @@
-import { visitor, Visitor } from "@sophon/base";
+import { visitor, Visitor } from "../../../../base";
 import { PBInsideFunctionScope, PBShaderExp } from "../../device";
 import { ShaderLib } from "./shaderlib";
 import { EnvironmentLighting, EnvConstantAmbient, EnvIBL } from "./envlight";

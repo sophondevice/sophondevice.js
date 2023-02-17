@@ -1,4 +1,4 @@
-import { REventTarget, REvent, REventPathBuilder } from '@sophon/base';
+import { REventTarget, REvent, REventPathBuilder } from '../../../base';
 import { Vector3, Quaternion, Matrix4x4 } from './vector';
 import { BoundingVolume } from '../scene/bounding_volume';
 import type { Scene } from '../scene/scene';

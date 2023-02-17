@@ -1,4 +1,4 @@
-import { Visitor, assert } from '@sophon/base';
+import { Visitor } from '../../../base';
 import { Vector3, AABB } from '../math';
 import type { SceneNode } from './scene_node';
 import { GraphNode } from './graph_node';
@@ -56,7 +56,7 @@ export class OctreeNode {
     this._nodes = [];
   }
   setChunk(chunk: OctreeNodeChunk) {
-    assert(!!chunk, 'Invalid chunk', true);
+    console.assert(!!chunk, 'Invalid chunk');
     this._chunk = chunk;
   }
   getChunk(): OctreeNodeChunk {
@@ -103,7 +103,7 @@ export class OctreeNode {
   }
   getBoxLoosed(): AABB {
     if (this._boxLoosed === null) {
-      assert(!!this._chunk, 'Invalid chunk', true);
+      console.assert(!!this._chunk, 'Invalid chunk');
       const d = this._chunk.getDimension();
       const nodeSize = this._chunk.getNodeSize();
       const halfWorldSize = this._chunk.getWorldSize() * 0.5;
@@ -123,7 +123,7 @@ export class OctreeNode {
     return this._boxLoosed;
   }
   getMinPoint(): Vector3 {
-    assert(!!this._chunk, 'Invalid chunk', true);
+    console.assert(!!this._chunk, 'Invalid chunk');
     const d = this._chunk.getDimension();
     const nodeSize = this._chunk.getNodeSize();
     const halfWorldSize = this._chunk.getWorldSize() * 0.5;
@@ -135,7 +135,7 @@ export class OctreeNode {
       .subBy(new Vector3(halfWorldSize, halfWorldSize, halfWorldSize));
   }
   getMaxPoint(): Vector3 {
-    assert(!!this._chunk, 'Invalid chunk', true);
+    console.assert(!!this._chunk, 'Invalid chunk');
     const d = this._chunk.getDimension();
     const nodeSize = this._chunk.getNodeSize();
     const halfWorldSize = this._chunk.getWorldSize() * 0.5;
@@ -158,22 +158,22 @@ export class OctreeNode {
     return this._references;
   }
   getChild(placement: OctreePlacement): OctreeNode {
-    assert(!!this._chunk, 'Invalid chunk', true);
+    console.assert(!!this._chunk, 'Invalid chunk');
     const next = this._chunk.getNext();
     return next ? next.getNode(this._chunk.getChildIndex(this._position, placement)) : null;
   }
   getOrCreateChild(placement: OctreePlacement): OctreeNode {
-    assert(!!this._chunk, 'Invalid chunk', true);
+    console.assert(!!this._chunk, 'Invalid chunk');
     const next = this._chunk.getNext();
     return next ? next.getOrCreateNode(this._chunk.getChildIndex(this._position, placement)) : null;
   }
   getParent(): OctreeNode {
-    assert(!!this._chunk, 'Invalid chunk', true);
+    console.assert(!!this._chunk, 'Invalid chunk');
     const prev = this._chunk.getPrev();
     return prev ? prev.getNode(this._chunk.getParentIndex(this._position)) : null;
   }
   getOrCreateParent(): OctreeNode {
-    assert(!!this._chunk, 'Invalid chunk', true);
+    console.assert(!!this._chunk, 'Invalid chunk');
     const prev = this._chunk.getPrev();
     return prev ? prev.getOrCreateNode(this._chunk.getParentIndex(this._position)) : null;
   }
@@ -272,7 +272,7 @@ export class OctreeNodeChunk {
   }
   freeNode(node: OctreeNode) {
     if (node) {
-      assert(node.getChunk() === this, 'Invalid chunk', true);
+      console.assert(node.getChunk() === this, 'Invalid chunk');
       this.freeNodeByIndex(node.getPosition());
     }
   }
@@ -317,7 +317,7 @@ export class OctreeNodeChunk {
       case OctreePlacement.NNN:
         break;
       default:
-        assert(false, 'getChildIndex: Got invalid index', true);
+        console.assert(false, 'getChildIndex: Got invalid index');
         return 0;
     }
     const dimension2 = 2 * dim;
@@ -401,7 +401,7 @@ export class Octree {
     this.initialize(rootSize, leafSize);
   }
   initialize(rootSize: number, leafSize: number) {
-    assert(rootSize >= leafSize && leafSize > 0, 'Invalid rootSize or leafSize for octree', true);
+    console.assert(rootSize >= leafSize && leafSize > 0, 'Invalid rootSize or leafSize for octree');
     this.finalize();
     this._rootSize = rootSize;
     this._leafSize = leafSize;

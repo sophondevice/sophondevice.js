@@ -1,8 +1,7 @@
-import { isPowerOf2, nextPowerOf2 } from '@sophon/base';
 import { PatchPosition } from './types';
 import { BoundingBox } from '../bounding_volume';
 import { TerrainPatch } from './patch';
-import { ClipState, Frustum, Matrix4x4, Vector3 } from '../../math';
+import { ClipState, Frustum, Matrix4x4, Vector3, isPowerOf2, nextPowerOf2 } from '../../math';
 import { GPUResourceUsageFlags, IndexBuffer, makeVertexBufferType, PrimitiveType, StructuredBuffer, Texture2D, TextureFormat } from '../../device';
 import { HeightField } from './heightfield';
 import type { Terrain } from './terrain';

@@ -10,15 +10,15 @@
     "lib": "dist"
   },
   "source": "./src/index.ts",
-  "types": "./dist/sophon.dom.d.ts",
+  "types": "./dist/sophon-dom.d.ts",
   "files": [
     "dist"
   ],
   "scripts": {
-    "build-modern": "microbundle -i src/index.ts --no-generateTypes --no-compress --no-pkg-main --external @sophon/device,@sophon/base -f modern -o dist/sophon.dom.modern.js",
-    "build-esm": "microbundle -i src/index.ts --no-generateTypes --no-pkg-main --external @sophon/device,@sophon/base -f esm -o dist/sophon.dom.module.js",
-    "build-umd": "microbundle -i src/index.ts --no-generateTypes --no-pkg-main --external @sophon/device,@sophon/base -f umd -o dist/sophon.dom.umd.js",
-    "build-cjs": "microbundle -i src/index.ts --no-generateTypes --no-pkg-main --external @sophon/device,@sophon/base -f cjs -o dist/sophon.dom.cjs",
+    "build-modern": "microbundle -i src/index.ts --no-generateTypes --no-compress --no-pkg-main --external @sophon/device -f modern -o dist/sophon.dom.modern.js",
+    "build-esm": "microbundle -i src/index.ts --no-generateTypes --no-pkg-main --external @sophon/device -f esm -o dist/sophon.dom.module.js",
+    "build-umd": "microbundle -i src/index.ts --no-generateTypes --no-pkg-main --external @sophon/device -f umd -o dist/sophon.dom.umd.js",
+    "build-cjs": "microbundle -i src/index.ts --no-generateTypes --no-pkg-main --external @sophon/device -f cjs -o dist/sophon.dom.cjs",
     "build-types": "dts-bundle-generator --disable-symlinks-following --project ./tsconfig.json --umd-module-name sophonDom -o ./dist/sophon.dom.d.ts ./src/index.ts",
     "build": "shx rm -rf ./dist && npm run build-modern && npm run build-types",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -75,7 +75,6 @@
     "tslib": "^2.5.0"
   },
   "dependencies": {
-    "@sophon/base": "workspace:*",
     "@sophon/device": "workspace:*"
   }
 }

@@ -24,6 +24,7 @@
     "sourceMap": true,
     "stripInternal": true,
     "keyofStringsOnly": false,
+    "rootDir": "../",
     "typeRoots": [
       "./node_modules/@types",
       "./node_modules/@webgpu/types",

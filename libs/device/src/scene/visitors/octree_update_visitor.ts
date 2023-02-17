@@ -1,6 +1,6 @@
-import { Visitor, visitor } from '@sophon/base';
-import type { Octree } from '../octree';
+import { Visitor, visitor } from '../../../../base';
 import { GraphNode } from '../graph_node';
+import type { Octree } from '../octree';
 
 export class OctreeUpdateVisitor extends Visitor {
   /** @internal */

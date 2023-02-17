@@ -1,4 +1,3 @@
-import { TypedArray } from '@sophon/base';
 import { Vector4 } from '../../math';
 import { getTextureFormatBlockSize, PrimitiveType, TextureFormat } from '../base_types';
 import {
@@ -22,7 +21,6 @@ import {
   TextureImageElement,
   GPUResourceUsageFlags
 } from '../gpuobject';
-import type { ITimer } from '../timer';
 import { GPUProgramConstructParams, Device, DeviceType, TextureCaps, MiscCaps, FramebufferCaps, ShaderCaps, DeviceOptions } from '../device';
 import { RenderStateSet } from '../render_states';
 import { WebGPUTextureSampler } from './sampler_webgpu';
@@ -51,6 +49,8 @@ import type { VertexData } from '../vertexdata';
 import type { PBStructTypeInfo } from '../builder';
 import type { WebGPURenderPass } from './renderpass_webgpu';
 import type { WebGPUComputePass } from './computepass_webgpu';
+import type { ITimer } from '../timer';
+import type { TypedArray } from '../../misc';
 
 export class WebGPUDevice extends Device {
   private _context: GPUCanvasContext;
@@ -292,11 +292,6 @@ export class WebGPUDevice extends Device {
     tex.loadFromElement(element, creationFlags);
     return tex;
   }
-  async loadTexture2DFromURL(url: string, mimeType?: string, creationFlags?: number): Promise<Texture2D> {
-    const tex = new WebGPUTexture2D(this);
-    await tex.loadFromURL(url, mimeType, creationFlags);
-    return tex;
-  }
   createTexture2DArray(format: TextureFormat, width: number, height: number, depth: number, creationFlags?: number): Texture2DArray {
     const tex = new WebGPUTexture2DArray(this);
     tex.createEmpty(format, width, height, depth, creationFlags);
@@ -315,11 +310,6 @@ export class WebGPUDevice extends Device {
   createCubeTextureFromMipmapData(data: TextureMipmapData, creationFlags?: number): TextureCube {
     const tex = new WebGPUTextureCube(this);
     tex.createWithMipmapData(data, creationFlags);
-    return tex;
-  }
-  async loadCubeTextureFromURL(url: string, mimeType?: string, creationFlags?: number): Promise<TextureCube> {
-    const tex = new WebGPUTextureCube(this);
-    await tex.loadFromURL(url, mimeType, creationFlags);
     return tex;
   }
   createTextureVideo(el: HTMLVideoElement): TextureVideo {

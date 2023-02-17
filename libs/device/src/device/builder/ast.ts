@@ -1,4 +1,3 @@
-import { assert } from '@sophon/base';
 import { ShaderType } from '../base_types';
 import { semanticToAttrib } from '../gpuobject';
 import { DeviceType, DEVICE_TYPE_WEBGL, DEVICE_TYPE_WEBGL2, DEVICE_TYPE_WEBGPU } from '../device';
@@ -853,8 +852,8 @@ export class ASTShaderExpConstructor extends ASTExpression {
     return null;
   }
   toWebGL(indent: string, ctx: ASTContext): string {
-    assert(!this.type.isArrayType(), 'array constructor not supported in webgl1 device', true);
-    assert(this.type.isConstructible(), `type '${this.type.toTypeName('webgl')}' is not constructible`, true);
+    console.assert(!this.type.isArrayType(), 'array constructor not supported in webgl1 device');
+    console.assert(this.type.isConstructible(), `type '${this.type.toTypeName('webgl')}' is not constructible`);
     const overloads = this.type.getConstructorOverloads('webgl');
     for (const overload of overloads) {
       const convertedArgs = convertArgs(this.args, overload);
@@ -866,7 +865,7 @@ export class ASTShaderExpConstructor extends ASTExpression {
     throw new Error(`no matching overload function found for type ${this.type.toTypeName('webgl')}`);
   }
   toWebGL2(indent: string, ctx: ASTContext): string {
-    assert(this.type.isConstructible(), `type '${this.type.toTypeName('webgl2')}' is not constructible`, true);
+    console.assert(this.type.isConstructible(), `type '${this.type.toTypeName('webgl2')}' is not constructible`, true);
     const overloads = this.type.getConstructorOverloads('webgl2');
     for (const overload of overloads) {
       const convertedArgs = convertArgs(this.args, overload);
@@ -878,7 +877,7 @@ export class ASTShaderExpConstructor extends ASTExpression {
     throw new Error(`no matching overload function found for type ${this.type.toTypeName('webgl2')}`);
   }
   toWGSL(indent: string, ctx: ASTContext): string {
-    assert(this.type.isConstructible(), `type '${this.type.toTypeName('webgpu')}' is not constructible`, true);
+    console.assert(this.type.isConstructible(), `type '${this.type.toTypeName('webgpu')}' is not constructible`, true);
     const overloads = this.type.getConstructorOverloads('webgpu');
     for (const overload of overloads) {
       const convertedArgs = convertArgs(this.args, overload);
@@ -1084,7 +1083,7 @@ export class ASTAddressOf extends ASTExpression {
   type: typeinfo.PBTypeInfo;
   constructor(value: ASTExpression) {
     super();
-    assert(value.isReference(), 'no pointer type for non-reference values', true);
+    console.assert(value.isReference(), 'no pointer type for non-reference values', true);
     this.value = value;
     this.type = new typeinfo.PBPointerTypeInfo(value.getType(), value.getAddressSpace());
   }

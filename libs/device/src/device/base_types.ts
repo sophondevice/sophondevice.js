@@ -2,21 +2,10 @@
  * Basic types
  */
 
-import { IterableWrapper, TypedArray, Constructor } from '@sophon/base';
+import { TypedArray } from '../misc';
 
 export type WebGLContext = WebGLRenderingContext | WebGL2RenderingContext;
-/*
-export enum BufferUsage {
-  Unknown = 0,
-  Vertex = (1<<1),
-  Index = (1<<2),
-  Read = (1<<3),
-  Write = (1<<4),
-  Uniform = (1<<5),
-  Storage = (1<<6),
-  Dynamic = (1<<7),
-}
-*/
+
 export enum TextureTarget {
   Unknown = 0,
   Texture2D = 1,
@@ -314,54 +303,6 @@ function encode5551(r: number, g: number, b: number, a: number) {
   return ((b & 0x1f) << 1) | ((g & 0x1f) << 6) | ((r & 0x1f) << 11) | (a >= 0.5 ? 1 : 0);
 }
 
-export function formatToTypedArray(format: TextureFormat): {
-  new(...args: unknown[]): TypedArray;
-} {
-  switch (format) {
-    case TextureFormat.R8UNORM:
-    case TextureFormat.RGBA8UNORM:
-    case TextureFormat.RGBA8UNORM_SRGB:
-    case TextureFormat.BGRA8UNORM:
-    case TextureFormat.BGRA8UNORM_SRGB:
-    case TextureFormat.R8UI:
-    case TextureFormat.RG8UNORM:
-    case TextureFormat.RG8UI:
-    case TextureFormat.RGBA8UI:
-      return Uint8Array;
-    case TextureFormat.R8SNORM:
-    case TextureFormat.R8I:
-    case TextureFormat.RG8SNORM:
-    case TextureFormat.RG8I:
-    case TextureFormat.RGBA8SNORM:
-    case TextureFormat.RGBA8I:
-      return Int8Array;
-    case TextureFormat.R16F:
-    case TextureFormat.R16UI:
-    case TextureFormat.RG16F:
-    case TextureFormat.RG16UI:
-    case TextureFormat.RGBA16F:
-    case TextureFormat.RGBA16UI:
-      return Uint16Array;
-    case TextureFormat.R16I:
-    case TextureFormat.RG16I:
-    case TextureFormat.RGBA16I:
-      return Int16Array;
-    case TextureFormat.R32F:
-    case TextureFormat.RG32F:
-    case TextureFormat.RGBA32F:
-      return Float32Array;
-    case TextureFormat.R32UI:
-    case TextureFormat.RG32UI:
-    case TextureFormat.RGBA32UI:
-      return Uint32Array;
-    case TextureFormat.R32I:
-    case TextureFormat.RG32I:
-    case TextureFormat.RGBA32I:
-      return Int32Array;
-    default:
-      return null;
-  }
-}
 export function encodePixel(
   format: TextureFormat,
   r: number,
@@ -592,60 +533,3 @@ export enum ShaderType {
   Compute = 1 << 2,
 }
 
-export class ColorRGBA extends IterableWrapper {
-  constructor(r: number, g: number, b: number, a: number);
-  constructor(other: ArrayLike<number>);
-  constructor();
-  constructor(rOrOther?: number | ArrayLike<number>, g?: number, b?: number, a?: number) {
-    super(4);
-    if (typeof rOrOther === 'number') {
-      this._v[0] = Number(rOrOther);
-      this._v[1] = Number(g);
-      this._v[2] = Number(b);
-      this._v[3] = Number(a);
-    } else if (rOrOther) {
-      this.assign(rOrOther);
-    }
-  }
-  get r() {
-    return this._v[0];
-  }
-  set r(value: number) {
-    this._v[0] = Number(value);
-  }
-  get g() {
-    return this._v[1];
-  }
-  set g(value: number) {
-    this._v[1] = Number(value);
-  }
-  get b() {
-    return this._v[2];
-  }
-  set b(value: number) {
-    this._v[2] = Number(value);
-  }
-  get a() {
-    return this._v[3];
-  }
-  set a(value: number) {
-    this._v[3] = Number(value);
-  }
-  set(r: number, g: number, b: number, a: number);
-  set(other: ArrayLike<number>);
-  set(rOrOther: number | ArrayLike<number>, g?: number, b?: number, a?: number) {
-    if (typeof rOrOther === 'number') {
-      this._v[0] = Number(rOrOther);
-      this._v[1] = Number(g);
-      this._v[2] = Number(b);
-      this._v[3] = Number(a);
-    } else {
-      this.assign(rOrOther);
-    }
-  }
-}
-
-export function sliceTypedArray(array: TypedArray, offset: number, length: number): TypedArray {
-  const c = array.constructor as Constructor<TypedArray>;
-  return new c(array.buffer, offset * c.BYTES_PER_ELEMENT, length);
-}

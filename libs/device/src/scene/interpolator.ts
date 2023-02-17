@@ -1,5 +1,5 @@
-import { numberClamp, TypedArray } from "@sophon/base";
-import { Quaternion } from "../math";
+import { Quaternion, numberClamp } from "../math";
+import type { TypedArray } from "../misc";
 
 export enum InterpolationMode {
   UNKNOWN = 0,

@@ -1,5 +1,5 @@
-import { FileLoader, TypedArray } from '@sophon/base';
 import { TextureFormat, TextureMipmapLevelData, TextureMipmapData } from '../../../../device';
+import type { TypedArray } from '../../../../misc';
 
 const DDSHeaderSize = 31; // in DWORD
 const DDSHeaderSizeExtended = 31 + 5; // in DWORD
@@ -674,22 +674,3 @@ export function getDDSMipLevelsInfo(dds: ArrayBuffer): DDSMetaData {
   return ddsLevelsInfo;
 }
 
-export async function dumpDDS(ddsFile: string) {
-  const content = (await new FileLoader(null, 'arraybuffer').load(ddsFile)) as ArrayBuffer;
-  if (!content) {
-    console.log(`Error reading file ${ddsFile}`);
-    return null;
-  }
-  const ddsHeader = loadDDSHeader(content);
-  if (!ddsHeader) {
-    console.log(`Invalid DDS file ${ddsFile}`);
-    return null;
-  }
-  const desc = getDDSHeaderDesc(ddsHeader);
-  console.log(desc);
-
-  const metaData = getMetaDataFromHeader(ddsHeader);
-  console.log(metaData);
-
-  return ddsHeader;
-}

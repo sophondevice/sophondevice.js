@@ -1,4 +1,3 @@
-import * as base from '@sophon/base';
 import * as chaos from '@sophon/device';
 import { assert, rand, randInt, randNonZero, toFloat32 } from './common';
 
@@ -105,14 +104,14 @@ export function testVectorType(c: VectorConstructor, size: 2 | 3 | 4 | 16) {
       const v3 = new c();
       c.normalize(v1, v3);
       v1.inplaceNormalize();
-      assert(v1.equalsTo(v2) && v1.equalsTo(v3) && base.numberEquals(v1.magnitude, 1), 'normalize failed');
+      assert(v1.equalsTo(v2) && v1.equalsTo(v3) && chaos.numberEquals(v1.magnitude, 1), 'normalize failed');
     })();
   }
 
   if (c.dot) {
     (function testDotProduct() {
       const v1 = randVec();
-      assert(base.numberEquals(c.dot(v1, v1), v1.magnitudeSq), 'dot production failed');
+      assert(chaos.numberEquals(c.dot(v1, v1), v1.magnitudeSq), 'dot production failed');
     })();
   }
 
@@ -133,7 +132,7 @@ export function testVectorType(c: VectorConstructor, size: 2 | 3 | 4 | 16) {
       const d1 = c.dot(v6, v7);
       const d2 = c.dot(v7, v8);
       const d3 = c.dot(v8, v6);
-      assert(base.numberEquals(d1, 0) && base.numberEquals(d2, 0) && base.numberEquals(d3, 0), 'cross product failed');
+      assert(chaos.numberEquals(d1, 0) && chaos.numberEquals(d2, 0) && chaos.numberEquals(d3, 0), 'cross product failed');
     })();
   }
 }
@@ -157,13 +156,13 @@ export function testQuaternion() {
     const axis = new chaos.Vector3(-0.10452544552113772, 0.43864725489574524, -0.8925598114474093); //new chaospace.Vector3(rand(), rand(), rand()).inplaceNormalize();
     const angle = 3.1390559093244788; //rand (0, Math.PI);
     const axisAngle = new chaos.Quaternion(chaos.Matrix3x3.rotation(axis, angle)).getAxisAngle();
-    assert(axisAngle.xyz().equalsTo(axis) && base.numberEquals(axisAngle.w, angle), 'chaospace.Matrix3x3 constructor failed');
+    assert(axisAngle.xyz().equalsTo(axis) && chaos.numberEquals(axisAngle.w, angle), 'chaospace.Matrix3x3 constructor failed');
     const axisAngle2 = new chaos.Quaternion(chaos.Matrix4x4.rotation(axis, angle)).getAxisAngle();
-    assert(axisAngle2.xyz().equalsTo(axis) && base.numberEquals(axisAngle2.w, angle), 'chaospace.Matrix4x4 constructor failed');
+    assert(axisAngle2.xyz().equalsTo(axis) && chaos.numberEquals(axisAngle2.w, angle), 'chaospace.Matrix4x4 constructor failed');
   })();
   (function testNormalize() {
     const q1 = new chaos.Quaternion(rand(), rand(), rand(), rand()).inplaceNormalize();
-    assert(base.numberEquals(q1.magnitude, 1), 'normalize failed');
+    assert(chaos.numberEquals(q1.magnitude, 1), 'normalize failed');
   })();
   (function testVetorToVector() {
     const v1 = new chaos.Vector3(rand(), rand(), rand()).inplaceNormalize();
@@ -179,7 +178,7 @@ export function testQuaternion() {
     const axis1 = q1.getAxisAngle().xyz();
     const axis2 = q2.getAxisAngle().xyz();
     const angle2 = Math.acos(chaos.Vector3.dot(axis1, axis2));
-    assert(base.numberEquals(angle, angle2), 'angle between failed');
+    assert(chaos.numberEquals(angle, angle2), 'angle between failed');
   });
   (function testEulerAngle() {
     const angle1 = rand(-Math.PI, Math.PI);
@@ -313,7 +312,7 @@ export function testMatrixType(c: MatrixConstructor, rows: number, cols: number)
       const v1 = { x: rand(), y: rand(), z: rand() };
       const m = c.translation(t);
       const v2 = m.transformPoint(v1);
-      assert(base.numberEquals(v2.x, v1.x + t.x) && base.numberEquals(v2.y, v1.y + t.y) && base.numberEquals(v2.z, v1.z + t.z), 'translation failed');
+      assert(chaos.numberEquals(v2.x, v1.x + t.x) && chaos.numberEquals(v2.y, v1.y + t.y) && chaos.numberEquals(v2.z, v1.z + t.z), 'translation failed');
       if (rows === 4 && cols === 4) {
         const m1 = randMatrix() as chaos.Matrix4x4;
         const t1 = { x: rand(), y: rand(), z: rand() };
@@ -333,7 +332,7 @@ export function testMatrixType(c: MatrixConstructor, rows: number, cols: number)
     const v1 = { x: rand(), y: rand(), z: rand() };
     const m = c.scaling(s);
     const v2 = m.transformPoint(v1);
-    assert(base.numberEquals(v2.x, v1.x * s.x) && base.numberEquals(v2.y, v1.y * s.y) && base.numberEquals(v2.z, v1.z * s.z), 'scaling failed');
+    assert(chaos.numberEquals(v2.x, v1.x * s.x) && chaos.numberEquals(v2.y, v1.y * s.y) && chaos.numberEquals(v2.z, v1.z * s.z), 'scaling failed');
     if (rows === 4 && cols === 4) {
       const m1 = randMatrix() as chaos.Matrix4x4;
       const s1 = { x: rand(), y: rand(), z: rand() };
@@ -352,21 +351,21 @@ export function testMatrixType(c: MatrixConstructor, rows: number, cols: number)
     const v1 = { x: 0, y: 1, z: 0 };
     const m = c.rotationX(angle);
     const v2 = m.transformPoint(v1);
-    assert(base.numberEquals(v2.x, 0) && base.numberEquals(v2.y, Math.cos(angle)) && base.numberEquals(v2.z, Math.sin(angle)), 'rotationX failed');
+    assert(chaos.numberEquals(v2.x, 0) && chaos.numberEquals(v2.y, Math.cos(angle)) && chaos.numberEquals(v2.z, Math.sin(angle)), 'rotationX failed');
   })();
   (function testRotationY() {
     const angle = rand(-Math.PI * 2, Math.PI * 2);
     const v1 = { x: 0, y: 0, z: 1 };
     const m = c.rotationY(angle);
     const v2 = m.transformPoint(v1);
-    assert(base.numberEquals(v2.x, Math.sin(angle)) && base.numberEquals(v2.y, 0) && base.numberEquals(v2.z, Math.cos(angle)), 'rotationY failed');
+    assert(chaos.numberEquals(v2.x, Math.sin(angle)) && chaos.numberEquals(v2.y, 0) && chaos.numberEquals(v2.z, Math.cos(angle)), 'rotationY failed');
   })();
   (function testRotationZ() {
     const angle = rand(-Math.PI * 2, Math.PI * 2);
     const v1 = { x: 1, y: 0, z: 0 };
     const m = c.rotationZ(angle);
     const v2 = m.transformPoint(v1);
-    assert(base.numberEquals(v2.x, Math.cos(angle)) && base.numberEquals(v2.y, Math.sin(angle)) && base.numberEquals(v2.z, 0), 'rotationZ failed');
+    assert(chaos.numberEquals(v2.x, Math.cos(angle)) && chaos.numberEquals(v2.y, Math.sin(angle)) && chaos.numberEquals(v2.z, 0), 'rotationZ failed');
   })();
   (function testRotation() {
     const angle = rand(-Math.PI * 2, Math.PI * 2);

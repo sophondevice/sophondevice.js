@@ -21,7 +21,7 @@ export class GLTFViewer {
     this._modelNode = null;
     this._scene = scene;
     this._assetManager = new chaos.AssetManager(scene.device);
-    chaos.AssetManager.fetchBuiltinTexture(scene.device, chaos.AssetManager.BUILTIN_TEXTURE_SHEEN_LUT);
+    this._assetManager.fetchBuiltinTexture(chaos.BUILTIN_ASSET_TEXTURE_SHEEN_LUT);
     this._scheme = new chaos.ForwardRenderScheme(scene.device);
     this._fov = Math.PI / 3;
     this._aspect = 1;

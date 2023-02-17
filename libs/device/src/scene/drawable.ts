@@ -1,4 +1,4 @@
-import type { ListIterator } from "@sophon/base";
+import type { ListIterator } from "../../../base";
 import type { Texture2D } from "../device";
 import type { Matrix4x4, XForm } from "../math";
 import type { BoundingVolume } from "./bounding_volume";

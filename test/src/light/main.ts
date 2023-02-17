@@ -1,4 +1,3 @@
-import * as base from '@sophon/base';
 import * as chaos from '@sophon/device';
 import * as dom from '@sophon/dom';
 import * as common from '../common';
@@ -108,7 +107,7 @@ new chaos.HemiSphericLight(scene, null)
   });
 
   let pause = false;
-  sceneView.addEventListener('keydown', function (evt: base.REvent) {
+  sceneView.addEventListener('keydown', function (evt: chaos.REvent) {
     const keyEvent = evt as dom.RKeyEvent;
     if (keyEvent.code === 'KeyP') {
       pause = !pause;
@@ -131,7 +130,7 @@ new chaos.HemiSphericLight(scene, null)
     }
   });
 
-  sceneView.addEventListener('draw', function (this: dom.RElement, evt: base.REvent) {
+  sceneView.addEventListener('draw', function (this: dom.RElement, evt: chaos.REvent) {
     evt.preventDefault();
     scheme.renderScene(scene, camera);
   });

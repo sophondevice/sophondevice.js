@@ -1,11 +1,10 @@
-import { ImageLoader, FileLoader, TypedArray } from '@sophon/base';
 import { TextureTarget, TextureFormat, linearTextureFormatToSRGB } from '../base_types';
 import { textureTargetMap } from './constants_webgl';
 import { WebGLBaseTexture } from './basetexture_webgl';
-import { getDDSMipLevelsInfo } from '../../support/dds';
 import { GPUResourceUsageFlags, TextureImageElement, TextureMipmapData, Texture2D, GPUDataBuffer } from '../gpuobject';
 import type { WebGLDevice } from './device_webgl';
 import type { WebGLTextureCap } from './capabilities_webgl';
+import type { TypedArray } from '../../misc';
 
 export class WebGLTexture2D extends WebGLBaseTexture implements Texture2D<WebGLTexture> {
   constructor(device: WebGLDevice) {
@@ -168,15 +167,6 @@ export class WebGLTexture2D extends WebGLBaseTexture implements Texture2D<WebGLT
     }
   }
   /** @internal */
-  async loadFromURL(url: string, mimeType?: string, creationFlags?: number): Promise<void> {
-    this._flags = Number(creationFlags) || 0;
-    if (this._flags & GPUResourceUsageFlags.TF_WRITABLE) {
-      console.error(new Error('webgl device does not support storage texture'));
-    } else {
-      await this.loadURL(url, mimeType);
-    }
-  }
-  /** @internal */
   private guessTextureFormat(url: string, mimeType?: string) {
     if (mimeType === 'image/jpeg' || mimeType === 'image/png') {
       return this.linearColorSpace ? TextureFormat.RGBA8UNORM : TextureFormat.RGBA8UNORM_SRGB;
@@ -276,26 +266,6 @@ export class WebGLTexture2D extends WebGLBaseTexture implements Texture2D<WebGLT
           return;
         }
       }
-    }
-  }
-  /** @internal */
-  private async loadURL(url: string, mimeType: string): Promise<void> {
-    const format = this.guessTextureFormat(url, mimeType);
-    if (format !== TextureFormat.Unknown) {
-      const img = await new ImageLoader(null).load(url);
-      const imageBitmap = await createImageBitmap(img, {
-        premultiplyAlpha: 'none',
-        colorSpaceConversion: 'none',
-      });
-      this.loadImage(imageBitmap, format);
-    } else {
-      const fileData = (await new FileLoader(null, 'arraybuffer').load(url)) as ArrayBuffer;
-      const ddsLevelsInfo = getDDSMipLevelsInfo(fileData);
-      if (!ddsLevelsInfo) {
-        console.error(new Error('Load DDS'));
-        return;
-      }
-      this.loadLevels(ddsLevelsInfo);
     }
   }
   /** @internal */

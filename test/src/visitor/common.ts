@@ -1,5 +1,4 @@
-// Common test utilities
-import * as base from '@sophon/base';
+import * as chaos from '@sophon/device';
 
 export interface ITestCase {
   caseName: string;
@@ -22,12 +21,12 @@ class Bar {
 class SuperBar extends Bar {
 }
 
-class Visitor2 extends base.Visitor {
-  @base.visitor(Foo)
+class Visitor2 extends chaos.Visitor {
+  @chaos.visitor(Foo)
   visitFoo() {
     return 'Foo';
   }
-  @base.visitor(Bar)
+  @chaos.visitor(Bar)
   visitBar() {
     return 'Bar';
   }
@@ -59,31 +58,3 @@ export function testVisitor() {
   })();
 }
 
-export function testMaxHeap() {
-  const maxHeap = new base.Heap<number>((a, b) => a < b);
-  for (let i = 0; i < 100; i++) {
-    maxHeap.add(Math.random() * 100);
-  }
-  let maxVal = Number.MAX_VALUE;
-  while (maxHeap.length > 0) {
-    const top = maxHeap.pop();
-    assert(maxVal >= top, 'Max heap test failed');
-    maxVal = top;
-  }
-}
-
-export function testMinHeap() {
-  const minHeap = new base.Heap<number>((a, b) => a > b);
-  for (let i = 0; i < 100; i++) {
-    minHeap.add(Math.random() * 100);
-  }
-  minHeap.remove(21);
-  minHeap.remove(55);
-  minHeap.remove(1);
-  let minVal = -Number.MAX_VALUE;
-  while (minHeap.length > 0) {
-    const top = minHeap.pop();
-    assert(minVal <= top, 'Min heap test failed');
-    minVal = top;
-  }
-}

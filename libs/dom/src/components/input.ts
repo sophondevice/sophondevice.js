@@ -1,4 +1,4 @@
-import { REvent, assert } from '@sophon/base'
+import { REvent } from '@sophon/device'
 import { RRectPrimitive, RPrimitiveBatchList } from '../primitive';
 import { RText } from './text';
 import { tagname } from '../gui';
@@ -83,7 +83,7 @@ export class Input extends RElement {
             data.offsetY - this.getClientRect().y - this._text.getRect().y,
           );
           if (loc) {
-            assert(loc.line === 0);
+            console.assert(loc.line === 0);
             this._selectionStart = loc.pos;
             this._selectionEnd = loc.pos;
             this._updateCursorVertices();

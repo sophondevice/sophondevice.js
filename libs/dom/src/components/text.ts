@@ -1,4 +1,4 @@
-import { REvent, assert } from '@sophon/base';
+import { REvent } from '@sophon/device';
 import { RRectPrimitive } from '../primitive';
 import { RNode } from '../node';
 import { RTextEvent, RAttributeChangeEvent } from '../events';
@@ -172,11 +172,9 @@ export class RText extends RNode {
   }
   /** @internal */
   _normalize(): RNode {
-    assert(
+    console.assert(
       !this.previousSibling || !this.previousSibling._isText(),
-      'Failed to execute _normalize: text node must be the first',
-      true,
-    );
+      'Failed to execute _normalize: text node must be the first');
     this._textContent = this._actualContent;
     const textSiblings: RNode[] = [];
     let next = this.nextSibling;
@@ -331,11 +329,9 @@ export class RText extends RNode {
   }
   /** @internal */
   private _styleChange() {
-    assert(
+    console.assert(
       !this.previousSibling || !this.previousSibling._isText(),
-      'Failed to execute _updateStyle: text node must be the first',
-      true,
-    );
+      'Failed to execute _updateStyle: text node must be the first');
     this.style.display = 'flex';
     let content = this.textContent;
     for (

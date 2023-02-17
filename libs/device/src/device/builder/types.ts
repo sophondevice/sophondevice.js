@@ -1,4 +1,3 @@
-import { assert } from '@sophon/base';
 import { TextureFormat } from '../base_types';
 import { DeviceType } from '../device';
 import type { UniformBufferLayout } from '../gpuobject';
@@ -908,8 +907,8 @@ export class PBArrayTypeInfo extends PBTypeInfo<ArrayTypeDetail> implements ILay
       const typename = `array<${elementTypeName}${this.dimension ? ', ' + this.dimension : ''}>`;
       return varName ? `${varName}: ${typename}` : typename;
     } else {
-      assert(!!this.dimension, 'runtime-sized array not supported for webgl', true);
-      assert(!this.elementType.isArrayType(), 'multi-dimensional arrays not supported for webgl', true);
+      console.assert(!!this.dimension, 'runtime-sized array not supported for webgl');
+      console.assert(!this.elementType.isArrayType(), 'multi-dimensional arrays not supported for webgl');
       const elementTypeName = this.elementType.toTypeName(deviceType, varName);
       return `${elementTypeName}[${this.dimension}]`;
     }
@@ -942,7 +941,7 @@ export class PBPointerTypeInfo extends PBTypeInfo<PointerTypeDetail> {
       pointerType,
       addressSpace,
     });
-    assert(pointerType.isStorable(), 'the pointee type must be storable', true);
+    console.assert(pointerType.isStorable(), 'the pointee type must be storable');
     this.writable = false;
   }
   get pointerType(): PBTypeInfo {
@@ -990,7 +989,7 @@ export class PBPointerTypeInfo extends PBTypeInfo<PointerTypeDetail> {
 
 export class PBAtomicTypeInfo extends PBTypeInfo<AtomicTypeInfoDetail> {
   constructor(type: PBPrimitiveType) {
-    assert(type === PBPrimitiveType.I32 || type === PBPrimitiveType.U32, 'invalid atomic type', true);
+    console.assert(type === PBPrimitiveType.I32 || type === PBPrimitiveType.U32, 'invalid atomic type');
     super(PBTypeClass.ATOMIC, {
       type
     });
@@ -1064,8 +1063,8 @@ export class PBTextureTypeInfo extends PBTypeInfo<TextureTypeDetail> {
       writable,
       storageTexelFormat: texelFormat || null
     });
-    assert(!!textureTypeMapWGSL[textureType], 'unsupported texture type');
-    assert(!(textureType & BITFLAG_STORAGE) || !!storageTexelFormatMap[texelFormat], 'invalid texel format for storage texture');
+    console.assert(!!textureTypeMapWGSL[textureType], 'unsupported texture type');
+    console.assert(!(textureType & BITFLAG_STORAGE) || !!storageTexelFormatMap[texelFormat], 'invalid texel format for storage texture');
   }
   get textureType(): PBTextureType {
     return this.detail.textureType;
@@ -1130,7 +1129,7 @@ export class PBTextureTypeInfo extends PBTypeInfo<TextureTypeDetail> {
       return varName ? `${varName}: ${typename}` : typename;
     } else {
       const typename = (deviceType === 'webgl' ? textureTypeMapWebGL : textureTypeMapWebGL2)[this.textureType];
-      assert(!!typename, 'unsupported texture type');
+      console.assert(!!typename, 'unsupported texture type');
       return varName ? `${typename} ${varName}` : typename;
     }
   }

@@ -1,13 +1,13 @@
-import { TypedArray } from '@sophon/base';
 import { WebGPUObject } from './gpuobject_webgpu';
 import { TextureCaps } from '../device';
 import { TextureTarget, TextureFilter, TextureWrapping, TextureFormat, isCompressedTextureFormat, isDepthTextureFormat, isFloatTextureFormat, isIntegerTextureFormat, isSignedTextureFormat, CompareFunc, getTextureFormatBlockWidth, getTextureFormatBlockHeight, getTextureFormatBlockSize } from '../base_types';
 import { GPUResourceUsageFlags, SamplerOptions, BaseTexture, TextureSampler, GPUDataBuffer } from '../gpuobject';
 import { UploadRingBuffer, UploadTexture, UploadImage } from './uploadringbuffer';
+import { textureFormatMap } from './constants_webgpu';
 import type { WebGPUDevice } from './device';
 import type { WebGPUBuffer } from './buffer_webgpu';
 import type { WebGPUTextureCap, ITextureFormatInfoWebGPU } from './capabilities_webgpu';
-import { textureFormatMap } from './constants_webgpu';
+import type { TypedArray } from '../../misc';
 
 export abstract class WebGPUBaseTexture<T extends GPUTexture|GPUExternalTexture = GPUTexture> extends WebGPUObject<T> {
   protected _target: TextureTarget;

@@ -1,8 +1,8 @@
-import { TypedArray } from '@sophon/base';
 import { WebGLGPUObject } from './gpuobject_webgl';
 import { WebGLEnum } from './webgl_enum';
 import { GPUResourceUsageFlags, GPUDataBuffer } from '../gpuobject';
 import { isWebGL2 } from './utils';
+import type { TypedArray } from '../../misc';
 import type { WebGLDevice } from './device_webgl';
 
 export class WebGLGPUBuffer extends WebGLGPUObject<WebGLBuffer> implements GPUDataBuffer<WebGLBuffer> {

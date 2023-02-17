@@ -1,4 +1,3 @@
-import { TypedArray } from '@sophon/base';
 import { Device } from './device';
 import {
   ShaderType,
@@ -11,6 +10,7 @@ import {
 } from './base_types';
 import { PBTypeInfo, PBArrayTypeInfo, PBPrimitiveTypeInfo, PBStructTypeInfo, PBPrimitiveType } from './builder/types';
 import { VectorBase, CubeFace } from '../math';
+import type { TypedArray } from '../misc';
 
 export type TextureImageElement = ImageBitmap | HTMLCanvasElement;
 

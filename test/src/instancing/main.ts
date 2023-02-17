@@ -1,4 +1,3 @@
-import * as base from '@sophon/base';
 import * as chaos from '@sophon/device';
 import * as dom from '@sophon/dom';
 import * as common from '../common';
@@ -22,7 +21,6 @@ import * as common from '../common';
   common.createSceneTweakPanel(scene, group, { width: '200px' });
   const assetManager = new chaos.AssetManager(viewer.device);
 
-  // scene.addSkybox(await viewer.device.loadCubeTextureFromURL('./assets/images/sky2.dds'));
   const boxMaterial = new chaos.PBRMetallicRoughnessMaterial(viewer.device);
   boxMaterial.lightModel.setAlbedoMap(await assetManager.fetchTexture('./assets/images/rustediron2_basecolor.png', null, true), null, 0);
   boxMaterial.lightModel.setNormalMap(await assetManager.fetchTexture('./assets/images/rustediron2_normal.png', null, false), null, 0);
@@ -44,7 +42,7 @@ import * as common from '../common';
     .setColor(new chaos.Vector4(1, 1, 1, 1))
     .setRotation(chaos.Quaternion.fromAxisAngle(new chaos.Vector3(1, 1, 0).inplaceNormalize(), Math.PI * 2 / 3));
 
-  sceneView.addEventListener('draw', function (this: dom.RElement, evt: base.REvent) {
+  sceneView.addEventListener('draw', function (this: dom.RElement, evt: chaos.REvent) {
     evt.preventDefault();
     scheme.renderScene(scene, camera);
   });

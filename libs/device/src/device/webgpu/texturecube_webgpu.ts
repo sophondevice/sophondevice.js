@@ -1,10 +1,9 @@
-import { FileLoader, ImageLoader, TypedArray } from '@sophon/base';
-import { getDDSMipLevelsInfo } from '../../support/dds';
 import { TextureFormat, TextureTarget, linearTextureFormatToSRGB, getTextureFormatBlockWidth, getTextureFormatBlockHeight, getTextureFormatBlockSize } from '../base_types';
 import { WebGPUBaseTexture } from './basetexture_webgpu';
 import { GPUResourceUsageFlags, TextureMipmapData, TextureCube, TextureImageElement, GPUDataBuffer } from '../gpuobject';
 import { CubeFace } from '../../math';
 import type { WebGPUDevice } from './device';
+import type { TypedArray } from '../../misc';
 
 export class WebGPUTextureCube extends WebGPUBaseTexture implements TextureCube<GPUTexture> {
   constructor(device: WebGPUDevice) {
@@ -116,15 +115,6 @@ export class WebGPUTextureCube extends WebGPUBaseTexture implements TextureCube<
     }
   }
   /** @internal */
-  async loadFromURL(url: string | string[], mimeType?: string, creationFlags?: number) {
-    this._flags = Number(creationFlags) || 0;
-    if (this._flags & GPUResourceUsageFlags.TF_WRITABLE) {
-      console.error(new Error('storage texture can not be cube texture'));
-    } else {
-      await this.loadURL(url, mimeType);
-    }
-  }
-  /** @internal */
   private loadEmpty(format: TextureFormat, size: number, mipLevelCount: number): void {
     this.allocInternal(format, size, size, 1, mipLevelCount);
     if (this._mipLevelCount > 1 && !this._device.isContextLost()) {
@@ -163,32 +153,6 @@ export class WebGPUTextureCube extends WebGPUBaseTexture implements TextureCube<
       if (this._mipLevelCount > 1) {
         this.generateMipmaps();
       }
-    }
-  }
-  /** @internal */
-  private async loadURL(url: string | string[], mimeType: string): Promise<void> {
-    if (typeof url === 'string') {
-      if (url.split('.').slice(-1)[0] === 'dds' || mimeType === 'image/dds') {
-        const fileData = (await new FileLoader(null, 'arraybuffer').load(url)) as ArrayBuffer;
-        const ddsLevelsInfo = getDDSMipLevelsInfo(fileData);
-        if (!ddsLevelsInfo) {
-          console.error(new Error('Load DDS'));
-          return;
-        }
-        this.loadLevels(ddsLevelsInfo);
-      } else {
-        console.error(new Error(`unknown mime type of image: ${url}`));
-      }
-    } else if (url.length === 6) {
-      const images: HTMLImageElement[] = Array.from({ length: 6 });
-      images[0] = await new ImageLoader().load(url[0]);
-      images[1] = await new ImageLoader().load(url[1]);
-      images[2] = await new ImageLoader().load(url[2]);
-      images[3] = await new ImageLoader().load(url[3]);
-      images[4] = await new ImageLoader().load(url[4]);
-      images[5] = await new ImageLoader().load(url[5]);
-      const format = (this._flags & GPUResourceUsageFlags.TF_LINEAR_COLOR_SPACE) ? TextureFormat.RGBA8UNORM : TextureFormat.RGBA8UNORM_SRGB;
-      this.loadImages(images, format);
     }
   }
   /** @internal */

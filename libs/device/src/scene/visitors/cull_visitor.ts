@@ -1,4 +1,4 @@
-import { Visitor, visitor } from '@sophon/base';
+import { Visitor, visitor } from '../../../../base';
 import { ClipState, AABB } from '../../math';
 import { GraphNode } from '../graph_node';
 import { OctreeNode } from '../octree';

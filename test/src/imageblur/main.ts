@@ -1,4 +1,3 @@
-import * as base from '@sophon/base';
 import * as chaos from '@sophon/device';
 import * as dom from '@sophon/dom';
 
@@ -10,6 +9,8 @@ import * as dom from '@sophon/dom';
   await GUI.deserializeFromXML(document.querySelector('#main-ui').innerHTML);
   const sceneView = GUI.document.querySelector('#scene-view');
   sceneView.customDraw = true;
+
+  const assetManager = new chaos.AssetManager(viewer.device);
 
   const pb = new chaos.ProgramBuilder(viewer.device);
   const fullScreenQuadProgram = pb.buildRenderProgram({
@@ -75,7 +76,7 @@ import * as dom from '@sophon/dom';
       });
     }
   });
-  const cubeTexture = await viewer.device.loadTexture2DFromURL('./assets/images/Di-3d.png', null, chaos.GPUResourceUsageFlags.TF_NO_MIPMAP | chaos.GPUResourceUsageFlags.TF_LINEAR_COLOR_SPACE);
+  const cubeTexture = await assetManager.fetchTexture('./assets/images/Di-3d.png', null, false, true);
   const textures = [
     viewer.device.createTexture2D(chaos.TextureFormat.RGBA8UNORM, cubeTexture.width, cubeTexture.height, chaos.GPUResourceUsageFlags.TF_WRITABLE | chaos.GPUResourceUsageFlags.TF_NO_MIPMAP | chaos.GPUResourceUsageFlags.TF_LINEAR_COLOR_SPACE),
     viewer.device.createTexture2D(chaos.TextureFormat.RGBA8UNORM, cubeTexture.width, cubeTexture.height, chaos.GPUResourceUsageFlags.TF_WRITABLE | chaos.GPUResourceUsageFlags.TF_NO_MIPMAP | chaos.GPUResourceUsageFlags.TF_LINEAR_COLOR_SPACE),
@@ -120,7 +121,7 @@ import * as dom from '@sophon/dom';
     updateSettings();
   });
   updateSettings();
-  sceneView.addEventListener('draw', function (this: dom.RElement, evt: base.REvent) {
+  sceneView.addEventListener('draw', function (this: dom.RElement, evt: chaos.REvent) {
     evt.preventDefault();
     viewer.device.setProgram(blurProgram);
     viewer.device.setBindGroup(0, computeUniforms);

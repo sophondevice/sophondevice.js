@@ -1,9 +1,9 @@
-import type { TypedArray } from "@sophon/base";
 import { WebGPUBuffer } from "./buffer_webgpu";
 import { StructuredBufferData } from "../uniformdata";
 import { GPUResourceUsageFlags, StructuredBuffer, StructuredValue } from "../gpuobject";
 import * as typeinfo from '../builder/types';
 import type { WebGPUDevice } from './device';
+import type { TypedArray } from "../../misc";
 
 const vertexFormatTable: { [id: string]: GPUVertexFormat } = {
   [typeinfo.typeU8Vec2_Norm.typeId]: 'unorm8x2',

@@ -1,10 +1,10 @@
-import {List, ListIterator, assert} from '@sophon/base';
+import { List, ListIterator } from '../../base';
 import * as Yoga from './typeflex/api';
-import {YGSize} from './typeflex/yoga';
-import type {RNode} from './node';
-import type {RCoord, RColor} from './types';
-import type {YGNode} from './typeflex/ygnode';
-import type {YGMeasureMode} from './typeflex/enums';
+import { YGSize } from './typeflex/yoga';
+import type { RNode } from './node';
+import type { RCoord, RColor } from './types';
+import type { YGNode } from './typeflex/ygnode';
+import type { YGMeasureMode } from './typeflex/enums';
 
 export interface UIRect {
   x: number;
@@ -87,25 +87,21 @@ export class UILayout {
     return this._children.length;
   }
   appendChild(child: UILayout) {
-    assert(
+    console.assert(
       this._children.length === this.node.getChildCount(),
-      'Failed to append child layout: child count mismatch',
-    );
-    assert(
+      'Failed to append child layout: child count mismatch');
+    console.assert(
       child && !child._parent,
-      'Failed to append child layout: invalid child or child already has an parent',
-      true,
-    );
+      'Failed to append child layout: invalid child or child already has an parent');
     child._parent = this;
     child._iterator = this._children.append(child);
     this.node.insertChild(child.node, this.node.getChildCount());
     this.invalidateLayout();
   }
   removeChild(child: UILayout) {
-    assert(
+    console.assert(
       this._children.length === this.node.getChildCount(),
-      'Failed to append child layout: child count mismatch',
-    );
+      'Failed to append child layout: child count mismatch');
     if (child._iterator && child._iterator.list === this._children) {
       this.node.removeChild(child.node);
       this.invalidateLayout();
@@ -115,24 +111,19 @@ export class UILayout {
     }
   }
   insertChild(child: UILayout, at: UILayout) {
-    assert(
+    console.assert(
       this._children.length === this.node.getChildCount(),
-      'Failed to append child layout: child count mismatch',
-    );
-    assert(
+      'Failed to append child layout: child count mismatch');
+    console.assert(
       child && !child._parent,
-      'Failed to append child layout: invalid child or child already has an parent',
-      true,
-    );
-    assert(
+      'Failed to append child layout: invalid child or child already has an parent');
+    console.assert(
       at && at._parent === this,
-      'Failed to append child layout: invalid reference child',
-      true,
-    );
+      'Failed to append child layout: invalid reference child');
     child._parent = this;
     child._iterator = this._children.insertAt(child, at._iterator);
     const index = this.node.node.getChildren().indexOf(at.node.node);
-    assert(index >= 0, 'Failed to append child layout: cannot get reference child index', true);
+    console.assert(index >= 0, 'Failed to append child layout: cannot get reference child index');
     this.node.insertChild(child.node, index);
     this.invalidateLayout();
   }
@@ -158,7 +149,7 @@ export class UILayout {
     }
   }
   calcLayout(): void {
-    assert(!this._parent, 'calcLayout must be called on root element', true);
+    console.assert(!this._parent, 'calcLayout must be called on root element');
     this.node.calculateLayout(Yoga.UNDEFINED, Yoga.UNDEFINED, Yoga.DIRECTION_LTR);
     this.syncComputedRect(0, 0, false);
   }

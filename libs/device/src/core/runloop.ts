@@ -1,18 +1,15 @@
-import {assert} from '@sophon/base';
-
 const runningLoopStack: RunLoop[] = [];
 const runLoopQueue: RunLoop[] = [];
 
 function runLoopFunc() {
-  assert(runningLoopStack.length > 0, 'running loop stack error', true);
+  console.assert(runningLoopStack.length > 0, 'running loop stack error');
   const currentLoop = runningLoopStack[runningLoopStack.length - 1];
   currentLoop._processFrameTasks();
 
   if (currentLoop.mainFunc(...currentLoop.runArgs)) {
-    assert(
+    console.assert(
       runningLoopStack.length > 0 && runningLoopStack[runningLoopStack.length - 1] === currentLoop,
-      'running loop error',
-      true,
+      'running loop error'
     );
     runningLoopStack.pop();
     currentLoop.atexit && currentLoop.atexit();
@@ -100,16 +97,15 @@ export class RunLoop {
     this._frameTasks = [];
   }
   run(...args: unknown[]) {
-    if (assert(!!this._options.main, 'invalid runloop main function', false)) {
-      this._runArgs = [...args];
-      if (runningLoopStack.indexOf(this) < 0) {
-        if (runningLoopStack.length === 0) {
-          assert(runLoopQueue.length === 0, 'run loop queue error', true);
-          runningLoopStack.push(this);
-          runLoopFunc();
-        } else if (runLoopQueue.indexOf(this) < 0) {
-          runLoopQueue.push(this);
-        }
+    console.assert(!!this._options.main, 'invalid runloop main function')
+    this._runArgs = [...args];
+    if (runningLoopStack.indexOf(this) < 0) {
+      if (runningLoopStack.length === 0) {
+        console.assert(runLoopQueue.length === 0, 'run loop queue error');
+        runningLoopStack.push(this);
+        runLoopFunc();
+      } else if (runLoopQueue.indexOf(this) < 0) {
+        runLoopQueue.push(this);
       }
     }
   }

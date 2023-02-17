@@ -1,4 +1,4 @@
-import { REvent } from "@sophon/base";
+import { REvent } from "../../../../base";
 import { Vector3 } from "../../math";
 import { Quadtree } from "./quadtree";
 import { FaceMode, GPUObject, GPUResourceUsageFlags, PBStructTypeInfo, RenderStateSet, StructuredBuffer, Texture2D, TextureFormat } from "../../device";

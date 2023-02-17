@@ -1,5 +1,4 @@
-import { FileLoader, LoadManager, REvent, REventTarget, assert, Font } from '@sophon/base';
-import { Texture2D } from '@sophon/device';
+import { REvent, REventTarget, Texture2D, AssetManager } from '@sophon/device';
 import * as Yoga from './typeflex/api';
 import { injectGUIEvents, GUIRenderer } from './renderer';
 import { RColor, GUIEventPathBuilder } from './types';
@@ -13,6 +12,7 @@ import { RDocument } from './document';
 import { IStyleSheet, parseStyleSheet } from './style';
 import { RDOMTreeEvent, RMouseEvent, RDragEvent, RKeyEvent, RFocusEvent } from './events';
 import { RSelector, Rule } from './selector';
+import type { Font } from './font';
 import type { RElement } from './element';
 import type { Input } from './components/input';
 import type { StyleElement } from './style_element';
@@ -93,14 +93,12 @@ export class ElementRegistry {
     this._constructors = {};
   }
   register(ctor: IElementConstructor, tagName: string | ITagNameGetter) {
-    assert(!!ctor, 'Failed to register element type with null constructor', true);
-    assert(!!tagName, 'Failed to register element type with null tag name getter', true);
+    console.assert(!!ctor, 'Failed to register element type with null constructor');
+    console.assert(!!tagName, 'Failed to register element type with null tag name getter');
     if (typeof tagName === 'string') {
-      assert(
+      console.assert(
         !this._constructors[tagName],
-        'Failed to register element type: tagname already registered',
-        true,
-      );
+        'Failed to register element type: tagname already registered');
       this._constructors[tagName] = ctor;
     }
   }
@@ -401,6 +399,8 @@ export class GUI extends REventTarget {
   protected _metaKey: boolean;
   /** @internal */
   protected _styleElements: RElement[];
+  /** @internal */
+  protected _assetManager: AssetManager;
 
   constructor(renderer: GUIRenderer, bounds?: UIRect) {
     super(new GUIEventPathBuilder());
@@ -408,6 +408,7 @@ export class GUI extends REventTarget {
     this._drawVisitor = new DrawVisitor(this);
     this._imageManager = new ImageManager(this._renderer);
     this._glyphManager = new GlyphManager(this._renderer);
+    this._assetManager = new AssetManager(this._renderer.device);
     this._document = null;
     this._focusElement = null;
     this._activeElement = null;
@@ -640,7 +641,7 @@ export class GUI extends REventTarget {
           if (data.parent.isConnected) {
             if (el.tagName === 'style') {
               const index = this._styleElements.indexOf(el);
-              assert(index >= 0, 'Style element not found');
+              console.assert(index >= 0, 'Style element not found');
               this._styleElements.splice(index, 1);
               styleChanged = true;
             }
@@ -648,7 +649,7 @@ export class GUI extends REventTarget {
               const styles = el.querySelectorAll('style');
               styles.forEach((styleEl) => {
                 const index = this._styleElements.indexOf(styleEl as RElement);
-                assert(index >= 0, 'Style element not found');
+                console.assert(index >= 0, 'Style element not found');
                 this._styleElements.splice(index, 1);
                 styleChanged = true;
               });
@@ -983,9 +984,9 @@ export class GUI extends REventTarget {
   }
   async deserializeFromURL(url: string) {
     this._guiLoading = true;
-    const content = (await new FileLoader(null, 'text').load(url)) as string;
+    const content = await this._assetManager.fetchTextData(url);
     if (content) {
-      const normalizedURL = LoadManager.resolveURL(url);
+      const normalizedURL = this._assetManager.resolveURL(url);
       const index = normalizedURL.lastIndexOf('/');
       this._baseURI = normalizedURL.substring(0, index + 1);
       await this.deserializeFromXML(content);
@@ -1017,7 +1018,7 @@ export class GUI extends REventTarget {
   }
   /** @internal */
   async loadCSSFromURL(url: string) {
-    const content = (await new FileLoader(null, 'text').load(this._baseURI + url)) as string;
+    const content = await this._assetManager.fetchTextData(this._baseURI + url);
     this.loadCSS(content);
   }
   /** @internal */

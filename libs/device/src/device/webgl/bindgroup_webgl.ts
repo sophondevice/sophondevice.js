@@ -1,10 +1,10 @@
-import { TypedArray } from '@sophon/base';
 import { WebGLBaseTexture } from './basetexture_webgl';
 import { WebGLGPUProgram } from './gpuprogram_webgl';
 import { GPUResourceUsageFlags, StructuredValue } from '../gpuobject';
 import { WebGLStructuredBuffer } from './structuredbuffer_webgl';
 import { WebGLTextureSampler } from './sampler_webgl';
 import { WebGLGPUObject } from './gpuobject_webgl';
+import type { TypedArray } from '../../misc';
 import type { PBStructTypeInfo } from '../builder';
 import type { WebGLDevice } from './device_webgl';
 import type { BindGroupLayout, BaseTexture, StructuredBuffer, TextureSampler, BindGroup, BindGroupLayoutEntry } from '../gpuobject';

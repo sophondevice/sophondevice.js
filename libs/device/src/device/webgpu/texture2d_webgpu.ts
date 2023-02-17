@@ -1,9 +1,8 @@
-import { ImageLoader, FileLoader, TypedArray } from '@sophon/base';
 import { TextureTarget, TextureFormat, linearTextureFormatToSRGB, getTextureFormatBlockWidth, getTextureFormatBlockHeight, getTextureFormatBlockSize } from '../base_types';
 import { WebGPUBaseTexture } from './basetexture_webgpu';
-import { getDDSMipLevelsInfo } from '../../support/dds';
 import { GPUResourceUsageFlags, TextureImageElement, TextureMipmapData, Texture2D, GPUDataBuffer } from '../gpuobject';
 import type { WebGPUDevice } from './device';
+import type { TypedArray } from '../../misc';
 
 export class WebGPUTexture2D extends WebGPUBaseTexture implements Texture2D<GPUTexture> {
   constructor(device: WebGPUDevice) {
@@ -111,11 +110,6 @@ export class WebGPUTexture2D extends WebGPUBaseTexture implements Texture2D<GPUT
     }
   }
   /** @internal */
-  async loadFromURL(url: string, mimeType?: string, creationFlags?: number): Promise<void> {
-    this._flags = Number(creationFlags) || 0;
-    await this.loadURL(url, mimeType);
-  }
-  /** @internal */
   private guessTextureFormat(url: string, mimeType?: string) {
     if (mimeType === 'image/jpeg' || mimeType === 'image/png') {
       return this.linearColorSpace ? TextureFormat.RGBA8UNORM : TextureFormat.RGBA8UNORM_SRGB;
@@ -183,26 +177,6 @@ export class WebGPUTexture2D extends WebGPUBaseTexture implements Texture2D<GPUT
         }
         this.uploadRaw(levels.mipDatas[0][i].data, levels.mipDatas[0][i].width, levels.mipDatas[0][i].height, 1, 0, 0, 0, i);
       }
-    }
-  }
-  /** @internal */
-  private async loadURL(url: string, mimeType: string): Promise<void> {
-    const format = this.guessTextureFormat(url, mimeType);
-    if (format !== TextureFormat.Unknown) {
-      const img = await new ImageLoader(null).load(url);
-      const imageBitmap = await createImageBitmap(img, {
-        premultiplyAlpha: 'none',
-        colorSpaceConversion: 'none',
-      });
-      this.loadImage(imageBitmap, format);
-    } else {
-      const fileData = (await new FileLoader(null, 'arraybuffer').load(url)) as ArrayBuffer;
-      const ddsLevelsInfo = getDDSMipLevelsInfo(fileData);
-      if (!ddsLevelsInfo) {
-        console.error(new Error('Load DDS'));
-        return;
-      }
-      this.loadLevels(ddsLevelsInfo);
     }
   }
   /** @internal */

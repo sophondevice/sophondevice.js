@@ -9,7 +9,7 @@ import { visualizer } from 'rollup-plugin-visualizer';
 
 function getTargetES6() {
   return {
-    external: ['@sophon/base', '@sophon/device'],
+    external: ['@sophon/device'],
     input: 'src/index.ts',
     preserveSymlinks: true,
     output: {

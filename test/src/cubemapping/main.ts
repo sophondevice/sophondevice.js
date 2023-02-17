@@ -1,4 +1,3 @@
-import * as base from '@sophon/base';
 import * as chaos from '@sophon/device';
 import * as dom from '@sophon/dom';
 import * as common from '../common';
@@ -87,10 +86,12 @@ class ReflectLightModel extends chaos.UnlitLightModel {
   camera.keyboardInputSource = sceneView;
   camera.setModel(new chaos.OrbitCameraModel({ distance: camera.position.magnitude }));
 
+  const assetManager = new chaos.AssetManager(scene.device);
+
   const reflectionTexture = scheme.fb.getColorAttachments()[0] as chaos.TextureCube;
   const material = new chaos.StandardMaterial<ReflectLightModel>(scene.device);
   material.lightModel = new ReflectLightModel(reflectionTexture);
-  const cubeTexture = await viewer.device.loadCubeTextureFromURL('./assets/images/sky2.dds');
+  const cubeTexture = await assetManager.fetchTexture<chaos.TextureCube>('./assets/images/sky2.dds', null, true);
   scene.addSkybox(cubeTexture);
   scheme.reflectiveSphere = new chaos.SphereMesh(scene, { radius: 10, material: material });
 
@@ -101,9 +102,9 @@ class ReflectLightModel extends chaos.UnlitLightModel {
   light.lookAt(new chaos.Vector3(10, 10, 10), new chaos.Vector3(0, 0, 0), chaos.Vector3.axisPY());
 
   const stdMat = new chaos.PBRMetallicRoughnessMaterial(scene.device);
-  stdMat.lightModel.setAlbedoMap(await viewer.device.loadTexture2DFromURL('./assets/images/rustediron2_basecolor.png'), null, 0);
-  stdMat.lightModel.setNormalMap(await viewer.device.loadTexture2DFromURL('./assets/images/rustediron2_normal.png', null, chaos.GPUResourceUsageFlags.TF_LINEAR_COLOR_SPACE), null, 0);
-  stdMat.lightModel.setMetallicMap(await viewer.device.loadTexture2DFromURL('./assets/images/mr.png', null, chaos.GPUResourceUsageFlags.TF_LINEAR_COLOR_SPACE), null, 0);
+  stdMat.lightModel.setAlbedoMap(await assetManager.fetchTexture('./assets/images/rustediron2_basecolor.png', null, true), null, 0);
+  stdMat.lightModel.setNormalMap(await assetManager.fetchTexture('./assets/images/rustediron2_normal.png', null, false), null, 0);
+  stdMat.lightModel.setMetallicMap(await assetManager.fetchTexture('./assets/images/mr.png', null, false), null, 0);
   stdMat.lightModel.metallicIndex = 0;
   stdMat.lightModel.roughnessIndex = 1;
 
@@ -124,7 +125,7 @@ class ReflectLightModel extends chaos.UnlitLightModel {
     camera.setProjectionMatrix(chaos.Matrix4x4.perspective(camera.getFOV(), rect.width / rect.height, camera.getNearPlane(), camera.getFarPlane()));
   });
 
-  sceneView.addEventListener('keyup', function (evt: base.REvent) {
+  sceneView.addEventListener('keyup', function (evt: chaos.REvent) {
     const keyEvent = evt as dom.RKeyEvent;
     console.log(keyEvent.code, keyEvent.key);
     if (keyEvent.code === 'Space') {
@@ -141,7 +142,7 @@ class ReflectLightModel extends chaos.UnlitLightModel {
     }
   });
 
-  sceneView.addEventListener('draw', function (this: dom.RElement, evt: base.REvent) {
+  sceneView.addEventListener('draw', function (this: dom.RElement, evt: chaos.REvent) {
     evt.preventDefault();
     const elapsed = viewer.device.frameInfo.elapsedOverall;
     sphere2.position.set(20 * Math.sin(elapsed * 0.003), 0, 20 * Math.cos(elapsed * 0.003));
