@@ -1,4 +1,3 @@
-import { Device, Texture2D } from '../device';
 import { GraphNode } from './graph_node';
 import { BoxFrameShape, BoxShape, IBoxCreationOptions, PlaneShape, SphereShape } from './shape';
 import { LambertLightModel, StandardMaterial } from './materiallib';
@@ -10,6 +9,7 @@ import type { Scene } from './scene';
 import type { Material } from './material';
 import type { BatchDrawable, DrawContext } from './drawable';
 import type { BoundingBox, BoundingVolume } from './bounding_volume';
+import type { Device, Texture2D } from '../device';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export class Mesh extends GraphNode implements BatchDrawable {

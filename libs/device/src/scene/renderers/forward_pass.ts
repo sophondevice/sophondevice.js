@@ -1,4 +1,5 @@
-import { BlendFunc, RenderStateSet, Texture2D, TextureCube, PBGlobalScope, BindGroup, ShaderType, Texture2DArray } from '../../device';
+import { BlendFunc, RenderStateSet } from '../../device/render_states';
+import { ShaderType } from '../../device/base_types';
 import { IRenderQueueItem, RenderQueue } from '../render_queue';
 import { Camera } from '../camera';
 import { RenderPass } from './renderpass';
@@ -8,6 +9,8 @@ import * as values from '../values';
 import type { PunctualLight } from '../light';
 import type { DrawContext } from '../drawable';
 import type { RenderScheme } from './renderscheme';
+import type { PBGlobalScope } from '../../device/builder';
+import type { BindGroup } from '../../device/gpuobject';
 
 export class ForwardRenderPass extends RenderPass {
   /** @internal */

@@ -1,9 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {
-  Device,
-  Geometry,
-} from '../device';
+import { Geometry } from '../device/geometry';
 import type {BoundingVolume} from './bounding_volume';
+import type { Device } from '../device/device';
 
 export class Primitive extends Geometry {
   /** @internal */

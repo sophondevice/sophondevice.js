@@ -1,4 +1,5 @@
-import { TextureFormat, TextureMipmapLevelData, TextureMipmapData } from '../../../../device';
+import { TextureFormat } from '../../../../device/base_types';
+import { TextureMipmapLevelData, TextureMipmapData } from '../../../../device/gpuobject';
 import type { TypedArray } from '../../../../misc';
 
 const DDSHeaderSize = 31; // in DWORD

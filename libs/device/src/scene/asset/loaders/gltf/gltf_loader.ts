@@ -1,13 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { TextureFilter, TextureWrapping, PrimitiveType } from '../../../../device/base_types';
+import { FaceMode } from '../../../../device/render_states';
 import {
-  GPUDataBuffer,
-  TextureFilter,
-  TextureWrapping,
   GPUResourceUsageFlags,
-  FaceMode,
-  PrimitiveType,
-  Texture2D,
-  IndexBuffer,
   VERTEX_ATTRIB_POSITION,
   VERTEX_ATTRIB_NORMAL,
   VERTEX_ATTRIB_TANGENT,
@@ -23,10 +18,9 @@ import {
   VERTEX_ATTRIB_DIFFUSE,
   VERTEX_ATTRIB_BLEND_INDICES,
   VERTEX_ATTRIB_BLEND_WEIGHT,
-  PBStructTypeInfo,
-  PBArrayTypeInfo,
-  PBPrimitiveTypeInfo,
-  makePrimitiveType,
+  getVertexBufferAttribType
+} from '../../../../device/gpuobject';
+import {
   I8_BITMASK,
   U8_BITMASK,
   I16_BITMASK,
@@ -34,9 +28,8 @@ import {
   I32_BITMASK,
   U32_BITMASK,
   F32_BITMASK,
-  StructuredBuffer,
-  getVertexBufferAttribType,
-} from '../../../../device';
+  makePrimitiveType,
+} from '../../../../device/builder/types';
 import { Vector3, Vector4, Matrix4x4, Quaternion } from '../../../../math';
 import { SharedModel, AssetHierarchyNode, AssetMeshData, AssetSkeleton, AssetScene, AssetAnimationData, AssetSubMeshData, AssetMaterial, AssetUnlitMaterial, AssetPBRMaterialMR, AssetPBRMaterialSG, AssetMaterialCommon, MaterialTextureInfo, AssetPBRMaterialCommon } from '../../model';
 import { BoundingBox } from '../../../bounding_volume';
@@ -46,9 +39,11 @@ import { ComponentType, GLTFAccessor } from './helpers';
 import { Interpolator, InterpolationMode, InterpolationTarget } from '../../../interpolator';
 import { AbstractModelLoader } from '../loader';
 import { BUILTIN_ASSET_TEXTURE_SHEEN_LUT } from '../../../values';
+import { PBStructTypeInfo, PBArrayTypeInfo, PBPrimitiveTypeInfo } from '../../../../device/builder/types';
 import type { AssetManager } from '../../assetmanager';
 import type { AnimationChannel, AnimationSampler, GlTf, Material, TextureInfo } from './gltf';
 import type { TypedArray } from '../../../../misc';
+import type { GPUDataBuffer, Texture2D, IndexBuffer, StructuredBuffer } from '../../../../device/gpuobject';
 
 export interface GLTFContent extends GlTf {
   _manager: AssetManager;

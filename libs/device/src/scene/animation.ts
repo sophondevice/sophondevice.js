@@ -1,11 +1,11 @@
-import { Matrix4x4, Quaternion, Vector3, Vector4, XForm } from "../math";
+import { Matrix4x4, Quaternion, Vector3 } from "../math";
 import { AnimationTrack } from "./animationtrack";
 import { InterpolationTarget, Interpolator } from "./interpolator";
+import { BoundingBox } from "./bounding_volume";
 import type { SceneNode } from "./scene_node";
 import type { Skeleton } from "./skeleton";
 import type { Mesh } from "./mesh";
 import type { Model } from "./model";
-import { BoundingBox } from "./bounding_volume";
 
 export interface SkinnedBoundingBox {
   boundingVertices: Vector3[];

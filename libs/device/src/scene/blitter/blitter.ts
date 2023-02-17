@@ -1,7 +1,12 @@
-import { BaseTexture, BindGroup, Device, FaceMode, FrameBuffer, GPUProgram, GPUResourceUsageFlags, makeVertexBufferType, PBGlobalScope, PBInsideFunctionScope, PBShaderExp, PrimitiveType, ProgramBuilder, RenderStateSet, Texture2D, Texture2DArray, TextureCube, TextureSampler } from "../../device";
-import { CubeFace, Matrix4x4, Vector4 } from "../../math";
+import { PrimitiveType } from '../../device/base_types'
+import { RenderStateSet, FaceMode } from '../../device/render_states';
+import { GPUResourceUsageFlags, makeVertexBufferType } from '../../device/gpuobject';
+import { CubeFace } from "../../math";
 import { Primitive } from "../primitive";
 import { BoxShape } from "../shape";
+import type { Device } from '../../device/device';
+import type { BaseTexture, BindGroup, FrameBuffer, GPUProgram, Texture2D, Texture2DArray, TextureCube, TextureSampler } from '../../device/gpuobject';
+import type { PBGlobalScope, PBInsideFunctionScope, PBShaderExp } from "../../device/builder";
 
 // TODO: multi-pass support for filter
 
@@ -219,7 +224,7 @@ function getBlitProgram(device: Device, type: BlitType, filter: Blitter): BlitPr
 }
 
 function createBlitProgram(device: Device, type: BlitType, filter: Blitter): BlitProgramInfo {
-  const pb = new ProgramBuilder(device);
+  const pb = device.createProgramBuilder();
   const program = pb.buildRenderProgram({
     vertex() {
       this.$inputs.pos = pb.vec2().attrib('position');

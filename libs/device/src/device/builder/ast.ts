@@ -1,9 +1,9 @@
 import { ShaderType } from '../base_types';
 import { semanticToAttrib } from '../gpuobject';
-import { DeviceType, DEVICE_TYPE_WEBGL, DEVICE_TYPE_WEBGL2, DEVICE_TYPE_WEBGPU } from '../device';
 import * as typeinfo from './types';
 import * as errors from './errors';
 import type { PBShaderExp, PBGlobalScope } from './programbuilder';
+import type { DeviceType } from '../device';
 
 export const BuiltinInputStructNameVS = 'ch_VertexInput';
 export const BuiltinOutputStructNameVS = 'ch_VertexOutput';
@@ -128,7 +128,7 @@ const webGL2Extensions: string[] = [
 
 /** @internal */
 export const builtinVariables = {
-  [DEVICE_TYPE_WEBGL]: {
+  'webgl': {
     position: {
       name: 'gl_Position',
       type: new typeinfo.PBPrimitiveTypeInfo(typeinfo.PBPrimitiveType.F32VEC4),
@@ -157,7 +157,7 @@ export const builtinVariables = {
       stage: 'fragment',
     },
   },
-  [DEVICE_TYPE_WEBGL2]: {
+  webgl2: {
     vertexIndex: {
       name: 'gl_VertexID',
       semantic: 'vertex_index',
@@ -198,7 +198,7 @@ export const builtinVariables = {
       stage: 'fragment',
     },
   },
-  [DEVICE_TYPE_WEBGPU]: {
+  webgpu: {
     vertexIndex: {
       name: 'ch_builtin_vertexIndex',
       semantic: 'vertex_index',
@@ -475,7 +475,7 @@ export class ASTGlobalScope extends ASTScope {
       + ctx.outputs.map(output => output.toWebGL(indent, ctx)).join('')
       + super.toWebGL(indent, ctx);
     for (const k of ctx.builtins) {
-      const info = builtinVariables[DEVICE_TYPE_WEBGL][k];
+      const info = builtinVariables.webgl[k];
       if (info.extension) {
         ctx.extensions.add(info.extension);
       }
@@ -493,7 +493,7 @@ export class ASTGlobalScope extends ASTScope {
       + ctx.outputs.map(output => output.toWebGL2(indent, ctx)).join('')
       + super.toWebGL2(indent, ctx);
     for (const k of ctx.builtins) {
-      const info = builtinVariables[DEVICE_TYPE_WEBGL2][k];
+      const info = builtinVariables.webgl2[k];
       if (info.extension) {
         ctx.extensions.add(info.extension);
       }
@@ -510,9 +510,9 @@ export class ASTGlobalScope extends ASTScope {
         : [BuiltinInputStructNameCS];
     const usedBuiltins: string[] = [];
     for (const k of ctx.builtins) {
-      usedBuiltins.push(builtinVariables[DEVICE_TYPE_WEBGPU][k].name);
+      usedBuiltins.push(builtinVariables.webgpu[k].name);
     }
-    const allBuiltins = Object.keys(builtinVariables[DEVICE_TYPE_WEBGPU]).map(val => builtinVariables[DEVICE_TYPE_WEBGPU][val].name);
+    const allBuiltins = Object.keys(builtinVariables.webgpu).map(val => builtinVariables.webgpu[val].name);
     for (const type of ctx.types) {
       if (type instanceof ASTStructDefine && structNames.indexOf(type.type.structName) >= 0) {
         for (let i = type.type.structMembers.length - 1; i >= 0; i--) {

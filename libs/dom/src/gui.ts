@@ -1,4 +1,4 @@
-import { REvent, REventTarget, Texture2D, AssetManager } from '@sophon/device';
+import { REvent, REventTarget } from '../../base';
 import * as Yoga from './typeflex/api';
 import { injectGUIEvents, GUIRenderer } from './renderer';
 import { RColor, GUIEventPathBuilder } from './types';
@@ -17,6 +17,7 @@ import type { RElement } from './element';
 import type { Input } from './components/input';
 import type { StyleElement } from './style_element';
 import type { RPrimitiveBatchList } from './primitive';
+import type { Texture2D, AssetManager } from '@sophon/device';
 
 interface IElementConstructor {
   new(gui: GUI, ...args: unknown[]): RElement;
@@ -408,7 +409,7 @@ export class GUI extends REventTarget {
     this._drawVisitor = new DrawVisitor(this);
     this._imageManager = new ImageManager(this._renderer);
     this._glyphManager = new GlyphManager(this._renderer);
-    this._assetManager = new AssetManager(this._renderer.device);
+    this._assetManager = this._renderer.device.createAssetManager();
     this._document = null;
     this._focusElement = null;
     this._activeElement = null;

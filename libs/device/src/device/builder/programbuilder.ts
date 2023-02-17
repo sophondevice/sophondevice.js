@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { DeviceType, Device } from '../device';
 import { ShaderType } from '../base_types';
 import {
   MAX_BINDING_GROUPS,
@@ -15,6 +14,7 @@ import * as AST from './ast';
 import * as errors from './errors';
 import { PBAddressSpace, PBArrayTypeInfo, PBFunctionTypeInfo, PBPointerTypeInfo, PBPrimitiveType, PBPrimitiveTypeInfo, PBSamplerAccessMode, PBStructLayout, PBStructTypeInfo, PBTextureTypeInfo, PBTypeInfo, typeBool, typeF32, typeFrexpResult, typeFrexpResultVec2, typeFrexpResultVec3, typeFrexpResultVec4, typeI32, typeTex2D, typeTexCube, typeU32, typeVoid } from './types';
 import type { StorageTextureConstructor } from './constructors';
+import type { DeviceType, Device } from '../device';
 
 const COMPUTE_UNIFORM_NAME = 'ch_compute_block';
 const VERTEX_UNIFORM_NAME = 'ch_vertex_block';

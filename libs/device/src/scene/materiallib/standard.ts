@@ -1,4 +1,5 @@
-import { MAX_TEXCOORD_INDEX_COUNT, Device, Texture2D, BindGroup, ProgramBuilder, GPUProgram, PBGlobalScope, BlendFunc, TextureSampler } from '../../device';
+import { MAX_TEXCOORD_INDEX_COUNT } from '../../device/gpuobject';
+import { BlendFunc } from '../../device/render_states';
 import { Material } from '../material';
 import { ShaderLib } from './shaderlib';
 import { Matrix4x4 } from '../../math';
@@ -7,6 +8,9 @@ import * as values from '../values';
 import type { LightModel } from './lightmodel';
 import type { DrawContext } from '../drawable';
 import type { ShadowMapPass } from '../renderers';
+import type { Device } from '../../device/device';
+import type { BindGroup, GPUProgram } from '../../device/gpuobject';
+import type { PBGlobalScope, ProgramBuilder } from '../../device/builder';
 
 export class StandardMaterial<T extends LightModel = LightModel> extends Material {
   private _vertexColor: boolean;

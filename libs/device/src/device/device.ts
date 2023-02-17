@@ -2,6 +2,7 @@ import { REventTarget, REvent } from '../../../base';
 import { Vector4 } from '../math';
 import { PrimitiveType, TextureFormat } from './base_types';
 import { CPUTimer, ITimer } from './timer';
+import { AssetManager } from '../scene/asset/assetmanager';
 import type { TypedArray } from '../misc';
 import type { RenderStateSet } from './render_states';
 import type { VertexData } from './vertexdata';
@@ -27,7 +28,7 @@ import type {
   TextureImageElement,
   Texture2DArray
 } from './gpuobject';
-import { PBStructTypeInfo } from './builder';
+import { PBStructTypeInfo, ProgramBuilder } from './builder';
 
 interface GPUObjectList {
   textures: BaseTexture[];
@@ -447,6 +448,12 @@ export abstract class Device extends REventTarget {
   }
   deviceToScreen(val: number): number {
     return this.getFramebuffer() ? val : Math.round(val / this.getScale());
+  }
+  createAssetManager(): AssetManager {
+    return new AssetManager(this);
+  }
+  createProgramBuilder(): ProgramBuilder {
+    return new ProgramBuilder(this);
   }
   /** @internal */
   addGPUObject(obj: GPUObject) {

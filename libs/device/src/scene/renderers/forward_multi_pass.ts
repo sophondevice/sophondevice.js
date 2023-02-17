@@ -1,4 +1,4 @@
-import { BlendFunc, RenderStateSet, PBGlobalScope, BindGroup } from '../../device';
+import { RenderStateSet, BlendFunc } from '../../device/render_states';
 import { RenderQueue } from '../render_queue';
 import { Camera } from '../camera';
 import { RenderPass } from './renderpass';
@@ -7,6 +7,8 @@ import { RENDER_PASS_TYPE_MULTI_FORWARD, MATERIAL_FUNC_NORMAL, LIGHT_TYPE_NONE }
 import { PunctualLight } from '../light';
 import type { DrawContext } from '../drawable';
 import type { RenderScheme } from './renderscheme';
+import type { BindGroup } from '../../device/gpuobject';
+import type { PBGlobalScope } from '../../device/builder';
 
 export class ForwardMultiRenderPass extends RenderPass {
   /** @internal */

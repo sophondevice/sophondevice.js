@@ -1,8 +1,9 @@
 import { Material } from '../material';
 import { ShaderLib } from './shaderlib';
-import { Device, TextureCube, BindGroup, FaceMode, GPUProgram, PBGlobalScope, ProgramBuilder, TextureSampler } from '../../device';
+import { FaceMode } from '../../device/render_states';
 import * as values from '../values';
 import type { DrawContext } from '../drawable';
+import type { Device, TextureCube, BindGroup, GPUProgram, PBGlobalScope, ProgramBuilder, TextureSampler } from '../../device';
 
 export class SkyboxMaterial extends Material {
   private _skyCubemap: TextureCube;

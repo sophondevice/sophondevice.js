@@ -1,10 +1,11 @@
 import { Matrix4x4, Vector3, Vector4 } from "../../math";
-import { BindGroup, PBInsideFunctionScope, PBShaderExp, ShaderType, Texture2D, PBGlobalScope, TextureSampler, BaseTexture, PBStructTypeInfo, typeF32Vec3, typeF32, typeF32Vec4, typeMat3 } from "../../device";
+import { ShaderType } from "../../device/base_types";
+import { PBInsideFunctionScope, PBShaderExp, PBGlobalScope, PBStructTypeInfo, typeF32Vec3, typeF32, typeF32Vec4, typeMat3 } from "../../device/builder";
 import { EnvironmentLighting, EnvConstantAmbient, EnvIBL } from "./envlight";
 import { ShaderLib } from "./shaderlib";
 import { MATERIAL_FUNC_NORMAL } from "../values";
 import type { DrawContext } from "../drawable";
-
+import type { BindGroup, Texture2D, BaseTexture, TextureSampler } from '../../device/gpuobject';
 type TexCoordChannel = {
   srcLocation: number;
   transform: Matrix4x4;

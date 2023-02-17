@@ -1,5 +1,5 @@
-import {Frustum, AABB, Plane, ClipState, Vector3, Matrix4x4} from '../math';
-import {AABBTree} from './aabbtree';
+import { Frustum, AABB, Plane, ClipState, Vector3, Matrix4x4 } from '../math';
+import { AABBTree } from './aabbtree';
 
 export function boundingvolume() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

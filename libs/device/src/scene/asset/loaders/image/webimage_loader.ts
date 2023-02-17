@@ -1,4 +1,4 @@
-import { BaseTexture, GPUResourceUsageFlags } from '../../../../device';
+import { BaseTexture, GPUResourceUsageFlags } from '../../../../device/gpuobject';
 import { AbstractTextureLoader } from '../loader';
 import type { AssetManager } from '../../assetmanager';
 

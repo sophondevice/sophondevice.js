@@ -1,8 +1,7 @@
 import { ListIterator } from '../../../base';
 import { XForm, Frustum, Matrix4x4 } from '../math';
 import { SceneNode } from './scene_node';
-import { WorldBoundingVolume } from './world_bounding_volume';
-import { Texture2D } from '../device';
+import type { Texture2D } from '../device/gpuobject';
 import type { BatchDrawable, Drawable } from './drawable';
 import type { Scene } from './scene';
 import type { Camera } from './camera';
@@ -30,8 +29,6 @@ export class GraphNode extends SceneNode {
   /** @internal */
   protected _renderOrder: number;
   /** @internal */
-  protected _worldBoundingVolume: WorldBoundingVolume;
-  /** @internal */
   protected _boxDrawMode: number;
   /** @internal */
   protected _visible: number;
@@ -44,7 +41,6 @@ export class GraphNode extends SceneNode {
   constructor(scene: Scene, parent?: SceneNode) {
     super(scene, parent);
     this._clipMode = GraphNode.CLIP_ENABLED;
-    this._worldBoundingVolume = null;
     this._boxDrawMode = GraphNode.BBOXDRAW_DISABLED;
     this._renderOrder = GraphNode.ORDER_DEFAULT;
     this._visible = GraphNode.SHOW_DEFAULT;

@@ -1,6 +1,8 @@
-import { Device, Texture2D, TextureFormat, GPUResourceUsageFlags, BaseTexture } from "../../device";
-import { Vector2, Vector3, Vector4, Matrix3x3 } from "../../math";
-import { BUILTIN_ASSET_TEXTURE_SHEEN_LUT } from "../values";
+import { TextureFormat } from '../../device/base_types';
+import { GPUResourceUsageFlags, Texture2D, BaseTexture } from '../../device/gpuobject';
+import { Vector2, Vector3, Vector4, Matrix3x3 } from '../../math';
+import { BUILTIN_ASSET_TEXTURE_SHEEN_LUT } from '../values';
+import type { Device } from '../../device/device';
 
 const data = [
   0x28ff, 0x3ba9, 0x4891, 0x2f2b, 0x3b1a, 0x434a, 0x31c9, 0x3a8e, 0x3e0f, 0x33d9, 0x3a0a, 0x38f7,

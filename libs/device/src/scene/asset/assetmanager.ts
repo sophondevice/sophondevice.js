@@ -1,7 +1,8 @@
 import { isPowerOf2, nextPowerOf2, Vector3 } from '../../math';
-import { Device, BaseTexture, TextureFilter, TextureWrapping, GPUResourceUsageFlags, TextureFormat, Texture2D, GPUObject } from '../../device'
+import { TextureFilter, TextureWrapping, TextureFormat } from '../../device/base_types'
+import { GPUResourceUsageFlags } from '../../device/gpuobject'
 import { AssetHierarchyNode, AssetSkeleton, AssetSubMeshData, SharedModel } from './model';
-import { GLTFLoader } from './loaders/gltf';
+import { GLTFLoader } from './loaders/gltf/gltf_loader';
 import { WebImageLoader } from './loaders/image/webimage_loader';
 import { DDSLoader } from './loaders/dds/dds_loader';
 import { SceneNode } from '../scene_node';
@@ -13,9 +14,11 @@ import { BoundingBox } from '../bounding_volume';
 import { GammaBlitter } from '../blitter';
 import { getSheenLutLoader } from './builtin';
 import { GraphNode } from '../graph_node';
+import { BUILTIN_ASSET_TEXTURE_SHEEN_LUT } from '../values';
+import type { Device } from '../../device'
+import type { BaseTexture, Texture2D, GPUObject } from '../../device/gpuobject';
 import type { Scene } from '../scene';
 import type { AbstractTextureLoader, AbstractModelLoader } from './loaders/loader';
-import { BUILTIN_ASSET_TEXTURE_SHEEN_LUT } from '../values';
 
 export class AssetManager {
   /** @internal */

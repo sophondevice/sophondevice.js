@@ -1,5 +1,5 @@
 import { Accessor, AccessorSparse } from "./gltf";
-import { I8_BITMASK, U8_BITMASK, I16_BITMASK, U16_BITMASK, I32_BITMASK, U32_BITMASK, F32_BITMASK } from "../../../../device";
+import { I8_BITMASK, U8_BITMASK, I16_BITMASK, U16_BITMASK, I32_BITMASK, U32_BITMASK, F32_BITMASK } from "../../../../device/builder";
 import type { GLTFContent } from "./gltf_loader";
 import type { TypedArray } from "../../../../misc";
 

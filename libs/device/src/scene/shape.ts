@@ -1,11 +1,9 @@
 import { Vector2, Vector3 } from '../math';
-import {
-  PrimitiveType,
-  Device,
-  makeVertexBufferType,
-} from '../device';
+import { PrimitiveType } from '../device/base_types';
+import { makeVertexBufferType } from '../device/gpuobject';
 import { Primitive } from './primitive';
 import { BoundingBox } from './bounding_volume';
+import type { Device } from '../device';
 
 export interface IShapeCreationOptions {
   needNormal?: boolean;

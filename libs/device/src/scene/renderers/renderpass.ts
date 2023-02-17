@@ -1,5 +1,4 @@
 import { Vector4, Matrix4x4, Quaternion, CubeFace } from '../../math';
-import { Device, ProgramBuilder, FrameBuffer, BindGroup, PBGlobalScope } from '../../device';
 import { CullVisitor } from '../visitors/cull_visitor';
 import { RenderQueue } from '../render_queue';
 import { Material } from '../material';
@@ -9,6 +8,9 @@ import type { PunctualLight } from '../light';
 import type { RenderScheme } from './renderscheme';
 import type { DrawContext } from '../drawable';
 import type { Camera } from '../camera';
+import type { Device } from '../../device/device';
+import type { ProgramBuilder, PBGlobalScope } from '../../device/builder';
+import type { FrameBuffer, BindGroup } from '../../device/gpuobject';
 
 const cubeFaceList = [
   CubeFace.PX,
@@ -224,7 +226,7 @@ export abstract class RenderPass {
     let bindGroup = this._globalBindGroups[hash];
     if (!bindGroup) {
       const that = this;
-      const pb = new ProgramBuilder(this.device);
+      const pb = this.device.createProgramBuilder();
       const ret = pb.buildRender({
         vertex() {
           that.setGlobalBindings(this, ctx);

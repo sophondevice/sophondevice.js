@@ -1,10 +1,10 @@
 import { Vector3, Vector4, Matrix4x4 } from '../math';
 import { GraphNode } from './graph_node';
 import { BoundingVolume, BoundingBox } from './bounding_volume';
-import { TextureCube } from '../device';
 import { ShadowMapper } from './shadow/shadowmapper';
 import { LIGHT_TYPE_DIRECTIONAL, LIGHT_TYPE_ENVIRONMENT, LIGHT_TYPE_HEMISPHERIC, LIGHT_TYPE_POINT, LIGHT_TYPE_SPOT } from './values';
 import type { Scene } from './scene';
+import type { TextureCube } from '../device/gpuobject';
 
 export enum LightingFalloffMode {
   UNKNOWN = 0,

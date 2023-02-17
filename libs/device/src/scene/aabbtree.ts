@@ -1,4 +1,4 @@
-import { PrimitiveType } from '../device';
+import { PrimitiveType } from '../device/base_types';
 import { AABB, Vector3, Matrix4x4, Ray } from '../math';
 import type { TypedArray } from '../misc';
 

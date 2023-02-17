@@ -1,4 +1,3 @@
-import { Device } from './device';
 import {
   ShaderType,
   PrimitiveType,
@@ -11,6 +10,7 @@ import {
 import { PBTypeInfo, PBArrayTypeInfo, PBPrimitiveTypeInfo, PBStructTypeInfo, PBPrimitiveType } from './builder/types';
 import { VectorBase, CubeFace } from '../math';
 import type { TypedArray } from '../misc';
+import type { Device } from './device';
 
 export type TextureImageElement = ImageBitmap | HTMLCanvasElement;
 

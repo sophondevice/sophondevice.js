@@ -1,6 +1,6 @@
-import { BaseTexture, Texture2D } from '@sophon/device';
 import { MaxRectsPacker } from './maxrects-packer';
 import type { GUIRenderer } from './renderer';
+import type { BaseTexture, Texture2D } from '@sophon/device';
 
 export interface IAtlasInfo {
   atlasIndex: number;

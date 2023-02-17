@@ -1,8 +1,9 @@
 import { List, ListIterator } from '../../../base';
-import { Geometry, BindGroup, GPUProgram, RenderStateSet, Device, ProgramBuilder, BindGroupLayout, TextureSampler, TextureFilter } from '../device';
 import { ShaderLib } from './materiallib/shaderlib';
+import { TextureFilter } from '../device/base_types';
 import type { Matrix4x4 } from '../math';
 import type { Drawable, DrawContext } from './drawable';
+import type { Geometry, BindGroup, GPUProgram, RenderStateSet, Device, ProgramBuilder, BindGroupLayout, TextureSampler } from '../device';
 
 export type MaterialGCOptions = {
   disabled?: boolean,
@@ -447,7 +448,7 @@ export class Material {
   }
   /** @internal */
   protected createProgram(ctx: DrawContext, func: number): GPUProgram {
-    const pb = new ProgramBuilder(this._device);
+    const pb = this._device.createProgramBuilder();
     return this._createProgram(pb, ctx, func);
   }
   /** @internal */

@@ -1,4 +1,4 @@
-import { PBInsideFunctionScope, PBShaderExp } from "../../device";
+import { PBInsideFunctionScope, PBShaderExp } from "../../device/builder";
 import { ShaderLib } from "../materiallib/shaderlib";
 import { DEBUG_CASCADED_SHADOW_MAPS, LIGHT_TYPE_DIRECTIONAL, LIGHT_TYPE_POINT, LIGHT_TYPE_SPOT, RENDER_PASS_TYPE_FORWARD, RENDER_PASS_TYPE_MULTI_FORWARD } from "../values";
 import { DrawContext } from "../drawable";

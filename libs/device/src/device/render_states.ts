@@ -1,4 +1,4 @@
-import {CompareFunc} from './base_types';
+import { CompareFunc } from './base_types';
 
 export interface ColorState {
   redMask: boolean;

@@ -1,5 +1,7 @@
 import { Blitter, BlitType } from "./blitter";
-import { BindGroup, ProgramBuilder, PBShaderExp, ShaderType, PBInsideFunctionScope, PBGlobalScope } from "../../device";
+import { ShaderType } from "../../device/base_types";
+import type { BindGroup } from '../../device/gpuobject';
+import type { PBShaderExp, PBInsideFunctionScope, PBGlobalScope } from "../../device/builder";
 
 export class BoxFilterBlitter extends Blitter {
   protected _phase: 'horizonal' | 'vertical';
