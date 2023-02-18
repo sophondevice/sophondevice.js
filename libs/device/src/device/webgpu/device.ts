@@ -1,4 +1,4 @@
-import { Vector4 } from '../../math';
+import { Vector4 } from '../../../../base';
 import { getTextureFormatBlockSize, PrimitiveType, TextureFormat } from '../base_types';
 import {
   IFrameBufferOptions,
@@ -19,7 +19,8 @@ import {
   StructuredBuffer,
   TextureMipmapData,
   TextureImageElement,
-  GPUResourceUsageFlags
+  TextureCreationOptions,
+  BufferCreationOptions
 } from '../gpuobject';
 import { GPUProgramConstructParams, Device, DeviceType, TextureCaps, MiscCaps, FramebufferCaps, ShaderCaps, DeviceOptions } from '../device';
 import { RenderStateSet } from '../render_states';
@@ -277,39 +278,67 @@ export class WebGPUDevice extends Device {
   createSampler(options: SamplerOptions): TextureSampler {
     return this.fetchSampler(options);
   }
-  createTexture2D(format: TextureFormat, width: number, height: number, creationFlags?: number): Texture2D {
-    const tex = new WebGPUTexture2D(this);
-    tex.createEmpty(format, width, height, creationFlags);
+  createTexture2D(format: TextureFormat, width: number, height: number, options?: TextureCreationOptions): Texture2D {
+    const tex = options?.texture as WebGPUTexture2D ?? new WebGPUTexture2D(this);
+    if (!tex.isTexture2D()) {
+      console.error('createTexture2D() failed: options.texture must be 2d texture');
+      return null;
+    }
+    tex.createEmpty(format, width, height, this.parseTextureOptions(options));
     return tex;
   }
-  createTexture2DFromMipmapData(data: TextureMipmapData, creationFlags?: number): Texture2D {
-    const tex = new WebGPUTexture2D(this);
-    tex.createWithMipmapData(data, creationFlags);
+  createTexture2DFromMipmapData(data: TextureMipmapData, options?: TextureCreationOptions): Texture2D {
+    const tex = options?.texture as WebGPUTexture2D ?? new WebGPUTexture2D(this);
+    if (!tex.isTexture2D()) {
+      console.error('createTexture2DFromMipmapData() failed: options.texture must be 2d texture');
+      return null;
+    }
+    tex.createWithMipmapData(data, this.parseTextureOptions(options));
     return tex;
   }
-  createTexture2DFromImage(element: TextureImageElement, creationFlags?: number): Texture2D {
-    const tex = new WebGPUTexture2D(this);
-    tex.loadFromElement(element, creationFlags);
+  createTexture2DFromImage(element: TextureImageElement, options?: TextureCreationOptions): Texture2D {
+    const tex = options?.texture as WebGPUTexture2D ?? new WebGPUTexture2D(this);
+    if (!tex.isTexture2D()) {
+      console.error('createTexture2DFromImage() failed: options.texture must be 2d texture');
+      return null;
+    }
+    tex.loadFromElement(element, this.parseTextureOptions(options));
     return tex;
   }
-  createTexture2DArray(format: TextureFormat, width: number, height: number, depth: number, creationFlags?: number): Texture2DArray {
-    const tex = new WebGPUTexture2DArray(this);
-    tex.createEmpty(format, width, height, depth, creationFlags);
+  createTexture2DArray(format: TextureFormat, width: number, height: number, depth: number, options?: TextureCreationOptions): Texture2DArray {
+    const tex = options?.texture as WebGPUTexture2DArray ?? new WebGPUTexture2DArray(this);
+    if (!tex.isTexture2DArray()) {
+      console.error('createTexture2DArray() failed: options.texture must be 2d array texture');
+      return null;
+    }
+    tex.createEmpty(format, width, height, depth, this.parseTextureOptions(options));
     return tex;
   }
-  createTexture3D(format: TextureFormat, width: number, height: number, depth: number, creationFlags?: number): Texture3D {
-    const tex = new WebGPUTexture3D(this);
-    tex.createEmpty(format, width, height, depth, creationFlags);
+  createTexture3D(format: TextureFormat, width: number, height: number, depth: number, options?: TextureCreationOptions): Texture3D {
+    const tex = options?.texture as WebGPUTexture3D ?? new WebGPUTexture3D(this);
+    if (!tex.isTexture3D()) {
+      console.error('createTexture3D() failed: options.texture must be 3d texture');
+      return null;
+    }
+    tex.createEmpty(format, width, height, depth, this.parseTextureOptions(options));
     return tex;
   }
-  createCubeTexture(format: TextureFormat, size: number, creationFlags?: number): TextureCube {
-    const tex = new WebGPUTextureCube(this);
-    tex.createEmpty(format, size, creationFlags);
+  createCubeTexture(format: TextureFormat, size: number, options?: TextureCreationOptions): TextureCube {
+    const tex = options?.texture as WebGPUTextureCube ?? new WebGPUTextureCube(this);
+    if (!tex.isTextureCube()) {
+      console.error('createCubeTexture() failed: options.texture must be cube texture');
+      return null;
+    }
+    tex.createEmpty(format, size, this.parseTextureOptions(options));
     return tex;
   }
-  createCubeTextureFromMipmapData(data: TextureMipmapData, creationFlags?: number): TextureCube {
-    const tex = new WebGPUTextureCube(this);
-    tex.createWithMipmapData(data, creationFlags);
+  createCubeTextureFromMipmapData(data: TextureMipmapData, options?: TextureCreationOptions): TextureCube {
+    const tex = options?.texture as WebGPUTextureCube ?? new WebGPUTextureCube(this);
+    if (!tex.isTextureCube()) {
+      console.error('createCubeTextureFromMipmapData() failed: options.texture must be cube texture');
+      return null;
+    }
+    tex.createWithMipmapData(data, this.parseTextureOptions(options));
     return tex;
   }
   createTextureVideo(el: HTMLVideoElement): TextureVideo {
@@ -323,15 +352,15 @@ export class WebGPUDevice extends Device {
   }
   createBuffer(
     sizeInBytes: number,
-    usage: number,
+    options: BufferCreationOptions,
   ): GPUDataBuffer {
-    return new WebGPUBuffer(this, usage, sizeInBytes);
+    return new WebGPUBuffer(this, this.parseBufferOptions(options), sizeInBytes);
   }
-  createIndexBuffer(data: Uint16Array | Uint32Array, usage?: number): IndexBuffer<unknown> {
-    return new WebGPUIndexBuffer(this, data, usage);
+  createIndexBuffer(data: Uint16Array | Uint32Array, options?: BufferCreationOptions): IndexBuffer<unknown> {
+    return new WebGPUIndexBuffer(this, data, this.parseBufferOptions(options, 'index'));
   }
-  createStructuredBuffer(structureType: PBStructTypeInfo, usage: number, data?: TypedArray): StructuredBuffer {
-    return new WebGPUStructuredBuffer(this, structureType, usage, data);
+  createStructuredBuffer(structureType: PBStructTypeInfo, options: BufferCreationOptions, data?: TypedArray): StructuredBuffer {
+    return new WebGPUStructuredBuffer(this, structureType, this.parseBufferOptions(options), data);
   }
   createVAO(data: VertexData): VertexInputLayout {
     return new WebGPUVertexInputLayout(this, data);
@@ -511,7 +540,9 @@ export class WebGPUDevice extends Device {
     if (colorAttachment && texFormat) {
       const pixelSize = getTextureFormatBlockSize(texFormat);
       const bufferSize = w * h * pixelSize;
-      const stagingBuffer = this.createBuffer(bufferSize, GPUResourceUsageFlags.BF_READ);
+      const stagingBuffer = this.createBuffer(bufferSize, {
+        usage: 'read'
+      });
       this.readPixelsToBuffer(x, y, w, h, stagingBuffer);
       const data = new Uint8Array(buffer.buffer, buffer.byteOffset, buffer.byteLength);
       await stagingBuffer.getBufferSubData(data);

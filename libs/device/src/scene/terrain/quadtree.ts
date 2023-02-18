@@ -1,8 +1,8 @@
 import { PatchPosition } from './types';
 import { BoundingBox } from '../bounding_volume';
 import { TerrainPatch } from './patch';
-import { ClipState, Frustum, Matrix4x4, Vector3, isPowerOf2, nextPowerOf2 } from '../../math';
-import { GPUResourceUsageFlags, IndexBuffer, makeVertexBufferType, PrimitiveType, StructuredBuffer, Texture2D, TextureFormat } from '../../device';
+import { ClipState, Frustum, Matrix4x4, Vector3, isPowerOf2, nextPowerOf2 } from '../../../../base';
+import { IndexBuffer, makeVertexBufferType, PrimitiveType, StructuredBuffer, Texture2D, TextureFormat } from '../../device';
 import { HeightField } from './heightfield';
 import type { Terrain } from './terrain';
 import type { Camera } from '../camera';
@@ -187,12 +187,12 @@ export class Quadtree {
     vertices[offset + (dimension - 1) * 3 + 0] = dimension - 3;
     vertices[offset + (dimension - 1) * 3 + 1] = 0;
     vertices[offset + (dimension - 1) * 3 + 2] = dimension - 3;
-    this._baseVertices = device.createStructuredBuffer(makeVertexBufferType(dimension * dimension, 'position_f32x3'), GPUResourceUsageFlags.BF_VERTEX | GPUResourceUsageFlags.MANAGED, vertices);
+    this._baseVertices = device.createStructuredBuffer(makeVertexBufferType(dimension * dimension, 'position_f32x3'), { usage: 'vertex', managed: true }, vertices);
     // Create base index buffer
     const indices = this.strip(vertexCacheSize);
-    this._indices = device.createIndexBuffer(indices, GPUResourceUsageFlags.MANAGED);
+    this._indices = device.createIndexBuffer(indices, { managed: true });
     const lineIndices = this.line(indices);
-    this._indicesWireframe = device.createIndexBuffer(lineIndices, GPUResourceUsageFlags.MANAGED);
+    this._indicesWireframe = device.createIndexBuffer(lineIndices, { managed: true });
     this._primitiveCount = indices.length - 2;
     this._primitiveType = PrimitiveType.TriangleStrip;
     this._rootNode = new QuadtreeNode();
@@ -204,7 +204,7 @@ export class Quadtree {
       normalMapBytes[i * 4 + 2] = Math.floor((normals[i * 3 + 2] * 0.5 + 0.5) * 255);
       normalMapBytes[i * 4 + 3] = 255;
     }
-    this._normalMap = device.createTexture2D(TextureFormat.RGBA8UNORM, rootSizeX, rootSizeZ, GPUResourceUsageFlags.TF_LINEAR_COLOR_SPACE);
+    this._normalMap = device.createTexture2D(TextureFormat.RGBA8UNORM, rootSizeX, rootSizeZ, { colorSpace: 'linear' });
     this._normalMap.name = `TerrainNormalMap-${this._normalMap.uid}`;
     this._normalMap.update(normalMapBytes, 0, 0, this._normalMap.width, this._normalMap.height);
     return this._rootNode.initialize(scene, this, null, PatchPosition.LeftTop, this._baseVertices, normals, elevations);

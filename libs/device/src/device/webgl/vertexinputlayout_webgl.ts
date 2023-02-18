@@ -1,7 +1,7 @@
 import { PrimitiveType } from '../base_types';
 import { WebGLGPUObject } from './gpuobject_webgl';
 import { WebGLEnum } from './webgl_enum';
-import { VertexInputLayout, StructuredBuffer, IndexBuffer, getVertexBufferAttribType, getVertexBufferStride } from '../gpuobject';
+import { VertexInputLayout, StructuredBuffer, IndexBuffer, getVertexBufferAttribType, getVertexBufferStride, VertexSemantic } from '../gpuobject';
 import { VertexData } from '../vertexdata';
 import { typeMap } from './constants_webgl';
 import type { WebGLDevice } from './device_webgl';
@@ -36,8 +36,8 @@ export class WebGLVertexInputLayout
   getDrawOffset(): number {
     return this._vertexData.getDrawOffset();
   }
-  getVertexBuffer(location: number): StructuredBuffer {
-    return this._vertexData.getVertexBuffer(location);
+  getVertexBuffer(semantic: VertexSemantic): StructuredBuffer {
+    return this._vertexData.getVertexBuffer(semantic);
   }
   getIndexBuffer(): IndexBuffer {
     return this._vertexData.getIndexBuffer();

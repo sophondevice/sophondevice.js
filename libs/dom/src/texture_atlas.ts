@@ -1,4 +1,4 @@
-import { Texture2D } from '@sophon/device';
+import type { Texture2D } from '@sophon/device';
 import type { RCoord } from './types';
 
 export class TextureAtlas {

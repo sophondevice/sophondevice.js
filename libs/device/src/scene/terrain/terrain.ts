@@ -1,7 +1,6 @@
-import { REvent } from "../../../../base";
-import { Vector3 } from "../../math";
+import { REvent, Vector3 } from "../../../../base";
 import { Quadtree } from "./quadtree";
-import { FaceMode, GPUObject, GPUResourceUsageFlags, PBStructTypeInfo, RenderStateSet, StructuredBuffer, Texture2D, TextureFormat } from "../../device";
+import { FaceMode, GPUObject, PBStructTypeInfo, RenderStateSet, StructuredBuffer, Texture2D, TextureFormat } from "../../device";
 import { MAX_DETAIL_TEXTURE_LEVELS, TerrainMaterial } from "./terrainmaterial";
 import { Drawable, DrawContext } from "../drawable";
 import { GraphNode } from "../graph_node";
@@ -165,7 +164,7 @@ export class Terrain extends GraphNode implements Drawable {
   draw(ctx: DrawContext) {
     if (!this._terrainInfoBuffer) {
       const program = this._material.getOrCreateProgram(ctx).programs[ctx.materialFunc];
-      this._terrainInfoBuffer = this.scene.device.createStructuredBuffer(program.getBindingInfo('terrainInfo').type as PBStructTypeInfo, GPUResourceUsageFlags.BF_UNIFORM);
+      this._terrainInfoBuffer = this.scene.device.createStructuredBuffer(program.getBindingInfo('terrainInfo').type as PBStructTypeInfo, { usage: 'uniform' });
       const bbox = this.getBoundingVolume().toAABB();
       const terrainSizeX = bbox.extents.x * 2;
       const terrainSizeZ = bbox.extents.z * 2;

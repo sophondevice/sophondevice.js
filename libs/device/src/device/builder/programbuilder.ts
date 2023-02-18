@@ -7,7 +7,7 @@ import {
   BindGroupLayout,
   BindGroupLayoutEntry,
   getVertexAttribByName,
-  VertexAttribName,
+  VertexSemantic,
 } from '../gpuobject';
 import { PBReflection, PBReflectionTagGetter } from './reflection';
 import * as AST from './ast';
@@ -2614,7 +2614,7 @@ export class PBShaderExp extends Proxiable<PBShaderExp> {
   /** @internal */
   $memberCache: { [name: string]: PBShaderExp };
   /** @internal */
-  $attrib: VertexAttribName;
+  $attrib: VertexSemantic;
   /** @internal */
   $tags: ProgramBuilder.ShaderExpTagValue[];
   /** @internal */
@@ -2674,7 +2674,7 @@ export class PBShaderExp extends Proxiable<PBShaderExp> {
     this.$group = group;
     return this;
   }
-  attrib(attr: VertexAttribName): PBShaderExp {
+  attrib(attr: VertexSemantic): PBShaderExp {
     this.$declareType = AST.DeclareType.DECLARE_TYPE_IN;
     this.$attrib = attr;
     return this;

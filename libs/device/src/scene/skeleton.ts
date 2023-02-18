@@ -1,5 +1,5 @@
-import { Matrix4x4, Vector3, nextPowerOf2 } from "../math";
-import { GPUResourceUsageFlags, Texture2D } from "../device/gpuobject";
+import { Matrix4x4, Vector3, nextPowerOf2 } from "../../../base";
+import { Texture2D } from "../device/gpuobject";
 import { TextureFormat } from "../device/base_types";
 import { SkinnedBoundingBox } from "./animation";
 import type { SceneNode } from "./scene_node";
@@ -63,7 +63,10 @@ export class Skeleton {
   /** @internal */
   private _createJointTexture(device: Device) {
     const textureWidth = nextPowerOf2(Math.max(4, Math.ceil(Math.sqrt(this._joints.length * 4))));
-    this._jointTexture = device.createTexture2D(TextureFormat.RGBA32F, textureWidth, textureWidth, GPUResourceUsageFlags.TF_NO_MIPMAP | GPUResourceUsageFlags.TF_LINEAR_COLOR_SPACE);
+    this._jointTexture = device.createTexture2D(TextureFormat.RGBA32F, textureWidth, textureWidth, {
+      colorSpace: 'linear',
+      noMipmap: true
+    });
     this._jointMatrixArray = new Float32Array(textureWidth * textureWidth * 4);
     this._jointMatrices = this._joints.map((val, index) => new Matrix4x4(this._jointMatrixArray.subarray(index * 16, index * 16 + 16)));
   }

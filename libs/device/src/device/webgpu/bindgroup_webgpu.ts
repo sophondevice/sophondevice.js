@@ -2,7 +2,7 @@ import { WebGPUStructuredBuffer } from './structuredbuffer_webgpu';
 import { WebGPUBaseTexture } from './basetexture_webgpu';
 import { WebGPUTextureVideo } from './texturevideo_webgpu';
 import { WebGPUTextureSampler } from './sampler_webgpu';
-import { GPUResourceUsageFlags, StructuredValue, TextureVideo } from '../gpuobject';
+import { BufferCreationOptions, GPUResourceUsageFlags, StructuredValue, TextureVideo } from '../gpuobject';
 import { WebGPUObject } from './gpuobject_webgpu';
 import type { PBStructTypeInfo } from '../builder';
 import type { WebGPUDevice } from './device';
@@ -273,7 +273,12 @@ export class WebGPUBindGroup extends WebGPUObject<unknown> implements BindGroup 
         }
         let buffer = this._resources[entry.name] as WebGPUStructuredBuffer;
         if (!buffer && !nocreate) {
-          buffer = this._device.createStructuredBuffer(entry.type as PBStructTypeInfo, usage | GPUResourceUsageFlags.DYNAMIC) as WebGPUStructuredBuffer;
+          const options: BufferCreationOptions = {
+            usage: bufferUsage === GPUResourceUsageFlags.BF_UNIFORM ? 'uniform' : null,
+            storage: bufferUsage === GPUResourceUsageFlags.BF_STORAGE,
+            dynamic: true
+          };
+          buffer = this._device.createStructuredBuffer(entry.type as PBStructTypeInfo, options) as WebGPUStructuredBuffer;
           this._resources[entry.name] = buffer;
         }
         return buffer;

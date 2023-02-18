@@ -8,31 +8,49 @@ import {
   CompareFunc,
 } from './base_types';
 import { PBTypeInfo, PBArrayTypeInfo, PBPrimitiveTypeInfo, PBStructTypeInfo, PBPrimitiveType } from './builder/types';
-import { VectorBase, CubeFace } from '../math';
+import { VectorBase, CubeFace } from '../../../base';
 import type { TypedArray } from '../misc';
 import type { Device } from './device';
 
 export type TextureImageElement = ImageBitmap | HTMLCanvasElement;
 
+/** @internal */
 export const MAX_VERTEX_ATTRIBUTES = 16;
+/** @internal */
 export const MAX_BINDING_GROUPS = 4;
+/** @internal */
 export const MAX_TEXCOORD_INDEX_COUNT = 8;
-
+/** @internal */
 export const VERTEX_ATTRIB_POSITION = 0;
+/** @internal */
 export const VERTEX_ATTRIB_NORMAL = 1;
+/** @internal */
 export const VERTEX_ATTRIB_DIFFUSE = 2;
+/** @internal */
 export const VERTEX_ATTRIB_TANGENT = 3;
+/** @internal */
 export const VERTEX_ATTRIB_TEXCOORD0 = 4;
+/** @internal */
 export const VERTEX_ATTRIB_TEXCOORD1 = 5;
+/** @internal */
 export const VERTEX_ATTRIB_TEXCOORD2 = 6;
+/** @internal */
 export const VERTEX_ATTRIB_TEXCOORD3 = 7;
+/** @internal */
 export const VERTEX_ATTRIB_TEXCOORD4 = 8;
+/** @internal */
 export const VERTEX_ATTRIB_TEXCOORD5 = 9;
+/** @internal */
 export const VERTEX_ATTRIB_TEXCOORD6 = 10;
+/** @internal */
 export const VERTEX_ATTRIB_TEXCOORD7 = 11;
+/** @internal */
 export const VERTEX_ATTRIB_BLEND_WEIGHT = 12;
+/** @internal */
 export const VERTEX_ATTRIB_BLEND_INDICES = 13;
+/** @internal */
 export const VERTEX_ATTRIB_CUSTOM0 = 14;
+/** @internal */
 export const VERTEX_ATTRIB_CUSTOM1 = 15;
 
 const vertexAttribFormatMap = {
@@ -365,7 +383,7 @@ const vertexAttribNameMap = {
   custom1: VERTEX_ATTRIB_CUSTOM1,
 } as const;
 
-export type VertexAttribName = keyof typeof vertexAttribNameMap;
+export type VertexSemantic = keyof typeof vertexAttribNameMap;
 
 const vertexAttribNameRevMap = {
   [VERTEX_ATTRIB_POSITION]: 'position',
@@ -386,6 +404,24 @@ const vertexAttribNameRevMap = {
   [VERTEX_ATTRIB_CUSTOM1]: 'custom1',
 } as const;
 
+export type TextureColorSpace = 'srgb'|'linear';
+export type BufferUsage = 'vertex'|'index'|'uniform'|'read'|'write';
+export interface BaseCreationOptions {
+  dynamic?: boolean;
+  managed?: boolean;
+}
+export interface TextureCreationOptions extends BaseCreationOptions {
+  colorSpace?: TextureColorSpace;
+  noMipmap?: boolean;
+  writable?: boolean;
+  texture?: BaseTexture;
+}
+export interface BufferCreationOptions extends BaseCreationOptions {
+  usage?: BufferUsage;
+  storage?: boolean;
+}
+
+/** @internal */
 export enum GPUResourceUsageFlags {
   TF_LINEAR_COLOR_SPACE = (1 << 1),
   TF_NO_MIPMAP = (1 << 2),
@@ -401,11 +437,11 @@ export enum GPUResourceUsageFlags {
   MANAGED = (1 << 12),
 }
 
-export function getVertexAttribByName(name: VertexAttribName): number {
+export function getVertexAttribByName(name: VertexSemantic): number {
   return vertexAttribNameMap[name];
 }
 
-export function getVertexAttribName(attrib: number): VertexAttribName {
+export function getVertexAttribName(attrib: number): VertexSemantic {
   return vertexAttribNameRevMap[attrib];
 }
 
@@ -762,7 +798,7 @@ export interface VertexInputLayout<T = unknown> extends GPUObject<T> {
   };
   readonly indexBuffer: IndexBuffer;
   getDrawOffset(): number;
-  getVertexBuffer(location: number): StructuredBuffer;
+  getVertexBuffer(semantic: VertexSemantic): StructuredBuffer;
   getIndexBuffer(): IndexBuffer;
   bind(): void;
   draw(primitiveType: PrimitiveType, first: number, count: number): void;

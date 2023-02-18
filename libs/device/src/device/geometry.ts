@@ -1,5 +1,5 @@
 import { PrimitiveType } from './base_types';
-import { GPUResourceUsageFlags, VertexInputLayout, StructuredBuffer, IndexBuffer, VertexStepMode } from './gpuobject';
+import { GPUResourceUsageFlags, VertexInputLayout, StructuredBuffer, IndexBuffer, VertexStepMode, VertexSemantic, getVertexAttribByName } from './gpuobject';
 import { VertexData } from './vertexdata';
 import type { PBStructTypeInfo } from './builder';
 import type { Device } from './device';
@@ -54,15 +54,18 @@ export class Geometry {
   removeVertexBuffer(buffer: StructuredBuffer): void {
     this._vaoDirty = this._vertexData.removeVertexBuffer(buffer);
   }
-  getVertexBuffer(location: number): StructuredBuffer {
-    return this._vertexData.getVertexBuffer(location);
+  getVertexBuffer(semantic: VertexSemantic): StructuredBuffer {
+    return this._vertexData.getVertexBuffer(semantic);
   }
   createAndSetVertexBuffer(
     structureType: PBStructTypeInfo,
     data: TypedArray,
     stepMode?: VertexStepMode
   ): StructuredBuffer {
-    const buffer = this._device.createStructuredBuffer(structureType, GPUResourceUsageFlags.BF_VERTEX | GPUResourceUsageFlags.MANAGED, data);
+    const buffer = this._device.createStructuredBuffer(structureType, {
+      usage: 'vertex',
+      managed: true
+    }, data);
     const ret = this._vertexData.setVertexBuffer(buffer, stepMode);
     this._vaoDirty = !!ret;
     return ret;
@@ -76,7 +79,10 @@ export class Geometry {
     return ret;
   }
   createAndSetIndexBuffer(data: Uint16Array | Uint32Array, dynamic?: boolean): IndexBuffer {
-    const buffer = this._device.createIndexBuffer(data, dynamic ? GPUResourceUsageFlags.DYNAMIC : GPUResourceUsageFlags.MANAGED);
+    const buffer = this._device.createIndexBuffer(data, {
+      dynamic: !!dynamic,
+      managed: !dynamic
+    });
     this._vertexData.setIndexBuffer(buffer);
     this._vaoDirty = true;
     return buffer;

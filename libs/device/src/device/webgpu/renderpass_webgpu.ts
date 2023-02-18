@@ -1,4 +1,4 @@
-import { Vector4 } from "../../math";
+import { Vector4 } from "../../../../base";
 import { hasStencilChannel, PrimitiveType } from "../base_types";
 import { WebGPUProgram } from "./gpuprogram_webgpu";
 import { WebGPURenderStateSet } from "./renderstates_webgpu";

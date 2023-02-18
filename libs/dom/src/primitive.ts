@@ -1,6 +1,6 @@
-import { Texture2D } from '@sophon/device';
 import { UIRect } from './layout';
 import { RColor } from './types';
+import type { Texture2D } from '@sophon/device';
 
 export abstract class RPrimitive {
   abstract forEach(callback: (x: number, y: number, u: number, v: number) => void, thisArg?: unknown);

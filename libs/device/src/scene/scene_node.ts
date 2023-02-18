@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Visitor, REventPath, REventPathBuilder, REventTarget, REvent } from '../../../base';
-import { XForm, Vector3, Quaternion } from '../math';
+import { Visitor, REventPath, REventPathBuilder, REventTarget, REvent, Vector3, Quaternion } from '../../../base';
+import { XForm } from './xform';
 import type { Scene } from './scene';
 import type { GraphNode } from './graph_node';
 import type { Mesh } from './mesh';

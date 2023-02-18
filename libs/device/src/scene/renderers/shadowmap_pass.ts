@@ -1,10 +1,10 @@
 import { RenderPass } from './renderpass';
 import { RENDER_PASS_TYPE_SHADOWMAP } from '../values';
-import { Frustum, Matrix4x4, Vector4 } from '../../math';
+import { Frustum, Vector4 } from '../../../../base';
 import { PunctualLight } from '../light';
 import { ShaderLib } from '../materiallib';
 import { Camera } from '../camera';
-import { ProgramBuilder, PBShaderExp, PBGlobalScope, BindGroup, RenderStateSet, FaceMode, TextureFormat, PBInsideFunctionScope } from '../../device';
+import { PBShaderExp, PBGlobalScope, BindGroup, RenderStateSet, FaceMode, TextureFormat, PBInsideFunctionScope } from '../../device';
 import { CopyBlitter, GaussianBlurBlitter, BlitType } from '../blitter';
 import * as values from '../values';
 import type { Scene } from '../scene';

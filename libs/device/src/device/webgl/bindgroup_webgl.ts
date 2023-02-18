@@ -140,7 +140,7 @@ export class WebGLBindGroup extends WebGLGPUObject<unknown> implements BindGroup
       if (entry.buffer && entry.name === name) {
         let buffer = this._resources[entry.name] as WebGLStructuredBuffer;
         if (!buffer && !nocreate) {
-          buffer = this._device.createStructuredBuffer(entry.type as PBStructTypeInfo, GPUResourceUsageFlags.BF_UNIFORM) as WebGLStructuredBuffer;
+          buffer = this._device.createStructuredBuffer(entry.type as PBStructTypeInfo, { usage: 'uniform' }) as WebGLStructuredBuffer;
           this._resources[entry.name] = buffer;
         }
         return buffer;

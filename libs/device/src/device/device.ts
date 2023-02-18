@@ -1,12 +1,11 @@
-import { REventTarget, REvent } from '../../../base';
-import { Vector4 } from '../math';
+import { REventTarget, REvent, Vector4 } from '../../../base';
 import { PrimitiveType, TextureFormat } from './base_types';
 import { CPUTimer, ITimer } from './timer';
 import { AssetManager } from '../scene/asset/assetmanager';
 import type { TypedArray } from '../misc';
 import type { RenderStateSet } from './render_states';
 import type { VertexData } from './vertexdata';
-import type {
+import {
   IFrameBufferOptions,
   SamplerOptions,
   TextureSampler,
@@ -26,7 +25,11 @@ import type {
   TextureVideo,
   TextureMipmapData,
   TextureImageElement,
-  Texture2DArray
+  Texture2DArray,
+  TextureCreationOptions,
+  BufferCreationOptions,
+  GPUResourceUsageFlags,
+  BufferUsage
 } from './gpuobject';
 import { PBStructTypeInfo, ProgramBuilder } from './builder';
 
@@ -38,6 +41,12 @@ interface GPUObjectList {
   framebuffers: FrameBuffer[];
   vertexArrayObjects: VertexInputLayout[];
   bindGroups: BindGroup[];
+}
+
+export interface EngineCaps {
+  maxVertexAttributes: number;
+  maxBindGroups: number;
+  maxTexCoordIndex: number;
 }
 
 export interface FramebufferCaps {
@@ -273,13 +282,13 @@ export abstract class Device extends REventTarget {
   abstract createGPUTimer(): ITimer;
   abstract createRenderStateSet(): RenderStateSet;
   abstract createSampler(options: SamplerOptions): TextureSampler;
-  abstract createTexture2D(format: TextureFormat, width: number, height: number, creationFlags?: number): Texture2D;
-  abstract createTexture2DFromMipmapData(data: TextureMipmapData, creationFlags?: number): Texture2D;
-  abstract createTexture2DFromImage(element: TextureImageElement, creationFlags?: number): Texture2D;
-  abstract createTexture2DArray(format: TextureFormat, width: number, height: number, depth: number, creationFlags?: number): Texture2DArray;
-  abstract createTexture3D(format: TextureFormat, width: number, height: number, depth: number, creationFlags?: number): Texture3D;
-  abstract createCubeTexture(format: TextureFormat, size: number, creationFlags?: number): TextureCube;
-  abstract createCubeTextureFromMipmapData(data: TextureMipmapData, creationFlags?: number): TextureCube;
+  abstract createTexture2D(format: TextureFormat, width: number, height: number, options?: TextureCreationOptions): Texture2D;
+  abstract createTexture2DFromMipmapData(data: TextureMipmapData, options?: TextureCreationOptions): Texture2D;
+  abstract createTexture2DFromImage(element: TextureImageElement, options?: TextureCreationOptions): Texture2D;
+  abstract createTexture2DArray(format: TextureFormat, width: number, height: number, depth: number, options?: TextureCreationOptions): Texture2DArray;
+  abstract createTexture3D(format: TextureFormat, width: number, height: number, depth: number, options?: TextureCreationOptions): Texture3D;
+  abstract createCubeTexture(format: TextureFormat, size: number, options?: TextureCreationOptions): TextureCube;
+  abstract createCubeTextureFromMipmapData(data: TextureMipmapData, options?: TextureCreationOptions): TextureCube;
   abstract createTextureVideo(el: HTMLVideoElement): TextureVideo;
   abstract reverseVertexWindingOrder(reverse: boolean): void;
   abstract isWindingOrderReversed(): boolean;
@@ -287,9 +296,9 @@ export abstract class Device extends REventTarget {
   // program
   abstract createGPUProgram(params: GPUProgramConstructParams): GPUProgram;
   abstract createBindGroup(layout: BindGroupLayout): BindGroup;
-  abstract createBuffer(sizeInBytes: number, usage?: number): GPUDataBuffer;
-  abstract createIndexBuffer(data: Uint16Array | Uint32Array, usage?: number): IndexBuffer;
-  abstract createStructuredBuffer(structureType: PBStructTypeInfo, usage: number, data?: TypedArray): StructuredBuffer;
+  abstract createBuffer(sizeInBytes: number, options: BufferCreationOptions): GPUDataBuffer;
+  abstract createIndexBuffer(data: Uint16Array | Uint32Array, options?: BufferCreationOptions): IndexBuffer;
+  abstract createStructuredBuffer(structureType: PBStructTypeInfo, options: BufferCreationOptions, data?: TypedArray): StructuredBuffer;
   abstract createVAO(vertexData: VertexData): VertexInputLayout;
   abstract createFrameBuffer(options?: IFrameBufferOptions): FrameBuffer;
   // render related
@@ -327,6 +336,13 @@ export abstract class Device extends REventTarget {
   }
   get isRendering(): boolean {
     return this._runningLoop !== null;
+  }
+  getEngineCaps(): EngineCaps {
+    return {
+      maxBindGroups: 4,
+      maxTexCoordIndex: 8,
+      maxVertexAttributes: 16
+    };
   }
   disposeObject(obj: GPUObject, remove = true) {
     if (obj) {
@@ -579,5 +595,45 @@ export abstract class Device extends REventTarget {
       }
     }
     return Promise.all(promises);
+  }
+  /** @internal */
+  protected parseTextureOptions(options?: TextureCreationOptions): number {
+    const colorSpace = options?.colorSpace ?? 'srgb';
+    console.assert(colorSpace === 'srgb' || colorSpace === 'linear', `invalid texture color space: ${colorSpace}`);
+    const colorSpaceFlag = colorSpace === 'srgb' ? 0 : GPUResourceUsageFlags.TF_LINEAR_COLOR_SPACE;
+    const noMipmapFlag = !!options?.noMipmap ? GPUResourceUsageFlags.TF_NO_MIPMAP : 0;
+    const writableFlag = !!options?.writable ? GPUResourceUsageFlags.TF_WRITABLE : 0;
+    const dynamicFlag = !!options?.dynamic ? GPUResourceUsageFlags.DYNAMIC : 0;
+    const managedFlag = !!options?.managed ? GPUResourceUsageFlags.MANAGED : 0;
+    return colorSpaceFlag|noMipmapFlag|writableFlag|dynamicFlag|managedFlag;
+  }
+  /** @internal */
+  protected parseBufferOptions(options: BufferCreationOptions, defaultUsage?: BufferUsage): number {
+    const usage = options?.usage || defaultUsage;
+    let usageFlag: number;
+    switch(usage) {
+      case 'uniform':
+        usageFlag = GPUResourceUsageFlags.BF_UNIFORM;
+        break;
+      case 'vertex':
+        usageFlag = GPUResourceUsageFlags.BF_VERTEX;
+        break;
+      case 'index': 
+        usageFlag = GPUResourceUsageFlags.BF_INDEX; 
+        break;
+      case 'read':
+        usageFlag = GPUResourceUsageFlags.BF_READ;
+        break;
+      case 'write':
+        usageFlag = GPUResourceUsageFlags.BF_WRITE;
+        break;
+      default:
+        usageFlag = 0;
+        break;
+    }
+    const storageFlag = !!options?.storage ? GPUResourceUsageFlags.BF_STORAGE : 0;
+    const dynamicFlag = !!options?.dynamic ? GPUResourceUsageFlags.DYNAMIC : 0;
+    const managedFlag = !!options?.managed ? GPUResourceUsageFlags.MANAGED : 0;
+    return usageFlag|storageFlag|dynamicFlag|managedFlag;
   }
 }

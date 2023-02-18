@@ -1,7 +1,6 @@
 export * from './box_data';
 export * from './misc';
 export * from './vector';
-export * from './xform';
 export * from './clip_test';
 export * from './plane';
 export * from './frustum';

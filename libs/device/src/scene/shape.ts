@@ -1,4 +1,4 @@
-import { Vector2, Vector3 } from '../math';
+import { Vector2, Vector3 } from '../../../base';
 import { PrimitiveType } from '../device/base_types';
 import { makeVertexBufferType } from '../device/gpuobject';
 import { Primitive } from './primitive';

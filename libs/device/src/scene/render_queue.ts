@@ -1,5 +1,5 @@
 import type { Device } from '../device';
-import type { Matrix4x4 } from '../math';
+import type { Matrix4x4 } from '../../../base';
 import type { Camera } from './camera';
 import type { Drawable } from './drawable';
 import type { RenderPass } from './renderers';

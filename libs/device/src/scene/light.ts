@@ -1,4 +1,4 @@
-import { Vector3, Vector4, Matrix4x4 } from '../math';
+import { Vector3, Vector4, Matrix4x4 } from '../../../base';
 import { GraphNode } from './graph_node';
 import { BoundingVolume, BoundingBox } from './bounding_volume';
 import { ShadowMapper } from './shadow/shadowmapper';

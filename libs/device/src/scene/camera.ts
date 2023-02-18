@@ -1,4 +1,4 @@
-import { CubeFace, Matrix4x4, Vector3, Frustum } from '../math';
+import { CubeFace, Matrix4x4, Vector3, Frustum } from '../../../base';
 import { SceneNode } from './scene_node';
 import type { Scene } from './scene';
 export interface IMouseEvent {

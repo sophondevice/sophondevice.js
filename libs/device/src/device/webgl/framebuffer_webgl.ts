@@ -1,4 +1,4 @@
-import { CubeFace } from '../../math';
+import { CubeFace } from '../../../../base';
 import { WebGLGPUObject } from './gpuobject_webgl';
 import { WebGLEnum } from './webgl_enum';
 import { BaseTexture, IFrameBufferTextureAttachment, FrameBuffer, IFrameBufferOptions, GPUResourceUsageFlags } from '../gpuobject';

@@ -2,7 +2,6 @@
 import { TextureFilter, TextureWrapping, PrimitiveType } from '../../../../device/base_types';
 import { FaceMode } from '../../../../device/render_states';
 import {
-  GPUResourceUsageFlags,
   VERTEX_ATTRIB_POSITION,
   VERTEX_ATTRIB_NORMAL,
   VERTEX_ATTRIB_TANGENT,
@@ -30,7 +29,7 @@ import {
   F32_BITMASK,
   makePrimitiveType,
 } from '../../../../device/builder/types';
-import { Vector3, Vector4, Matrix4x4, Quaternion } from '../../../../math';
+import { Vector3, Vector4, Matrix4x4, Quaternion } from '../../../../../../base';
 import { SharedModel, AssetHierarchyNode, AssetMeshData, AssetSkeleton, AssetScene, AssetAnimationData, AssetSubMeshData, AssetMaterial, AssetUnlitMaterial, AssetPBRMaterialMR, AssetPBRMaterialSG, AssetMaterialCommon, MaterialTextureInfo, AssetPBRMaterialCommon } from '../../model';
 import { BoundingBox } from '../../../bounding_volume';
 import { Primitive } from '../../../primitive';
@@ -422,9 +421,9 @@ export class GLTFLoader extends AbstractModelLoader {
             primitive.primitiveType = this._primitiveType(primitiveType);
             gltf._primitiveCache[hash] = primitive;
           }
-          const hasVertexNormal = !!primitive.getVertexBuffer(VERTEX_ATTRIB_NORMAL);
-          const hasVertexColor = !!primitive.getVertexBuffer(VERTEX_ATTRIB_DIFFUSE);
-          const hasVertexTangent = !!primitive.getVertexBuffer(VERTEX_ATTRIB_TANGENT);
+          const hasVertexNormal = !!primitive.getVertexBuffer('normal');
+          const hasVertexColor = !!primitive.getVertexBuffer('diffuse');
+          const hasVertexTangent = !!primitive.getVertexBuffer('tangent');
           const materialHash = `${p.material}.${Number(hasVertexNormal)}.${Number(hasVertexColor)}.${Number(hasVertexTangent)}`;
           let material = gltf._materialCache[materialHash];
           if (!material) {
@@ -975,14 +974,14 @@ export class GLTFLoader extends AbstractModelLoader {
         }
       }
       if (semantic < 0) {
-        buffer = gltf._manager.device.createIndexBuffer(data as Uint16Array | Uint32Array, GPUResourceUsageFlags.MANAGED);
+        buffer = gltf._manager.device.createIndexBuffer(data as Uint16Array | Uint32Array, { managed: true });
       } else {
         const name = getVertexAttribName(semantic);
         const bufferType = new PBStructTypeInfo(null, 'packed', [{
           name: name,
           type: new PBArrayTypeInfo(PBPrimitiveTypeInfo.getCachedTypeInfo(makePrimitiveType(typeMask, 1, componentCount, 0)), data.length / componentCount),
         }]);
-        buffer = gltf._manager.device.createStructuredBuffer(bufferType, GPUResourceUsageFlags.BF_VERTEX | GPUResourceUsageFlags.MANAGED, data);
+        buffer = gltf._manager.device.createStructuredBuffer(bufferType, { usage: 'vertex', managed: true }, data);
       }
       gltf._bufferCache[hash] = buffer;
     }

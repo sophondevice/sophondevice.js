@@ -1,4 +1,4 @@
-import { Vector3, Vector4 } from "../../math";
+import { Vector3, Vector4 } from "../../../../base";
 import { BoundingBox } from "../bounding_volume";
 
 /*

@@ -1,7 +1,6 @@
-import { Visitor } from '../../../base';
-import { Vector3, AABB } from '../math';
-import type { SceneNode } from './scene_node';
+import { Visitor, Vector3, AABB } from '../../../base';
 import { GraphNode } from './graph_node';
+import type { SceneNode } from './scene_node';
 import type { Scene } from './scene';
 
 export enum OctreePlacement {

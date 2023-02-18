@@ -5,7 +5,7 @@ import { Device, Texture2D, BindGroup, GPUProgram, PBGlobalScope, ProgramBuilder
 import { forwardComputeLighting } from '../renderers/forward.shaderlib';
 import * as values from '../values';
 import type { DrawContext } from '../drawable';
-import type { Vector2 } from '../../math';
+import type { Vector2 } from '../../../../base';
 import type { ShadowMapPass } from '../renderers';
 
 export enum TerrainRenderMode {

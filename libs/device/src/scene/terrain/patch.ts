@@ -1,9 +1,8 @@
 import { BoundingBox } from "../bounding_volume";
 import { Primitive } from "../primitive";
 import { PatchPosition } from "./types";
-import { Device, GPUDataBuffer, GPUResourceUsageFlags, makeVertexBufferType, PBStructTypeInfo, PrimitiveType, StructuredBuffer } from "../../device";
-import { Vector3 } from "../../math";
-import * as values from '../values';
+import { Device, GPUDataBuffer, makeVertexBufferType, PBStructTypeInfo, PrimitiveType, StructuredBuffer } from "../../device";
+import { Vector3 } from "../../../../base";
 import type { Terrain } from './terrain';
 import type { Quadtree } from "./quadtree";
 import type { Scene } from "../scene";
@@ -149,8 +148,8 @@ export class TerrainPatch {
       t = setNormalAndHeight(heights, normals, t, x, z, w, h, -skirtLength);
     }
     t = setNormalAndHeight(heights, normals, t, x - this._step, z, w, h, -skirtLength);
-    const heightArray = device.createStructuredBuffer(makeVertexBufferType(numVerts, 'custom0_f32'), GPUResourceUsageFlags.BF_VERTEX | GPUResourceUsageFlags.MANAGED, heights);
-    const normalArray = device.createStructuredBuffer(makeVertexBufferType(numVerts, 'normal_f32x3'), GPUResourceUsageFlags.BF_VERTEX | GPUResourceUsageFlags.MANAGED, normals);
+    const heightArray = device.createStructuredBuffer(makeVertexBufferType(numVerts, 'custom0_f32'), { usage: 'vertex', managed: true }, heights);
+    const normalArray = device.createStructuredBuffer(makeVertexBufferType(numVerts, 'normal_f32x3'), { usage: 'vertex', managed: true }, normals);
     this._geometry.setVertexBuffer(baseVertices);
     this._geometry.setVertexBuffer(normalArray);
     this._geometry.setVertexBuffer(heightArray);
@@ -172,7 +171,7 @@ export class TerrainPatch {
       const scaleX = this._quadtree.getScaleX();
       const scaleZ = this._quadtree.getScaleZ();
       const v = new Float32Array([this._step * scaleX, this._offsetX * scaleX, this._step * scaleZ, this._offsetZ * scaleZ]);
-      this._offsetScale = ctx.renderPass.device.createStructuredBuffer(terrainProgram.programs[ctx.materialFunc].getBindingInfo('scaleOffset').type as PBStructTypeInfo, GPUResourceUsageFlags.BF_UNIFORM, v);
+      this._offsetScale = ctx.renderPass.device.createStructuredBuffer(terrainProgram.programs[ctx.materialFunc].getBindingInfo('scaleOffset').type as PBStructTypeInfo, { usage: 'uniform' }, v);
       this._offsetScale.restoreHandler = async obj => {
         (obj as GPUDataBuffer).bufferSubData(0, v);
       };

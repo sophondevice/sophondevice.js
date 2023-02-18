@@ -1,6 +1,6 @@
-import { ListIterator } from '../../../base';
-import { XForm, Frustum, Matrix4x4 } from '../math';
+import { ListIterator, Frustum, Matrix4x4 } from '../../../base';
 import { SceneNode } from './scene_node';
+import type { XForm } from './xform';
 import type { Texture2D } from '../device/gpuobject';
 import type { BatchDrawable, Drawable } from './drawable';
 import type { Scene } from './scene';

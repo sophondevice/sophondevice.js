@@ -1,4 +1,4 @@
-import { Vector3, Quaternion, Matrix3x3, Matrix4x4 } from '../../math';
+import { Vector3, Quaternion, Matrix3x3, Matrix4x4 } from '../../../../base';
 import { BaseCameraModel } from './base';
 import type { AbstractCameraModel, IMouseEvent, IKeyEvent } from '../camera';
 export interface IFPSCameraModelOptions {

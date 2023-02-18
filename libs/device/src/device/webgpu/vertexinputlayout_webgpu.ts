@@ -1,5 +1,5 @@
 import { PrimitiveType } from '../base_types';
-import { StructuredBuffer, VertexInputLayout, IndexBuffer, getVertexBufferStride, getVertexBufferAttribType } from '../gpuobject';
+import { StructuredBuffer, VertexInputLayout, IndexBuffer, getVertexBufferStride, getVertexBufferAttribType, VertexSemantic } from '../gpuobject';
 import { vertexFormatToHash } from './constants_webgpu';
 import { WebGPUObject } from './gpuobject_webgpu';
 import { WebGPUStructuredBuffer } from './structuredbuffer_webgpu';
@@ -36,8 +36,8 @@ export class WebGPUVertexInputLayout extends WebGPUObject<unknown> implements Ve
   getDrawOffset(): number {
     return this._vertexData.getDrawOffset();
   }
-  getVertexBuffer(location: number): StructuredBuffer {
-    return this._vertexData.getVertexBuffer(location);
+  getVertexBuffer(semantic: VertexSemantic): StructuredBuffer {
+    return this._vertexData.getVertexBuffer(semantic);
   }
   getIndexBuffer(): IndexBuffer {
     return this._vertexData.getIndexBuffer();

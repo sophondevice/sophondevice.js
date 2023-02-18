@@ -1,5 +1,4 @@
-import { Visitor, visitor } from '../../../../base';
-import { ClipState, AABB } from '../../math';
+import { Visitor, visitor, ClipState, AABB } from '../../../../base';
 import { GraphNode } from '../graph_node';
 import { OctreeNode } from '../octree';
 import { Mesh } from '../mesh';

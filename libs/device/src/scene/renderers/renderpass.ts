@@ -1,4 +1,4 @@
-import { Vector4, Matrix4x4, Quaternion, CubeFace } from '../../math';
+import { Vector4, Matrix4x4, Quaternion, CubeFace } from '../../../../base';
 import { CullVisitor } from '../visitors/cull_visitor';
 import { RenderQueue } from '../render_queue';
 import { Material } from '../material';
@@ -9,7 +9,7 @@ import type { RenderScheme } from './renderscheme';
 import type { DrawContext } from '../drawable';
 import type { Camera } from '../camera';
 import type { Device } from '../../device/device';
-import type { ProgramBuilder, PBGlobalScope } from '../../device/builder';
+import type { PBGlobalScope } from '../../device/builder';
 import type { FrameBuffer, BindGroup } from '../../device/gpuobject';
 
 const cubeFaceList = [

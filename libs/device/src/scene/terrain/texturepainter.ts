@@ -1,5 +1,5 @@
-import { Device, FrameBuffer, GPUResourceUsageFlags, FaceMode, PrimitiveType, ProgramBuilder, RenderStateSet, Texture2D, TextureFormat, GPUProgram, BindGroup, makeVertexBufferType, ShaderType, TextureWrapping, TextureFilter } from '../../device';
-import { Matrix4x4, Vector3, Vector4 } from '../../math';
+import { Device, FrameBuffer, FaceMode, PrimitiveType, ProgramBuilder, RenderStateSet, Texture2D, TextureFormat, GPUProgram, BindGroup, makeVertexBufferType, ShaderType, TextureWrapping, TextureFilter } from '../../device';
+import { Matrix4x4, Vector3, Vector4 } from '../../../../base';
 import { Camera } from '../camera';
 import { Primitive } from '../primitive';
 import { MAX_DETAIL_TEXTURE_LEVELS } from './terrainmaterial';
@@ -36,9 +36,9 @@ export abstract class TerrainTexturePainter {
     this._cellX = null;
     this._cellZ = null;
     this._textureSize = textureSize;
-    this._detailTexture = terrain.scene.device.createTexture2D(TextureFormat.RGBA8UNORM, textureSize * numDetailLevels, textureSize, GPUResourceUsageFlags.TF_LINEAR_COLOR_SPACE);
+    this._detailTexture = terrain.scene.device.createTexture2D(TextureFormat.RGBA8UNORM, textureSize * numDetailLevels, textureSize, { colorSpace: 'linear' });
     this._detailTexture.name = `TerrainDetailTextureAtlas-${this._detailTexture.uid}`;
-    this._detailNormalTexture = paintNormals ? terrain.scene.device.createTexture2D(TextureFormat.RGBA8UNORM, textureSize * numDetailLevels, textureSize, GPUResourceUsageFlags.TF_LINEAR_COLOR_SPACE) : null;
+    this._detailNormalTexture = paintNormals ? terrain.scene.device.createTexture2D(TextureFormat.RGBA8UNORM, textureSize * numDetailLevels, textureSize, { colorSpace: 'linear' }) : null;
     if (this._detailNormalTexture) {
       this._detailNormalTexture.name = `TerrainDetailNormalTextureAtlas-${this._detailNormalTexture.uid}`;
     }
@@ -259,7 +259,10 @@ export class SimpleTexturePainter extends TerrainTexturePainter {
     const y = (miny + maxy) * 0.5;
     const vertexbuffer = device.createStructuredBuffer(
       makeVertexBufferType(4, 'position_f32x3', 'tex0_f32x2'),
-      GPUResourceUsageFlags.BF_VERTEX | GPUResourceUsageFlags.MANAGED,
+      {
+        usage: 'vertex',
+        managed: true
+      },
       flip
         ? new Float32Array([minx, y, maxz, 0, 0, maxx, y, maxz, 1, 0, minx, y, minz, 0, 1, maxx, y, minz, 1, 1])
         : new Float32Array([minx, y, maxz, 0, 1, maxx, y, maxz, 1, 1, minx, y, minz, 0, 0, maxx, y, minz, 1, 0]));
@@ -357,7 +360,10 @@ export class SlopeBasedTexturePainter extends TerrainTexturePainter {
     const y = (miny + maxy) * 0.5;
     const vertexbuffer = device.createStructuredBuffer(
       makeVertexBufferType(4, 'position_f32x3', 'tex0_f32x2'),
-      GPUResourceUsageFlags.BF_VERTEX | GPUResourceUsageFlags.MANAGED,
+      {
+        usage: 'vertex',
+        managed: true,
+      },
       flip
         ? new Float32Array([minx, y, maxz, 0, 0, maxx, y, maxz, 1, 0, minx, y, minz, 0, 1, maxx, y, minz, 1, 1])
         : new Float32Array([minx, y, maxz, 0, 1, maxx, y, maxz, 1, 1, minx, y, minz, 0, 0, maxx, y, minz, 1, 0]));
@@ -402,7 +408,7 @@ export class SlopeBasedTexturePainter extends TerrainTexturePainter {
     this._renderStates.useDepthState().enableTest(false).enableWrite(false);
   }
   protected createDefaultNormalTexture(device: Device): Texture2D {
-    const tex = device.createTexture2D(TextureFormat.RGBA8UNORM, 1, 1, GPUResourceUsageFlags.TF_LINEAR_COLOR_SPACE);
+    const tex = device.createTexture2D(TextureFormat.RGBA8UNORM, 1, 1, { colorSpace: 'linear' });
     tex.update(new Uint8Array([127, 127, 255, 255]), 0, 0, 1, 1);
     return tex;
   }

@@ -1,5 +1,5 @@
 import { PrimitiveType } from '../device/base_types';
-import { AABB, Vector3, Matrix4x4, Ray } from '../math';
+import { AABB, Vector3, Matrix4x4, Ray } from '../../../base';
 import type { TypedArray } from '../misc';
 
 interface PrimitivesInfo {

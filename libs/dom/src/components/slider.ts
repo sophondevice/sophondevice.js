@@ -1,4 +1,4 @@
-import { REvent } from '@sophon/device';
+import { REvent } from '../../../base';
 import { RRectPrimitive } from '../primitive';
 import { RElement } from '../element';
 import { tagname } from '../gui';

@@ -1,4 +1,4 @@
-import { GPUResourceUsageFlags, StructuredBuffer, IndexBuffer, VertexStepMode, getVertexBufferStride, MAX_VERTEX_ATTRIBUTES, getVertexAttribByName, VertexAttribName } from './gpuobject';
+import { GPUResourceUsageFlags, StructuredBuffer, IndexBuffer, VertexStepMode, MAX_VERTEX_ATTRIBUTES, getVertexAttribByName, VertexSemantic } from './gpuobject';
 import { PBArrayTypeInfo } from './builder/types';
 
 export class VertexData {
@@ -51,8 +51,8 @@ export class VertexData {
       this.updateTag();
     }
   }
-  getVertexBuffer(location: number): StructuredBuffer {
-    return this._vertexBuffers[location]?.buffer || null;
+  getVertexBuffer(semantic: VertexSemantic): StructuredBuffer {
+    return this._vertexBuffers[getVertexAttribByName(semantic)]?.buffer || null;
   }
   getIndexBuffer(): IndexBuffer {
     return this._indexBuffer || null;
@@ -66,12 +66,12 @@ export class VertexData {
     if (vertexType.isStructType()) {
       let offset = 0;
       for (const attrib of vertexType.structMembers) {
-        const loc = getVertexAttribByName(attrib.name as VertexAttribName);
+        const loc = getVertexAttribByName(attrib.name as VertexSemantic);
         this.internalSetVertexBuffer(loc, buffer, offset, stepMode);
         offset += attrib.size;
       }
     } else {
-      const loc = getVertexAttribByName(buffer.structure.structMembers[0].name as VertexAttribName);
+      const loc = getVertexAttribByName(buffer.structure.structMembers[0].name as VertexSemantic);
       this.internalSetVertexBuffer(loc, buffer, 0, stepMode);
     }
     return buffer;

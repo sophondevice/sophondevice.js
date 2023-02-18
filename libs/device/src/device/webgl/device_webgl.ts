@@ -1,4 +1,4 @@
-import { Vector4 } from '../../math';
+import { Vector4 } from '../../../../base';
 import { TextureFormat, WebGLContext, PrimitiveType, hasAlphaChannel, hasRedChannel, hasGreenChannel, hasBlueChannel, isIntegerTextureFormat, isSignedTextureFormat, isFloatTextureFormat, getTextureFormatBlockSize, isCompressedTextureFormat, isDepthTextureFormat } from '../base_types';
 import { isWebGL2, WebGLError } from './utils';
 import { WebGLEnum } from './webgl_enum';
@@ -31,8 +31,9 @@ import {
   StructuredBuffer,
   TextureMipmapData,
   TextureImageElement,
-  GPUResourceUsageFlags,
   Texture2DArray,
+  TextureCreationOptions,
+  BufferCreationOptions,
 } from '../gpuobject';
 import { WebGLTextureCap, WebGLFramebufferCap, WebGLMiscCap, WebGLShaderCap } from './capabilities_webgl';
 import { WebGLBindGroup } from './bindgroup_webgl';
@@ -263,43 +264,71 @@ export class WebGLDevice extends Device {
   createSampler(options: SamplerOptions): TextureSampler {
     return this._samplerCache.fetchSampler(options);
   }
-  createTexture2D(format: TextureFormat, width: number, height: number, creationFlags?: number): Texture2D {
-    const tex = new WebGLTexture2D(this);
-    tex.createEmpty(format, width, height, creationFlags);
+  createTexture2D(format: TextureFormat, width: number, height: number, options?: TextureCreationOptions): Texture2D {
+    const tex = options?.texture as WebGLTexture2D ?? new WebGLTexture2D(this);
+    if (!tex.isTexture2D()) {
+      console.error('createTexture2D() failed: options.texture must be 2d texture');
+      return null;
+    }
+    tex.createEmpty(format, width, height, this.parseTextureOptions(options));
     return tex;
   }
-  createTexture2DFromMipmapData(data: TextureMipmapData, creationFlags?: number): Texture2D {
-    const tex = new WebGLTexture2D(this);
-    tex.createWithMipmapData(data, creationFlags);
+  createTexture2DFromMipmapData(data: TextureMipmapData, options?: TextureCreationOptions): Texture2D {
+    const tex = options?.texture as WebGLTexture2D ?? new WebGLTexture2D(this);
+    if (!tex.isTexture2D()) {
+      console.error('createTexture2DFromMipmapData() failed: options.texture must be 2d texture');
+      return null;
+    }
+    tex.createWithMipmapData(data, this.parseTextureOptions(options));
     return tex;
   }
-  createTexture2DFromImage(element: TextureImageElement, creationFlags?: number): Texture2D {
-    const tex = new WebGLTexture2D(this);
-    tex.loadFromElement(element, creationFlags);
+  createTexture2DFromImage(element: TextureImageElement, options?: TextureCreationOptions): Texture2D {
+    const tex = options?.texture as WebGLTexture2D ?? new WebGLTexture2D(this);
+    if (!tex.isTexture2D()) {
+      console.error('createTexture2DFromImage() failed: options.texture must be 2d texture');
+      return null;
+    }
+    tex.loadFromElement(element, this.parseTextureOptions(options));
     return tex;
   }
-  createTexture2DArray(format: TextureFormat, width: number, height: number, depth: number, creationFlags?: number): Texture2DArray {
-    const tex = new WebGLTexture2DArray(this);
-    tex.createEmpty(format, width, height, depth, creationFlags);
+  createTexture2DArray(format: TextureFormat, width: number, height: number, depth: number, options?: TextureCreationOptions): Texture2DArray {
+    const tex = options?.texture as WebGLTexture2DArray ?? new WebGLTexture2DArray(this);
+    if (!tex.isTexture2DArray()) {
+      console.error('createTexture2DArray() failed: options.texture must be 2d array texture');
+      return null;
+    }
+    tex.createEmpty(format, width, height, depth, this.parseTextureOptions(options));
     return tex;
   }
-  createTexture3D(format: TextureFormat, width: number, height: number, depth: number, creationFlags?: number): Texture3D {
+  createTexture3D(format: TextureFormat, width: number, height: number, depth: number, options?: TextureCreationOptions): Texture3D {
     if (!this.isWebGL2) {
       console.error('device does not support 3d texture');
       return null;
     }
-    const tex = new WebGLTexture3D(this);
-    tex.createEmpty(format, width, height, depth, creationFlags);
+    const tex = options?.texture as WebGLTexture3D ?? new WebGLTexture3D(this);
+    if (!tex.isTexture3D()) {
+      console.error('createTexture3D() failed: options.texture must be 3d texture');
+      return null;
+    }
+    tex.createEmpty(format, width, height, depth, this.parseTextureOptions(options));
     return tex;
   }
-  createCubeTexture(format: TextureFormat, size: number, creationFlags?: number): TextureCube {
-    const tex = new WebGLTextureCube(this);
-    tex.createEmpty(format, size, creationFlags);
+  createCubeTexture(format: TextureFormat, size: number, options?: TextureCreationOptions): TextureCube {
+    const tex = options?.texture as WebGLTextureCube ?? new WebGLTextureCube(this);
+    if (!tex.isTextureCube()) {
+      console.error('createCubeTexture() failed: options.texture must be cube texture');
+      return null;
+    }
+    tex.createEmpty(format, size, this.parseTextureOptions(options));
     return tex;
   }
-  createCubeTextureFromMipmapData(data: TextureMipmapData, creationFlags?: number): TextureCube {
-    const tex = new WebGLTextureCube(this);
-    tex.createWithMipmapData(data, creationFlags);
+  createCubeTextureFromMipmapData(data: TextureMipmapData, options?: TextureCreationOptions): TextureCube {
+    const tex = options?.texture as WebGLTextureCube ?? new WebGLTextureCube(this);
+    if (!tex.isTextureCube()) {
+      console.error('createCubeTextureFromMipmapData() failed: options.texture must be cube texture');
+      return null;
+    }
+    tex.createWithMipmapData(data, this.parseTextureOptions(options));
     return tex;
   }
   createTextureVideo(el: HTMLVideoElement): TextureVideo {
@@ -315,14 +344,14 @@ export class WebGLDevice extends Device {
   createBindGroup(layout: BindGroupLayout): BindGroup {
     return new WebGLBindGroup(this, layout);
   }
-  createBuffer(sizeInBytes: number, usage: number): GPUDataBuffer {
-    return new WebGLGPUBuffer(this, usage, sizeInBytes);
+  createBuffer(sizeInBytes: number, options: BufferCreationOptions): GPUDataBuffer {
+    return new WebGLGPUBuffer(this, this.parseBufferOptions(options), sizeInBytes);
   }
-  createIndexBuffer(data: Uint16Array | Uint32Array, usage?: number): IndexBuffer {
-    return new WebGLIndexBuffer(this, data, usage);
+  createIndexBuffer(data: Uint16Array | Uint32Array, options?: BufferCreationOptions): IndexBuffer {
+    return new WebGLIndexBuffer(this, data, this.parseBufferOptions(options, 'index'));
   }
-  createStructuredBuffer(structureType: PBStructTypeInfo, usage: number, data?: TypedArray): StructuredBuffer {
-    return new WebGLStructuredBuffer(this, structureType, usage, data);
+  createStructuredBuffer(structureType: PBStructTypeInfo, options?: BufferCreationOptions, data?: TypedArray): StructuredBuffer {
+    return new WebGLStructuredBuffer(this, structureType, this.parseBufferOptions(options), data);
   }
   createVAO(vertexData: VertexData): VertexInputLayout {
     return new WebGLVertexInputLayout(this, vertexData);
@@ -459,7 +488,9 @@ export class WebGLDevice extends Device {
       throw new Error(`readPixels() failed: destination buffer must have at least ${byteSize} bytes`);
     }
     if (isWebGL2(this.context)) {
-      const stagingBuffer = this.createBuffer(byteSize, GPUResourceUsageFlags.BF_READ);
+      const stagingBuffer = this.createBuffer(byteSize, {
+        usage: 'read'
+      });
       this.context.bindBuffer(WebGLEnum.PIXEL_PACK_BUFFER, stagingBuffer.object);
       this.context.readBuffer(WebGLEnum.COLOR_ATTACHMENT0);
       this.flush();

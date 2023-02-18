@@ -1,7 +1,7 @@
 import { PrimitiveType } from '../../device/base_types'
 import { RenderStateSet, FaceMode } from '../../device/render_states';
-import { GPUResourceUsageFlags, makeVertexBufferType } from '../../device/gpuobject';
-import { CubeFace } from "../../math";
+import { makeVertexBufferType } from '../../device/gpuobject';
+import { CubeFace } from "../../../../base";
 import { Primitive } from "../primitive";
 import { BoxShape } from "../shape";
 import type { Device } from '../../device/device';
@@ -180,7 +180,7 @@ let blitRenderStates: RenderStateSet = null;
 function getBlitPrimitive2D(device: Device): Primitive {
   if (!blitPrimitive2D) {
     blitPrimitive2D = new Primitive(device);
-    const vb = device.createStructuredBuffer(makeVertexBufferType(4, 'position_f32x2'), GPUResourceUsageFlags.BF_VERTEX | GPUResourceUsageFlags.MANAGED, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]));
+    const vb = device.createStructuredBuffer(makeVertexBufferType(4, 'position_f32x2'), { usage: 'vertex', managed: true }, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]));
     blitPrimitive2D.setVertexBuffer(vb);
     blitPrimitive2D.indexCount = 4;
     blitPrimitive2D.indexStart = 0;

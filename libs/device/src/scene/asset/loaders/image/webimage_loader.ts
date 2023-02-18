@@ -1,4 +1,4 @@
-import { BaseTexture, GPUResourceUsageFlags } from '../../../../device/gpuobject';
+import { BaseTexture, TextureCreationOptions } from '../../../../device/gpuobject';
 import { AbstractTextureLoader } from '../loader';
 import type { AssetManager } from '../../assetmanager';
 
@@ -23,22 +23,16 @@ export class WebImageLoader extends AbstractTextureLoader {
           premultiplyAlpha: 'none',
           colorSpaceConversion: 'none',
         }).then(bm => {
-          const colorSpaceFlag = srgb ? 0 : GPUResourceUsageFlags.TF_LINEAR_COLOR_SPACE;
-          const mipmapFlag = noMipmap ? GPUResourceUsageFlags.TF_NO_MIPMAP : 0;
-          const creationFlags = colorSpaceFlag | mipmapFlag;
-          if (texture) {
-            if (!texture.isTexture2D()) {
-              throw new Error('can not reload texture: invalid texture type');
-            }
-            texture.loadFromElement(bm, creationFlags);
-            resolve(texture);
+          const options: TextureCreationOptions = {
+            colorSpace: srgb ? 'srgb' : 'linear',
+            noMipmap: !!noMipmap,
+            texture: texture
+          };
+          const tex = assetManager.device.createTexture2DFromImage(bm, options);
+          if (tex) {
+            resolve(tex);
           } else {
-            const tex = assetManager.device.createTexture2DFromImage(bm, creationFlags);
-            if (tex) {
-              resolve(tex);
-            } else {
-              reject('create texture from image element failed');
-            }
+            reject('create texture from image element failed');
           }
         });
       };

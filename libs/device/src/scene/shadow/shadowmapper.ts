@@ -1,5 +1,5 @@
-import { PBShaderExp, RenderStateSet, FrameBuffer, GPUResourceUsageFlags, Texture2D, Texture2DArray, TextureCube, FaceMode, TextureFormat, TextureTarget, PBInsideFunctionScope, TextureSampler } from "../../device";
-import { AABB, Matrix4x4, Vector3, Vector4 } from "../../math";
+import { PBShaderExp, RenderStateSet, FrameBuffer, Texture2D, Texture2DArray, TextureCube, FaceMode, TextureFormat, TextureTarget, PBInsideFunctionScope, TextureSampler, TextureCreationOptions } from "../../device";
+import { AABB, Matrix4x4, Vector3, Vector4 } from "../../../../base";
 import { Camera } from "../camera";
 import { ShaderLib } from "../materiallib";
 import { SSM } from "./ssm";
@@ -402,13 +402,17 @@ export class ShadowMapper {
   }
   /** @internal */
   protected createTexture(target: TextureTarget, format: TextureFormat, width: number, height: number, depth: number): Texture2D | TextureCube | Texture2DArray {
+    const options: TextureCreationOptions = {
+      colorSpace: 'linear',
+      noMipmap: true
+    };
     switch (target) {
       case TextureTarget.Texture2D:
-        return this._light.scene.device.createTexture2D(format, width, height, GPUResourceUsageFlags.TF_LINEAR_COLOR_SPACE | GPUResourceUsageFlags.TF_NO_MIPMAP);
+        return this._light.scene.device.createTexture2D(format, width, height, options);
       case TextureTarget.TextureCubemap:
-        return this._light.scene.device.createCubeTexture(format, width, GPUResourceUsageFlags.TF_LINEAR_COLOR_SPACE | GPUResourceUsageFlags.TF_NO_MIPMAP);
+        return this._light.scene.device.createCubeTexture(format, width, options);
       case TextureTarget.Texture2DArray:
-        return this._light.scene.device.createTexture2DArray(format, width, height, depth, GPUResourceUsageFlags.TF_LINEAR_COLOR_SPACE | GPUResourceUsageFlags.TF_NO_MIPMAP);
+        return this._light.scene.device.createTexture2DArray(format, width, height, depth, options);
       default:
         return null;
     }

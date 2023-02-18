@@ -1,6 +1,4 @@
-import { REventTarget } from '../../base';
 import { 
-  VERTEX_ATTRIB_POSITION,
   BindGroup,
   RenderStateSet,
   BlendFunc,
@@ -9,17 +7,14 @@ import {
   Device,
   Texture2D,
   GPUProgram,
-  GPUResourceUsageFlags,
   PrimitiveType,
   TextureFormat,
   makeVertexBufferType,
   TextureSampler,
   TextureFilter,
-  Primitive,
-  Matrix4x4,
-  Vector3,
-  Vector4,
+  Primitive
 } from '@sophon/device';
+import { REventTarget, Matrix4x4, Vector3, Vector4, VectorBase } from '../../base';
 import { RMouseEvent, RDragEvent, RKeyEvent } from './events';
 import type { RColor } from './types';
 import type { GUI } from './gui';
@@ -92,10 +87,10 @@ export class GUIRenderer extends REventTarget {
       indexArray[i * 6 + 5] = base + 3;
     }
     for (let i = 0; i < 2; i++) {
-      const indexbuffer = this._device.createIndexBuffer(indexArray, GPUResourceUsageFlags.MANAGED);
+      const indexbuffer = this._device.createIndexBuffer(indexArray, { managed: true });
       this._primitiveBuffer[i].setIndexBuffer(indexbuffer);
       this._primitiveBuffer[i].primitiveType = PrimitiveType.TriangleList;
-      const buffer = this._device.createStructuredBuffer(makeVertexBufferType(GUIRenderer.VAO_BUFFER_SIZE * 4, 'position_f32x3', 'diffuse_f32x4', 'tex0_f32x2'), GPUResourceUsageFlags.BF_VERTEX | GPUResourceUsageFlags.DYNAMIC);
+      const buffer = this._device.createStructuredBuffer(makeVertexBufferType(GUIRenderer.VAO_BUFFER_SIZE * 4, 'position_f32x3', 'diffuse_f32x4', 'tex0_f32x2'), { usage: 'vertex', dynamic: true });
       this._primitiveBuffer[i].setVertexBuffer(buffer);
     }
     this._drawPosition = 0;
@@ -130,7 +125,7 @@ export class GUIRenderer extends REventTarget {
     return true;
   }
   createTexture(width: number, height: number, color: RColor, linear: boolean): Texture2D {
-    const tex = this._device.createTexture2D(TextureFormat.RGBA8UNORM, width, height, GPUResourceUsageFlags.TF_NO_MIPMAP | GPUResourceUsageFlags.TF_NO_GC | (linear ? GPUResourceUsageFlags.TF_LINEAR_COLOR_SPACE : 0));
+    const tex = this._device.createTexture2D(TextureFormat.RGBA8UNORM, width, height, { colorSpace: linear ? 'linear' : 'srgb', noMipmap: true });
     if (color) {
       this.clearTexture(tex, color);
     }
@@ -202,7 +197,7 @@ export class GUIRenderer extends REventTarget {
   flush() {
     if (this._drawCount > 0) {
       const buffer = this._primitiveBuffer[this._activeBuffer];
-      buffer.getVertexBuffer(VERTEX_ATTRIB_POSITION).bufferSubData(this._drawPosition * 36 * this._vertexCache.BYTES_PER_ELEMENT, this._vertexCache, this._drawPosition * 36, this._drawCount * 36);
+      buffer.getVertexBuffer('position').bufferSubData(this._drawPosition * 36 * this._vertexCache.BYTES_PER_ELEMENT, this._vertexCache, this._drawPosition * 36, this._drawCount * 36);
       if (this._currentTexture) {
         this._device.setProgram(this._programTexture);
         this._bindGroupTexture.setTexture('tex', this._currentTexture, this._textureSampler);
@@ -249,7 +244,8 @@ export class GUIRenderer extends REventTarget {
     this._projectionMatrix.ortho(0, this.getDrawingBufferWidth(), 0, this.getDrawingBufferHeight(), 1, 100);
     this._flipMatrix = Matrix4x4.translation(new Vector3(0, this.getDrawingBufferHeight(), 0)).scaleRight(new Vector3(1, -1, 1));
     const mvpMatrix = Matrix4x4.multiply(this._projectionMatrix, this._flipMatrix);
-    this._bindGroup.setValue('transform', { mvpMatrix });
+    const x: VectorBase = mvpMatrix;
+    this._bindGroup.setValue('transform', { mvpMatrix: x });
     this._bindGroupTexture.setValue('transform', { mvpMatrix });
     this._device.clearFrameBuffer(new Vector4(0, 0, 0, 1), 1, 0);
   }

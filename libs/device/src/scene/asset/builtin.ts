@@ -1,6 +1,6 @@
 import { TextureFormat } from '../../device/base_types';
-import { GPUResourceUsageFlags, Texture2D, BaseTexture } from '../../device/gpuobject';
-import { Vector2, Vector3, Vector4, Matrix3x3 } from '../../math';
+import { Texture2D, BaseTexture } from '../../device/gpuobject';
+import { Vector2, Vector3, Vector4, Matrix3x3 } from '../../../../base';
 import { BUILTIN_ASSET_TEXTURE_SHEEN_LUT } from '../values';
 import type { Device } from '../../device/device';
 
@@ -1184,7 +1184,7 @@ export function getSheenLutLoader(textureSize: number): (device: Device) => Prom
   }
 
   async function createSheenLUT(device: Device): Promise<Texture2D> {
-    const tex = device.createTexture2D(TextureFormat.RGBA8UNORM, textureSize, textureSize, GPUResourceUsageFlags.TF_LINEAR_COLOR_SPACE);
+    const tex = device.createTexture2D(TextureFormat.RGBA8UNORM, textureSize, textureSize, { colorSpace: 'linear' });
     const image = new Uint8Array(textureSize * textureSize * 4);
     let p = 0;
     const c = new Vector4();
@@ -1393,7 +1393,7 @@ export function getSheenLutLoader(textureSize: number): (device: Device) => Prom
 
   async function createSheenLUT2(device: Device): Promise<Texture2D> {
     const texSize = 64;
-    const tex = device.createTexture2D(TextureFormat.RGBA16F, texSize, texSize, GPUResourceUsageFlags.TF_LINEAR_COLOR_SPACE);
+    const tex = device.createTexture2D(TextureFormat.RGBA16F, texSize, texSize, { colorSpace: 'linear' });
     const image = new Uint16Array(textureSize * textureSize * 4);
     const one = encodeF16(1);
     for (let i = 0; i < texSize * texSize; i++) {
@@ -1420,7 +1420,7 @@ export function getSheenLutLoader(textureSize: number): (device: Device) => Prom
         throw new Error('can not reload sheen lut texture: invalid texture size');
       }
     }
-    const tex = texture as Texture2D || device.createTexture2D(TextureFormat.RGBA16F, textureSize, textureSize, GPUResourceUsageFlags.TF_LINEAR_COLOR_SPACE);
+    const tex = texture as Texture2D || device.createTexture2D(TextureFormat.RGBA16F, textureSize, textureSize, { colorSpace: 'linear' });
     const image = new Uint16Array(textureSize * textureSize * 4);
     let p = 0;
     const one = encodeF16(1);

@@ -1,4 +1,4 @@
-import { Matrix4x4, Quaternion, Vector3 } from "../math";
+import { Matrix4x4, Quaternion, Vector3 } from "../../../base";
 import { AnimationTrack } from "./animationtrack";
 import { InterpolationTarget, Interpolator } from "./interpolator";
 import { BoundingBox } from "./bounding_volume";

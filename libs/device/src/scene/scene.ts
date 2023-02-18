@@ -1,5 +1,5 @@
-import { REventTarget, REvent } from '../../../base';
-import { Vector3, Vector4, Matrix4x4, Ray, AABB, XFormChangeEvent } from '../math';
+import { REventTarget, REvent, Vector3, Vector4, Matrix4x4, Ray, AABB } from '../../../base';
+import { XFormChangeEvent } from './xform';
 import { Device, TextureCube } from '../device';
 import { SkyboxMaterial } from './materiallib';
 import { SceneNode, SceneNodeAttachEvent } from './scene_node';

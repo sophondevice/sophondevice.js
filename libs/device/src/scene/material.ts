@@ -1,7 +1,6 @@
-import { List, ListIterator } from '../../../base';
+import { List, ListIterator, Matrix4x4 } from '../../../base';
 import { ShaderLib } from './materiallib/shaderlib';
 import { TextureFilter } from '../device/base_types';
-import type { Matrix4x4 } from '../math';
 import type { Drawable, DrawContext } from './drawable';
 import type { Geometry, BindGroup, GPUProgram, RenderStateSet, Device, ProgramBuilder, BindGroupLayout, TextureSampler } from '../device';
 

@@ -1,7 +1,7 @@
 import { TextureFormat, TextureTarget, linearTextureFormatToSRGB, getTextureFormatBlockWidth, getTextureFormatBlockHeight, getTextureFormatBlockSize } from '../base_types';
 import { WebGPUBaseTexture } from './basetexture_webgpu';
 import { GPUResourceUsageFlags, TextureMipmapData, TextureCube, TextureImageElement, GPUDataBuffer } from '../gpuobject';
-import { CubeFace } from '../../math';
+import { CubeFace } from '../../../../base';
 import type { WebGPUDevice } from './device';
 import type { TypedArray } from '../../misc';
 
@@ -94,7 +94,7 @@ export class WebGPUTextureCube extends WebGPUBaseTexture implements TextureCube<
     if (buffer.byteLength < imageSize) {
       throw new Error(`Texture2D.readPixels() failed: destination buffer size is ${buffer.byteLength}, should be at least ${imageSize}`);
     }
-    const tmpBuffer = this._device.createBuffer(imageSize, GPUResourceUsageFlags.BF_READ);
+    const tmpBuffer = this._device.createBuffer(imageSize, { usage: 'read' });
     await this.copyPixelDataToBuffer(x, y, w, h, face, 0, tmpBuffer);
     await tmpBuffer.getBufferSubData(new Uint8Array(buffer.buffer, buffer.byteOffset, buffer.byteLength), 0, imageSize);
     tmpBuffer.dispose();

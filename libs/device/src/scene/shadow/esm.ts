@@ -2,7 +2,7 @@ import { ShadowImpl } from "./shadow_impl";
 import { GaussianBlurBlitter, BlitType } from "../blitter";
 import { computeShadowMapDepth, filterShadowESM } from "../renderers/shadowmap.shaderlib";
 import { ShaderLib } from "../materiallib";
-import { Device, FrameBuffer, TextureTarget, TextureFormat, GPUResourceUsageFlags, PBShaderExp, PBInsideFunctionScope, TextureSampler } from "../../device";
+import { Device, FrameBuffer, TextureTarget, TextureFormat, GPUResourceUsageFlags, PBShaderExp, PBInsideFunctionScope, TextureSampler, TextureCreationOptions } from "../../device";
 import type { ShadowMapper, ShadowMapType, ShadowMode } from "./shadowmapper";
 
 class BlurBlitter extends GaussianBlurBlitter {
@@ -155,13 +155,17 @@ export class ESM extends ShadowImpl {
   }
   /** @internal */
   protected createTexture(device: Device, target: TextureTarget, format: TextureFormat, width: number, height: number, depth: number, mipmap: boolean): ShadowMapType {
+    const options: TextureCreationOptions = {
+      colorSpace: 'linear',
+      noMipmap: !mipmap
+    };
     switch (target) {
       case TextureTarget.Texture2D:
-        return device.createTexture2D(format, width, height, GPUResourceUsageFlags.TF_LINEAR_COLOR_SPACE | (mipmap ? 0 : GPUResourceUsageFlags.TF_NO_MIPMAP));
+        return device.createTexture2D(format, width, height, options);
       case TextureTarget.TextureCubemap:
-        return device.createCubeTexture(format, width, GPUResourceUsageFlags.TF_LINEAR_COLOR_SPACE | (mipmap ? 0 : GPUResourceUsageFlags.TF_NO_MIPMAP));
+        return device.createCubeTexture(format, width, options);
       case TextureTarget.Texture2DArray:
-        return device.createTexture2DArray(format, width, height, depth, GPUResourceUsageFlags.TF_LINEAR_COLOR_SPACE | (mipmap ? 0 : GPUResourceUsageFlags.TF_NO_MIPMAP));
+        return device.createTexture2DArray(format, width, height, depth, options);
       default:
         return null;
     }

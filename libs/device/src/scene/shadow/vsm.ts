@@ -1,7 +1,7 @@
 import { ShadowImpl } from "./shadow_impl";
 import { Blitter, BlitType } from "../blitter";
 import { ShaderLib } from "../materiallib";
-import { Device, BindGroup, ShaderType, FrameBuffer, TextureTarget, TextureFormat, GPUResourceUsageFlags, ProgramBuilder, PBShaderExp, TextureFilter, PBInsideFunctionScope, TextureSampler, PBGlobalScope } from "../../device";
+import { Device, BindGroup, ShaderType, FrameBuffer, TextureTarget, TextureFormat, GPUResourceUsageFlags, ProgramBuilder, PBShaderExp, TextureFilter, PBInsideFunctionScope, TextureSampler, PBGlobalScope, TextureCreationOptions } from "../../device";
 import { computeShadowMapDepth, filterShadowVSM } from "../renderers/shadowmap.shaderlib";
 import type { ShadowMapper, ShadowMapType, ShadowMode } from "./shadowmapper";
 
@@ -218,13 +218,17 @@ export class VSM extends ShadowImpl {
   }
   /** @internal */
   protected createTexture(device: Device, target: TextureTarget, format: TextureFormat, width: number, height: number, depth: number, mipmap: boolean): ShadowMapType {
+    const options: TextureCreationOptions = {
+      colorSpace: 'linear',
+      noMipmap: !mipmap
+    };
     switch (target) {
       case TextureTarget.Texture2D:
-        return device.createTexture2D(format, width, height, GPUResourceUsageFlags.TF_LINEAR_COLOR_SPACE | (mipmap ? 0 : GPUResourceUsageFlags.TF_NO_MIPMAP));
+        return device.createTexture2D(format, width, height, options);
       case TextureTarget.TextureCubemap:
-        return device.createCubeTexture(format, width, GPUResourceUsageFlags.TF_LINEAR_COLOR_SPACE | (mipmap ? 0 : GPUResourceUsageFlags.TF_NO_MIPMAP));
+        return device.createCubeTexture(format, width, options);
       case TextureTarget.Texture2DArray:
-        return device.createTexture2DArray(format, width, height, depth, GPUResourceUsageFlags.TF_LINEAR_COLOR_SPACE | (mipmap ? 0 : GPUResourceUsageFlags.TF_NO_MIPMAP));
+        return device.createTexture2DArray(format, width, height, depth, options);
       default:
         return null;
     }

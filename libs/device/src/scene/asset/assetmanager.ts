@@ -1,6 +1,5 @@
-import { isPowerOf2, nextPowerOf2, Vector3 } from '../../math';
+import { isPowerOf2, nextPowerOf2, Vector3 } from '../../../../base';
 import { TextureFilter, TextureWrapping, TextureFormat } from '../../device/base_types'
-import { GPUResourceUsageFlags } from '../../device/gpuobject'
 import { AssetHierarchyNode, AssetSkeleton, AssetSubMeshData, SharedModel } from './model';
 import { GLTFLoader } from './loaders/gltf/gltf_loader';
 import { WebImageLoader } from './loaders/image/webimage_loader';
@@ -251,8 +250,8 @@ export class AssetManager {
         });
         const blitter = new GammaBlitter(1);
         const newTexture = tex.isTexture2D()
-          ? this.device.createTexture2D(TextureFormat.RGBA8UNORM, newWidth, newHeight, GPUResourceUsageFlags.TF_LINEAR_COLOR_SPACE)
-          : this.device.createCubeTexture(TextureFormat.RGBA8UNORM, newWidth, GPUResourceUsageFlags.TF_LINEAR_COLOR_SPACE);
+          ? this.device.createTexture2D(TextureFormat.RGBA8UNORM, newWidth, newHeight, { colorSpace: 'linear' })
+          : this.device.createCubeTexture(TextureFormat.RGBA8UNORM, newWidth, { colorSpace: 'linear' });
 
         blitter.blit(tex as any, newTexture as any, sampler);
         tex.dispose();

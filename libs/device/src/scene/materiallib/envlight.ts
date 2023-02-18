@@ -1,5 +1,5 @@
 import type { BaseTexture, BindGroup, ProgramBuilder, TextureCube, TextureSampler } from "../../device";
-import { Vector4 } from "../../math";
+import { Vector4 } from "../../../../base";
 
 export abstract class EnvironmentLighting {
   abstract initShaderBindings(pb: ProgramBuilder): void;

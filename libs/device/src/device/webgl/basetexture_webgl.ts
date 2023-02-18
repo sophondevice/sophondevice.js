@@ -1,4 +1,4 @@
-import { isPowerOf2 } from '../../math';
+import { isPowerOf2 } from '../../../../base';
 import { WebGLGPUObject } from './gpuobject_webgl';
 import { TextureCaps } from '../device';
 import { TextureTarget, TextureFilter, TextureWrapping, TextureFormat, CompareFunc, isCompressedTextureFormat, isDepthTextureFormat, isFloatTextureFormat, isIntegerTextureFormat, isSignedTextureFormat } from '../base_types';

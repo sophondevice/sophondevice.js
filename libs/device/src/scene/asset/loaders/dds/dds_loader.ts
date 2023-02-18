@@ -1,4 +1,4 @@
-import { BaseTexture, GPUResourceUsageFlags } from '../../../../device/gpuobject';
+import { BaseTexture, GPUResourceUsageFlags, TextureCreationOptions } from '../../../../device/gpuobject';
 import { getDDSMipLevelsInfo } from './dds';
 import { AbstractTextureLoader } from '../loader';
 import type { AssetManager } from '../../assetmanager';
@@ -16,31 +16,17 @@ export class DDSLoader extends AbstractTextureLoader {
     if (!mipmapLevelData) {
       throw new Error(`read DDS file failed: ${url}`);
     }
-    const colorSpaceFlag = srgb ? 0 : GPUResourceUsageFlags.TF_LINEAR_COLOR_SPACE;
-    const mipmapFlag = noMipmap ? GPUResourceUsageFlags.TF_NO_MIPMAP : 0;
-    const creationFlags = colorSpaceFlag | mipmapFlag;
+    const options: TextureCreationOptions = {
+      colorSpace: srgb ? 'srgb' : 'linear',
+      noMipmap: !!noMipmap,
+      texture: texture
+    }
     if (mipmapLevelData.isCubemap) {
-      if (texture) {
-        if (!texture.isTextureCube()) {
-          throw new Error('can not reload texture: invalid texture type');
-        }
-        texture.createWithMipmapData(mipmapLevelData, creationFlags);
-        return texture;
-      } else {
-        return assetManager.device.createCubeTextureFromMipmapData(mipmapLevelData, creationFlags);
-      }
+      return assetManager.device.createCubeTextureFromMipmapData(mipmapLevelData, options);
     } else if (mipmapLevelData.isVolume) {
       throw new Error(`load DDS volume texture is not supported`);
     } else {
-      if (texture) {
-        if (!texture.isTexture2D()) {
-          throw new Error('can not reload texture: invalid texture type');
-        }
-        texture.createWithMipmapData(mipmapLevelData, creationFlags);
-        return texture;
-      } else {
-        return assetManager.device.createTexture2DFromMipmapData(mipmapLevelData, creationFlags);
-      }
+      return assetManager.device.createTexture2DFromMipmapData(mipmapLevelData, options);
     }
   }
 }

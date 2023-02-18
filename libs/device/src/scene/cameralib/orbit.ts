@@ -1,4 +1,4 @@
-import { Vector3, Quaternion } from '../../math';
+import { Vector3, Quaternion } from '../../../../base';
 import { BaseCameraModel } from './base';
 import type { AbstractCameraModel, IMouseEvent } from '../camera';
 export interface IOrbitCameraModelOptions {

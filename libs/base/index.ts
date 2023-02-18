@@ -3,3 +3,4 @@ export * from './utils';
 export * from './event';
 export * from './visitor';
 export * from './linkedlist';
+export * from './math';
