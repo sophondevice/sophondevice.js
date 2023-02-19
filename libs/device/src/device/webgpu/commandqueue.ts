@@ -1,5 +1,5 @@
+import { Vector4 } from '@sophon/base/math/vector';
 import { PrimitiveType } from '../base_types';
-import { Vector4 } from '../../../../base';
 import { WebGPURenderPass } from './renderpass_webgpu';
 import { WebGPUComputePass } from './computepass_webgpu';
 import type { WebGPUDevice } from './device';

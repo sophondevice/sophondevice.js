@@ -1,24 +1,16 @@
 {
   "name": "@sophon/device",
   "version": "0.0.1",
-  "description": "javascript 3d rendering library for webgl and webGPU",
+  "description": "device system for sophon device library",
   "homepage": "https://github.com/sophondevice/sophondevice#readme",
   "type": "module",
-  "main": "./dist/sophon-device.cjs",
-  "umd:main": "./dist/sophon-device.umd.js",
-  "module": "./dist/sophon-device.module.js",
-  "exports": {
-    "types": "./dist/sophon-device.d.ts",
-    "require": "./dist/sophon-device.cjs",
-    "default": "./dist/sophon-device.modern.js"
-  },
-  "directories": {
-    "lib": "dist"
-  },
-  "source": "./src/index.ts",
-  "types": "./dist/sophon-device.d.ts",
+  "main": "./index.js",
+  "module": "./index.js",
+  "types": "./index.d.ts",
   "files": [
-    "dist"
+    "./**/*.js",
+    "./**/*.d.ts",
+    "./**/*.js.map"
   ],
   "scripts": {
     "build:source": "microbundle -i src/index.ts --no-generateTypes --no-compress --external none",
@@ -74,10 +66,14 @@
     "run-script-os": "^1.1.6",
     "shx": "^0.3.4",
     "typescript": "^4.7.3",
-    "tslib": "^2.5.0"
+    "tslib": "^2.5.0",
+    "@sophon/base": "workspace:*"
   },
   "dependencies": {
     "@webgpu/types": "^0.1.26",
     "@types/node": "^18.13.0"
+  },
+  "peerDependencies": {
+    "@sophon/base": "workspace:*"
   }
 }

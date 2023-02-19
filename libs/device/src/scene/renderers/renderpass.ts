@@ -1,4 +1,4 @@
-import { Vector4, Matrix4x4, Quaternion, CubeFace } from '../../../../base';
+import { Vector4, Matrix4x4, Quaternion, CubeFace } from '@sophon/base/math/vector';
 import { CullVisitor } from '../visitors/cull_visitor';
 import { RenderQueue } from '../render_queue';
 import { Material } from '../material';

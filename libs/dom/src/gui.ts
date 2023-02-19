@@ -1,4 +1,4 @@
-import { REvent, REventTarget } from '../../base';
+import { REvent, REventTarget } from '@sophon/base/event';
 import * as Yoga from './typeflex/api';
 import { injectGUIEvents, GUIRenderer } from './renderer';
 import { RColor, GUIEventPathBuilder } from './types';
@@ -12,12 +12,12 @@ import { RDocument } from './document';
 import { IStyleSheet, parseStyleSheet } from './style';
 import { RDOMTreeEvent, RMouseEvent, RDragEvent, RKeyEvent, RFocusEvent } from './events';
 import { RSelector, Rule } from './selector';
+import type { Texture2D, AssetManager } from '@sophon/device';
 import type { Font } from './font';
 import type { RElement } from './element';
 import type { Input } from './components/input';
 import type { StyleElement } from './style_element';
 import type { RPrimitiveBatchList } from './primitive';
-import type { Texture2D, AssetManager } from '@sophon/device';
 
 interface IElementConstructor {
   new(gui: GUI, ...args: unknown[]): RElement;

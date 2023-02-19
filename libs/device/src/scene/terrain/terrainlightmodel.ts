@@ -1,6 +1,6 @@
+import { Vector2 } from "@sophon/base/math/vector";
 import { LambertLightModel } from "../materiallib";
 import { ShaderType, PBInsideFunctionScope, PBGlobalScope, PBShaderExp, Texture2D, BindGroup, TextureWrapping, TextureFilter, TextureSampler, BaseTexture } from "../../device";
-import { Vector2 } from "../../../../base";
 import { MATERIAL_FUNC_NORMAL } from "../values";
 import type { DrawContext } from "../drawable";
 

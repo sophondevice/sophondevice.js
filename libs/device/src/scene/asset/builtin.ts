@@ -1,6 +1,6 @@
+import { Vector2, Vector3, Vector4, Matrix3x3 } from '@sophon/base/math/vector';
 import { TextureFormat } from '../../device/base_types';
 import { Texture2D, BaseTexture } from '../../device/gpuobject';
-import { Vector2, Vector3, Vector4, Matrix3x3 } from '../../../../base';
 import { BUILTIN_ASSET_TEXTURE_SHEEN_LUT } from '../values';
 import type { Device } from '../../device/device';
 

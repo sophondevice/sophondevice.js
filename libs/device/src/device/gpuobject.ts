@@ -1,3 +1,4 @@
+import { VectorBase, CubeFace } from '@sophon/base/math/vector';
 import {
   ShaderType,
   PrimitiveType,
@@ -8,7 +9,6 @@ import {
   CompareFunc,
 } from './base_types';
 import { PBTypeInfo, PBArrayTypeInfo, PBPrimitiveTypeInfo, PBStructTypeInfo, PBPrimitiveType } from './builder/types';
-import { VectorBase, CubeFace } from '../../../base';
 import type { TypedArray } from '../misc';
 import type { Device } from './device';
 

@@ -1,7 +1,7 @@
+import { Vector4 } from "@sophon/base/math/vector";
 import { CompareFunc, PrimitiveType } from "../base_types";
 import { ProgramBuilder } from "../builder";
 import { FaceMode, StencilOp } from "../render_states";
-import { Vector4 } from "../../../../base";
 import type { WebGPUProgram } from "./gpuprogram_webgpu";
 import type { WebGPUBaseTexture } from "./basetexture_webgpu";
 import type { WebGPUBindGroup } from "./bindgroup_webgpu";

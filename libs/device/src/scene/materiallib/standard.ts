@@ -1,8 +1,8 @@
+import { Matrix4x4 } from '@sophon/base/math/vector';
 import { MAX_TEXCOORD_INDEX_COUNT } from '../../device/gpuobject';
 import { BlendFunc } from '../../device/render_states';
 import { Material } from '../material';
 import { ShaderLib } from './shaderlib';
-import { Matrix4x4 } from '../../../../base';
 import { forwardComputeLighting } from '../renderers/forward.shaderlib';
 import * as values from '../values';
 import type { LightModel } from './lightmodel';

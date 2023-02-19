@@ -14,8 +14,8 @@ function getTargetES6() {
     preserveSymlinks: true,
     output: {
       banner: '/** sophon dom library */',
-      file: "dist/sophon-dom.module.js",
-      preserveModules: false,
+      dir: "dist",
+      preserveModules: true,
       format: 'esm',
       sourcemap: true,
     },
@@ -47,7 +47,7 @@ function getTargetTypes() {
     input: 'src/index.ts',
     preserveSymlinks: true,
     output: {
-      file: `dist/sophon-dom.d.ts`,
+      file: `dist/index.d.ts`,
     },
     plugins: [
       dts()

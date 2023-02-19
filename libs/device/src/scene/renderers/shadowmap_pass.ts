@@ -1,6 +1,7 @@
+import { Vector4 } from '@sophon/base/math/vector';
+import { Frustum } from '@sophon/base/math/frustum';
 import { RenderPass } from './renderpass';
 import { RENDER_PASS_TYPE_SHADOWMAP } from '../values';
-import { Frustum, Vector4 } from '../../../../base';
 import { PunctualLight } from '../light';
 import { ShaderLib } from '../materiallib';
 import { Camera } from '../camera';

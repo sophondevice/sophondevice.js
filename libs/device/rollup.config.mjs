@@ -5,15 +5,13 @@ import dts from 'rollup-plugin-dts';
 
 function getTargetES6() {
   return {
-    external: function (id) {
-      return false;
-    },
+    external: "@sophon/base",
     input: 'src/index.ts',
     preserveSymlinks: true,
     output: {
       banner: '/** sophon device library */',
-      file: "dist/sophon-device.module.js",
-      preserveModules: false,
+      dir: "dist",
+      preserveModules: true,
       format: 'esm',
       sourcemap: true,
     },
@@ -45,7 +43,7 @@ function getTargetTypes() {
     input: 'src/index.ts',
     preserveSymlinks: true,
     output: {
-      file: `dist/sophon-device.d.ts`,
+      file: `dist/index.d.ts`,
     },
     plugins: [
       dts()

@@ -1,4 +1,4 @@
-import { Vector4 } from '../../../../base';
+import { Vector4 } from '@sophon/base/math/vector';
 import { getTextureFormatBlockSize, PrimitiveType, TextureFormat } from '../base_types';
 import {
   IFrameBufferOptions,

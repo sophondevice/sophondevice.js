@@ -1,4 +1,4 @@
-import { zip } from '../../../../base';
+import { zip } from '@sophon/base/utils';
 import { TextureFormat, PrimitiveType, TextureWrapping, TextureFilter, CompareFunc } from '../base_types';
 import { StencilOp, FaceWinding, FaceMode, BlendEquation, BlendFunc } from '../render_states';
 

@@ -1,4 +1,4 @@
-import { Vector4 } from '../../../../base';
+import { Vector4 } from '@sophon/base/math/vector';
 import { TextureFormat, WebGLContext, PrimitiveType, hasAlphaChannel, hasRedChannel, hasGreenChannel, hasBlueChannel, isIntegerTextureFormat, isSignedTextureFormat, isFloatTextureFormat, getTextureFormatBlockSize, isCompressedTextureFormat, isDepthTextureFormat } from '../base_types';
 import { isWebGL2, WebGLError } from './utils';
 import { WebGLEnum } from './webgl_enum';

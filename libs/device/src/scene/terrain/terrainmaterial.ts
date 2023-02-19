@@ -4,8 +4,8 @@ import { TerrainLightModel } from './terrainlightmodel';
 import { Device, Texture2D, BindGroup, GPUProgram, PBGlobalScope, ProgramBuilder } from '../../device';
 import { forwardComputeLighting } from '../renderers/forward.shaderlib';
 import * as values from '../values';
+import type { Vector2 } from '@sophon/base/math/vector';
 import type { DrawContext } from '../drawable';
-import type { Vector2 } from '../../../../base';
 import type { ShadowMapPass } from '../renderers';
 
 export enum TerrainRenderMode {

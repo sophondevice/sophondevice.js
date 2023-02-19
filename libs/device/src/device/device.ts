@@ -1,4 +1,5 @@
-import { REventTarget, REvent, Vector4 } from '../../../base';
+import { REventTarget, REvent } from '@sophon/base/event';
+import { Vector4 } from '@sophon/base/math/vector';
 import { PrimitiveType, TextureFormat } from './base_types';
 import { CPUTimer, ITimer } from './timer';
 import { AssetManager } from '../scene/asset/assetmanager';

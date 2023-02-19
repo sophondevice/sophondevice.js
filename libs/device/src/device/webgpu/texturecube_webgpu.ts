@@ -1,7 +1,7 @@
+import { CubeFace } from '@sophon/base/math/vector';
 import { TextureFormat, TextureTarget, linearTextureFormatToSRGB, getTextureFormatBlockWidth, getTextureFormatBlockHeight, getTextureFormatBlockSize } from '../base_types';
 import { WebGPUBaseTexture } from './basetexture_webgpu';
 import { GPUResourceUsageFlags, TextureMipmapData, TextureCube, TextureImageElement, GPUDataBuffer } from '../gpuobject';
-import { CubeFace } from '../../../../base';
 import type { WebGPUDevice } from './device';
 import type { TypedArray } from '../../misc';
 

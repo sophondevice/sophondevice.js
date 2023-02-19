@@ -1,4 +1,5 @@
-import { Matrix4x4, Vector3, nextPowerOf2 } from "../../../base";
+import { Matrix4x4, Vector3 } from "@sophon/base/math/vector";
+import { nextPowerOf2 } from "@sophon/base/math/misc";
 import { Texture2D } from "../device/gpuobject";
 import { TextureFormat } from "../device/base_types";
 import { SkinnedBoundingBox } from "./animation";

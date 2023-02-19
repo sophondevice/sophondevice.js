@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { Vector3, Vector4, Matrix4x4, Quaternion } from '@sophon/base/math/vector';
 import { TextureFilter, TextureWrapping, PrimitiveType } from '../../../../device/base_types';
 import { FaceMode } from '../../../../device/render_states';
 import {
@@ -29,7 +30,6 @@ import {
   F32_BITMASK,
   makePrimitiveType,
 } from '../../../../device/builder/types';
-import { Vector3, Vector4, Matrix4x4, Quaternion } from '../../../../../../base';
 import { SharedModel, AssetHierarchyNode, AssetMeshData, AssetSkeleton, AssetScene, AssetAnimationData, AssetSubMeshData, AssetMaterial, AssetUnlitMaterial, AssetPBRMaterialMR, AssetPBRMaterialSG, AssetMaterialCommon, MaterialTextureInfo, AssetPBRMaterialCommon } from '../../model';
 import { BoundingBox } from '../../../bounding_volume';
 import { Primitive } from '../../../primitive';

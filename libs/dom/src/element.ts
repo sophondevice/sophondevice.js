@@ -1,4 +1,4 @@
-import { REvent } from '../../base';
+import { REvent } from '@sophon/base/event';
 import { RNode } from './node';
 import { tagname } from './gui';
 import { RAttributeChangeEvent } from './events';

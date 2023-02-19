@@ -1,4 +1,5 @@
-import { Visitor, visitor, Ray } from '../../../../base';
+import { Visitor, visitor } from '@sophon/base/visitor';
+import { Ray } from '@sophon/base/math/ray';
 import { GraphNode } from '../graph_node';
 import { OctreeNode } from '../octree';
 import { Mesh } from '../mesh';

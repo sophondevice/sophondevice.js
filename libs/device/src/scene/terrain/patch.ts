@@ -1,8 +1,8 @@
+import { Vector3 } from "@sophon/base/math/vector";
 import { BoundingBox } from "../bounding_volume";
 import { Primitive } from "../primitive";
 import { PatchPosition } from "./types";
 import { Device, GPUDataBuffer, makeVertexBufferType, PBStructTypeInfo, PrimitiveType, StructuredBuffer } from "../../device";
-import { Vector3 } from "../../../../base";
 import type { Terrain } from './terrain';
 import type { Quadtree } from "./quadtree";
 import type { Scene } from "../scene";

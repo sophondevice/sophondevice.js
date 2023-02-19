@@ -1,4 +1,4 @@
-import { Vector3, Vector4 } from "../../../../base";
+import { Vector3, Vector4 } from "@sophon/base/math/vector";
 import { BoundingBox } from "../bounding_volume";
 
 /*

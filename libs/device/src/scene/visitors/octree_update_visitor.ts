@@ -1,4 +1,4 @@
-import { Visitor, visitor } from '../../../../base';
+import { Visitor, visitor } from '@sophon/base/visitor';
 import { GraphNode } from '../graph_node';
 import type { Octree } from '../octree';
 

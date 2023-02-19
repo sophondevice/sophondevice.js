@@ -1,0 +1,21 @@
+{
+    "extends": "../../../tsconfig.common.json",
+
+    "compilerOptions": {
+        "module": "ES6",
+        "target": "ES6",
+        "outDir": "./dist",
+        "rootDir": "..",
+        "declaration": true,
+        "importHelpers": true,
+        "paths": {
+            "@sophon/base": ["./node_modules/@sophon/base"]
+        },
+        "typeRoots": [
+            "./node_modules/@webgpu/types",
+            "./node_modules/@sophon/base"
+        ]
+    },
+
+    "include": ["../src"]
+}

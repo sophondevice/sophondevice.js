@@ -1,4 +1,4 @@
-import { Matrix4x4, Quaternion, Vector3, Vector4 } from "../../../../base";
+import { Matrix4x4, Quaternion, Vector3, Vector4 } from "@sophon/base/math/vector";
 import type { Primitive } from "../primitive";
 import type { Texture2D, TextureSampler } from "../../device";
 import type { StandardMaterial } from "../materiallib";

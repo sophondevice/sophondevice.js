@@ -1,4 +1,7 @@
-import { REventTarget, REvent, Vector3, Vector4, Matrix4x4, Ray, AABB } from '../../../base';
+import { REventTarget, REvent } from '@sophon/base/event';
+import { Vector3, Vector4, Matrix4x4 } from '@sophon/base/math/vector';
+import { Ray } from '@sophon/base/math/ray';
+import { AABB } from '@sophon/base/math/aabb';
 import { XFormChangeEvent } from './xform';
 import { Device, TextureCube } from '../device';
 import { SkyboxMaterial } from './materiallib';

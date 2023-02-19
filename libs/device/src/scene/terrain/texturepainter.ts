@@ -1,5 +1,5 @@
+import { Matrix4x4, Vector3, Vector4 } from '@sophon/base/math/vector';
 import { Device, FrameBuffer, FaceMode, PrimitiveType, ProgramBuilder, RenderStateSet, Texture2D, TextureFormat, GPUProgram, BindGroup, makeVertexBufferType, ShaderType, TextureWrapping, TextureFilter } from '../../device';
-import { Matrix4x4, Vector3, Vector4 } from '../../../../base';
 import { Camera } from '../camera';
 import { Primitive } from '../primitive';
 import { MAX_DETAIL_TEXTURE_LEVELS } from './terrainmaterial';

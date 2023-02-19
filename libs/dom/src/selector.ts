@@ -1,4 +1,4 @@
-import { List, ListIterator } from '../../base';
+import { List, ListIterator } from '@sophon/base/linkedlist';
 import { RNode } from './node';
 import type { RElement } from './element';
 

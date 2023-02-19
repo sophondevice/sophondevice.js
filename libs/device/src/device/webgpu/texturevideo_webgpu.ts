@@ -29,7 +29,7 @@ export class WebGPUTextureVideo extends WebGPUBaseTexture<GPUExternalTexture> im
     }
   }
   updateVideoFrame(): boolean {
-    if ((!this._object || this._object.expired || this._object.expired === undefined) && this._source.readyState > 2) {
+    if ((!this._object || (this._object as any).expired || (this._object as any).expired === undefined) && this._source.readyState > 2) {
       this._object = this._device.gpuImportExternalTexture(this._source);
       return true;
     }

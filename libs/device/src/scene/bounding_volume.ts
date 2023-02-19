@@ -1,4 +1,8 @@
-import { Frustum, AABB, Plane, ClipState, Vector3, Matrix4x4 } from '../../../base';
+import { Vector3, Matrix4x4 } from '@sophon/base/math/vector';
+import { Frustum } from '@sophon/base/math/frustum';
+import { AABB } from '@sophon/base/math/aabb';
+import { Plane } from '@sophon/base/math/plane';
+import { ClipState } from '@sophon/base/math/clip_test';
 import { AABBTree } from './aabbtree';
 
 export function boundingvolume() {

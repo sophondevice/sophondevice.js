@@ -1,4 +1,4 @@
-import { Vector3, Quaternion } from '../../../../base';
+import { Vector3, Quaternion } from '@sophon/base/math/vector';
 import { BaseCameraModel } from './base';
 import type { AbstractCameraModel, IMouseEvent } from '../camera';
 export interface IOrbitCameraModelOptions {

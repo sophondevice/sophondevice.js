@@ -1,4 +1,5 @@
-import { isPowerOf2, nextPowerOf2, Vector3 } from '../../../../base';
+import { isPowerOf2, nextPowerOf2 } from '@sophon/base/math/misc';
+import { Vector3 } from '@sophon/base/math/vector';
 import { TextureFilter, TextureWrapping, TextureFormat } from '../../device/base_types'
 import { AssetHierarchyNode, AssetSkeleton, AssetSubMeshData, SharedModel } from './model';
 import { GLTFLoader } from './loaders/gltf/gltf_loader';

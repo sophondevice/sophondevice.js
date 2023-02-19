@@ -1,4 +1,4 @@
-import { REvent } from '../../../base'
+import { REvent } from '@sophon/base/event'
 import { RRectPrimitive, RPrimitiveBatchList } from '../primitive';
 import { RText } from './text';
 import { tagname } from '../gui';

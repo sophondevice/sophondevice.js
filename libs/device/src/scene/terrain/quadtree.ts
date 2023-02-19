@@ -1,7 +1,10 @@
+import { ClipState } from '@sophon/base/math/clip_test';
+import { Frustum } from '@sophon/base/math/frustum';
+import { Matrix4x4, Vector3 } from '@sophon/base/math/vector';
+import { isPowerOf2, nextPowerOf2 } from '@sophon/base/math/misc';
 import { PatchPosition } from './types';
 import { BoundingBox } from '../bounding_volume';
 import { TerrainPatch } from './patch';
-import { ClipState, Frustum, Matrix4x4, Vector3, isPowerOf2, nextPowerOf2 } from '../../../../base';
 import { IndexBuffer, makeVertexBufferType, PrimitiveType, StructuredBuffer, Texture2D, TextureFormat } from '../../device';
 import { HeightField } from './heightfield';
 import type { Terrain } from './terrain';

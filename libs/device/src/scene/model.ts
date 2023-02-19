@@ -1,4 +1,4 @@
-import { REvent } from '../../../base';
+import { REvent } from '@sophon/base/event';
 import { AnimationClip } from './animation';
 import { GraphNode } from './graph_node';
 import type { Scene } from './scene';

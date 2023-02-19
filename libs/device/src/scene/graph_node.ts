@@ -1,4 +1,6 @@
-import { ListIterator, Frustum, Matrix4x4 } from '../../../base';
+import { ListIterator } from '@sophon/base/linkedlist';
+import { Frustum } from '@sophon/base/math/frustum';
+import { Matrix4x4 } from '@sophon/base/math/vector';
 import { SceneNode } from './scene_node';
 import type { XForm } from './xform';
 import type { Texture2D } from '../device/gpuobject';

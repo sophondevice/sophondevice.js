@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { REventTarget, REvent, REventListener, REventHandlerOptions } from '../../base';
+import { REventTarget, REvent, REventListener, REventHandlerOptions } from '@sophon/base/event';
 import { RCoord, RColor, GUIEventPathBuilder } from './types';
 import { RRectPrimitive, RPolygonPrimitive, RPrimitiveBatchList } from './primitive';
 import { RNodeList, RLiveNodeList } from './nodelist';

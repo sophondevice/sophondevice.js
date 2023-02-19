@@ -1,3 +1,5 @@
+import { REventTarget } from '@sophon/base/event';
+import { Matrix4x4, Vector3, Vector4 } from '@sophon/base/math/vector';
 import { 
   BindGroup,
   RenderStateSet,
@@ -14,7 +16,6 @@ import {
   TextureFilter,
   Primitive
 } from '@sophon/device';
-import { REventTarget, Matrix4x4, Vector3, Vector4, VectorBase } from '../../base';
 import { RMouseEvent, RDragEvent, RKeyEvent } from './events';
 import type { RColor } from './types';
 import type { GUI } from './gui';
@@ -244,8 +245,7 @@ export class GUIRenderer extends REventTarget {
     this._projectionMatrix.ortho(0, this.getDrawingBufferWidth(), 0, this.getDrawingBufferHeight(), 1, 100);
     this._flipMatrix = Matrix4x4.translation(new Vector3(0, this.getDrawingBufferHeight(), 0)).scaleRight(new Vector3(1, -1, 1));
     const mvpMatrix = Matrix4x4.multiply(this._projectionMatrix, this._flipMatrix);
-    const x: VectorBase = mvpMatrix;
-    this._bindGroup.setValue('transform', { mvpMatrix: x });
+    this._bindGroup.setValue('transform', { mvpMatrix });
     this._bindGroupTexture.setValue('transform', { mvpMatrix });
     this._device.clearFrameBuffer(new Vector4(0, 0, 0, 1), 1, 0);
   }

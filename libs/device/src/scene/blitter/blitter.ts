@@ -1,7 +1,7 @@
+import { CubeFace } from "@sophon/base/math/vector";
 import { PrimitiveType } from '../../device/base_types'
 import { RenderStateSet, FaceMode } from '../../device/render_states';
 import { makeVertexBufferType } from '../../device/gpuobject';
-import { CubeFace } from "../../../../base";
 import { Primitive } from "../primitive";
 import { BoxShape } from "../shape";
 import type { Device } from '../../device/device';

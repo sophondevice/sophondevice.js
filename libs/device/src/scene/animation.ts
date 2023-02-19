@@ -1,4 +1,4 @@
-import { Matrix4x4, Quaternion, Vector3 } from "../../../base";
+import { Matrix4x4, Quaternion, Vector3 } from "@sophon/base/math/vector";
 import { AnimationTrack } from "./animationtrack";
 import { InterpolationTarget, Interpolator } from "./interpolator";
 import { BoundingBox } from "./bounding_volume";

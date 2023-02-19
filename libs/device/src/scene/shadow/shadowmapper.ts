@@ -1,5 +1,6 @@
+import { AABB } from "@sophon/base/math/aabb";
+import { Matrix4x4, Vector3, Vector4 } from "@sophon/base/math/vector";
 import { PBShaderExp, RenderStateSet, FrameBuffer, Texture2D, Texture2DArray, TextureCube, FaceMode, TextureFormat, TextureTarget, PBInsideFunctionScope, TextureSampler, TextureCreationOptions } from "../../device";
-import { AABB, Matrix4x4, Vector3, Vector4 } from "../../../../base";
 import { Camera } from "../camera";
 import { ShaderLib } from "../materiallib";
 import { SSM } from "./ssm";

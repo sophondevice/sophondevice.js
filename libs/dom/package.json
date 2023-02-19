@@ -4,15 +4,13 @@
   "description": "html dom style ui library for sophon device",
   "homepage": "https://github.com/sophondevice/sophondevice#readme",
   "type": "module",
-  "main": "./dist/sophon.dom.umd.js",
-  "module": "./dist/sophon.dom.module.js",
-  "directories": {
-    "lib": "dist"
-  },
-  "source": "./src/index.ts",
-  "types": "./dist/sophon-dom.d.ts",
+  "main": "./index.js",
+  "module": "./index.js",
+  "types": "./index.d.ts",
   "files": [
-    "dist"
+    "./**/*.js",
+    "./**/*.d.ts",
+    "./**/*.js.map"
   ],
   "scripts": {
     "build-modern": "microbundle -i src/index.ts --no-generateTypes --no-compress --no-pkg-main --external @sophon/device -f modern -o dist/sophon.dom.modern.js",
@@ -72,9 +70,12 @@
     "run-script-os": "^1.1.6",
     "shx": "^0.3.4",
     "typescript": "^4.7.3",
-    "tslib": "^2.5.0"
+    "tslib": "^2.5.0",
+    "@sophon/device": "workspace:*",
+    "@sophon/base": "workspace:*"
   },
-  "dependencies": {
-    "@sophon/device": "workspace:*"
+  "peerDependencies": {
+    "@sophon/device": "workspace:*",
+    "@sophon/base": "workspace:*"
   }
 }

@@ -1,8 +1,8 @@
+import { Matrix4x4 } from '@sophon/base/math/vector';
 import { GraphNode } from './graph_node';
 import { BoxFrameShape, BoxShape, IBoxCreationOptions, PlaneShape, SphereShape } from './shape';
 import { LambertLightModel, StandardMaterial } from './materiallib';
 import { RenderPass } from './renderers';
-import { Matrix4x4 } from '../../../base';
 import type { XForm } from './xform';
 import type { Primitive } from './primitive';
 import type { SceneNode } from './scene_node';

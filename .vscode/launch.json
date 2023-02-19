@@ -17,6 +17,20 @@
       "outFiles": [
         "${workspaceFolder}/**/*.js"
       ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "rollup bundle test",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "program": "${workspaceFolder}\\libs\\device\\module\\node_modules\\dts-bundle-generator\\dist\\bin\\dts-bundle-generator.js",
+      "args": ["--disable-symlinks-following", "-o", "test.d.ts", "test.ts"],
+      "cwd": "${workspaceFolder}\\libs\\device",
+      "outFiles": [
+        "${workspaceFolder}/**/*.js"
+      ]
     }
   ]
 }

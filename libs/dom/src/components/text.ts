@@ -1,4 +1,4 @@
-import { REvent } from '../../../base';
+import { REvent } from '@sophon/base/event';
 import { RRectPrimitive } from '../primitive';
 import { RNode } from '../node';
 import { RTextEvent, RAttributeChangeEvent } from '../events';

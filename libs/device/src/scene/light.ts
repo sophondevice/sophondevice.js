@@ -1,4 +1,4 @@
-import { Vector3, Vector4, Matrix4x4 } from '../../../base';
+import { Vector3, Vector4, Matrix4x4 } from '@sophon/base/math/vector';
 import { GraphNode } from './graph_node';
 import { BoundingVolume, BoundingBox } from './bounding_volume';
 import { ShadowMapper } from './shadow/shadowmapper';

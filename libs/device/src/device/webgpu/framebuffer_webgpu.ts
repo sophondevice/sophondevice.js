@@ -1,6 +1,6 @@
+import { CubeFace } from '@sophon/base/math/vector';
 import { WebGPUObject } from './gpuobject_webgpu';
 import { FrameBuffer, IFrameBufferOptions } from '../gpuobject';
-import { CubeFace } from '../../../../base';
 import type { WebGPUDevice } from './device';
 import type { BaseTexture } from '../gpuobject';
 import type { WebGPUBaseTexture } from './basetexture_webgpu';
