@@ -1,4 +1,4 @@
-import { Matrix4x4, Vector3, Vector4 } from "@sophon/base/math/vector";
+import { Matrix4x4, Vector3, Vector4 } from "@sophon/base";
 import { ShaderType } from "../../device/base_types";
 import { PBInsideFunctionScope, PBShaderExp, PBGlobalScope, PBStructTypeInfo, typeF32Vec3, typeF32, typeF32Vec4, typeMat3 } from "../../device/builder";
 import { EnvironmentLighting, EnvConstantAmbient, EnvIBL } from "./envlight";

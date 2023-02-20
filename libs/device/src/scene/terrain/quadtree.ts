@@ -1,7 +1,4 @@
-import { ClipState } from '@sophon/base/math/clip_test';
-import { Frustum } from '@sophon/base/math/frustum';
-import { Matrix4x4, Vector3 } from '@sophon/base/math/vector';
-import { isPowerOf2, nextPowerOf2 } from '@sophon/base/math/misc';
+import { ClipState, Frustum, Matrix4x4, Vector3, isPowerOf2, nextPowerOf2 } from '@sophon/base';
 import { PatchPosition } from './types';
 import { BoundingBox } from '../bounding_volume';
 import { TerrainPatch } from './patch';

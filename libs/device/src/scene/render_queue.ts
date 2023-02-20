@@ -1,4 +1,4 @@
-import type { Matrix4x4 } from '@sophon/base/math/vector';
+import type { Matrix4x4 } from '@sophon/base';
 import type { Device } from '../device';
 import type { Camera } from './camera';
 import type { Drawable } from './drawable';

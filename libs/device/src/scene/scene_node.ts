@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Visitor } from '@sophon/base/visitor';
-import { REventPath, REventPathBuilder, REventTarget, REvent } from '@sophon/base/event';
-import { Vector3, Quaternion } from '@sophon/base/math/vector';
+import { REventPath, REventPathBuilder, REventTarget, REvent, Vector3, Quaternion } from '@sophon/base';
 import { XForm } from './xform';
+import type { Visitor } from '../misc';
 import type { Scene } from './scene';
 import type { GraphNode } from './graph_node';
 import type { Mesh } from './mesh';

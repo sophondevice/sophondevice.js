@@ -1,4 +1,4 @@
-import { Vector4 } from "@sophon/base/math/vector";
+import { Vector4 } from "@sophon/base";
 import { CompareFunc, PrimitiveType } from "../base_types";
 import { ProgramBuilder } from "../builder";
 import { FaceMode, StencilOp } from "../render_states";

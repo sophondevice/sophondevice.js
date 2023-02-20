@@ -1,7 +1,7 @@
 import { babel } from '@rollup/plugin-babel';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import terser from '@rollup/plugin-terser';
-import typescript from '@rollup/plugin-typescript';
+import typescript from 'rollup-plugin-typescript2';
 import dts from 'rollup-plugin-dts';
 
 function getTargetES6() {
@@ -11,18 +11,14 @@ function getTargetES6() {
     preserveSymlinks: true,
     output: {
       banner: '/** sophon device library */',
-      dir: "dist",
+      dir: "module",
       preserveModules: true,
       format: 'esm',
       sourcemap: true,
     },
     plugins: [
-      nodeResolve({
-        rootDir: '.'
-      }),
-      typescript({
-        tslib: null
-      }),
+      typescript(),
+      nodeResolve(),
       babel({
         babelHelpers: 'bundled',
         babelrc: false,

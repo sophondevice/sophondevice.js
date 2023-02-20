@@ -1,5 +1,4 @@
-import { Quaternion } from "@sophon/base/math/vector";
-import { numberClamp } from "@sophon/base/math/misc";
+import { Quaternion, numberClamp } from "@sophon/base";
 import type { TypedArray } from "../misc";
 
 export enum InterpolationMode {

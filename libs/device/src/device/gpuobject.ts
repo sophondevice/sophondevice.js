@@ -1,4 +1,4 @@
-import { VectorBase, CubeFace } from '@sophon/base/math/vector';
+import { VectorBase, CubeFace } from '@sophon/base';
 import {
   ShaderType,
   PrimitiveType,

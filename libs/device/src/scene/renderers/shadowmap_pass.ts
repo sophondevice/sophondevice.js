@@ -1,5 +1,4 @@
-import { Vector4 } from '@sophon/base/math/vector';
-import { Frustum } from '@sophon/base/math/frustum';
+import { Vector4, Frustum } from '@sophon/base';
 import { RenderPass } from './renderpass';
 import { RENDER_PASS_TYPE_SHADOWMAP } from '../values';
 import { PunctualLight } from '../light';

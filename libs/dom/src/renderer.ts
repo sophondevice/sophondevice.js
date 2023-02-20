@@ -1,5 +1,4 @@
-import { REventTarget } from '@sophon/base/event';
-import { Matrix4x4, Vector3, Vector4 } from '@sophon/base/math/vector';
+import { Matrix4x4, Vector3, Vector4, REventTarget } from '@sophon/base';
 import { 
   BindGroup,
   RenderStateSet,

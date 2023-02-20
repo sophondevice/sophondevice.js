@@ -1,7 +1,6 @@
-import { REvent } from '@sophon/base/event'
+import { REvent } from '@sophon/base'
 import { RRectPrimitive, RPrimitiveBatchList } from '../primitive';
 import { RText } from './text';
-import { tagname } from '../gui';
 import { RElement } from '../element';
 import {
   RElementLayoutEvent,
@@ -15,7 +14,6 @@ import type { GUI } from '../gui';
 import type { IStyleSheet } from '../style';
 import type { GUIRenderer } from '../renderer';
 
-@tagname('input')
 export class Input extends RElement {
   /** @internal */
   private _hiddenInput: HTMLInputElement;

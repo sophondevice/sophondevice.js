@@ -5,7 +5,7 @@ importers:
   .:
     specifiers: {}
 
-  ../../libs/base/module:
+  ../../libs/base:
     specifiers:
       '@babel/core': ^7.20.12
       '@babel/eslint-parser': ^7.19.1
@@ -14,70 +14,6 @@ importers:
       '@rollup/plugin-node-resolve': ^15.0.1
       '@rollup/plugin-strip': ^3.0.2
       '@rollup/plugin-terser': ^0.4.0
-      '@rollup/plugin-typescript': ^11.0.0
-      '@rollup/pluginutils': ^5.0.2
-      '@types/node': ^18.13.0
-      '@typescript-eslint/eslint-plugin': ^5.51.0
-      '@typescript-eslint/parser': ^5.51.0
-      '@web/dev-server': ^0.1.35
-      dts-bundle-generator: ^7.2.0
-      eslint: ^8.33.0
-      eslint-config-prettier: ^8.6.0
-      eslint-plugin-import: ^2.27.5
-      eslint-plugin-prettier: ^4.2.1
-      eslint-plugin-tsdoc: ^0.2.17
-      prettier: ^2.8.4
-      replace: ^1.2.2
-      rollup: ^3.15.0
-      rollup-plugin-dts: ^5.2.0
-      rollup-plugin-visualizer: ^5.9.0
-      run-script-os: ^1.1.6
-      shx: ^0.3.4
-      tslib: ^2.5.0
-      typedoc: ^0.23.24
-      typescript: ^4.7.3
-    dependencies:
-      '@types/node': 18.13.0
-    devDependencies:
-      '@babel/core': 7.20.12
-      '@babel/eslint-parser': 7.19.1_0ed82455e8f660174d75840457c44d8e
-      '@babel/preset-env': 7.20.2_@babel+core@7.20.12
-      '@rollup/plugin-babel': 6.0.3_547db84a4cf9a196cc6aaf9a2fed38ba
-      '@rollup/plugin-node-resolve': 15.0.1_rollup@3.15.0
-      '@rollup/plugin-strip': 3.0.2_rollup@3.15.0
-      '@rollup/plugin-terser': 0.4.0_rollup@3.15.0
-      '@rollup/plugin-typescript': 11.0.0_2d60ac883c3cb74044d0cba5224c37f5
-      '@rollup/pluginutils': 5.0.2_rollup@3.15.0
-      '@typescript-eslint/eslint-plugin': 5.51.0_0fb7d53160f0e41e16372a0eab719cf9
-      '@typescript-eslint/parser': 5.51.0_eslint@8.33.0+typescript@4.9.5
-      '@web/dev-server': 0.1.35
-      dts-bundle-generator: 7.2.0
-      eslint: 8.33.0
-      eslint-config-prettier: 8.6.0_eslint@8.33.0
-      eslint-plugin-import: 2.27.5_eslint@8.33.0
-      eslint-plugin-prettier: 4.2.1_80353385657558523d8688bf9d3ac177
-      eslint-plugin-tsdoc: 0.2.17
-      prettier: 2.8.4
-      replace: 1.2.2
-      rollup: 3.15.0
-      rollup-plugin-dts: 5.2.0_rollup@3.15.0+typescript@4.9.5
-      rollup-plugin-visualizer: 5.9.0_rollup@3.15.0
-      run-script-os: 1.1.6
-      shx: 0.3.4
-      tslib: 2.5.0
-      typedoc: 0.23.24_typescript@4.9.5
-      typescript: 4.9.5
-
-  ../../libs/device:
-    specifiers:
-      '@babel/core': ^7.20.12
-      '@babel/eslint-parser': ^7.19.1
-      '@babel/preset-env': ^7.20.2
-      '@rollup/plugin-babel': ^6.0.3
-      '@rollup/plugin-node-resolve': ^15.0.1
-      '@rollup/plugin-strip': ^3.0.2
-      '@rollup/plugin-terser': ^0.4.0
-      '@rollup/plugin-typescript': ^11.0.0
       '@rollup/pluginutils': ^5.0.2
       '@sophon/base': workspace:*
       '@types/node': ^18.13.0
@@ -95,10 +31,10 @@ importers:
       replace: ^1.2.2
       rollup: ^3.15.0
       rollup-plugin-dts: ^5.2.0
+      rollup-plugin-typescript2: ^0.34.1
       rollup-plugin-visualizer: ^5.9.0
       run-script-os: ^1.1.6
       shx: ^0.3.4
-      tslib: ^2.5.0
       typedoc: ^0.23.24
       typescript: ^4.7.3
     dependencies:
@@ -112,7 +48,74 @@ importers:
       '@rollup/plugin-node-resolve': 15.0.1_rollup@3.15.0
       '@rollup/plugin-strip': 3.0.2_rollup@3.15.0
       '@rollup/plugin-terser': 0.4.0_rollup@3.15.0
-      '@rollup/plugin-typescript': 11.0.0_2d60ac883c3cb74044d0cba5224c37f5
+      '@rollup/pluginutils': 5.0.2_rollup@3.15.0
+      '@sophon/base': link:module
+      '@typescript-eslint/eslint-plugin': 5.51.0_0fb7d53160f0e41e16372a0eab719cf9
+      '@typescript-eslint/parser': 5.51.0_eslint@8.33.0+typescript@4.9.5
+      '@web/dev-server': 0.1.35
+      dts-bundle-generator: 7.2.0
+      eslint: 8.33.0
+      eslint-config-prettier: 8.6.0_eslint@8.33.0
+      eslint-plugin-import: 2.27.5_eslint@8.33.0
+      eslint-plugin-prettier: 4.2.1_80353385657558523d8688bf9d3ac177
+      eslint-plugin-tsdoc: 0.2.17
+      prettier: 2.8.4
+      replace: 1.2.2
+      rollup: 3.15.0
+      rollup-plugin-dts: 5.2.0_rollup@3.15.0+typescript@4.9.5
+      rollup-plugin-typescript2: 0.34.1_rollup@3.15.0+typescript@4.9.5
+      rollup-plugin-visualizer: 5.9.0_rollup@3.15.0
+      run-script-os: 1.1.6
+      shx: 0.3.4
+      typedoc: 0.23.24_typescript@4.9.5
+      typescript: 4.9.5
+
+  ../../libs/base/module:
+    specifiers: {}
+
+  ../../libs/device:
+    specifiers:
+      '@babel/core': ^7.20.12
+      '@babel/eslint-parser': ^7.19.1
+      '@babel/preset-env': ^7.20.2
+      '@rollup/plugin-babel': ^6.0.3
+      '@rollup/plugin-node-resolve': ^15.0.1
+      '@rollup/plugin-strip': ^3.0.2
+      '@rollup/plugin-terser': ^0.4.0
+      '@rollup/pluginutils': ^5.0.2
+      '@sophon/base': workspace:*
+      '@types/node': ^18.13.0
+      '@typescript-eslint/eslint-plugin': ^5.51.0
+      '@typescript-eslint/parser': ^5.51.0
+      '@web/dev-server': ^0.1.35
+      '@webgpu/types': ^0.1.26
+      dts-bundle-generator: ^7.2.0
+      eslint: ^8.33.0
+      eslint-config-prettier: ^8.6.0
+      eslint-plugin-import: ^2.27.5
+      eslint-plugin-prettier: ^4.2.1
+      eslint-plugin-tsdoc: ^0.2.17
+      prettier: ^2.8.4
+      replace: ^1.2.2
+      rollup: ^3.15.0
+      rollup-plugin-dts: ^5.2.0
+      rollup-plugin-typescript2: ^0.34.1
+      rollup-plugin-visualizer: ^5.9.0
+      run-script-os: ^1.1.6
+      shx: ^0.3.4
+      typedoc: ^0.23.24
+      typescript: ^4.7.3
+    dependencies:
+      '@types/node': 18.13.0
+      '@webgpu/types': 0.1.27
+    devDependencies:
+      '@babel/core': 7.20.12
+      '@babel/eslint-parser': 7.19.1_0ed82455e8f660174d75840457c44d8e
+      '@babel/preset-env': 7.20.2_@babel+core@7.20.12
+      '@rollup/plugin-babel': 6.0.3_547db84a4cf9a196cc6aaf9a2fed38ba
+      '@rollup/plugin-node-resolve': 15.0.1_rollup@3.15.0
+      '@rollup/plugin-strip': 3.0.2_rollup@3.15.0
+      '@rollup/plugin-terser': 0.4.0_rollup@3.15.0
       '@rollup/pluginutils': 5.0.2_rollup@3.15.0
       '@sophon/base': link:../base/module
       '@typescript-eslint/eslint-plugin': 5.51.0_0fb7d53160f0e41e16372a0eab719cf9
@@ -128,12 +131,15 @@ importers:
       replace: 1.2.2
       rollup: 3.15.0
       rollup-plugin-dts: 5.2.0_rollup@3.15.0+typescript@4.9.5
+      rollup-plugin-typescript2: 0.34.1_rollup@3.15.0+typescript@4.9.5
       rollup-plugin-visualizer: 5.9.0_rollup@3.15.0
       run-script-os: 1.1.6
       shx: 0.3.4
-      tslib: 2.5.0
       typedoc: 0.23.24_typescript@4.9.5
       typescript: 4.9.5
+
+  ../../libs/device/module:
+    specifiers: {}
 
   ../../libs/dom:
     specifiers:
@@ -144,7 +150,6 @@ importers:
       '@rollup/plugin-node-resolve': ^15.0.1
       '@rollup/plugin-strip': ^3.0.2
       '@rollup/plugin-terser': ^0.4.0
-      '@rollup/plugin-typescript': ^11.0.0
       '@rollup/pluginutils': ^5.0.2
       '@sophon/base': workspace:*
       '@sophon/device': workspace:*
@@ -161,10 +166,10 @@ importers:
       replace: ^1.2.2
       rollup: ^3.15.0
       rollup-plugin-dts: ^5.2.0
+      rollup-plugin-typescript2: ^0.34.1
       rollup-plugin-visualizer: ^5.9.0
       run-script-os: ^1.1.6
       shx: ^0.3.4
-      tslib: ^2.5.0
       typedoc: ^0.23.24
       typescript: ^4.7.3
     devDependencies:
@@ -175,10 +180,9 @@ importers:
       '@rollup/plugin-node-resolve': 15.0.1_rollup@3.15.0
       '@rollup/plugin-strip': 3.0.2_rollup@3.15.0
       '@rollup/plugin-terser': 0.4.0_rollup@3.15.0
-      '@rollup/plugin-typescript': 11.0.0_2d60ac883c3cb74044d0cba5224c37f5
       '@rollup/pluginutils': 5.0.2_rollup@3.15.0
       '@sophon/base': link:../base/module
-      '@sophon/device': link:../device
+      '@sophon/device': link:../device/module
       '@typescript-eslint/eslint-plugin': 5.51.0_0fb7d53160f0e41e16372a0eab719cf9
       '@typescript-eslint/parser': 5.51.0_eslint@8.33.0+typescript@4.9.5
       '@web/dev-server': 0.1.35
@@ -192,12 +196,15 @@ importers:
       replace: 1.2.2
       rollup: 3.15.0
       rollup-plugin-dts: 5.2.0_rollup@3.15.0+typescript@4.9.5
+      rollup-plugin-typescript2: 0.34.1_rollup@3.15.0+typescript@4.9.5
       rollup-plugin-visualizer: 5.9.0_rollup@3.15.0
       run-script-os: 1.1.6
       shx: 0.3.4
-      tslib: 2.5.0
       typedoc: 0.23.24_typescript@4.9.5
       typescript: 4.9.5
+
+  ../../libs/dom/module:
+    specifiers: {}
 
   ../../test:
     specifiers:
@@ -225,8 +232,8 @@ importers:
       typedoc: ^0.23.24
       typescript: ^4.7.3
     dependencies:
-      '@sophon/device': link:../libs/device
-      '@sophon/dom': link:../libs/dom
+      '@sophon/device': link:../libs/device/module
+      '@sophon/dom': link:../libs/dom/module
       '@types/colors': 1.2.1
       '@types/diff': 5.0.2
       '@webgpu/types': 0.1.26
@@ -1806,26 +1813,6 @@ packages:
       serialize-javascript: 6.0.1
       smob: 0.0.6
       terser: 5.16.3
-    dev: true
-
-  /@rollup/plugin-typescript/11.0.0_2d60ac883c3cb74044d0cba5224c37f5:
-    resolution: {integrity: sha512-goPyCWBiimk1iJgSTgsehFD5OOFHiAknrRJjqFCudcW8JtWiBlK284Xnn4flqMqg6YAjVG/EE+3aVzrL5qNSzQ==}
-    engines: {node: '>=14.0.0'}
-    peerDependencies:
-      rollup: ^2.14.0||^3.0.0
-      tslib: '*'
-      typescript: '>=3.7.0'
-    peerDependenciesMeta:
-      rollup:
-        optional: true
-      tslib:
-        optional: true
-    dependencies:
-      '@rollup/pluginutils': 5.0.2_rollup@3.15.0
-      resolve: 1.22.1
-      rollup: 3.15.0
-      tslib: 2.5.0
-      typescript: 4.9.5
     dev: true
 
   /@rollup/pluginutils/3.1.0_rollup@2.79.1:
@@ -5313,6 +5300,21 @@ packages:
       fs-extra: 10.1.0
       resolve: 1.22.1
       rollup: 2.79.1
+      tslib: 2.5.0
+      typescript: 4.9.5
+    dev: true
+
+  /rollup-plugin-typescript2/0.34.1_rollup@3.15.0+typescript@4.9.5:
+    resolution: {integrity: sha512-P4cHLtGikESmqi1CA+tdMDUv8WbQV48mzPYt77TSTOPJpERyZ9TXdDgjSDix8Fkqce6soYz3+fa4lrC93IEkcw==}
+    peerDependencies:
+      rollup: '>=1.26.3'
+      typescript: '>=2.4.0'
+    dependencies:
+      '@rollup/pluginutils': 4.2.1
+      find-cache-dir: 3.3.2
+      fs-extra: 10.1.0
+      rollup: 3.15.0
+      semver: 7.3.8
       tslib: 2.5.0
       typescript: 4.9.5
     dev: true

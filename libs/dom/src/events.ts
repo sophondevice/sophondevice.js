@@ -1,4 +1,4 @@
-import { REvent } from '@sophon/base/event';
+import { REvent } from '@sophon/base';
 import type { RNode } from './node';
 import type { RPrimitiveBatchList } from './primitive';
 

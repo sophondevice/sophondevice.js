@@ -1,4 +1,4 @@
-import { CubeFace } from '@sophon/base/math/vector';
+import { CubeFace } from '@sophon/base';
 import { TextureFormat, TextureTarget, linearTextureFormatToSRGB } from '../base_types';
 import { WebGLBaseTexture } from './basetexture_webgl';
 import { textureTargetMap, cubeMapFaceMap } from './constants_webgl';

@@ -1,11 +1,9 @@
-import {tagname} from '../gui';
 import {Button} from './button';
 import {Slider} from './slider';
 import {RMouseEvent} from '../events';
 import type {GUI} from '../gui';
 import type {IStyleSheet} from '../style';
 
-@tagname('scrollbar')
 export class ScrollBar extends Slider {
   /** @internal */
   private _buttonUp: Button;

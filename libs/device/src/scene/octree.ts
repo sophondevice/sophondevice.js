@@ -1,9 +1,8 @@
-import { Visitor } from '@sophon/base/visitor';
-import { Vector3 } from '@sophon/base/math/vector';
-import { AABB } from '@sophon/base/math/aabb';
+import { Vector3, AABB } from '@sophon/base';
 import { GraphNode } from './graph_node';
 import type { SceneNode } from './scene_node';
 import type { Scene } from './scene';
+import type { Visitor } from '../misc';
 
 export enum OctreePlacement {
   PPP = 0,

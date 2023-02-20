@@ -14,7 +14,8 @@
   "scripts": {
     "build-js": "node build.js",
     "copy-assets": "shx mkdir -p dist/js && shx cp dist-tmp/*.js dist-tmp/*.js.map dist/js && shx cp dist-tmp/*.html dist && shx cp -R src/assets dist && shx cp src/index.html dist",
-    "build": "shx rm -rf dist dist-tmp && npm run build-js && npm run copy-assets && shx rm -rf dist-tmp",
+    "build-xx": "shx rm -rf dist dist-tmp && npm run build-js && npm run copy-assets && shx rm -rf dist-tmp",
+    "build": "echo build not implemented",
     "dev-test": "web-dev-server --port 8000 --open dist/index.html",
     "lint": "eslint src --ext .ts",
     "lint-fix": "eslint src --ext .ts --fix"

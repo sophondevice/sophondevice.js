@@ -1,9 +1,7 @@
 import {RElement} from '../element';
-import {tagname} from '../gui';
 import type {GUI} from '../gui';
 import type {IStyleSheet} from '../style';
 
-@tagname('button')
 export class Button extends RElement {
   constructor(uiscene: GUI) {
     super(uiscene);

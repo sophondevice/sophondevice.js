@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Vector3, Vector4, Matrix4x4, Quaternion } from '@sophon/base/math/vector';
+import { Vector3, Vector4, Matrix4x4, Quaternion } from '@sophon/base';
 import { TextureFilter, TextureWrapping, PrimitiveType } from '../../../../device/base_types';
 import { FaceMode } from '../../../../device/render_states';
 import {

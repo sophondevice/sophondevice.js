@@ -1,29 +1,24 @@
 import { babel } from '@rollup/plugin-babel';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import terser from '@rollup/plugin-terser';
-import typescript from '@rollup/plugin-typescript';
+import typescript from 'rollup-plugin-typescript2';
 import dts from 'rollup-plugin-dts';
 
 function getTargetES6() {
   return {
     external: id => /@sophon\/base/.test(id),
-    input: '../src/index.ts',
+    input: 'src/index.ts',
     preserveSymlinks: true,
     output: {
-      banner: '/** sophon device library */',
-      dir: "./dist",
+      banner: '/** sophon base library */',
+      dir: "module",
       preserveModules: true,
       format: 'esm',
       sourcemap: true,
     },
     plugins: [
-      nodeResolve({
-        rootDir: '.'
-      }),
       typescript(),
-      nodeResolve({
-        rootDir: '.'
-      }),
+      nodeResolve(),
       babel({
         babelHelpers: 'bundled',
         babelrc: false,
@@ -40,17 +35,17 @@ function getTargetES6() {
           }]
         ]
       }),
-      // terser()
+      terser()
     ]
   };
 }
 
 function getTargetTypes() {
   return {
-    input: '../src/index.ts',
+    input: 'src/index.ts',
     preserveSymlinks: true,
     output: {
-      file: `./index.d.ts`,
+      file: `dist/index.d.ts`,
     },
     plugins: [
       dts()
@@ -59,5 +54,5 @@ function getTargetTypes() {
 }
 
 export default (args) => {
-  return [getTargetES6(), /* getTargetTypes() */];
+  return [getTargetES6()/*, getTargetTypes()*/];
 };

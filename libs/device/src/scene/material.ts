@@ -1,5 +1,4 @@
-import { Matrix4x4 } from '@sophon/base/math/vector';
-import { List, ListIterator } from '@sophon/base/linkedlist';
+import { Matrix4x4, List, ListIterator } from '@sophon/base';
 import { ShaderLib } from './materiallib/shaderlib';
 import { TextureFilter } from '../device/base_types';
 import type { Drawable, DrawContext } from './drawable';

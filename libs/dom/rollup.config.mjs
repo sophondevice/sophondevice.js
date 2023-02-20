@@ -1,20 +1,25 @@
 import { babel } from '@rollup/plugin-babel';
-import resolve from '@rollup/plugin-node-resolve';
-import strip from '@rollup/plugin-strip';
+import { nodeResolve } from '@rollup/plugin-node-resolve';
 import terser from '@rollup/plugin-terser';
-import typescript from '@rollup/plugin-typescript';
-
+import typescript from 'rollup-plugin-typescript2';
 import dts from 'rollup-plugin-dts';
-import { visualizer } from 'rollup-plugin-visualizer';
+
+const externals = [/@sophon\/base/, /@sophon\/device/];
 
 function getTargetES6() {
   return {
-    external: ['@sophon/device'],
+    external: id => {
+      for (const m of externals) {
+        if (m.test(id)) {
+          return true;
+        }
+      }
+    },
     input: 'src/index.ts',
     preserveSymlinks: true,
     output: {
       banner: '/** sophon dom library */',
-      dir: "dist",
+      dir: "module",
       preserveModules: true,
       format: 'esm',
       sourcemap: true,
@@ -56,5 +61,5 @@ function getTargetTypes() {
 }
 
 export default (args) => {
-  return [getTargetES6(), getTargetTypes()];
+  return [getTargetES6()/*, getTargetTypes()*/];
 };

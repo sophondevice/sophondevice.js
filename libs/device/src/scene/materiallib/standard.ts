@@ -1,4 +1,4 @@
-import { Matrix4x4 } from '@sophon/base/math/vector';
+import { Matrix4x4 } from '@sophon/base';
 import { MAX_TEXCOORD_INDEX_COUNT } from '../../device/gpuobject';
 import { BlendFunc } from '../../device/render_states';
 import { Material } from '../material';

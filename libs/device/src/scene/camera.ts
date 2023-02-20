@@ -1,5 +1,4 @@
-import { CubeFace, Matrix4x4, Vector3 } from '@sophon/base/math/vector';
-import { Frustum } from '@sophon/base/math/frustum';
+import { CubeFace, Matrix4x4, Vector3, Frustum } from '@sophon/base';
 import { SceneNode } from './scene_node';
 import type { Scene } from './scene';
 export interface IMouseEvent {

@@ -1,4 +1,4 @@
-import { CubeFace } from "@sophon/base/math/vector";
+import { CubeFace } from "@sophon/base";
 import { PrimitiveType } from '../../device/base_types'
 import { RenderStateSet, FaceMode } from '../../device/render_states';
 import { makeVertexBufferType } from '../../device/gpuobject';

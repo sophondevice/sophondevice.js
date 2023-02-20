@@ -1,6 +1,5 @@
 import { AABB } from "@sophon/base"
-import { Vector3, Matrix4x4 } from '@sophon/base/math/vector';
-import { Ray } from '@sophon/base/math/ray';
+import { Vector3, Matrix4x4, Ray } from '@sophon/base';
 import { PrimitiveType } from '../device/base_types';
 import type { TypedArray } from '../misc';
 

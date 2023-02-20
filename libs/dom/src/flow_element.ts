@@ -1,10 +1,7 @@
 import {RElement} from './element';
-import {tagname} from './gui';
 import type {GUI} from './gui';
 import type {IStyleSheet} from './style';
 
-@tagname('html')
-@tagname('body')
 export class RFlowElement extends RElement {
   constructor(uiscene: GUI) {
     super(uiscene);

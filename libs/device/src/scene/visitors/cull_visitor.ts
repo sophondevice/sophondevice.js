@@ -1,17 +1,16 @@
-import { Visitor, visitor } from '@sophon/base/visitor';
-import { ClipState } from '@sophon/base/math/clip_test';
-import { AABB } from '@sophon/base/math/aabb';
+import { ClipState, AABB } from '@sophon/base';
 import { GraphNode } from '../graph_node';
 import { OctreeNode } from '../octree';
 import { Mesh } from '../mesh';
 import { Terrain } from '../terrain';
 import { RenderQueue } from '../render_queue';
 import { RENDER_PASS_TYPE_SHADOWMAP } from '../values';
+import type { Visitor } from '../../misc';
 import type { Camera } from '../camera';
 import type { RenderPass } from '../renderers';
 import type { Drawable } from '../drawable';
 
-export class CullVisitor extends Visitor {
+export class CullVisitor implements Visitor {
   /** @internal */
   private _camera: Camera;
   /** @internal */
@@ -23,7 +22,6 @@ export class CullVisitor extends Visitor {
   /** @internal */
   private _postCullHook: (camera: Camera, drawable: Drawable, castShadow: boolean, clipState: ClipState, box: AABB) => boolean;
   constructor(renderPass: RenderPass, camera?: Camera) {
-    super();
     this._camera = camera || null;
     this._renderQueue = new RenderQueue(renderPass);
     this._skipClipTest = false;
@@ -56,7 +54,15 @@ export class CullVisitor extends Visitor {
       this.renderQueue.push(camera, drawable, renderOrder);
     }
   }
-  @visitor(Terrain)
+  visit(target: unknown): unknown {
+    if (target instanceof Mesh) {
+      return this.visitMesh(target);
+    } else if (target instanceof OctreeNode) {
+      return this.visitOctreeNode(target);
+    } else if (target instanceof Terrain) {
+      return this.visitTerrain(target);
+    }
+  }
   visitTerrain(node: Terrain) {
     if (node.computedShowState !== GraphNode.SHOW_HIDE && (node.castShadow || this._renderPass.getRenderPassType() !== RENDER_PASS_TYPE_SHADOWMAP)) {
       const clipState = this.getClipState(node);
@@ -67,7 +73,6 @@ export class CullVisitor extends Visitor {
       }
     }
   }
-  @visitor(Mesh)
   visitMesh(node: Mesh) {
     if (node.computedShowState !== GraphNode.SHOW_HIDE && (node.castShadow || this._renderPass.getRenderPassType() !== RENDER_PASS_TYPE_SHADOWMAP)) {
       const clipState = this.getClipState(node);
@@ -76,7 +81,6 @@ export class CullVisitor extends Visitor {
       }
     }
   }
-  @visitor(OctreeNode)
   visitOctreeNode(node: OctreeNode) {
     const clipState =
       node.getLevel() > 0

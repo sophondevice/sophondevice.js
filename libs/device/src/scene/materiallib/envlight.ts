@@ -1,4 +1,4 @@
-import { Vector4 } from "@sophon/base/math/vector";
+import { Vector4 } from "@sophon/base";
 import type { BaseTexture, BindGroup, ProgramBuilder, TextureCube, TextureSampler } from "../../device";
 
 export abstract class EnvironmentLighting {

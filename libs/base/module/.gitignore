@@ -1,4 +1,4 @@
 *.js
 *.js.map
 *.d.ts
-math/
+math

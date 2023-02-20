@@ -18,3 +18,6 @@ export type TypedArrayConstructor<T extends TypedArray = any> = {
   BYTES_PER_ELEMENT: number;
 }
 
+export interface Visitor {
+  visit(target: unknown): unknown;
+}

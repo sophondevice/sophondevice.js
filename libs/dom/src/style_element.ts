@@ -1,5 +1,4 @@
 import {RElement} from './element';
-import {tagname} from './gui';
 import {RTextContentChangeEvent} from './events';
 import type {GUI} from './gui';
 import type {RSelector} from './selector';
@@ -12,7 +11,6 @@ export interface IStyleDefiniation {
   extra: unknown;
 }
 
-@tagname('style')
 export class StyleElement extends RElement {
   /** @internal */
   private _definitions: IStyleDefiniation[];

@@ -1,4 +1,4 @@
-import { List, ListIterator } from '@sophon/base/linkedlist';
+import { List, ListIterator } from '@sophon/base';
 import * as Yoga from './typeflex/api';
 import { YGSize } from './typeflex/yoga';
 import type { RNode } from './node';

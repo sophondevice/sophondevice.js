@@ -1,12 +1,10 @@
 import {RText} from './text';
-import {tagname} from '../gui';
 import {RElementLayoutEvent, RTextEvent, RChangeEvent} from '../events';
 import {RNode} from '../node';
 import {RElement} from '../element';
 import type {GUI} from '../gui';
 import type {IStyleSheet} from '../style';
 
-@tagname('option')
 export class Option extends RElement {
   /** @internal */
   private _hiddenOption: HTMLOptionElement;
@@ -73,7 +71,6 @@ export class Option extends RElement {
   }
 }
 
-@tagname('select')
 export class Select extends RElement {
   /** @internal */
   private _hiddenInput: HTMLSelectElement;

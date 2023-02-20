@@ -1,4 +1,4 @@
-import { Vector4 } from "@sophon/base/math/vector";
+import { Vector4 } from "@sophon/base";
 import { hasStencilChannel, PrimitiveType } from "../base_types";
 import { WebGPUProgram } from "./gpuprogram_webgpu";
 import { WebGPURenderStateSet } from "./renderstates_webgpu";

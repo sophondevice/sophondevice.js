@@ -1,43 +1,10 @@
 {
-  "name": "@sophon/dom",
-  "version": "0.0.1",
-  "description": "html dom style ui library for sophon device",
-  "homepage": "https://github.com/sophondevice/sophondevice#readme",
-  "type": "module",
-  "main": "./index.js",
-  "module": "./index.js",
-  "types": "./index.d.ts",
-  "files": [
-    "./**/*.js",
-    "./**/*.d.ts",
-    "./**/*.js.map"
-  ],
+  "name": "@sophon-build/dom",
+  "version": "0.0.0",
+  "private": true,
   "scripts": {
-    "build-modern": "microbundle -i src/index.ts --no-generateTypes --no-compress --no-pkg-main --external @sophon/device -f modern -o dist/sophon.dom.modern.js",
-    "build-esm": "microbundle -i src/index.ts --no-generateTypes --no-pkg-main --external @sophon/device -f esm -o dist/sophon.dom.module.js",
-    "build-umd": "microbundle -i src/index.ts --no-generateTypes --no-pkg-main --external @sophon/device -f umd -o dist/sophon.dom.umd.js",
-    "build-cjs": "microbundle -i src/index.ts --no-generateTypes --no-pkg-main --external @sophon/device -f cjs -o dist/sophon.dom.cjs",
-    "build-types": "dts-bundle-generator --disable-symlinks-following --project ./tsconfig.json --umd-module-name sophonDom -o ./dist/sophon.dom.d.ts ./src/index.ts",
-    "build": "shx rm -rf ./dist && npm run build-modern && npm run build-types",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "rollup -c"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/sophondevice/sophondevice.git"
-  },
-  "keywords": [
-    "javascript",
-    "3d",
-    "rendering",
-    "engine",
-    "webgl",
-    "webgpu",
-    "canvas",
-    "sophon",
-    "device",
-    "dom",
-    "ui"
-  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/sophondevice/sophondevice/issues"
@@ -60,7 +27,7 @@
     "@rollup/plugin-node-resolve": "^15.0.1",
     "@rollup/plugin-strip": "^3.0.2",
     "@rollup/plugin-terser": "^0.4.0",
-    "@rollup/plugin-typescript": "^11.0.0",
+    "rollup-plugin-typescript2": "^0.34.1",
     "@rollup/pluginutils": "^5.0.2",
     "rollup": "^3.15.0",
     "rollup-plugin-dts": "^5.2.0",
@@ -70,7 +37,6 @@
     "run-script-os": "^1.1.6",
     "shx": "^0.3.4",
     "typescript": "^4.7.3",
-    "tslib": "^2.5.0",
     "@sophon/device": "workspace:*",
     "@sophon/base": "workspace:*"
   },

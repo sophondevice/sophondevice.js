@@ -1,6 +1,5 @@
-import { REvent } from '@sophon/base/event';
+import { REvent } from '@sophon/base';
 import { RNode } from './node';
-import { tagname } from './gui';
 import { RAttributeChangeEvent } from './events';
 import { RNodeList, RStaticNodeList } from './nodelist';
 import type {GUI} from './gui';
@@ -144,7 +143,6 @@ export interface RAttr {
   value: string;
 }
 
-@tagname('div')
 export class RElement extends RNode {
   /** @internal */
   protected _tagname: string;

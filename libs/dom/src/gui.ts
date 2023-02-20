@@ -1,4 +1,4 @@
-import { REvent, REventTarget } from '@sophon/base/event';
+import { REvent, REventTarget } from '@sophon/base';
 import * as Yoga from './typeflex/api';
 import { injectGUIEvents, GUIRenderer } from './renderer';
 import { RColor, GUIEventPathBuilder } from './types';
@@ -12,19 +12,21 @@ import { RDocument } from './document';
 import { IStyleSheet, parseStyleSheet } from './style';
 import { RDOMTreeEvent, RMouseEvent, RDragEvent, RKeyEvent, RFocusEvent } from './events';
 import { RSelector, Rule } from './selector';
+import { DummyElement } from './dummy_element';
+import { RElement } from './element';
+import { Input } from './components/input';
+import { StyleElement } from './style_element';
+import { RFlowElement } from './flow_element';
+import { Button } from './components/button';
+import { ScrollBar } from './components/scrollbar';
+import { Option, Select } from './components/select';
+import { Slider } from './components/slider';
 import type { Texture2D, AssetManager } from '@sophon/device';
 import type { Font } from './font';
-import type { RElement } from './element';
-import type { Input } from './components/input';
-import type { StyleElement } from './style_element';
 import type { RPrimitiveBatchList } from './primitive';
 
 interface IElementConstructor {
   new(gui: GUI, ...args: unknown[]): RElement;
-}
-
-interface ITagNameGetter {
-  (element: RElement): string;
 }
 
 class DrawVisitor {
@@ -90,10 +92,15 @@ class DrawVisitor {
 export class ElementRegistry {
   /** @internal */
   private _constructors: { [tagname: string]: IElementConstructor };
-  constructor() {
+  constructor(tags?: { [tagname: string]: IElementConstructor }) {
     this._constructors = {};
+    if (tags) {
+      for (const tag in tags) {
+        this.register(tags[tag], tag);
+      }
+    }
   }
-  register(ctor: IElementConstructor, tagName: string | ITagNameGetter) {
+  register(ctor: IElementConstructor, tagName: string) {
     console.assert(!!ctor, 'Failed to register element type with null constructor');
     console.assert(!!tagName, 'Failed to register element type with null tag name getter');
     if (typeof tagName === 'string') {
@@ -111,13 +118,21 @@ export class ElementRegistry {
   }
 }
 
-const elementRegistry = new ElementRegistry();
-
-export function tagname(name: string) {
-  return function (ctor: IElementConstructor) {
-    elementRegistry.register(ctor, name);
-  };
-}
+const elementRegistry = new ElementRegistry({
+  link: DummyElement,
+  head: DummyElement,
+  meta: DummyElement,
+  div: RElement,
+  html: RFlowElement,
+  body: RFlowElement,
+  style: StyleElement,
+  button: Button,
+  input: Input,
+  scrollbar: ScrollBar,
+  option: Option,
+  select: Select,
+  slider: Slider,
+});
 
 const deviceMouseEvents = {
   [RMouseEvent.NAME_RENDERER_MOUSEDOWN]: RMouseEvent.NAME_MOUSEDOWN,

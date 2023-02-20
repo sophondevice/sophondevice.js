@@ -1,4 +1,4 @@
-import { Vector3 } from "@sophon/base/math/vector";
+import { Vector3 } from "@sophon/base";
 import { BoundingBox } from "../bounding_volume";
 import { Primitive } from "../primitive";
 import { PatchPosition } from "./types";

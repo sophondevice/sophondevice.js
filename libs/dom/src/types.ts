@@ -1,4 +1,4 @@
-import { REventPath, REventPathBuilder, REventTarget } from '@sophon/base/event';
+import { REventPath, REventPathBuilder, REventTarget } from '@sophon/base';
 
 export interface RCoord {
   x: number;

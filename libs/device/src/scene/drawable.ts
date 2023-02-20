@@ -1,5 +1,4 @@
-import { ListIterator } from "@sophon/base/linkedlist";
-import { Matrix4x4 } from "@sophon/base/math/vector";
+import { ListIterator, Matrix4x4 } from "@sophon/base";
 import type { XForm } from "./xform";
 import type { Texture2D } from "../device";
 import type { BoundingVolume } from "./bounding_volume";

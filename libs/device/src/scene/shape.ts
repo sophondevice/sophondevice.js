@@ -1,4 +1,4 @@
-import { Vector2, Vector3 } from '@sophon/base/math/vector';
+import { Vector2, Vector3 } from '@sophon/base';
 import { PrimitiveType } from '../device/base_types';
 import { makeVertexBufferType } from '../device/gpuobject';
 import { Primitive } from './primitive';

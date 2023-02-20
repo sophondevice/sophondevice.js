@@ -1,5 +1,4 @@
-import { REvent } from "@sophon/base/event";
-import { Vector3 } from "@sophon/base/math/vector";
+import { REvent, Vector3 } from "@sophon/base";
 import { Quadtree } from "./quadtree";
 import { FaceMode, GPUObject, PBStructTypeInfo, RenderStateSet, StructuredBuffer, Texture2D, TextureFormat } from "../../device";
 import { MAX_DETAIL_TEXTURE_LEVELS, TerrainMaterial } from "./terrainmaterial";

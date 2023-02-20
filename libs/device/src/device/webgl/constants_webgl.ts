@@ -1,4 +1,4 @@
-import { CubeFace } from '@sophon/base/math/vector';
+import { CubeFace } from '@sophon/base';
 import { CompareFunc, TextureFilter, TextureWrapping, PrimitiveType, TextureTarget, CompareMode } from '../base_types';
 import { PBPrimitiveType } from '../builder/types';
 import { WebGLEnum } from './webgl_enum';

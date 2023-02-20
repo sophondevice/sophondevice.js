@@ -1,7 +1,6 @@
-import { REvent } from '@sophon/base/event';
+import { REvent } from '@sophon/base';
 import { RRectPrimitive } from '../primitive';
 import { RElement } from '../element';
-import { tagname } from '../gui';
 import {
   RAttributeChangeEvent,
   RMouseEvent,
@@ -13,7 +12,6 @@ import type { IStyleSheet } from '../style';
 import type { UIRect } from '../layout';
 import type { RColor } from '../types';
 
-@tagname('slider')
 export class Slider extends RElement {
   /** @internal */
   protected _blockRect: UIRect;

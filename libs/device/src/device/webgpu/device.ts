@@ -1,4 +1,4 @@
-import { Vector4 } from '@sophon/base/math/vector';
+import { Vector4 } from '@sophon/base';
 import { getTextureFormatBlockSize, PrimitiveType, TextureFormat } from '../base_types';
 import {
   IFrameBufferOptions,
@@ -235,7 +235,7 @@ export class WebGPUDevice extends Device {
     for (const feature of this._device.features) {
       console.log(` - ${feature}`);
     }
-    this._context = this._canvas.getContext('webgpu') || null;
+    this._context = this._canvas.getContext('webgpu') as unknown as GPUCanvasContext || null;
     if (!this._context) {
       this._canRender = false;
       throw new Error('WebGPU: getContext() failed');

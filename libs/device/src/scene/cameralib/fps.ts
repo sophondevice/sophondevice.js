@@ -1,4 +1,4 @@
-import { Vector3, Quaternion, Matrix3x3, Matrix4x4 } from '@sophon/base/math/vector';
+import { Vector3, Quaternion, Matrix3x3, Matrix4x4 } from '@sophon/base';
 import { BaseCameraModel } from './base';
 import type { AbstractCameraModel, IMouseEvent, IKeyEvent } from '../camera';
 export interface IFPSCameraModelOptions {
