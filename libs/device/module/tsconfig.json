@@ -6,10 +6,11 @@
         "target": "ES6",
         "outDir": "./dist",
         "rootDir": "..",
+        "baseUrl": "../src",
         "declaration": true,
         "importHelpers": true,
         "paths": {
-            "@sophon/base": ["./node_modules/@sophon/base"]
+            "@sophon/base/*": ["../module/node_modules/@sophon/base/*"]
         },
         "typeRoots": [
             "./node_modules/@webgpu/types",

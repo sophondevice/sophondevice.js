@@ -5,26 +5,7 @@ import { Plane } from '@sophon/base/math/plane';
 import { ClipState } from '@sophon/base/math/clip_test';
 import { AABBTree } from './aabbtree';
 
-export function boundingvolume() {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return function (constructor: any) {
-    constructor.__tagcounter = 1;
-    constructor._fetchTag = function () {
-      return constructor.__tagcounter++;
-    };
-    constructor.prototype._tag = constructor._fetchTag();
-    constructor.prototype.tag = function () {
-      this._tag = constructor._fetchTag();
-    };
-    constructor.prototype.getTag = function () {
-      return this._tag;
-    };
-  };
-}
-
 export interface BoundingVolume {
-  tag(): void;
-  getTag(): number;
   clone(): BoundingVolume;
   transform(matrix: Matrix4x4): BoundingVolume;
   behindPlane(plane: Plane): boolean;
@@ -34,7 +15,6 @@ export interface BoundingVolume {
 
 export interface BoundingBox extends BoundingVolume {}
 
-@boundingvolume()
 export class BoundingBox extends AABB {
   constructor();
   constructor(box: AABB);
@@ -42,8 +22,6 @@ export class BoundingBox extends AABB {
   constructor(arg0?: Vector3 | AABB, arg1?: Vector3) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     super(arg0 as any, arg1);
-    this.minPoint.setChangeCallback(() => this.tag());
-    this.maxPoint.setChangeCallback(() => this.tag());
   }
   clone(): BoundingVolume {
     return new BoundingBox(this);
@@ -65,7 +43,6 @@ export class BoundingBox extends AABB {
 
 export interface BoundingBoxTree extends BoundingVolume {}
 
-@boundingvolume()
 export class BoundingBoxTree extends AABBTree {
   constructor();
   constructor(aabbtree: AABBTree);

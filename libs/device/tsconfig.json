@@ -24,11 +24,13 @@
     "sourceMap": true,
     "stripInternal": true,
     "keyofStringsOnly": false,
-    "rootDir": "../",
+    "rootDir": "./src",
+    "importHelpers": false,
     "typeRoots": [
       "./node_modules/@types",
       "./node_modules/@webgpu/types",
-    ]
+    ],
+    "outDir": "./dist"
   },
   "include": [
     "src"

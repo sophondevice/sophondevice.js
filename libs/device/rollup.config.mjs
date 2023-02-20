@@ -1,11 +1,12 @@
 import { babel } from '@rollup/plugin-babel';
+import { nodeResolve } from '@rollup/plugin-node-resolve';
 import terser from '@rollup/plugin-terser';
 import typescript from '@rollup/plugin-typescript';
 import dts from 'rollup-plugin-dts';
 
 function getTargetES6() {
   return {
-    external: "@sophon/base",
+    external: id => /@sophon\/base/.test(id),
     input: 'src/index.ts',
     preserveSymlinks: true,
     output: {
@@ -16,7 +17,12 @@ function getTargetES6() {
       sourcemap: true,
     },
     plugins: [
-      typescript(),
+      nodeResolve({
+        rootDir: '.'
+      }),
+      typescript({
+        tslib: null
+      }),
       babel({
         babelHelpers: 'bundled',
         babelrc: false,
@@ -52,5 +58,5 @@ function getTargetTypes() {
 }
 
 export default (args) => {
-  return [getTargetES6(), getTargetTypes()];
+  return [getTargetES6()/*, getTargetTypes()*/];
 };

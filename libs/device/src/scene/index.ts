@@ -9,7 +9,6 @@ export * from './events';
 export * from './scene_node';
 export * from './model';
 export * from './animation';
-export * from './world_bounding_volume';
 export * from './graph_node';
 export * from './camera';
 export * from './cameralib/fps';

@@ -429,7 +429,7 @@
     },
     {
       "packageName": "@sophon/device",
-      "projectFolder": "libs/device/module"
+      "projectFolder": "libs/device"
     },
     {
       "packageName": "@sophon/dom",
