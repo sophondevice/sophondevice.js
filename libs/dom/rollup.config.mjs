@@ -18,7 +18,6 @@ function getTargetES6() {
     input: 'src/index.ts',
     preserveSymlinks: true,
     output: {
-      banner: '/** sophon dom library */',
       dir: "module",
       preserveModules: true,
       format: 'esm',
@@ -43,7 +42,7 @@ function getTargetES6() {
           }]
         ]
       }),
-      terser()
+      // terser()
     ]
   };
 }

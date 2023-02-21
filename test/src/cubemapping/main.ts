@@ -1,3 +1,4 @@
+import * as base from '@sophon/base';
 import * as chaos from '@sophon/device';
 import * as dom from '@sophon/dom';
 import * as common from '../common';
@@ -14,8 +15,12 @@ class MyRenderScheme extends chaos.ForwardRenderScheme {
     super(device);
     this.cubemapRenderPass = device.getDeviceType() === 'webgl' ? new chaos.ForwardMultiRenderPass(this, 'cubemap') : new chaos.ForwardRenderPass(this, 'cubemap');
     this.cubemapRenderCamera = new Map();
-    this.colorAttachment = device.createCubeTexture(chaos.TextureFormat.RGBA8UNORM, 512, chaos.GPUResourceUsageFlags.TF_LINEAR_COLOR_SPACE);
-    this.depthAttachment = device.createTexture2D(chaos.TextureFormat.D24S8, 512, 512, chaos.GPUResourceUsageFlags.TF_NO_MIPMAP);
+    this.colorAttachment = device.createCubeTexture(chaos.TextureFormat.RGBA8UNORM, 512, {
+      colorSpace: 'linear'
+    });
+    this.depthAttachment = device.createTexture2D(chaos.TextureFormat.D24S8, 512, 512, {
+      noMipmap: true
+    });
     this.fb = device.createFrameBuffer({
       colorAttachments: [{
         texture: this.colorAttachment,
@@ -29,7 +34,7 @@ class MyRenderScheme extends chaos.ForwardRenderScheme {
     if (this.reflectiveSphere) {
       if (!this.cubemapRenderCamera.get(scene)) {
         this.cubemapRenderCamera.set(scene, new chaos.Camera(scene));
-        this.cubemapRenderCamera.get(scene).projectionMatrix = chaos.Matrix4x4.perspective(Math.PI / 2, 1, 1, 500);
+        this.cubemapRenderCamera.get(scene).projectionMatrix = base.Matrix4x4.perspective(Math.PI / 2, 1, 1, 500);
       }
       this.reflectiveSphere.showState = chaos.GraphNode.SHOW_HIDE;
       this.cubemapRenderPass.renderToCubeTexture(scene, this.cubemapRenderCamera.get(scene), this.fb);
@@ -80,8 +85,8 @@ class ReflectLightModel extends chaos.UnlitLightModel {
   sceneView.customDraw = true;
   const scene = new chaos.Scene(viewer.device);
   const scheme = new MyRenderScheme(viewer.device);
-  const camera = scene.addCamera().lookAt(new chaos.Vector3(0, 8, 30), new chaos.Vector3(0, 0, 0), chaos.Vector3.axisPY());
-  camera.setProjectionMatrix(chaos.Matrix4x4.perspective(Math.PI / 3, viewer.device.getDrawingBufferWidth() / viewer.device.getDrawingBufferHeight(), 1, 160));
+  const camera = scene.addCamera().lookAt(new base.Vector3(0, 8, 30), new base.Vector3(0, 0, 0), base.Vector3.axisPY());
+  camera.setProjectionMatrix(base.Matrix4x4.perspective(Math.PI / 3, viewer.device.getDrawingBufferWidth() / viewer.device.getDrawingBufferHeight(), 1, 160));
   camera.mouseInputSource = sceneView;
   camera.keyboardInputSource = sceneView;
   camera.setModel(new chaos.OrbitCameraModel({ distance: camera.position.magnitude }));
@@ -96,10 +101,10 @@ class ReflectLightModel extends chaos.UnlitLightModel {
   scheme.reflectiveSphere = new chaos.SphereMesh(scene, { radius: 10, material: material });
 
   const light = new chaos.DirectionalLight(scene)
-    .setColor(new chaos.Vector4(1, 1, 1, 1))
+    .setColor(new base.Vector4(1, 1, 1, 1))
     .setIntensity(1)
     .setCastShadow(false);
-  light.lookAt(new chaos.Vector3(10, 10, 10), new chaos.Vector3(0, 0, 0), chaos.Vector3.axisPY());
+  light.lookAt(new base.Vector3(10, 10, 10), new base.Vector3(0, 0, 0), base.Vector3.axisPY());
 
   const stdMat = new chaos.PBRMetallicRoughnessMaterial(scene.device);
   stdMat.lightModel.setAlbedoMap(await assetManager.fetchTexture('./assets/images/rustediron2_basecolor.png', null, true), null, 0);
@@ -110,22 +115,22 @@ class ReflectLightModel extends chaos.UnlitLightModel {
 
   const sphere2 = chaos.Mesh.unitSphere(scene);
   sphere2.material = stdMat;
-  sphere2.scaling = new chaos.Vector3(3, 3, 3);
+  sphere2.scaling = new base.Vector3(3, 3, 3);
 
   const sphere3 = chaos.Mesh.unitSphere(scene);
   sphere3.material = stdMat;
-  sphere3.scaling = new chaos.Vector3(3, 3, 3);
+  sphere3.scaling = new base.Vector3(3, 3, 3);
 
   const sphere4 = chaos.Mesh.unitSphere(scene);
   sphere4.material = stdMat;
-  sphere4.scaling = new chaos.Vector3(3, 3, 3);
+  sphere4.scaling = new base.Vector3(3, 3, 3);
 
   sceneView.addEventListener('layout', function (this: dom.RElement) {
     const rect = this.getClientRect();
-    camera.setProjectionMatrix(chaos.Matrix4x4.perspective(camera.getFOV(), rect.width / rect.height, camera.getNearPlane(), camera.getFarPlane()));
+    camera.setProjectionMatrix(base.Matrix4x4.perspective(camera.getFOV(), rect.width / rect.height, camera.getNearPlane(), camera.getFarPlane()));
   });
 
-  sceneView.addEventListener('keyup', function (evt: chaos.REvent) {
+  sceneView.addEventListener('keyup', function (evt: base.REvent) {
     const keyEvent = evt as dom.RKeyEvent;
     console.log(keyEvent.code, keyEvent.key);
     if (keyEvent.code === 'Space') {
@@ -142,7 +147,7 @@ class ReflectLightModel extends chaos.UnlitLightModel {
     }
   });
 
-  sceneView.addEventListener('draw', function (this: dom.RElement, evt: chaos.REvent) {
+  sceneView.addEventListener('draw', function (this: dom.RElement, evt: base.REvent) {
     evt.preventDefault();
     const elapsed = viewer.device.frameInfo.elapsedOverall;
     sphere2.position.set(20 * Math.sin(elapsed * 0.003), 0, 20 * Math.cos(elapsed * 0.003));

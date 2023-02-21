@@ -1,3 +1,4 @@
+import * as base from '@sophon/base';
 import * as chaos from '@sophon/device';
 import { randNonZero } from './common';
 /* SH product shader
@@ -166,39 +167,39 @@ void main (void) {
 */
 
 export function testSH() {
-  function randVec(): chaos.Vector3 {
-    return new chaos.Vector3(randNonZero(), randNonZero(), randNonZero());
+  function randVec(): base.Vector3 {
+    return new base.Vector3(randNonZero(), randNonZero(), randNonZero());
   }
-  function shLookup(R: Float32Array, G: Float32Array, B: Float32Array, normal: chaos.Vector3): chaos.Vector3 {
-    const result = new chaos.Vector3(R[0], G[0], B[0]);
-    result.addBy(new chaos.Vector3(R[1], G[1], B[1]).scaleBy(normal.x));
-    result.addBy(new chaos.Vector3(R[2], G[2], B[2]).scaleBy(normal.y));
-    result.addBy(new chaos.Vector3(R[3], G[3], B[3]).scaleBy(normal.z));
-    result.addBy(new chaos.Vector3(R[4], G[4], B[4]).scaleBy(normal.z * normal.x));
-    result.addBy(new chaos.Vector3(R[5], G[5], B[5]).scaleBy(normal.y * normal.z));
-    result.addBy(new chaos.Vector3(R[6], G[6], B[6]).scaleBy(normal.x * normal.y));
-    result.addBy(new chaos.Vector3(R[7], G[7], B[7]).scaleBy(3 * normal.z * normal.z - 1));
-    result.addBy(new chaos.Vector3(R[8], G[8], B[8]).scaleBy(normal.x * normal.x - normal.y * normal.y));
+  function shLookup(R: Float32Array, G: Float32Array, B: Float32Array, normal: base.Vector3): base.Vector3 {
+    const result = new base.Vector3(R[0], G[0], B[0]);
+    result.addBy(new base.Vector3(R[1], G[1], B[1]).scaleBy(normal.x));
+    result.addBy(new base.Vector3(R[2], G[2], B[2]).scaleBy(normal.y));
+    result.addBy(new base.Vector3(R[3], G[3], B[3]).scaleBy(normal.z));
+    result.addBy(new base.Vector3(R[4], G[4], B[4]).scaleBy(normal.z * normal.x));
+    result.addBy(new base.Vector3(R[5], G[5], B[5]).scaleBy(normal.y * normal.z));
+    result.addBy(new base.Vector3(R[6], G[6], B[6]).scaleBy(normal.x * normal.y));
+    result.addBy(new base.Vector3(R[7], G[7], B[7]).scaleBy(3 * normal.z * normal.z - 1));
+    result.addBy(new base.Vector3(R[8], G[8], B[8]).scaleBy(normal.x * normal.x - normal.y * normal.y));
     return result;
   }
   (function testEvalDirectionalLight() {
     const dir = randVec().inplaceNormalize();
     console.log(dir.toString());
-    const color = chaos.Vector3.one();
+    const color = base.Vector3.one();
     const order = 3;
     const R = new Float32Array(9);
     const G = new Float32Array(9);
     const B = new Float32Array(9);
-    chaos.XMSHEvalDirectionalLight(3, dir, color, R, G, B);
-    const c1 = shLookup(R, G, B, chaos.Vector3.axisPX());
+    base.XMSHEvalDirectionalLight(3, dir, color, R, G, B);
+    const c1 = shLookup(R, G, B, base.Vector3.axisPX());
     console.log(c1.toString());
-    const c2 = shLookup(R, G, B, chaos.Vector3.axisPY());
+    const c2 = shLookup(R, G, B, base.Vector3.axisPY());
     console.log(c2.toString());
-    const c3 = shLookup(R, G, B, chaos.Vector3.axisPZ());
+    const c3 = shLookup(R, G, B, base.Vector3.axisPZ());
     console.log(c3.toString());
     const c4 = shLookup(R, G, B, dir);
     console.log(c4.toString());
-    const c5 = shLookup(R, G, B, chaos.Vector3.scale(dir, -1));
+    const c5 = shLookup(R, G, B, base.Vector3.scale(dir, -1));
     console.log(c5.toString());
   }());
 }

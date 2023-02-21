@@ -1,3 +1,4 @@
+import * as base from '@sophon/base';
 import * as chaos from '@sophon/device';
 import * as dom from '@sophon/dom';
 import * as common from '../common';
@@ -13,7 +14,7 @@ import * as common from '../common';
   sceneView.customDraw = true;
   const scene = new chaos.Scene(viewer.device);
   const scheme = new chaos.ForwardRenderScheme(viewer.device);
-  const camera = scene.addCamera().setPosition(new chaos.Vector3(0, 0, 60));
+  const camera = scene.addCamera().setPosition(new base.Vector3(0, 0, 60));
   camera.mouseInputSource = sceneView;
   camera.keyboardInputSource = sceneView;
   camera.setModel(new chaos.OrbitCameraModel({ distance: camera.position.magnitude }));
@@ -39,10 +40,10 @@ import * as common from '../common';
 
   const light = new chaos.DirectionalLight(scene)
     .setCastShadow(false)
-    .setColor(new chaos.Vector4(1, 1, 1, 1))
-    .setRotation(chaos.Quaternion.fromAxisAngle(new chaos.Vector3(1, 1, 0).inplaceNormalize(), Math.PI * 2 / 3));
+    .setColor(new base.Vector4(1, 1, 1, 1))
+    .setRotation(base.Quaternion.fromAxisAngle(new base.Vector3(1, 1, 0).inplaceNormalize(), Math.PI * 2 / 3));
 
-  sceneView.addEventListener('draw', function (this: dom.RElement, evt: chaos.REvent) {
+  sceneView.addEventListener('draw', function (this: dom.RElement, evt: base.REvent) {
     evt.preventDefault();
     scheme.renderScene(scene, camera);
   });

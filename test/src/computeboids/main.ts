@@ -1,3 +1,4 @@
+import * as base from '@sophon/base';
 import * as chaos from '@sophon/device';
 import * as dom from '@sophon/dom';
 
@@ -110,7 +111,10 @@ import * as dom from '@sophon/dom';
       });
     }
   });
-  const spriteVertexBuffer = viewer.device.createStructuredBuffer(chaos.makeVertexBufferType(3, 'position_f32x2'), chaos.GPUResourceUsageFlags.BF_VERTEX | chaos.GPUResourceUsageFlags.MANAGED, new Float32Array([-0.01, -0.02, 0.01, -0.02, 0.0, 0.02]));
+  const spriteVertexBuffer = viewer.device.createStructuredBuffer(chaos.makeVertexBufferType(3, 'position_f32x2'), {
+    usage: 'vertex',
+    managed: true
+  }, new Float32Array([-0.01, -0.02, 0.01, -0.02, 0.0, 0.02]));
   const simParams = {
     deltaT: 0.04,
     rule1Distance: 0.1,
@@ -120,7 +124,9 @@ import * as dom from '@sophon/dom';
     rule2Scale: 0.05,
     rule3Scale: 0.005
   };
-  const uniformBuffer = viewer.device.createStructuredBuffer(spriteUpdateProgram.getBindingInfo('params').type as chaos.PBStructTypeInfo, chaos.GPUResourceUsageFlags.BF_UNIFORM);
+  const uniformBuffer = viewer.device.createStructuredBuffer(spriteUpdateProgram.getBindingInfo('params').type as chaos.PBStructTypeInfo, {
+    usage: 'uniform'
+  });
   const numParticles = 1500;
   const initialParticleData = new Float32Array(numParticles * 4);
   for (let i = 0; i < numParticles; ++i) {
@@ -133,7 +139,10 @@ import * as dom from '@sophon/dom';
   const particleBindGroups: chaos.BindGroup[] = [];
   const primitives: chaos.Primitive[] = [];
   for (let i = 0; i < 2; i++) {
-    particleBuffers.push(viewer.device.createStructuredBuffer(chaos.makeVertexBufferType(numParticles, 'tex0_f32x2', 'tex1_f32x2'), chaos.GPUResourceUsageFlags.BF_VERTEX | chaos.GPUResourceUsageFlags.BF_STORAGE, initialParticleData));
+    particleBuffers.push(viewer.device.createStructuredBuffer(chaos.makeVertexBufferType(numParticles, 'tex0_f32x2', 'tex1_f32x2'), {
+      usage: 'vertex',
+      storage: true
+    }, initialParticleData));
   }
   for (let i = 0; i < 2; i++) {
     const bindGroup = viewer.device.createBindGroup(spriteUpdateProgram.bindGroupLayouts[0]);
@@ -157,13 +166,13 @@ import * as dom from '@sophon/dom';
   }
   updateSimParams();
   let t = 0;
-  sceneView.addEventListener('draw', function (this: dom.RElement, evt: chaos.REvent) {
+  sceneView.addEventListener('draw', function (this: dom.RElement, evt: base.REvent) {
     evt.preventDefault();
     viewer.device.setProgram(spriteUpdateProgram);
     viewer.device.setBindGroup(0, particleBindGroups[t % 2]);
     viewer.device.compute(Math.ceil(numParticles / 64), 1, 1);
 
-    viewer.device.clearFrameBuffer(new chaos.Vector4(0, 0, 0, 1), 1, 0);
+    viewer.device.clearFrameBuffer(new base.Vector4(0, 0, 0, 1), 1, 0);
     viewer.device.setProgram(spriteProgram);
     viewer.device.setBindGroup(0, null);
     primitives[(t + 1) % 2].drawInstanced(numParticles);

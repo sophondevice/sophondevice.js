@@ -1,4 +1,5 @@
 import * as chaos from '@sophon/device';
+import * as base from '@sophon/base';
 import * as dom from '@sophon/dom';
 
 export function getQueryString(name: string) {
@@ -61,11 +62,11 @@ function decodeColorString(s: string) {
   const r = (value >> 16) & 0xff;
   const g = (value >> 8) & 0xff;
   const b = value & 0xff;
-  return new chaos.Vector4(Math.pow(r / 255, 2.2), Math.pow(g / 255, 2.2), Math.pow(b / 255, 2.2), 1);
+  return new base.Vector4(Math.pow(r / 255, 2.2), Math.pow(g / 255, 2.2), Math.pow(b / 255, 2.2), 1);
 }
 
 // linear to sRGB
-function encodeColorString(color: chaos.Vector4) {
+function encodeColorString(color: base.Vector4) {
   const r = ('0' + ((Math.pow(color.x, 1 / 2.2) * 255) >> 0).toString(16)).slice(-2);
   const g = ('0' + ((Math.pow(color.y, 1 / 2.2) * 255) >> 0).toString(16)).slice(-2);
   const b = ('0' + ((Math.pow(color.z, 1 / 2.2) * 255) >> 0).toString(16)).slice(-2);
@@ -639,7 +640,7 @@ export function initTextureViewPanel(device: chaos.Device, el: dom.RElement, wid
     const texture = device.getGPUObjectById(Number(textureSelect.value));
     (textureViewer as any).viewer.texture = texture;
   });
-  function onDeviceAddGPUObject(this: chaos.Device, e: chaos.REvent) {
+  function onDeviceAddGPUObject(this: chaos.Device, e: base.REvent) {
     const evt = e as chaos.DeviceGPUObjectAddedEvent;
     if (evt.object.isTexture2D()) {
       const option = textureSelect.ownerDocument.createElement<dom.Option>('option');
@@ -648,7 +649,7 @@ export function initTextureViewPanel(device: chaos.Device, el: dom.RElement, wid
       textureSelect.prepend(option);
     }
   }
-  function onDeviceRemoveGPUObject(this: chaos.Device, e: chaos.REvent) {
+  function onDeviceRemoveGPUObject(this: chaos.Device, e: base.REvent) {
     const evt = e as chaos.DeviceGPUObjectRemovedEvent;
     if (evt.object.isTexture2D()) {
       const options = textureSelect.querySelectorAll('option');
@@ -661,7 +662,7 @@ export function initTextureViewPanel(device: chaos.Device, el: dom.RElement, wid
       }
     }
   }
-  function onRenameGPUObject(this: chaos.Device, e: chaos.REvent) {
+  function onRenameGPUObject(this: chaos.Device, e: base.REvent) {
     const evt = e as chaos.DeviceGPUObjectRenameEvent;
     if (evt.object.isTexture2D()) {
       const options = textureSelect.querySelectorAll('option');
@@ -703,7 +704,7 @@ export class TextureView {
     this._mode = 0;
     this.init();
     const that = this;
-    this._el.addEventListener('draw', function (this: dom.RElement, evt: chaos.REvent) {
+    this._el.addEventListener('draw', function (this: dom.RElement, evt: base.REvent) {
       evt.preventDefault();
       that._device.setBindGroup(0, null);
       that._device.setBindGroup(1, null);
@@ -743,8 +744,10 @@ export class TextureView {
   }
   private init() {
     const vb = this._device.createStructuredBuffer(
-      chaos.makeVertexBufferType(4, 'position_f32x2', 'tex0_f32x2'),
-      chaos.GPUResourceUsageFlags.BF_VERTEX | chaos.GPUResourceUsageFlags.MANAGED,
+      chaos.makeVertexBufferType(4, 'position_f32x2', 'tex0_f32x2'), {
+        usage: 'vertex',
+        managed: true
+      },
       new Float32Array([-1, -1, 0, 1, 1, -1, 1, 1, -1, 1, 0, 0, 1, 1, 1, 0]));
     this._rect = new chaos.Primitive(this._device);
     this._rect.setVertexBuffer(vb);

@@ -1,3 +1,4 @@
+export * from './xform';
 export * from './bounding_volume';
 export * from './aabbtree';
 export * from './primitive';

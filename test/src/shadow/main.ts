@@ -1,3 +1,4 @@
+import * as base from '@sophon/base';
 import * as chaos from '@sophon/device';
 import * as dom from '@sophon/dom';
 import * as common from '../common';
@@ -13,8 +14,8 @@ import * as common from '../common';
   const scene = new chaos.Scene(viewer.device);
   scene.envLightStrength = 0.2;
   const scheme = new chaos.ForwardRenderScheme(viewer.device);
-  const camera = scene.addCamera().lookAt(new chaos.Vector3(0, 8, 30), new chaos.Vector3(0, 8, 0), chaos.Vector3.axisPY());
-  camera.setProjectionMatrix(chaos.Matrix4x4.perspective(Math.PI / 3, viewer.device.getDrawingBufferWidth() / viewer.device.getDrawingBufferHeight(), 1, 1000));
+  const camera = scene.addCamera().lookAt(new base.Vector3(0, 8, 30), new base.Vector3(0, 8, 0), base.Vector3.axisPY());
+  camera.setProjectionMatrix(base.Matrix4x4.perspective(Math.PI / 3, viewer.device.getDrawingBufferWidth() / viewer.device.getDrawingBufferHeight(), 1, 1000));
   camera.mouseInputSource = sceneView;
   camera.keyboardInputSource = sceneView;
   camera.setModel(new chaos.FPSCameraModel({ moveSpeed: 0.5 }));
@@ -26,8 +27,8 @@ import * as common from '../common';
 
   // const directionlight = null;
   const directionlight = new chaos.DirectionalLight(scene);
-  directionlight.setCastShadow(true).setColor(new chaos.Vector4(1, 1, 1, 1));
-  directionlight.lookAt(new chaos.Vector3(20, 28, -20), chaos.Vector3.zero(), chaos.Vector3.axisPY());
+  directionlight.setCastShadow(true).setColor(new base.Vector4(1, 1, 1, 1));
+  directionlight.lookAt(new base.Vector3(20, 28, -20), base.Vector3.zero(), base.Vector3.axisPY());
   directionlight.shadow.shadowMapSize = 2048;
   directionlight.shadow.numShadowCascades = 4;
   const planeMaterial = new chaos.PBRMetallicRoughnessMaterial(viewer.device);
@@ -39,36 +40,36 @@ import * as common from '../common';
   });
 
   const floor = chaos.Mesh.unitBox(scene);
-  floor.scaling = new chaos.Vector3(2000, 10, 2000);
-  floor.position = new chaos.Vector3(-1000, -10, -1000);
+  floor.scaling = new base.Vector3(2000, 10, 2000);
+  floor.position = new base.Vector3(-1000, -10, -1000);
   floor.castShadow = true;
   floor.material = planeMaterial;
 
   for (let i = -40; i <= 40; i++) {
     const box1 = chaos.Mesh.unitBox(scene);
-    box1.scaling = new chaos.Vector3(2, 20, 2);
-    box1.position = new chaos.Vector3(-20, -10, i * 10);
+    box1.scaling = new base.Vector3(2, 20, 2);
+    box1.position = new base.Vector3(-20, -10, i * 10);
     box1.material = planeMaterial;
     const box2 = chaos.Mesh.unitBox(scene);
-    box2.scaling = new chaos.Vector3(2, 20, 2);
-    box2.position = new chaos.Vector3(20, -10, i * 10);
+    box2.scaling = new base.Vector3(2, 20, 2);
+    box2.position = new base.Vector3(20, -10, i * 10);
     box2.material = planeMaterial;
   }
 
   sceneView.addEventListener('layout', function (this: dom.RElement) {
     const rect = this.getClientRect();
-    camera.setProjectionMatrix(chaos.Matrix4x4.perspective(camera.getFOV(), rect.width / rect.height, camera.getNearPlane(), camera.getFarPlane()));
+    camera.setProjectionMatrix(base.Matrix4x4.perspective(camera.getFOV(), rect.width / rect.height, camera.getNearPlane(), camera.getFarPlane()));
   });
 
   scene.addEventListener('tick', () => {
     const elapsed = viewer.device.frameInfo.elapsedOverall;
     if (false && directionlight) {
-      directionlight.setRotation(chaos.Quaternion.fromAxisAngle(chaos.Vector3.axisNX(), Math.PI * (0.5 + 0.25 * Math.sin(elapsed / 2000))));
-      directionlight.lookAt(new chaos.Vector3(0, 28, 0), new chaos.Vector3(40 * Math.cos(elapsed / 2000), 0, 40 * Math.sin(elapsed / 2000)), chaos.Vector3.axisPY());
+      directionlight.setRotation(base.Quaternion.fromAxisAngle(base.Vector3.axisNX(), Math.PI * (0.5 + 0.25 * Math.sin(elapsed / 2000))));
+      directionlight.lookAt(new base.Vector3(0, 28, 0), new base.Vector3(40 * Math.cos(elapsed / 2000), 0, 40 * Math.sin(elapsed / 2000)), base.Vector3.axisPY());
     }
   });
 
-  sceneView.addEventListener('draw', function (this: dom.RElement, evt: chaos.REvent) {
+  sceneView.addEventListener('draw', function (this: dom.RElement, evt: base.REvent) {
     evt.preventDefault();
     scheme.renderScene(scene, camera);
   });

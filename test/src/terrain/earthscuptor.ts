@@ -1,3 +1,4 @@
+import * as base from '@sophon/base';
 import * as chaos from '@sophon/device';
 
 declare global {
@@ -77,14 +78,14 @@ export async function loadEarthSculptorMap(scene: chaos.Scene, mapUrl: string): 
     heights[i] = h / 65535 * heightScale;
   }
   const terrain = new chaos.Terrain(scene);
-  terrain.create(sizeX, sizeZ, heights, new chaos.Vector3(1, 1, 1), 33);
+  terrain.create(sizeX, sizeZ, heights, new base.Vector3(1, 1, 1), 33);
   terrain.maxPixelError = 6;
   terrain.material.baseMap = await assetManager.fetchTexture(baseMap, null, true);
   terrain.material.detailMaskMap = await assetManager.fetchTexture(maskMap, null, false);
   for (let i = 0; i < 4; i++) {
     const scaleX = sizeX / detailScales[i];
     const scaleZ = sizeZ / detailScales[i];
-    terrain.material.addDetailMap(await assetManager.fetchTexture(detailMaps[i]), new chaos.Vector2(scaleX, scaleZ));
+    terrain.material.addDetailMap(await assetManager.fetchTexture(detailMaps[i]), new base.Vector2(scaleX, scaleZ));
   }
   return terrain;
 }

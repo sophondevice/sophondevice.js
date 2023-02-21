@@ -1,3 +1,4 @@
+import * as base from '@sophon/base';
 import * as chaos from '@sophon/device';
 import * as dom from '@sophon/dom';
 
@@ -31,10 +32,10 @@ export class GLTFViewer {
     // this._camera.setModel(new chaos.FPSCameraModel());
     this._camera.setModel(new chaos.OrbitCameraModel());
     this._light = new chaos.DirectionalLight(this._scene)
-      .setColor(new chaos.Vector4(1, 1, 1, 1))
+      .setColor(new base.Vector4(1, 1, 1, 1))
       .setCastShadow(false);
     this._light.shadow.shadowMapSize = 1024;
-    this._light.lookAt(new chaos.Vector3(10, 10, 10), new chaos.Vector3(0, 0, 0), chaos.Vector3.axisPY());
+    this._light.lookAt(new base.Vector3(10, 10, 10), new base.Vector3(0, 0, 0), base.Vector3.axisPY());
     chaos.Material.setGCOptions({ drawableCountThreshold: 0, materialCountThreshold: 0, inactiveTimeDuration: 10000, verbose: true });
     this._animationSelector.addEventListener('change', () => {
       if (this._animationSelector.value === 'none') {
@@ -159,12 +160,12 @@ export class GLTFViewer {
       }
       const dist = size / Math.tan(this._fov * 0.5) + extents.z + this._nearPlane;
 
-      this._camera.lookAt(chaos.Vector3.add(center, chaos.Vector3.scale(chaos.Vector3.axisPZ(), dist)), center, chaos.Vector3.axisPY());
-      this._camera.setProjectionMatrix(chaos.Matrix4x4.perspective(this._camera.getFOV(), this._aspect, Math.min(1, this._camera.getNearPlane()), Math.max(10, dist + extents.z + 100)));
+      this._camera.lookAt(base.Vector3.add(center, base.Vector3.scale(base.Vector3.axisPZ(), dist)), center, base.Vector3.axisPY());
+      this._camera.setProjectionMatrix(base.Matrix4x4.perspective(this._camera.getFOV(), this._aspect, Math.min(1, this._camera.getNearPlane()), Math.max(10, dist + extents.z + 100)));
       (this._camera.model as chaos.OrbitCameraModel).setOptions({ distance: dist });
     }
   }
-  private getBoundingBox(): chaos.AABB {
+  private getBoundingBox(): base.AABB {
     const bbox = new chaos.BoundingBox();
     bbox.beginExtend();
     this.traverseModel(node => {

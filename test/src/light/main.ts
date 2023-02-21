@@ -1,3 +1,4 @@
+import * as base from '@sophon/base';
 import * as chaos from '@sophon/device';
 import * as dom from '@sophon/dom';
 import * as common from '../common';
@@ -12,8 +13,8 @@ import * as common from '../common';
   sceneView.customDraw = true;
   const scene = new chaos.Scene(viewer.device);
   const scheme = new chaos.ForwardRenderScheme(viewer.device);
-  const camera = scene.addCamera().lookAt(new chaos.Vector3(0, 8, 30), new chaos.Vector3(0, 8, 0), chaos.Vector3.axisPY());
-  camera.setProjectionMatrix(chaos.Matrix4x4.perspective(Math.PI / 3, viewer.device.getDrawingBufferWidth() / viewer.device.getDrawingBufferHeight(), 1, 260));
+  const camera = scene.addCamera().lookAt(new base.Vector3(0, 8, 30), new base.Vector3(0, 8, 0), base.Vector3.axisPY());
+  camera.setProjectionMatrix(base.Matrix4x4.perspective(Math.PI / 3, viewer.device.getDrawingBufferWidth() / viewer.device.getDrawingBufferHeight(), 1, 260));
   camera.mouseInputSource = sceneView;
   camera.keyboardInputSource = sceneView;
   camera.setModel(new chaos.OrbitCameraModel({ distance: camera.position.magnitude }));
@@ -25,8 +26,8 @@ import * as common from '../common';
   common.createTextureViewPanel(viewer.device, sceneView, 300);
 
   const directionlight = new chaos.DirectionalLight(scene);
-  directionlight.setCastShadow(false).setColor(new chaos.Vector4(1, 0, 1, 1));
-  directionlight.lookAt(new chaos.Vector3(0, 28, 0), new chaos.Vector3(0, 0, 0), chaos.Vector3.axisPX());
+  directionlight.setCastShadow(false).setColor(new base.Vector4(1, 0, 1, 1));
+  directionlight.lookAt(new base.Vector3(0, 28, 0), new base.Vector3(0, 0, 0), base.Vector3.axisPX());
   directionlight.shadow.shadowMapSize = 1024;
   common.createLightTweakPanel(directionlight, sceneView, {
     width: '200px'
@@ -34,12 +35,12 @@ import * as common from '../common';
 
   // const pointlight = null;
   const pointlight = new chaos.SpotLight(scene)
-    .setPosition(new chaos.Vector3(0, 28, 0))
-    .setRotation(chaos.Quaternion.fromAxisAngle(chaos.Vector3.axisPX(), -Math.PI * 0.25))
+    .setPosition(new base.Vector3(0, 28, 0))
+    .setRotation(base.Quaternion.fromAxisAngle(base.Vector3.axisPX(), -Math.PI * 0.25))
     .setRange(50)
     .setIntensity(8)
     .setCutoff(Math.PI * 0.2)
-    .setColor(new chaos.Vector4(1, 1, 0, 1))
+    .setColor(new base.Vector4(1, 1, 0, 1))
     .setCastShadow(false);
   pointlight.shadow.shadowMapSize = 1024;
   common.createLightTweakPanel(pointlight, sceneView, {
@@ -47,9 +48,9 @@ import * as common from '../common';
   });
 
   const ballMaterial = new chaos.UnlitMaterial(viewer.device);
-  ballMaterial.lightModel.albedo = new chaos.Vector4(1, 1, 0, 1);
+  ballMaterial.lightModel.albedo = new base.Vector4(1, 1, 0, 1);
   const ball = chaos.Mesh.unitSphere(scene);
-  ball.scaling = new chaos.Vector3(1, 1, 1);
+  ball.scaling = new base.Vector3(1, 1, 1);
   ball.castShadow = false;
   ball.material = ballMaterial;
   ball.reparent(pointlight);
@@ -58,44 +59,44 @@ import * as common from '../common';
   const spotlight = new chaos.SpotLight(null)
   .setRange(100)
   .setCutoff(Math.PI * 0.2)
-  .setColor(new chaos.Vector4(1, 1, 1, 1))
+  .setColor(new base.Vector4(1, 1, 1, 1))
   .setCastShadow(true);
 new chaos.PointLight(scene, null)
-  .setPosition(new chaos.Vector3(-20, 20, 5))
+  .setPosition(new base.Vector3(-20, 20, 5))
   .setRange(30)
-  .setColor(new chaos.Vector4(0.4, 0.8, 0.7, 1));
+  .setColor(new base.Vector4(0.4, 0.8, 0.7, 1));
 new chaos.HemiSphericLight(scene, null)
-  .setColorDown(new chaos.Vector4(0.1, 0.2, 0, 1))
-  .setColorUp(new chaos.Vector4(0, 0.2, 0.4, 1));
+  .setColorDown(new base.Vector4(0.1, 0.2, 0, 1))
+  .setColorUp(new base.Vector4(0, 0.2, 0.4, 1));
 */
   //const sphereMaterial = new chaos.StandardMaterial(viewer.device);
   //const lm = new chaos.PBRLightModel();
-  //lm.albedo = new chaos.Vector4(1, 1, 0, 1);
+  //lm.albedo = new base.Vector4(1, 1, 0, 1);
   //lm.metallic = 0.8;
   //lm.roughness = 0.2;
   //sphereMaterial.lightModel = lm;
-  //new chaos.SphereMesh(scene, null, { radius: 8, verticalDetail: 40, horizonalDetail: 40 }).setPosition(new chaos.Vector3(0, 8, 0)).material = sphereMaterial;
+  //new chaos.SphereMesh(scene, null, { radius: 8, verticalDetail: 40, horizonalDetail: 40 }).setPosition(new base.Vector3(0, 8, 0)).material = sphereMaterial;
 
   const planeMaterial = new chaos.PBRMetallicRoughnessMaterial(viewer.device);
   planeMaterial.lightModel.metallic = 0.1;
   planeMaterial.lightModel.roughness = 0.6;
 
   const floor = chaos.Mesh.unitBox(scene);
-  floor.scaling = new chaos.Vector3(50, 10, 50);
-  floor.position = new chaos.Vector3(-25, -5, -25);
+  floor.scaling = new base.Vector3(50, 10, 50);
+  floor.position = new base.Vector3(-25, -5, -25);
   floor.castShadow = true;
   floor.material = planeMaterial;
 
   const sphere = chaos.Mesh.unitSphere(scene);
-  sphere.scaling = new chaos.Vector3(10, 10, 10);
-  sphere.position = new chaos.Vector3(0, 20, 0);
+  sphere.scaling = new base.Vector3(10, 10, 10);
+  sphere.position = new base.Vector3(0, 20, 0);
   sphere.material = planeMaterial;
   /*
   for (let i = -3; i <= 3; i++) {
     for (let j = -3; j <= 3; j++) {
       const box = chaos.Mesh.unitBox(scene);
-      box.scaling = new chaos.Vector3(5, 20, 5);
-      box.position = new chaos.Vector3(i * 30, 10, j * 30);
+      box.scaling = new base.Vector3(5, 20, 5);
+      box.position = new base.Vector3(i * 30, 10, j * 30);
       box.material = planeMaterial;
     }
   }
@@ -103,11 +104,11 @@ new chaos.HemiSphericLight(scene, null)
 
   sceneView.addEventListener('layout', function (this: dom.RElement) {
     const rect = this.getClientRect();
-    camera.setProjectionMatrix(chaos.Matrix4x4.perspective(camera.getFOV(), rect.width / rect.height, camera.getNearPlane(), camera.getFarPlane()));
+    camera.setProjectionMatrix(base.Matrix4x4.perspective(camera.getFOV(), rect.width / rect.height, camera.getNearPlane(), camera.getFarPlane()));
   });
 
   let pause = false;
-  sceneView.addEventListener('keydown', function (evt: chaos.REvent) {
+  sceneView.addEventListener('keydown', function (evt: base.REvent) {
     const keyEvent = evt as dom.RKeyEvent;
     if (keyEvent.code === 'KeyP') {
       pause = !pause;
@@ -124,13 +125,13 @@ new chaos.HemiSphericLight(scene, null)
         pointlight.position.y = 30 + 15 * Math.sin(elapsed / 3000)
       }
       if (directionlight) {
-        directionlight.setRotation(chaos.Quaternion.fromAxisAngle(chaos.Vector3.axisNX(), Math.PI * (0.5 + 0.25 * Math.sin(elapsed / 2000))));
-        directionlight.lookAt(new chaos.Vector3(0, 28, 0), new chaos.Vector3(40 * Math.cos(elapsed / 2000), 0, 40 * Math.sin(elapsed / 2000)), chaos.Vector3.axisPY());
+        directionlight.setRotation(base.Quaternion.fromAxisAngle(base.Vector3.axisNX(), Math.PI * (0.5 + 0.25 * Math.sin(elapsed / 2000))));
+        directionlight.lookAt(new base.Vector3(0, 28, 0), new base.Vector3(40 * Math.cos(elapsed / 2000), 0, 40 * Math.sin(elapsed / 2000)), base.Vector3.axisPY());
       }
     }
   });
 
-  sceneView.addEventListener('draw', function (this: dom.RElement, evt: chaos.REvent) {
+  sceneView.addEventListener('draw', function (this: dom.RElement, evt: base.REvent) {
     evt.preventDefault();
     scheme.renderScene(scene, camera);
   });

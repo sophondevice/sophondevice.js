@@ -1,3 +1,4 @@
+import * as base from '@sophon/base';
 import * as chaos from '@sophon/device';
 import * as dom from '@sophon/dom';
 
@@ -78,8 +79,16 @@ import * as dom from '@sophon/dom';
   });
   const cubeTexture = await assetManager.fetchTexture('./assets/images/Di-3d.png', null, false, true);
   const textures = [
-    viewer.device.createTexture2D(chaos.TextureFormat.RGBA8UNORM, cubeTexture.width, cubeTexture.height, chaos.GPUResourceUsageFlags.TF_WRITABLE | chaos.GPUResourceUsageFlags.TF_NO_MIPMAP | chaos.GPUResourceUsageFlags.TF_LINEAR_COLOR_SPACE),
-    viewer.device.createTexture2D(chaos.TextureFormat.RGBA8UNORM, cubeTexture.width, cubeTexture.height, chaos.GPUResourceUsageFlags.TF_WRITABLE | chaos.GPUResourceUsageFlags.TF_NO_MIPMAP | chaos.GPUResourceUsageFlags.TF_LINEAR_COLOR_SPACE),
+    viewer.device.createTexture2D(chaos.TextureFormat.RGBA8UNORM, cubeTexture.width, cubeTexture.height, {
+      colorSpace: 'linear',
+      writable: true,
+      noMipmap: true
+    }),
+    viewer.device.createTexture2D(chaos.TextureFormat.RGBA8UNORM, cubeTexture.width, cubeTexture.height, {
+      colorSpace: 'linear',
+      writable: true,
+      noMipmap: true
+    }),
   ];
   const computeUniforms = viewer.device.createBindGroup(blurProgram.bindGroupLayouts[0]);
   const computeBindGroup0 = viewer.device.createBindGroup(blurProgram.bindGroupLayouts[1]);
@@ -121,7 +130,7 @@ import * as dom from '@sophon/dom';
     updateSettings();
   });
   updateSettings();
-  sceneView.addEventListener('draw', function (this: dom.RElement, evt: chaos.REvent) {
+  sceneView.addEventListener('draw', function (this: dom.RElement, evt: base.REvent) {
     evt.preventDefault();
     viewer.device.setProgram(blurProgram);
     viewer.device.setBindGroup(0, computeUniforms);
@@ -135,7 +144,7 @@ import * as dom from '@sophon/dom';
       viewer.device.setBindGroup(1, computeBindGroup1);
       viewer.device.compute(Math.ceil(cubeTexture.height / blockDim), Math.ceil(cubeTexture.width / batch[1]), 1);
     }
-    viewer.device.clearFrameBuffer(new chaos.Vector4(0, 0, 0, 1), 1, 0);
+    viewer.device.clearFrameBuffer(new base.Vector4(0, 0, 0, 1), 1, 0);
     viewer.device.setProgram(fullScreenQuadProgram);
     viewer.device.setBindGroup(0, resultBindGroup);
     viewer.device.setBindGroup(1, null);

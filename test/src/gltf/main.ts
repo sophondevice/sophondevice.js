@@ -1,3 +1,4 @@
+import * as base from '@sophon/base';
 import * as chaos from '@sophon/device';
 import * as dom from '@sophon/dom';
 import * as common from '../common';
@@ -44,7 +45,7 @@ import { GLTFViewer } from './gltfviewer';
     gltfViewer.aspect = rect.width / rect.height;
   });
 
-  sceneView.addEventListener('draw', function (this: dom.RElement, evt: chaos.REvent) {
+  sceneView.addEventListener('draw', function (this: dom.RElement, evt: base.REvent) {
     evt.preventDefault();
     gltfViewer.render();
   });

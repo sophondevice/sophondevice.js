@@ -35,7 +35,7 @@ function getTargetES6() {
           }]
         ]
       }),
-      terser()
+      // terser()
     ]
   };
 }

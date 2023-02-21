@@ -1,3 +1,4 @@
+import * as base from '@sophon/base';
 import * as chaos from '@sophon/device';
 import * as dom from '@sophon/dom';
 import * as common from '../common';
@@ -15,16 +16,16 @@ import { loadEarthSculptorMap } from './earthscuptor';
   const scene = new chaos.Scene(viewer.device);
   const scheme = new chaos.ForwardRenderScheme(viewer.device);
   const camera = scene.addCamera();
-  camera.setProjectionMatrix(chaos.Matrix4x4.perspective(Math.PI / 3, viewer.device.getDrawingBufferWidth() / viewer.device.getDrawingBufferHeight(), 1, 300));
+  camera.setProjectionMatrix(base.Matrix4x4.perspective(Math.PI / 3, viewer.device.getDrawingBufferWidth() / viewer.device.getDrawingBufferHeight(), 1, 300));
   camera.mouseInputSource = sceneView;
   camera.keyboardInputSource = sceneView;
   camera.setModel(new chaos.FPSCameraModel({ moveSpeed: 0.5 }));
   scene.envLightStrength = 0.5;
 
   const light = new chaos.DirectionalLight(scene)
-    .setColor(new chaos.Vector4(1, 1, 1, 1))
+    .setColor(new base.Vector4(1, 1, 1, 1))
     .setCastShadow(false);
-  light.lookAt(new chaos.Vector3(10, 3, 10), new chaos.Vector3(0, 0, 0), chaos.Vector3.axisPY());
+  light.lookAt(new base.Vector3(10, 3, 10), new base.Vector3(0, 0, 0), base.Vector3.axisPY());
   light.shadow.shadowMapSize = 2048;
   light.shadow.numShadowCascades = 4;
 
@@ -42,10 +43,10 @@ import { loadEarthSculptorMap } from './earthscuptor';
       terrain.castShadow = true;
       const eyePos = terrain.getBoundingVolume().toAABB().maxPoint;
       const destPos = terrain.getBoundingVolume().toAABB().center;
-      camera.lookAt(eyePos, destPos, chaos.Vector3.axisPY());
+      camera.lookAt(eyePos, destPos, base.Vector3.axisPY());
       let timer: number = null;
       let rot = 0;
-      sceneView.addEventListener('keydown', function (evt: chaos.REvent) {
+      sceneView.addEventListener('keydown', function (evt: base.REvent) {
         const keyEvent = evt as dom.RKeyEvent;
         if (keyEvent.code === 'Space') {
           terrain.wireframe = !terrain.wireframe;
@@ -59,10 +60,10 @@ import { loadEarthSculptorMap } from './earthscuptor';
           } else {
             timer = window.setInterval(() => {
               const center = terrain.getBoundingVolume().toAABB().center;
-              const t1 = chaos.Matrix4x4.translation(new chaos.Vector3(-center.x, 0, -center.z));
-              const r = chaos.Quaternion.fromAxisAngle(chaos.Vector3.axisPY(), rot).toMatrix4x4();
-              const t2 = chaos.Matrix4x4.translation(new chaos.Vector3(center.x, 0, center.z));
-              const matrix = chaos.Matrix4x4.multiply(chaos.Matrix4x4.multiply(t2, r), t1);
+              const t1 = base.Matrix4x4.translation(new base.Vector3(-center.x, 0, -center.z));
+              const r = base.Quaternion.fromAxisAngle(base.Vector3.axisPY(), rot).toMatrix4x4();
+              const t2 = base.Matrix4x4.translation(new base.Vector3(center.x, 0, center.z));
+              const matrix = base.Matrix4x4.multiply(base.Matrix4x4.multiply(t2, r), t1);
               matrix.decompose(terrain.scaling, terrain.rotation, terrain.position);
               rot += 0.02;
             }, 20);
@@ -73,10 +74,10 @@ import { loadEarthSculptorMap } from './earthscuptor';
   }
   sceneView.addEventListener('layout', function (this: dom.RElement) {
     const rect = this.getClientRect();
-    camera.setProjectionMatrix(chaos.Matrix4x4.perspective(camera.getFOV(), rect.width / rect.height, camera.getNearPlane(), camera.getFarPlane()));
+    camera.setProjectionMatrix(base.Matrix4x4.perspective(camera.getFOV(), rect.width / rect.height, camera.getNearPlane(), camera.getFarPlane()));
   });
 
-  sceneView.addEventListener('draw', function (this: dom.RElement, evt: chaos.REvent) {
+  sceneView.addEventListener('draw', function (this: dom.RElement, evt: base.REvent) {
     evt.preventDefault();
     scheme.renderScene(scene, camera);
   });

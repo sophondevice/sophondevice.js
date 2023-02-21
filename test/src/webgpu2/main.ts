@@ -10,7 +10,7 @@ import { frag, vert } from './testshader';
   const device = await adapter.requestDevice();
 
   const canvas = document.getElementById('canvas') as HTMLCanvasElement;
-  const context: GPUCanvasContext = canvas.getContext('webgpu');
+  const context = canvas.getContext('webgpu') as unknown as GPUCanvasContext;
 
   const swapChainFormat = 'bgra8unorm';
 

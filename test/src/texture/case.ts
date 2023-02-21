@@ -1,3 +1,4 @@
+import * as base from '@sophon/base';
 import * as chaos from '@sophon/device';
 import { projectCubemapCPU } from './sh';
 
@@ -40,10 +41,10 @@ export abstract class TextureTestCase {
 }
 
 export class TestTexture2D extends TextureTestCase {
-  private viewMatrix: chaos.Matrix4x4;
+  private viewMatrix: base.Matrix4x4;
   constructor(device: chaos.Device, assetManager: chaos.AssetManager) {
     super(device, assetManager);
-    this.viewMatrix = chaos.Matrix4x4.lookAt(new chaos.Vector3(3, 3, 3), chaos.Vector3.zero(), chaos.Vector3.axisPY()).inplaceInverseAffine();
+    this.viewMatrix = base.Matrix4x4.lookAt(new base.Vector3(3, 3, 3), base.Vector3.zero(), base.Vector3.axisPY()).inplaceInverseAffine();
   }
   protected createProgram(): chaos.GPUProgram {
     const pb = new chaos.ProgramBuilder(this.device);
@@ -78,18 +79,18 @@ export class TestTexture2D extends TextureTestCase {
     return bindGroup;
   }
   protected updateBindGroup(t: number, w: number, h: number) {
-    const vpMatrix = chaos.Matrix4x4.multiply(chaos.Matrix4x4.perspective(Math.PI / 3, w / h, 1, 10), this.viewMatrix);
-    const matrix = this.animate ? chaos.Matrix4x4.multiply(vpMatrix, chaos.Matrix4x4.rotationY((t * 0.001) % (2 * Math.PI))) : vpMatrix;
+    const vpMatrix = base.Matrix4x4.multiply(base.Matrix4x4.perspective(Math.PI / 3, w / h, 1, 10), this.viewMatrix);
+    const matrix = this.animate ? base.Matrix4x4.multiply(vpMatrix, base.Matrix4x4.rotationY((t * 0.001) % (2 * Math.PI))) : vpMatrix;
     this.bindgroup.setValue('mvpMatrix', matrix);
   }
 }
 
 export class TestTextureVideo extends TextureTestCase {
-  private viewMatrix: chaos.Matrix4x4;
+  private viewMatrix: base.Matrix4x4;
   private el: HTMLVideoElement;
   constructor(device: chaos.Device, assetManager: chaos.AssetManager, video: string) {
     super(device, assetManager);
-    this.viewMatrix = chaos.Matrix4x4.lookAt(new chaos.Vector3(3, 3, 3), chaos.Vector3.zero(), chaos.Vector3.axisPY()).inplaceInverseAffine();
+    this.viewMatrix = base.Matrix4x4.lookAt(new base.Vector3(3, 3, 3), base.Vector3.zero(), base.Vector3.axisPY()).inplaceInverseAffine();
     this.el = document.createElement('video');
     this.el.src = video;
     this.el.loop = true;
@@ -129,17 +130,17 @@ export class TestTextureVideo extends TextureTestCase {
     return bindGroup;
   }
   protected updateBindGroup(t: number, w: number, h: number) {
-    const vpMatrix = chaos.Matrix4x4.multiply(chaos.Matrix4x4.perspective(Math.PI / 3, w / h, 1, 10), this.viewMatrix);
-    const matrix = this.animate ? chaos.Matrix4x4.multiply(vpMatrix, chaos.Matrix4x4.rotationY((t * 0.001) % (2 * Math.PI))) : vpMatrix;
+    const vpMatrix = base.Matrix4x4.multiply(base.Matrix4x4.perspective(Math.PI / 3, w / h, 1, 10), this.viewMatrix);
+    const matrix = this.animate ? base.Matrix4x4.multiply(vpMatrix, base.Matrix4x4.rotationY((t * 0.001) % (2 * Math.PI))) : vpMatrix;
     this.bindgroup.setValue('mvpMatrix', matrix);
   }
 }
 
 export class TestTexture2DArray extends TextureTestCase {
-  private viewMatrix: chaos.Matrix4x4;
+  private viewMatrix: base.Matrix4x4;
   constructor(device: chaos.Device, assetManager: chaos.AssetManager) {
     super(device, assetManager);
-    this.viewMatrix = chaos.Matrix4x4.lookAt(new chaos.Vector3(3, 3, 3), chaos.Vector3.zero(), chaos.Vector3.axisPY()).inplaceInverseAffine();
+    this.viewMatrix = base.Matrix4x4.lookAt(new base.Vector3(3, 3, 3), base.Vector3.zero(), base.Vector3.axisPY()).inplaceInverseAffine();
   }
   protected createProgram(): chaos.GPUProgram {
     const pb = new chaos.ProgramBuilder(this.device);
@@ -193,7 +194,9 @@ export class TestTexture2DArray extends TextureTestCase {
       ...purple, ...black, ...white, ...red,
       ...green, ...blue, ...yellow, ...purple
     ]);
-    const tex = this.device.createTexture2DArray(chaos.TextureFormat.RGBA8UNORM, 4, 4, 4, chaos.GPUResourceUsageFlags.TF_LINEAR_COLOR_SPACE);
+    const tex = this.device.createTexture2DArray(chaos.TextureFormat.RGBA8UNORM, 4, 4, 4, {
+      colorSpace: 'linear'
+    });
     tex.update(pixels, 0, 0, 0, 4, 4, 4);
     return tex;
   }
@@ -203,18 +206,18 @@ export class TestTexture2DArray extends TextureTestCase {
     return bindGroup;
   }
   protected updateBindGroup(t: number, w: number, h: number) {
-    const vpMatrix = chaos.Matrix4x4.multiply(chaos.Matrix4x4.perspective(Math.PI / 3, w / h, 1, 10), this.viewMatrix);
-    const matrix = this.animate ? chaos.Matrix4x4.multiply(vpMatrix, chaos.Matrix4x4.rotationY((t * 0.001) % (2 * Math.PI))) : vpMatrix;
+    const vpMatrix = base.Matrix4x4.multiply(base.Matrix4x4.perspective(Math.PI / 3, w / h, 1, 10), this.viewMatrix);
+    const matrix = this.animate ? base.Matrix4x4.multiply(vpMatrix, base.Matrix4x4.rotationY((t * 0.001) % (2 * Math.PI))) : vpMatrix;
     this.bindgroup.setValue('mvpMatrix', matrix);
   }
 }
 
 
 export class TestTexture3D extends TextureTestCase {
-  private viewMatrix: chaos.Matrix4x4;
+  private viewMatrix: base.Matrix4x4;
   constructor(device: chaos.Device, assetManager: chaos.AssetManager) {
     super(device, assetManager);
-    this.viewMatrix = chaos.Matrix4x4.lookAt(new chaos.Vector3(3, 3, 3), chaos.Vector3.zero(), chaos.Vector3.axisPY()).inplaceInverseAffine();
+    this.viewMatrix = base.Matrix4x4.lookAt(new base.Vector3(3, 3, 3), base.Vector3.zero(), base.Vector3.axisPY()).inplaceInverseAffine();
   }
   protected createProgram(): chaos.GPUProgram {
     const pb = new chaos.ProgramBuilder(this.device);
@@ -268,7 +271,10 @@ export class TestTexture3D extends TextureTestCase {
       ...purple, ...black, ...white, ...red,
       ...green, ...blue, ...yellow, ...purple
     ]);
-    const tex = this.device.createTexture3D(chaos.TextureFormat.RGBA8UNORM, 4, 4, 4, chaos.GPUResourceUsageFlags.TF_NO_MIPMAP | chaos.GPUResourceUsageFlags.TF_LINEAR_COLOR_SPACE);
+    const tex = this.device.createTexture3D(chaos.TextureFormat.RGBA8UNORM, 4, 4, 4, {
+      colorSpace: 'linear',
+      noMipmap: true
+    });
     tex.update(pixels, 0, 0, 0, 4, 4, 4);
     return tex;
   }
@@ -278,17 +284,17 @@ export class TestTexture3D extends TextureTestCase {
     return bindGroup;
   }
   protected updateBindGroup(t: number, w: number, h: number) {
-    const vpMatrix = chaos.Matrix4x4.multiply(chaos.Matrix4x4.perspective(Math.PI / 3, w / h, 1, 10), this.viewMatrix);
-    const matrix = this.animate ? chaos.Matrix4x4.multiply(vpMatrix, chaos.Matrix4x4.rotationY((t * 0.001) % (2 * Math.PI))) : vpMatrix;
+    const vpMatrix = base.Matrix4x4.multiply(base.Matrix4x4.perspective(Math.PI / 3, w / h, 1, 10), this.viewMatrix);
+    const matrix = this.animate ? base.Matrix4x4.multiply(vpMatrix, base.Matrix4x4.rotationY((t * 0.001) % (2 * Math.PI))) : vpMatrix;
     this.bindgroup.setValue('mvpMatrix', matrix);
   }
 }
 
 export class TestTextureCube extends TextureTestCase {
-  private viewMatrix: chaos.Matrix4x4;
+  private viewMatrix: base.Matrix4x4;
   constructor(device: chaos.Device, assetManager: chaos.AssetManager) {
     super(device, assetManager);
-    this.viewMatrix = chaos.Matrix4x4.lookAt(new chaos.Vector3(3, 3, 3), chaos.Vector3.zero(), chaos.Vector3.axisPY()).inplaceInverseAffine();
+    this.viewMatrix = base.Matrix4x4.lookAt(new base.Vector3(3, 3, 3), base.Vector3.zero(), base.Vector3.axisPY()).inplaceInverseAffine();
   }
   protected createProgram(): chaos.GPUProgram {
     const pb = new chaos.ProgramBuilder(this.device);
@@ -322,19 +328,19 @@ export class TestTextureCube extends TextureTestCase {
     return bindGroup;
   }
   protected updateBindGroup(t: number, w: number, h: number) {
-    const vpMatrix = chaos.Matrix4x4.multiply(chaos.Matrix4x4.perspective(Math.PI / 3, w / h, 1, 10), this.viewMatrix);
-    const matrix = this.animate ? chaos.Matrix4x4.multiply(vpMatrix, chaos.Matrix4x4.rotationY((t * 0.001) % (2 * Math.PI))) : vpMatrix;
+    const vpMatrix = base.Matrix4x4.multiply(base.Matrix4x4.perspective(Math.PI / 3, w / h, 1, 10), this.viewMatrix);
+    const matrix = this.animate ? base.Matrix4x4.multiply(vpMatrix, base.Matrix4x4.rotationY((t * 0.001) % (2 * Math.PI))) : vpMatrix;
     this.bindgroup.setValue('mvpMatrix', matrix);
   }
 }
 
 export class TestTextureCubeSH extends TextureTestCase {
-  private viewMatrix: chaos.Matrix4x4;
-  private shCoeff: chaos.Vector3[];
+  private viewMatrix: base.Matrix4x4;
+  private shCoeff: base.Vector3[];
   constructor(device: chaos.Device, assetManager: chaos.AssetManager) {
     super(device, assetManager);
-    this.viewMatrix = chaos.Matrix4x4.lookAt(new chaos.Vector3(3, 3, 3), chaos.Vector3.zero(), chaos.Vector3.axisPY()).inplaceInverseAffine();
-    this.shCoeff = Array.from({ length: 9 }).map(() => chaos.Vector3.zero());
+    this.viewMatrix = base.Matrix4x4.lookAt(new base.Vector3(3, 3, 3), base.Vector3.zero(), base.Vector3.axisPY()).inplaceInverseAffine();
+    this.shCoeff = Array.from({ length: 9 }).map(() => base.Vector3.zero());
   }
   protected createProgram(): chaos.GPUProgram {
     const pb = new chaos.ProgramBuilder(this.device);
@@ -419,8 +425,8 @@ export class TestTextureCubeSH extends TextureTestCase {
     return bindGroup;
   }
   protected updateBindGroup(t: number, w: number, h: number) {
-    const vpMatrix = chaos.Matrix4x4.multiply(chaos.Matrix4x4.perspective(Math.PI / 3, w / h, 1, 10), this.viewMatrix);
-    const matrix = this.animate ? chaos.Matrix4x4.multiply(vpMatrix, chaos.Matrix4x4.rotationY((t * 0.001) % (2 * Math.PI))) : vpMatrix;
+    const vpMatrix = base.Matrix4x4.multiply(base.Matrix4x4.perspective(Math.PI / 3, w / h, 1, 10), this.viewMatrix);
+    const matrix = this.animate ? base.Matrix4x4.multiply(vpMatrix, base.Matrix4x4.rotationY((t * 0.001) % (2 * Math.PI))) : vpMatrix;
     this.bindgroup.setValue('mvpMatrix', matrix);
   }
 }

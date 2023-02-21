@@ -1,34 +1,35 @@
-import * as chaos from '@sophon/device';
+import * as base from '@sophon/base';
+import * as device from '@sophon/device';
 
 class SphericalHarmonicsBasis {
-  static Y0(v: chaos.Vector3): number {
+  static Y0(v: base.Vector3): number {
     return 0.2820947917;
   }
-  static Y1(v: chaos.Vector3): number {
+  static Y1(v: base.Vector3): number {
     return 0.4886025119 * v.y;
   }
-  static Y2(v: chaos.Vector3): number {
+  static Y2(v: base.Vector3): number {
     return 0.4886025119 * v.z;
   }
-  static Y3(v: chaos.Vector3): number {
+  static Y3(v: base.Vector3): number {
     return 0.4886025119 * v.x;
   }
-  static Y4(v: chaos.Vector3): number {
+  static Y4(v: base.Vector3): number {
     return 1.0925484306 * v.x * v.y;
   }
-  static Y5(v: chaos.Vector3): number {
+  static Y5(v: base.Vector3): number {
     return 1.0925484306 * v.y * v.z;
   }
-  static Y6(v: chaos.Vector3): number {
+  static Y6(v: base.Vector3): number {
     return 0.3153915652 * (3 * v.z * v.z - 1);
   }
-  static Y7(v: chaos.Vector3): number {
+  static Y7(v: base.Vector3): number {
     return 1.0925484306 * v.x * v.z;
   }
-  static Y8(v: chaos.Vector3): number {
+  static Y8(v: base.Vector3): number {
     return 0.5462742153 * (v.x * v.x - v.y * v.y);
   }
-  static eval(c: number, v: chaos.Vector3): number {
+  static eval(c: number, v: base.Vector3): number {
     switch (c) {
     case 0: return this.Y0(v);
     case 1: return this.Y1(v);
@@ -59,8 +60,8 @@ function differentialSolidAngle(textureSize: number, U: number, V: number): numb
   return areaElement(x0, y0) - areaElement(x0, y1) - areaElement(x1, y0) + areaElement(x1, y1);
 }
 
-function directionFromCubemapTexel(face: number, u: number, v: number): chaos.Vector3 {
-  const dir = chaos.Vector3.zero();
+function directionFromCubemapTexel(face: number, u: number, v: number): base.Vector3 {
+  const dir = base.Vector3.zero();
   switch (face) {
   case 0: //+X
     dir.x = 1;
@@ -96,12 +97,12 @@ function directionFromCubemapTexel(face: number, u: number, v: number): chaos.Ve
   return dir.inplaceNormalize();
 }
 
-export async function projectCubemapCPU(input: chaos.TextureCube): Promise<chaos.Vector3[]> {
-  if (!input || (input.format !== chaos.TextureFormat.RGBA8UNORM && input.format !== chaos.TextureFormat.RGBA8UNORM_SRGB)) {
+export async function projectCubemapCPU(input: device.TextureCube): Promise<base.Vector3[]> {
+  if (!input || (input.format !== device.TextureFormat.RGBA8UNORM && input.format !== device.TextureFormat.RGBA8UNORM_SRGB)) {
     throw new Error(`cubemap must be rgba8unorm format`);
   }
   const size = input.width;
-  const output: chaos.Vector3[] = Array.from({length: 9}).map(() => chaos.Vector3.zero());
+  const output: base.Vector3[] = Array.from({length: 9}).map(() => base.Vector3.zero());
   for (let face = 0; face < 6; face++) {
     const input_face = new Uint8Array(size * size * 4);
     await input.readPixels(face, 0, 0, size, size, input_face);
@@ -113,7 +114,7 @@ export async function projectCubemapCPU(input: chaos.TextureCube): Promise<chaos
       let radianceR = input_face[texel * 4 + 0] / 255;
       let radianceG = input_face[texel * 4 + 1] / 255;
       let radianceB = input_face[texel * 4 + 2] / 255;
-      if (input.format === chaos.TextureFormat.RGBA8UNORM_SRGB) {
+      if (input.format === device.TextureFormat.RGBA8UNORM_SRGB) {
         radianceR = Math.pow(radianceR, 2.2);
         radianceG = Math.pow(radianceG, 2.2);
         radianceB = Math.pow(radianceB, 2.2);
