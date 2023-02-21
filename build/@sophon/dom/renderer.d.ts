@@ -1,0 +1,36 @@
+import { REventTarget } from '@sophon/base';
+import { Device, Texture2D } from '@sophon/device';
+import type { RColor } from './types';
+import type { GUI } from './gui';
+import type { RNode } from './node';
+export declare class GUIRenderer extends REventTarget {
+    constructor(device: Device);
+    get device(): Device;
+    dispose(): void;
+    getCanvas(): HTMLCanvasElement;
+    getDrawingBufferWidth(): number;
+    getDrawingBufferHeight(): number;
+    screenToDevice(val: number): number;
+    deviceToScreen(val: number): number;
+    supportColorComposition(): boolean;
+    createTexture(width: number, height: number, color: RColor, linear: boolean): Texture2D;
+    clearTexture(tex: Texture2D, color: RColor): void;
+    updateTextureWithImage(texture: Texture2D, bitmap: ImageData, x: number, y: number): void;
+    updateTextureWithCanvas(texture: Texture2D, ctx: CanvasRenderingContext2D, cvsOffsetX: number, cvsOffsetY: number, w: number, h: number, x: number, y: number): void;
+    getTextureWidth(texture: Texture2D): number;
+    getTextureHeight(texture: Texture2D): number;
+    disposeTexture(texture: Texture2D): void;
+    setCursorStyle(style: string): void;
+    getCursorStyle(): string;
+    drawQuads(data: Float32Array, texture: Texture2D): void;
+    flush(): void;
+    pushViewport(x: number, y: number, w: number, h: number): void;
+    popViewport(): void;
+    pushScissor(x: number, y: number, w: number, h: number): void;
+    popScissor(): void;
+    beginRender(): void;
+    endRender(): void;
+    beginCustomDraw(node: RNode): void;
+    endCustomDraw(node: RNode): void;
+}
+export declare function injectGUIEvents(gui: GUI, renderer: GUIRenderer): void;

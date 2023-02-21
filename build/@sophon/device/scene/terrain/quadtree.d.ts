@@ -1,0 +1,58 @@
+import { PatchPosition } from './types';
+import { BoundingBox } from '../bounding_volume';
+import { TerrainPatch } from './patch';
+import { IndexBuffer, PrimitiveType, StructuredBuffer, Texture2D } from '../../device';
+import { HeightField } from './heightfield';
+import type { Terrain } from './terrain';
+import type { Scene } from '../scene';
+export declare class QuadtreeNode {
+    private _patch;
+    private _parent;
+    private _children;
+    constructor();
+    initialize(scene: Scene, quadtree: Quadtree, parent: QuadtreeNode, position: PatchPosition, baseVertices: StructuredBuffer, normals: Float32Array, elevations: Float32Array): boolean;
+    setupCamera(viewportH: number, tanHalfFovy: number, maxPixelError: number): void;
+    getBoundingbox(): BoundingBox;
+    getPatch(): TerrainPatch;
+    getParent(): QuadtreeNode;
+    getChild(index: number): QuadtreeNode;
+}
+export declare class Quadtree {
+    private _baseVertices;
+    private _indices;
+    private _indicesWireframe;
+    private _normalMap;
+    private _scaleX;
+    private _scaleZ;
+    private _patchSize;
+    private _rootSizeX;
+    private _rootSizeZ;
+    private _rootSize;
+    private _primitiveCount;
+    private _primitiveType;
+    private _rootNode;
+    private _terrain;
+    private _heightField;
+    private _patches;
+    constructor(terrain: Terrain);
+    get normalMap(): Texture2D;
+    build(scene: Scene, patchSize: number, rootSizeX: number, rootSizeZ: number, elevations: Float32Array, scaleX: number, scaleZ: number, vertexCacheSize: number): boolean;
+    strip(vertexCacheSize: number): Uint16Array;
+    line(strip: Uint16Array): Uint16Array;
+    setupCamera(viewportH: number, tanHalfFovy: number, maxPixelError: number): void;
+    getBoundingBox(bbox: BoundingBox): void;
+    getPatchSize(): number;
+    getRootSize(): number;
+    getRootSizeX(): number;
+    getRootSizeZ(): number;
+    getTerrain(): Terrain;
+    getElevations(): Float32Array;
+    getScaleX(): number;
+    getScaleZ(): number;
+    getIndices(): IndexBuffer;
+    getIndicesWireframe(): IndexBuffer;
+    getPrimitiveCount(): number;
+    getPrimitiveType(): PrimitiveType;
+    getHeightField(): HeightField;
+    getPatches(): TerrainPatch[];
+}

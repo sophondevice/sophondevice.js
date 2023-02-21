@@ -1,0 +1,34 @@
+import { VectorBase, Vector3, IVector3Like, Matrix4x4 } from './vector';
+export declare class Plane extends VectorBase {
+    constructor();
+    constructor(a: number, b: number, c: number, d: number);
+    constructor(other: Plane);
+    constructor(origin: IVector3Like, normal: IVector3Like);
+    constructor(p0: IVector3Like, p1: IVector3Like, p2: IVector3Like);
+    get a(): number;
+    set a(val: number);
+    get b(): number;
+    set b(val: number);
+    get c(): number;
+    set c(val: number);
+    get d(): number;
+    set d(val: number);
+    get px(): number;
+    get py(): number;
+    get pz(): number;
+    get nx(): number;
+    get ny(): number;
+    get nz(): number;
+    assign(other: ArrayLike<number>): this;
+    set(a: number, b: number, c: number, d: number): this;
+    initWithOriginNormal(origin: IVector3Like, normal: IVector3Like): this;
+    initWithPoints(p0: IVector3Like, p1: IVector3Like, p2: IVector3Like): this;
+    distanceToPoint(p: IVector3Like): number;
+    nearestPointToPoint(p: IVector3Like, result?: Vector3): Vector3;
+    getNormal(result?: Vector3): Vector3;
+    inplaceFlip(): Plane;
+    inplaceNormalize(): Plane;
+    static flip(plane: Plane, result?: Plane): Plane;
+    static normalize(plane: Plane, result?: Plane): Plane;
+    static transform(plane: Plane, matrix: Matrix4x4, result?: Plane): Plane;
+}

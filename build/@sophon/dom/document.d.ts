@@ -1,0 +1,32 @@
+import { RNode } from './node';
+import { RNodeList } from './nodelist';
+import type { RElement } from './element';
+import type { RText } from './components/text';
+import type { GUI } from './gui';
+export declare class RDocument extends RNode {
+    constructor(uiscene: GUI);
+    get nodeType(): number;
+    get nodeName(): string;
+    get head(): RElement;
+    get body(): RElement;
+    get baseURI(): string;
+    set baseURI(val: string);
+    get textContent(): string;
+    set textContent(val: string);
+    get documentElement(): RElement;
+    get children(): RNodeList;
+    get childElementCount(): number;
+    get firstElementChild(): RElement;
+    get lastElementChild(): RElement;
+    appendChild(child: RNode): RNode;
+    insertBefore(newElement: RNode, referenceElement: RNode): RNode;
+    append(...nodes: (RNode | string)[]): void;
+    prepend(...nodes: (RNode | string)[]): void;
+    querySelectorAll(selectors: string): RNodeList;
+    querySelector<T extends RElement>(selectors: string): T;
+    getElementsByTagName(tagname: string): RNodeList;
+    getElementsByClassName(classnames: string): RNodeList;
+    getElementById(id: string): RElement;
+    createElement<T extends RElement = RElement>(tagname: string): T;
+    createTextNode(): RText;
+}

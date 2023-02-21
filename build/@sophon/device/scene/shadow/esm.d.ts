@@ -1,0 +1,33 @@
+import { ShadowImpl } from "./shadow_impl";
+import { TextureFormat, PBShaderExp, PBInsideFunctionScope, TextureSampler } from "../../device";
+import type { ShadowMapper, ShadowMapType, ShadowMode } from "./shadowmapper";
+export declare class ESM extends ShadowImpl {
+    constructor(kernelSize?: number, blurSize?: number, depthScale?: number);
+    resourceDirty(): boolean;
+    get blur(): boolean;
+    set blur(val: boolean);
+    get mipmap(): boolean;
+    set mipmap(b: boolean);
+    get kernelSize(): number;
+    set kernelSize(val: number);
+    get blurSize(): number;
+    set blurSize(val: number);
+    get logSpace(): boolean;
+    set logSpace(val: boolean);
+    getType(): ShadowMode;
+    dispose(): void;
+    getShadowMap(shadowMapper: ShadowMapper): ShadowMapType;
+    getShadowMapSampler(shadowMapper: ShadowMapper): TextureSampler;
+    doUpdateResources(shadowMapper: ShadowMapper): void;
+    postRenderShadowMap(shadowMapper: ShadowMapper): void;
+    getDepthScale(): number;
+    setDepthScale(val: number): void;
+    isSupported(shadowMapper: ShadowMapper): boolean;
+    getShaderHash(): string;
+    getShadowMapColorFormat(shadowMapper: ShadowMapper): TextureFormat;
+    getShadowMapDepthFormat(shadowMapper: ShadowMapper): TextureFormat;
+    computeShadowMapDepth(shadowMapper: ShadowMapper, scope: PBInsideFunctionScope): PBShaderExp;
+    computeShadowCSM(shadowMapper: ShadowMapper, scope: PBInsideFunctionScope, shadowVertex: PBShaderExp, NdotL: PBShaderExp, split: PBShaderExp): PBShaderExp;
+    computeShadow(shadowMapper: ShadowMapper, scope: PBInsideFunctionScope, shadowVertex: PBShaderExp, NdotL: PBShaderExp): PBShaderExp;
+    useNativeShadowMap(shadowMapper: ShadowMapper): boolean;
+}

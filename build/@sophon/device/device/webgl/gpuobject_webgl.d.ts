@@ -1,0 +1,37 @@
+import { Device } from '../device';
+import { BindGroup, VertexInputLayout, TextureSampler, BaseTexture, Texture2D, Texture2DArray, Texture3D, TextureCube, TextureVideo, FrameBuffer, GPUDataBuffer, GPUProgram, GPUObject } from '../gpuobject';
+import type { WebGLDevice } from './device_webgl';
+export declare abstract class WebGLGPUObject<T> implements GPUObject<T> {
+    protected _device: WebGLDevice;
+    protected _object: T;
+    protected _uid: number;
+    protected _cid: number;
+    protected _name: string;
+    protected _restoreHandler: (obj: GPUObject) => Promise<void>;
+    constructor(device: WebGLDevice);
+    get device(): Device;
+    get object(): T;
+    get disposed(): boolean;
+    get restoreHandler(): (obj: GPUObject) => Promise<void>;
+    set restoreHandler(handler: (obj: GPUObject) => Promise<void>);
+    get uid(): number;
+    get cid(): number;
+    get name(): string;
+    set name(val: string);
+    isVAO(): this is VertexInputLayout;
+    isFramebuffer(): this is FrameBuffer;
+    isSampler(): this is TextureSampler;
+    isTexture(): this is BaseTexture;
+    isTexture2D(): this is Texture2D;
+    isTexture2DArray(): this is Texture2DArray;
+    isTexture3D(): this is Texture3D;
+    isTextureCube(): this is TextureCube;
+    isTextureVideo(): this is TextureVideo;
+    isProgram(): this is GPUProgram;
+    isBuffer(): this is GPUDataBuffer;
+    isBindGroup(): this is BindGroup;
+    dispose(): void;
+    reload(): Promise<void>;
+    destroy(): void;
+    restore(): Promise<void>;
+}

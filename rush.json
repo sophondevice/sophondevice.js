@@ -424,30 +424,18 @@
     //   "tags": [ "tools" ]
     // }
     {
-      "packageName": "@sophon-build/base",
-      "projectFolder": "libs/base"
-    },
-    {
       "packageName": "@sophon/base",
-      "projectFolder": "libs/base/module",
+      "projectFolder": "build/@sophon/base",
       "shouldPublish": true
-    },
-    {
-      "packageName": "@sophon-build/device",
-      "projectFolder": "libs/device"
     },
     {
       "packageName": "@sophon/device",
-      "projectFolder": "libs/device/module",
+      "projectFolder": "build/@sophon/device",
       "shouldPublish": true
     },
     {
-      "packageName": "@sophon-build/dom",
-      "projectFolder": "libs/dom"
-    },
-    {
       "packageName": "@sophon/dom",
-      "projectFolder": "libs/dom/module",
+      "projectFolder": "build/@sophon/dom",
       "shouldPublish": true
     },
     {

@@ -1,0 +1,51 @@
+import { ShadowImpl } from "./shadow_impl";
+import { Blitter, BlitType } from "../blitter";
+import { BindGroup, TextureFormat, PBShaderExp, PBInsideFunctionScope, TextureSampler, PBGlobalScope } from "../../device";
+import type { ShadowMapper, ShadowMapType, ShadowMode } from "./shadowmapper";
+export declare class VSMBlitter extends Blitter {
+    protected _phase: 'horizonal' | 'vertical';
+    protected _packFloat: boolean;
+    protected _blurSize: number;
+    protected _kernelSize: number;
+    constructor(phase: 'horizonal' | 'vertical', kernelSize: number, blurSize: number, packFloat: boolean);
+    get blurSize(): number;
+    set blurSize(val: number);
+    get kernelSize(): number;
+    set kernelSize(val: number);
+    get packFloat(): boolean;
+    set packFloat(b: boolean);
+    setup(scope: PBGlobalScope, type: BlitType): void;
+    setUniforms(bindGroup: BindGroup): void;
+    readTexel(scope: PBInsideFunctionScope, type: BlitType, srcTex: PBShaderExp, srcUV: PBShaderExp, srcLayer: PBShaderExp): PBShaderExp;
+    writeTexel(scope: PBInsideFunctionScope, type: BlitType, srcUV: PBShaderExp, texel: PBShaderExp): PBShaderExp;
+    filter(scope: PBInsideFunctionScope, type: BlitType, srcTex: PBShaderExp, srcUV: PBShaderExp, srcLayer: PBShaderExp): PBShaderExp;
+    protected calcHash(): string;
+}
+export declare class VSM extends ShadowImpl {
+    constructor(kernelSize?: number, blurSize?: number, darkness?: number);
+    resourceDirty(): boolean;
+    get blur(): boolean;
+    set blur(val: boolean);
+    get mipmap(): boolean;
+    set mipmap(b: boolean);
+    get kernelSize(): number;
+    set kernelSize(val: number);
+    get blurSize(): number;
+    set blurSize(val: number);
+    getDepthScale(): number;
+    setDepthScale(val: number): void;
+    getType(): ShadowMode;
+    dispose(): void;
+    getShadowMap(shadowMapper: ShadowMapper): ShadowMapType;
+    getShadowMapSampler(shadowMapper: ShadowMapper): TextureSampler;
+    doUpdateResources(shadowMapper: ShadowMapper): void;
+    postRenderShadowMap(shadowMapper: ShadowMapper): void;
+    isSupported(shadowMapper: ShadowMapper): boolean;
+    getShaderHash(): string;
+    getShadowMapColorFormat(shadowMapper: ShadowMapper): TextureFormat;
+    getShadowMapDepthFormat(shadowMapper: ShadowMapper): TextureFormat;
+    computeShadowMapDepth(shadowMapper: ShadowMapper, scope: PBInsideFunctionScope): PBShaderExp;
+    computeShadowCSM(shadowMapper: ShadowMapper, scope: PBInsideFunctionScope, shadowVertex: PBShaderExp, NdotL: PBShaderExp, split: PBShaderExp): PBShaderExp;
+    computeShadow(shadowMapper: ShadowMapper, scope: PBInsideFunctionScope, shadowVertex: PBShaderExp, NdotL: PBShaderExp): PBShaderExp;
+    useNativeShadowMap(shadowMapper: ShadowMapper): boolean;
+}

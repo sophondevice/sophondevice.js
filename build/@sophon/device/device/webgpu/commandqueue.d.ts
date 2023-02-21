@@ -1,0 +1,36 @@
+import { Vector4 } from '@sophon/base';
+import { PrimitiveType } from '../base_types';
+import { WebGPURenderPass } from './renderpass_webgpu';
+import { WebGPUComputePass } from './computepass_webgpu';
+import type { WebGPUDevice } from './device';
+import type { WebGPUProgram } from './gpuprogram_webgpu';
+import type { WebGPUVertexInputLayout } from './vertexinputlayout_webgpu';
+import type { WebGPURenderStateSet } from './renderstates_webgpu';
+import type { WebGPUBindGroup } from './bindgroup_webgpu';
+import type { WebGPUFrameBuffer } from './framebuffer_webgpu';
+import type { FrameBufferInfo } from './pipeline_cache';
+import type { WebGPUBuffer } from './buffer_webgpu';
+import type { WebGPUBaseTexture } from './basetexture_webgpu';
+export declare class CommandQueueImmediate {
+    protected _renderPass: WebGPURenderPass;
+    protected _computePass: WebGPUComputePass;
+    constructor(device: WebGPUDevice);
+    get currentPass(): WebGPURenderPass | WebGPUComputePass;
+    beginFrame(): void;
+    endFrame(): void;
+    flush(): void;
+    setFramebuffer(fb: WebGPUFrameBuffer): void;
+    getFramebuffer(): WebGPUFrameBuffer;
+    getFramebufferInfo(): FrameBufferInfo;
+    compute(program: WebGPUProgram, bindGroups: WebGPUBindGroup[], bindGroupOffsets: Iterable<number>[], workgroupCountX: number, workgroupCountY: number, workgroupCountZ: number): void;
+    draw(program: WebGPUProgram, vertexData: WebGPUVertexInputLayout, stateSet: WebGPURenderStateSet, bindGroups: WebGPUBindGroup[], bindGroupOffsets: Iterable<number>[], primitiveType: PrimitiveType, first: number, count: number, numInstances: number): void;
+    setViewport(): any;
+    setViewport(x: number, y: number, w: number, h: number): void;
+    getViewport(): number[];
+    setScissor(): any;
+    setScissor(x: number, y: number, w: number, h: number): void;
+    getScissor(): number[];
+    clear(color: Vector4, depth: number, stencil: number): void;
+    isBufferUploading(buffer: WebGPUBuffer): boolean;
+    isTextureUploading(tex: WebGPUBaseTexture): boolean;
+}
