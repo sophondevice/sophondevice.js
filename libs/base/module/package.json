@@ -1,6 +1,6 @@
 {
   "name": "@sophon/base",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "base system for sophon device library",
   "homepage": "https://github.com/sophondevice/sophondevice#readme",
   "type": "module",

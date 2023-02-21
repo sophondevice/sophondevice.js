@@ -17,8 +17,8 @@ function getTargetES6() {
       sourcemap: true,
     },
     plugins: [
-      typescript(),
       nodeResolve(),
+      typescript(),
       babel({
         babelHelpers: 'bundled',
         babelrc: false,

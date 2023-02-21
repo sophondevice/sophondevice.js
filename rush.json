@@ -429,7 +429,8 @@
     },
     {
       "packageName": "@sophon/base",
-      "projectFolder": "libs/base/module"
+      "projectFolder": "libs/base/module",
+      "shouldPublish": true
     },
     {
       "packageName": "@sophon-build/device",
@@ -437,7 +438,8 @@
     },
     {
       "packageName": "@sophon/device",
-      "projectFolder": "libs/device/module"
+      "projectFolder": "libs/device/module",
+      "shouldPublish": true
     },
     {
       "packageName": "@sophon-build/dom",
@@ -445,7 +447,8 @@
     },
     {
       "packageName": "@sophon/dom",
-      "projectFolder": "libs/dom/module"
+      "projectFolder": "libs/dom/module",
+      "shouldPublish": true
     },
     {
       "packageName": "@sophon/test",
