@@ -1,9 +1,7 @@
 /** sophon base library */
 import '../../device/builder/ast.js';
-import { PBInsideFunctionScope } from '../../device/builder/programbuilder.js';
 import '../../device/builder/types.js';
-import '../../device/builder/builtinfunc.js';
-import '../../device/builder/constructors.js';
+import { PBInsideFunctionScope } from '../../device/builder/programbuilder.js';
 import { ShaderLib } from '../materiallib/shaderlib.js';
 import { RENDER_PASS_TYPE_MULTI_FORWARD, RENDER_PASS_TYPE_FORWARD, LIGHT_TYPE_DIRECTIONAL, LIGHT_TYPE_POINT, LIGHT_TYPE_SPOT } from '../values.js';
 

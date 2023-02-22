@@ -1,5 +1,5 @@
-import { PBShaderExp } from './programbuilder';
 import { TextureFormat } from '../base_types';
+import { PBShaderExp } from './base';
 declare const StorageTextureFormatMap: {
     rgba8unorm: TextureFormat;
     rgba8snorm: TextureFormat;

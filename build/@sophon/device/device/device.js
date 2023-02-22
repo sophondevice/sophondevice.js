@@ -4,10 +4,8 @@ import { CPUTimer } from './timer.js';
 import { AssetManager } from '../scene/asset/assetmanager.js';
 import { GPUResourceUsageFlags } from './gpuobject.js';
 import './builder/ast.js';
-import { ProgramBuilder } from './builder/programbuilder.js';
 import './builder/types.js';
-import './builder/builtinfunc.js';
-import './builder/constructors.js';
+import { ProgramBuilder } from './builder/programbuilder.js';
 
 const DEVICE_TYPE_WEBGL = 'webgl';
 const DEVICE_TYPE_WEBGL2 = 'webgl2';

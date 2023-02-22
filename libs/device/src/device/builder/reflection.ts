@@ -1,4 +1,5 @@
-import type {PBShaderExp, PBGlobalScope, ProgramBuilder} from './programbuilder';
+import type { PBGlobalScope, ProgramBuilder } from './programbuilder';
+import type { PBShaderExp } from './base';
 
 export type PBReflectionTagGetter = (scope: PBGlobalScope)=>PBShaderExp;
 

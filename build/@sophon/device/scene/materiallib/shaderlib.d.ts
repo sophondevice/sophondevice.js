@@ -1,4 +1,5 @@
-import { ProgramBuilder, PBShaderExp } from '../../device/builder';
+import { ProgramBuilder } from '../../device/builder';
+import { PBShaderExp } from '../../device/builder/base';
 export declare const MAX_BONE_MATRIX_UNIFORM = 36;
 export declare class ShaderLib {
     static readonly USAGE_VIEW_PROJ_MATRIX = "ch_usage_viewProjMatrix";

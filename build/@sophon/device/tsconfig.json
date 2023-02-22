@@ -25,8 +25,13 @@
     "stripInternal": true,
     "keyofStringsOnly": false,
     "rootDir": "../../../libs/device/src",
+    "outDir": ".",
     "declaration": true,
     "importHelpers": false,
+    "baseUrl": ".",
+    "paths": {
+      "@sophon/base": ["node_modules/@sophon/base"]
+    },
     "typeRoots": [
       "./node_modules/@types",
       "./node_modules/@webgpu/types"

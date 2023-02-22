@@ -21,10 +21,8 @@ import { Device, DeviceLostEvent, DeviceRestoreEvent } from '../device.js';
 import { SamplerCache } from './sampler_cache.js';
 import { WebGLStructuredBuffer } from './structuredbuffer_webgl.js';
 import '../builder/ast.js';
-import '../gpuobject.js';
 import { typeU16 } from '../builder/types.js';
-import '../builder/builtinfunc.js';
-import '../builder/constructors.js';
+import '../builder/programbuilder.js';
 
 class WebGLDevice extends Device {
     _context;

@@ -2,10 +2,8 @@
 import { Matrix4x4, Vector4 } from '@sophon/base';
 import { ShaderType } from '../../device/base_types.js';
 import '../../device/builder/ast.js';
-import '../../device/gpuobject.js';
 import { PBStructTypeInfo, typeF32Vec4, typeF32Vec3, typeF32, typeMat3 } from '../../device/builder/types.js';
-import '../../device/builder/builtinfunc.js';
-import '../../device/builder/constructors.js';
+import '../../device/builder/programbuilder.js';
 import { EnvConstantAmbient, EnvIBL } from './envlight.js';
 import { ShaderLib } from './shaderlib.js';
 import { MATERIAL_FUNC_NORMAL } from '../values.js';

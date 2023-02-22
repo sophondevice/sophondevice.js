@@ -10,20 +10,19 @@ import copy from 'rollup-plugin-copy';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const srcdir = path.join(__dirname, 'src');
+const destdir = path.join(__dirname, 'dist');
 const srcfiles = [];
 
 fs.readdirSync(srcdir).filter((dir) => {
   const fullpath = path.join(srcdir, dir);
   if (fs.statSync(fullpath).isDirectory()) {
     const main = path.join(fullpath, 'main.ts');
-    const html = path.join(fullpath, 'index.html');
+    const html = path.join('src', dir, 'index.html');
     if (fs.existsSync(main) && fs.statSync(main).isFile() && fs.existsSync(html) && fs.statSync(html).isFile()) {
       console.log('src files added: ' + main);
       srcfiles.push([
         main,
-        path.join(__dirname, 'dist', `${dir}.js`),
-        html,
-        path.join(__dirname, 'dist', `${dir}.html`)
+        dir
       ]);
     }
   }
@@ -36,7 +35,7 @@ function getTargetES6(input, output) {
     preserveSymlinks: false,
     output: {
       banner: '/** sophon dom library */',
-      file: output,
+      file: path.join(destdir, 'js', `${output}.js`),
       format: 'esm',
       sourcemap: true,
     },
@@ -60,6 +59,14 @@ function getTargetES6(input, output) {
         ]
       }),
       // terser()
+      copy({
+        targets: [{
+          src: `src/${output}/index.html`,
+          dest: 'dist',
+          rename: `${output}.html`
+        }],
+        verbose: true,
+      })
     ]
   };
 }

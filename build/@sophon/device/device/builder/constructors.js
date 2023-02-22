@@ -1,6 +1,6 @@
 /** sophon base library */
-import { ProgramBuilder, makeConstructor, PBShaderExp } from './programbuilder.js';
 import { TextureFormat } from '../base_types.js';
+import { makeConstructor, PBShaderExp } from './base.js';
 import { PBTextureType, PBPrimitiveType, typeF32, typeI32, typeU32, typeBool, typeF32Vec2, typeI32Vec2, typeU32Vec2, typeBVec2, typeF32Vec3, typeI32Vec3, typeU32Vec3, typeBVec3, typeF32Vec4, typeI32Vec4, typeU32Vec4, typeBVec4, typeMat2, typeMat2x3, typeMat2x4, typeMat3x2, typeMat3, typeMat3x4, typeMat4x2, typeMat4x3, typeMat4, typeTex1D, typeTex2D, typeTex3D, typeTexCube, typeTexDepth2D, typeTexDepthCube, typeTex2DArray, typeTexDepth2DArray, typeTexExternal, typeITex1D, typeITex2D, typeITex3D, typeITexCube, typeITex2DArray, typeUTex1D, typeUTex2D, typeUTex3D, typeUTexCube, typeUTex2DArray, typeSampler, typeSamplerComparison, PBTextureTypeInfo } from './types.js';
 import { ASTShaderExpConstructor } from './ast.js';
 import { PBDeviceNotSupport, PBParamTypeError } from './errors.js';
@@ -73,11 +73,6 @@ const primitiveCtors = {
     mat4x3: typeMat4x3,
     mat4: typeMat4
 };
-Object.keys(primitiveCtors).forEach(k => {
-    ProgramBuilder.prototype[k] = makeConstructor(function (...args) {
-        return vec_n.call(this, primitiveCtors[k], ...args);
-    }, primitiveCtors[k]);
-});
 const simpleCtors = {
     tex1D: typeTex1D,
     tex2D: typeTex2D,
@@ -101,11 +96,6 @@ const simpleCtors = {
     sampler: typeSampler,
     samplerComparison: typeSamplerComparison,
 };
-Object.keys(simpleCtors).forEach(k => {
-    ProgramBuilder.prototype[k] = function (rhs) {
-        return new PBShaderExp(rhs, simpleCtors[k]);
-    };
-});
 function makeStorageTextureCtor(type) {
     const ctor = {};
     for (const k of Object.keys(StorageTextureFormatMap)) {
@@ -121,7 +111,21 @@ const texStorageCtors = {
     texStorage2DArray: PBTextureType.TEX_STORAGE_2D_ARRAY,
     texStorage3D: PBTextureType.TEX_STORAGE_3D
 };
-Object.keys(texStorageCtors).forEach(k => {
-    ProgramBuilder.prototype[k] = makeStorageTextureCtor(texStorageCtors[k]);
-});
+function setConstructors(cls) {
+    Object.keys(primitiveCtors).forEach(k => {
+        cls.prototype[k] = makeConstructor(function (...args) {
+            return vec_n.call(this, primitiveCtors[k], ...args);
+        }, primitiveCtors[k]);
+    });
+    Object.keys(simpleCtors).forEach(k => {
+        cls.prototype[k] = function (rhs) {
+            return new PBShaderExp(rhs, simpleCtors[k]);
+        };
+    });
+    Object.keys(texStorageCtors).forEach(k => {
+        cls.prototype[k] = makeStorageTextureCtor(texStorageCtors[k]);
+    });
+}
+
+export { setConstructors };
 //# sourceMappingURL=constructors.js.map

@@ -8,8 +8,7 @@ import { MAX_FORWARD_LIGHT_COUNT, RENDER_PASS_TYPE_FORWARD, MATERIAL_FUNC_NORMAL
 import '../../device/gpuobject.js';
 import '../../device/builder/ast.js';
 import '../../device/builder/types.js';
-import '../../device/builder/builtinfunc.js';
-import '../../device/builder/constructors.js';
+import '../../device/builder/programbuilder.js';
 import '../materiallib/lightmodel.js';
 import '@sophon/base';
 

@@ -1,8 +1,9 @@
-import { PBShaderExp, ProgramBuilder, ShaderTypeFunc, makeConstructor } from './programbuilder';
 import { TextureFormat } from '../base_types';
+import { PBShaderExp, ShaderTypeFunc, makeConstructor } from './base';
 import * as typeinfo from './types';
 import * as AST from './ast';
 import * as errors from './errors';
+import type { ProgramBuilder } from './programbuilder';
 
 const StorageTextureFormatMap = {
   rgba8unorm: TextureFormat.RGBA8UNORM,
@@ -77,12 +78,6 @@ const primitiveCtors = {
   mat4: typeinfo.typeMat4
 };
 
-Object.keys(primitiveCtors).forEach(k => {
-  ProgramBuilder.prototype[k] = makeConstructor(function (this: ProgramBuilder, ...args: any[]): PBShaderExp {
-    return vec_n.call(this, primitiveCtors[k], ...args);
-  } as ShaderTypeFunc, primitiveCtors[k]);
-});
-
 const simpleCtors = {
   tex1D: typeinfo.typeTex1D,
   tex2D: typeinfo.typeTex2D,
@@ -107,12 +102,6 @@ const simpleCtors = {
   samplerComparison: typeinfo.typeSamplerComparison,
 };
 
-Object.keys(simpleCtors).forEach(k => {
-  ProgramBuilder.prototype[k] = function (this: ProgramBuilder, rhs: string): PBShaderExp {
-    return new PBShaderExp(rhs, simpleCtors[k]);
-  };
-});
-
 function makeStorageTextureCtor(type: typeinfo.PBTextureType): StorageTextureConstructor {
   const ctor = {} as StorageTextureConstructor;
   for (const k of Object.keys(StorageTextureFormatMap)) {
@@ -130,9 +119,22 @@ const texStorageCtors = {
   texStorage3D: typeinfo.PBTextureType.TEX_STORAGE_3D
 };
 
-Object.keys(texStorageCtors).forEach(k => {
-  ProgramBuilder.prototype[k] = makeStorageTextureCtor(texStorageCtors[k]);
-});
+/** @internal */
+export function setConstructors(cls: typeof ProgramBuilder) {
+  Object.keys(primitiveCtors).forEach(k => {
+    cls.prototype[k] = makeConstructor(function (this: ProgramBuilder, ...args: any[]): PBShaderExp {
+      return vec_n.call(this, primitiveCtors[k], ...args);
+    } as ShaderTypeFunc, primitiveCtors[k]);
+  });
+  Object.keys(simpleCtors).forEach(k => {
+    cls.prototype[k] = function (this: ProgramBuilder, rhs: string): PBShaderExp {
+      return new PBShaderExp(rhs, simpleCtors[k]);
+    };
+  });
+  Object.keys(texStorageCtors).forEach(k => {
+    cls.prototype[k] = makeStorageTextureCtor(texStorageCtors[k]);
+  });  
+}
 
 /*
 ProgramBuilder.prototype.texStorage1D = makeStorageTextureCtor(typeinfo.PBTextureType.TEX_STORAGE_1D);

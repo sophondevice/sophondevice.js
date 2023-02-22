@@ -1,10 +1,8 @@
 /** sophon base library */
 import { hasStencilChannel } from '../base_types.js';
 import '../builder/ast.js';
-import '../gpuobject.js';
 import { typeU16 } from '../builder/types.js';
-import '../builder/builtinfunc.js';
-import '../builder/constructors.js';
+import '../builder/programbuilder.js';
 import { WebGPUMipmapGenerator, WebGPUClearQuad } from './utils_webgpu.js';
 
 const VALIDATION_NEED_NEW_PASS = 1 << 0;

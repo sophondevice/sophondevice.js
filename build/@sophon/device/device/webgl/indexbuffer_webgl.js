@@ -1,11 +1,9 @@
 /** sophon base library */
 import { WebGLGPUBuffer } from './buffer_webgl.js';
 import '../builder/ast.js';
-import '../base_types.js';
-import { GPUResourceUsageFlags } from '../gpuobject.js';
 import { typeU16, typeU32 } from '../builder/types.js';
-import '../builder/builtinfunc.js';
-import '../builder/constructors.js';
+import '../builder/programbuilder.js';
+import { GPUResourceUsageFlags } from '../gpuobject.js';
 
 class WebGLIndexBuffer extends WebGLGPUBuffer {
     indexType;

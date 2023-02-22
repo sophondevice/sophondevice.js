@@ -1,10 +1,8 @@
 /** sophon base library */
 import { VERTEX_ATTRIB_POSITION, VERTEX_ATTRIB_BLEND_INDICES, VERTEX_ATTRIB_BLEND_WEIGHT, VERTEX_ATTRIB_NORMAL, VERTEX_ATTRIB_TANGENT } from '../../device/gpuobject.js';
 import '../../device/builder/ast.js';
-import { PBInsideFunctionScope } from '../../device/builder/programbuilder.js';
 import { PBPrimitiveType } from '../../device/builder/types.js';
-import '../../device/builder/builtinfunc.js';
-import '../../device/builder/constructors.js';
+import { PBInsideFunctionScope } from '../../device/builder/programbuilder.js';
 
 const MAX_BONE_MATRIX_UNIFORM = 36;
 class ShaderLib {

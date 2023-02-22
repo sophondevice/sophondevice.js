@@ -1,8 +1,8 @@
 import * as typeinfo from './types';
-import * as AST from './ast';
-import { ExpValueType, PBShaderExp, ProgramBuilder } from './programbuilder';
-import * as _ from './constructors';
-import * as errors from './errors';
+import { ASTExpression, ASTUnaryFunc, ASTBinaryFunc } from './ast';
+import { PBShaderExp } from './base';
+import { PBDeviceNotSupport, PBOverloadingMatchError, PBParamLengthError, PBParamTypeError, PBParamValueError } from './errors';
+import type { ExpValueType, ProgramBuilder } from './programbuilder';
 
 const genTypeList = [
   [typeinfo.typeF32, typeinfo.typeF32Vec2, typeinfo.typeF32Vec3, typeinfo.typeF32Vec4],
@@ -23,16 +23,16 @@ function matchFunctionOverloadings(pb: ProgramBuilder, name: string, ...args: Ex
   const bit = pb.getDeviceType() === 'webgl' ? MASK_WEBGL1 : (pb.getDeviceType() === 'webgl2' ? MASK_WEBGL2 : MASK_WEBGPU);
   const overloadings = builtinFunctionsAll?.[name].overloads.filter(val => !!(val[1] & bit)).map(val => val[0]);
   if (!overloadings || overloadings.length === 0) {
-    throw new errors.PBDeviceNotSupport(`builtin shader function '${name}'`);
+    throw new PBDeviceNotSupport(`builtin shader function '${name}'`);
   }
   const argsNonArray = args.map(val => pb.normalizeExpValue(val));
   const matchResult = pb._matchFunctionOverloading(overloadings, argsNonArray);
   if (!matchResult) {
-    throw new errors.PBOverloadingMatchError(name);
+    throw new PBOverloadingMatchError(name);
   }
   return matchResult;
 }
-function callBuiltinChecked(pb: ProgramBuilder, matchResult: [typeinfo.PBFunctionTypeInfo, AST.ASTExpression[]]) {
+function callBuiltinChecked(pb: ProgramBuilder, matchResult: [typeinfo.PBFunctionTypeInfo, ASTExpression[]]) {
   return pb.$callFunction(matchResult[0].name, matchResult[1], matchResult[0].returnType);
 }
 function callBuiltin(pb: ProgramBuilder, name: string, ...args: ExpValueType[]): PBShaderExp {
@@ -74,20 +74,20 @@ function genType(name: string, shaderTypeMask, r: typeinfo.PBTypeInfo | number, 
   }
 }
 
-function unaryFunc(a: AST.ASTExpression, op: string, type: typeinfo.PBTypeInfo): PBShaderExp {
+function unaryFunc(a: ASTExpression, op: string, type: typeinfo.PBTypeInfo): PBShaderExp {
   const exp = new PBShaderExp('', type);
-  exp.$ast = new AST.ASTUnaryFunc(a, op, type);
+  exp.$ast = new ASTUnaryFunc(a, op, type);
   return exp;
 }
 
 function binaryFunc(
-  a: AST.ASTExpression,
-  b: AST.ASTExpression,
+  a: ASTExpression,
+  b: ASTExpression,
   op: string,
   type: typeinfo.PBTypeInfo
 ): PBShaderExp {
   const exp = new PBShaderExp('', type);
-  exp.$ast = new AST.ASTBinaryFunc(a, b, op, type);
+  exp.$ast = new ASTBinaryFunc(a, b, op, type);
   return exp;
 }
 
@@ -136,7 +136,7 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
     overloads: [],
     normalizeFunc(pb, name, ...args) {
       if (args.length < 2) {
-        throw new errors.PBParamLengthError('add');
+        throw new PBParamLengthError('add');
       }
       let result = args[0];
       for (let i = 1; i < args.length; i++) {
@@ -304,7 +304,7 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
     overloads: [],
     normalizeFunc(pb, name, ...args) {
       if (args.length < 2) {
-        throw new errors.PBParamLengthError('mul');
+        throw new PBParamLengthError('mul');
       }
       let result = args[0];
       for (let i = 1; i < args.length; i++) {
@@ -325,7 +325,7 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
       const argType = matchResult[1][0].getType();
       const isIntegerType = argType.isPrimitiveType() && (argType.scalarType === typeinfo.PBPrimitiveType.I32 || argType.scalarType === typeinfo.PBPrimitiveType.U32);
       if (pb.getDeviceType() === 'webgl' && isIntegerType) {
-        throw new errors.PBDeviceNotSupport('integer modulus');
+        throw new PBDeviceNotSupport('integer modulus');
       }
       if (pb.getDeviceType() === 'webgpu' || isIntegerType) {
         return binaryFunc(matchResult[1][0], matchResult[1][1], '%', matchResult[0].returnType);
@@ -665,7 +665,7 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
     overloads: [],
     normalizeFunc(pb, name, ...args) {
       if (args.length < 2) {
-        throw new errors.PBParamLengthError('and');
+        throw new PBParamLengthError('and');
       }
       let result = args[0];
       for (let i = 1; i < args.length; i++) {
@@ -684,13 +684,13 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
   arrayLength: {
     normalizeFunc(pb, name, ...args) {
       if (pb.getDeviceType() !== 'webgpu') {
-        throw new errors.PBDeviceNotSupport('arrayLength builtin function');
+        throw new PBDeviceNotSupport('arrayLength builtin function');
       }
       if (args.length !== 1
         || !(args[0] instanceof PBShaderExp)
         || !args[0].$ast.getType().isPointerType()
         || !((args[0].$ast.getType() as typeinfo.PBPointerTypeInfo).pointerType.isArrayType())) {
-        throw new errors.PBParamTypeError('arrayLength');
+        throw new PBParamTypeError('arrayLength');
       }
       return pb.$callFunction(name, [args[0].$ast], typeinfo.typeU32);
     }
@@ -906,19 +906,19 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
     ],
     normalizeFunc(pb, name, ...args) {
       if (args.length < 1 || args.length > 2) {
-        throw new errors.PBParamLengthError('textureDimensions');
+        throw new PBParamLengthError('textureDimensions');
       }
       if (!(args[0] instanceof PBShaderExp)) {
-        throw new errors.PBParamValueError('textureDimensions', 'tex');
+        throw new PBParamValueError('textureDimensions', 'tex');
       }
       const texType = args[0].$ast.getType();
       if (!texType.isTextureType()) {
-        throw new errors.PBParamTypeError('textureDimensions', 'tex');
+        throw new PBParamTypeError('textureDimensions', 'tex');
       }
       if (pb.getDeviceType() === 'webgpu') {
         if (texType.isMultisampledTexture() || texType.isStorageTexture()) {
           if (args[1] !== undefined) {
-            throw new errors.PBParamValueError('textureDimensions', 'level');
+            throw new PBParamValueError('textureDimensions', 'level');
           }
         }
         return callBuiltin(pb, name, ...args);
@@ -1002,31 +1002,31 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
     ],
     normalizeFunc(pb, name, ...args) {
       if (args.length === 0) {
-        throw new errors.PBParamLengthError('textureLoad');
+        throw new PBParamLengthError('textureLoad');
       }
       if (!(args[0] instanceof PBShaderExp)) {
-        throw new errors.PBParamValueError('textureLoad', 'tex');
+        throw new PBParamValueError('textureLoad', 'tex');
       }
       const texType = args[0].$ast.getType();
       if (!texType.isTextureType()) {
-        throw new errors.PBParamTypeError('textureLoad', 'tex');
+        throw new PBParamTypeError('textureLoad', 'tex');
       }
       if (pb.getDeviceType() === 'webgl2') {
         if (args.length !== 3) {
-          throw new errors.PBParamLengthError('textureLoad');
+          throw new PBParamLengthError('textureLoad');
         }
         if (texType.is1DTexture()) {
           if (typeof args[1] === 'number') {
             if (!Number.isInteger(args[1])) {
-              throw new errors.PBParamTypeError('textureLoad', 'coord');
+              throw new PBParamTypeError('textureLoad', 'coord');
             }
           } else if (args[1] instanceof PBShaderExp) {
             const coordType = args[1].$ast.getType();
             if (!coordType.isPrimitiveType() || !coordType.isScalarType() || coordType.scalarType !== typeinfo.PBPrimitiveType.I32) {
-              throw new errors.PBParamTypeError('textureLoad', 'coord');
+              throw new PBParamTypeError('textureLoad', 'coord');
             }
           } else {
-            throw new errors.PBParamTypeError('textureLoad', 'coord');
+            throw new PBParamTypeError('textureLoad', 'coord');
           }
           args[1] = pb.ivec2(args[1], 0);
         }
@@ -1050,7 +1050,7 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
     normalizeFunc(pb, name, ...args) {
       if (pb.getDeviceType() === 'webgl2') {
         if (args.length !== 4) {
-          throw new errors.PBParamLengthError('textureArrayLoad');
+          throw new PBParamLengthError('textureArrayLoad');
         }
         const tex = args[0];
         const coords = pb.ivec3(args[1] as PBShaderExp, args[2] as PBShaderExp);
@@ -1226,15 +1226,15 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
     ],
     normalizeFunc(pb, name, ...args) {
       if (args.length !== 2) {
-        throw new errors.PBParamLengthError('textureSample');
+        throw new PBParamLengthError('textureSample');
       }
       const tex = args[0];
       if (!(tex instanceof PBShaderExp)) {
-        throw new errors.PBParamTypeError('textureSample', 'texture');
+        throw new PBParamTypeError('textureSample', 'texture');
       }
       const texType = tex.$ast.getType();
       if (!texType.isTextureType()) {
-        throw new errors.PBParamTypeError('textureSample', 'texture');
+        throw new PBParamTypeError('textureSample', 'texture');
       }
       if (pb.getDeviceType() === 'webgpu') {
         if (texType.isExternalTexture()) {
@@ -1255,10 +1255,10 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
           if (args[1] instanceof PBShaderExp) {
             const coordType = args[1].$ast.getType();
             if (!coordType.isPrimitiveType() || !coordType.isScalarType() || coordType.scalarType !== typeinfo.PBPrimitiveType.F32) {
-              throw new errors.PBParamTypeError('textureSample', 'coord');
+              throw new PBParamTypeError('textureSample', 'coord');
             }
           } else if (typeof args[1] !== 'number') {
-            throw new errors.PBParamTypeError('textureSample', 'coord');
+            throw new PBParamTypeError('textureSample', 'coord');
           }
           args[1] = pb.vec2(args[1], 0);
         }
@@ -1277,15 +1277,15 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
     ],
     normalizeFunc(pb, name, ...args) {
       if (args.length !== 3) {
-        throw new errors.PBParamLengthError('textureArraySample');
+        throw new PBParamLengthError('textureArraySample');
       }
       const tex = args[0];
       if (!(tex instanceof PBShaderExp)) {
-        throw new errors.PBParamTypeError('textureArraySample', 'texture');
+        throw new PBParamTypeError('textureArraySample', 'texture');
       }
       const texType = tex.$ast.getType();
       if (!texType.isTextureType()) {
-        throw new errors.PBParamTypeError('textureArraySample', 'texture');
+        throw new PBParamTypeError('textureArraySample', 'texture');
       }
       if (pb.getDeviceType() === 'webgpu') {
         const sampler = pb.getDefaultSampler(tex, false);
@@ -1320,15 +1320,15 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
     ],
     normalizeFunc(pb, name, ...args) {
       if (args.length !== 3) {
-        throw new errors.PBParamLengthError('textureSampleBias');
+        throw new PBParamLengthError('textureSampleBias');
       }
       const tex = args[0];
       if (!(tex instanceof PBShaderExp)) {
-        throw new errors.PBParamTypeError('textureSampleBias', 'texture');
+        throw new PBParamTypeError('textureSampleBias', 'texture');
       }
       const texType = tex.$ast.getType();
       if (!texType.isTextureType()) {
-        throw new errors.PBParamTypeError('textureSampleBias', 'texture');
+        throw new PBParamTypeError('textureSampleBias', 'texture');
       }
       if (pb.getDeviceType() === 'webgpu') {
         const sampler = pb.getDefaultSampler(tex, false);
@@ -1348,15 +1348,15 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
     ],
     normalizeFunc(pb, name, ...args) {
       if (args.length !== 4) {
-        throw new errors.PBParamLengthError('textureArraySampleBias');
+        throw new PBParamLengthError('textureArraySampleBias');
       }
       const tex = args[0];
       if (!(tex instanceof PBShaderExp)) {
-        throw new errors.PBParamTypeError('textureArraySampleBias', 'texture');
+        throw new PBParamTypeError('textureArraySampleBias', 'texture');
       }
       const texType = tex.$ast.getType();
       if (!texType.isTextureType()) {
-        throw new errors.PBParamTypeError('textureArraySampleBias', 'texture');
+        throw new PBParamTypeError('textureArraySampleBias', 'texture');
       }
       if (pb.getDeviceType() === 'webgpu') {
         const sampler = pb.getDefaultSampler(tex, false);
@@ -1380,15 +1380,15 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
     ],
     normalizeFunc(pb, name, ...args) {
       if (args.length !== 3) {
-        throw new errors.PBParamLengthError('textureSampleCompare');
+        throw new PBParamLengthError('textureSampleCompare');
       }
       const tex = args[0];
       if (!(tex instanceof PBShaderExp)) {
-        throw new errors.PBParamTypeError('textureSampleCompare', 'texture');
+        throw new PBParamTypeError('textureSampleCompare', 'texture');
       }
       const texType = tex.$ast.getType();
       if (!texType.isTextureType() || !texType.isDepthTexture()) {
-        throw new errors.PBParamTypeError('textureSampleCompare', 'texture');
+        throw new PBParamTypeError('textureSampleCompare', 'texture');
       }
       if (pb.getDeviceType() === 'webgpu') {
         const sampler = pb.getDefaultSampler(args[0] as PBShaderExp, true);
@@ -1414,15 +1414,15 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
     ],
     normalizeFunc(pb, name, ...args) {
       if (args.length !== 4) {
-        throw new errors.PBParamLengthError('textureArraySampleCompare');
+        throw new PBParamLengthError('textureArraySampleCompare');
       }
       const tex = args[0];
       if (!(tex instanceof PBShaderExp)) {
-        throw new errors.PBParamTypeError('textureArraySampleCompare', 'texture');
+        throw new PBParamTypeError('textureArraySampleCompare', 'texture');
       }
       const texType = tex.$ast.getType();
       if (!texType.isTextureType() || !texType.isDepthTexture()) {
-        throw new errors.PBParamTypeError('textureArraySampleCompare', 'texture');
+        throw new PBParamTypeError('textureArraySampleCompare', 'texture');
       }
       if (pb.getDeviceType() === 'webgpu') {
         const sampler = pb.getDefaultSampler(args[0] as PBShaderExp, true);
@@ -1458,11 +1458,11 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
     normalizeFunc(pb, name, ...args) {
       const tex = args[0];
       if (!(tex instanceof PBShaderExp)) {
-        throw new errors.PBParamTypeError('textureSampleLevel', 'texture');
+        throw new PBParamTypeError('textureSampleLevel', 'texture');
       }
       const texType = tex.$ast.getType();
       if (!texType.isTextureType()) {
-        throw new errors.PBParamTypeError('textureSampleLevel', 'texture');
+        throw new PBParamTypeError('textureSampleLevel', 'texture');
       }
       if (pb.getDeviceType() === 'webgpu') {
         if (texType.isExternalTexture()) {
@@ -1494,15 +1494,15 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
     ],
     normalizeFunc(pb, name, ...args) {
       if (args.length !== 4) {
-        throw new errors.PBParamLengthError('textureArraySampleLevel');
+        throw new PBParamLengthError('textureArraySampleLevel');
       }
       const tex = args[0];
       if (!(tex instanceof PBShaderExp)) {
-        throw new errors.PBParamTypeError('textureArraySampleLevel', 'texture');
+        throw new PBParamTypeError('textureArraySampleLevel', 'texture');
       }
       const texType = tex.$ast.getType();
       if (!texType.isTextureType()) {
-        throw new errors.PBParamTypeError('textureArraySampleLevel', 'texture');
+        throw new PBParamTypeError('textureArraySampleLevel', 'texture');
       }
       if (pb.getDeviceType() === 'webgpu') {
         const sampler = pb.getDefaultSampler(tex, false);
@@ -1530,15 +1530,15 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
     ],
     normalizeFunc(pb, name, ...args) {
       if (args.length !== 3) {
-        throw new errors.PBParamLengthError('textureSampleCompareLevel');
+        throw new PBParamLengthError('textureSampleCompareLevel');
       }
       const tex = args[0];
       if (!(tex instanceof PBShaderExp)) {
-        throw new errors.PBParamTypeError('textureSampleCompareLevel', 'texture');
+        throw new PBParamTypeError('textureSampleCompareLevel', 'texture');
       }
       const texType = tex.$ast.getType();
       if (!texType.isTextureType() || !texType.isDepthTexture()) {
-        throw new errors.PBParamTypeError('textureSampleCompareLevel', 'texture');
+        throw new PBParamTypeError('textureSampleCompareLevel', 'texture');
       }
       if (pb.getDeviceType() === 'webgpu') {
         const sampler = pb.getDefaultSampler(tex, true);
@@ -1564,15 +1564,15 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
     ],
     normalizeFunc(pb, name, ...args) {
       if (args.length !== 4) {
-        throw new errors.PBParamLengthError('textureArraySampleCompareLevel');
+        throw new PBParamLengthError('textureArraySampleCompareLevel');
       }
       const tex = args[0];
       if (!(tex instanceof PBShaderExp)) {
-        throw new errors.PBParamTypeError('textureArraySampleCompareLevel', 'texture');
+        throw new PBParamTypeError('textureArraySampleCompareLevel', 'texture');
       }
       const texType = tex.$ast.getType();
       if (!texType.isTextureType() || !texType.isDepthTexture()) {
-        throw new errors.PBParamTypeError('textureArraySampleCompareLevel', 'texture');
+        throw new PBParamTypeError('textureArraySampleCompareLevel', 'texture');
       }
       if (pb.getDeviceType() === 'webgpu') {
         const sampler = pb.getDefaultSampler(tex, true);
@@ -1598,15 +1598,15 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
     ],
     normalizeFunc(pb, name, ...args) {
       if (args.length !== 4) {
-        throw new errors.PBParamLengthError('textureSampleGrad');
+        throw new PBParamLengthError('textureSampleGrad');
       }
       const tex = args[0];
       if (!(tex instanceof PBShaderExp)) {
-        throw new errors.PBParamTypeError('textureSampleGrad', 'texture');
+        throw new PBParamTypeError('textureSampleGrad', 'texture');
       }
       const texType = tex.$ast.getType();
       if (!texType.isTextureType()) {
-        throw new errors.PBParamTypeError('textureSampleGrad', 'texture');
+        throw new PBParamTypeError('textureSampleGrad', 'texture');
       }
       if (pb.getDeviceType() === 'webgpu') {
         const sampler = pb.getDefaultSampler(tex, false);
@@ -1626,15 +1626,15 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
     ],
     normalizeFunc(pb, name, ...args) {
       if (args.length !== 5) {
-        throw new errors.PBParamLengthError('textureArraySampleGrad');
+        throw new PBParamLengthError('textureArraySampleGrad');
       }
       const tex = args[0];
       if (!(tex instanceof PBShaderExp)) {
-        throw new errors.PBParamTypeError('textureArraySampleGrad', 'texture');
+        throw new PBParamTypeError('textureArraySampleGrad', 'texture');
       }
       const texType = tex.$ast.getType();
       if (!texType.isTextureType() || !texType.isArrayTexture()) {
-        throw new errors.PBParamTypeError('textureArraySampleGrad', 'texture');
+        throw new PBParamTypeError('textureArraySampleGrad', 'texture');
       }
       if (pb.getDeviceType() === 'webgpu') {
         const sampler = pb.getDefaultSampler(tex, false);
@@ -1650,10 +1650,12 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
   workgroupBarrier: { overloads: genType('workgroupBarrier', MASK_WEBGPU, typeinfo.typeVoid, []) },
 };
 
-for (const k of Object.keys(builtinFunctionsAll)) {
-  ProgramBuilder.prototype[k] = function (this: ProgramBuilder, ...args: ExpValueType[]): PBShaderExp {
-    const normalizeFunc = builtinFunctionsAll?.[k]?.normalizeFunc || callBuiltin;
-    return normalizeFunc(this, k, ...args);
+/** @internal */
+export function setBuiltinFuncs(cls: typeof ProgramBuilder) {
+  for (const k of Object.keys(builtinFunctionsAll)) {
+    cls.prototype[k] = function (this: ProgramBuilder, ...args: ExpValueType[]): PBShaderExp {
+      const normalizeFunc = builtinFunctionsAll?.[k]?.normalizeFunc || callBuiltin;
+      return normalizeFunc(this, k, ...args);
+    }
   }
 }
-

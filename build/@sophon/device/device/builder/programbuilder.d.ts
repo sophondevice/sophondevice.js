@@ -1,16 +1,12 @@
 import { ShaderType } from '../base_types';
-import { GPUProgram, BindGroupLayout, VertexSemantic } from '../gpuobject';
+import { GPUProgram, BindGroupLayout } from '../gpuobject';
 import { PBReflection } from './reflection';
+import { PBShaderExp, ShaderTypeFunc } from './base';
 import { PBStructLayout, PBStructTypeInfo } from './types';
-import type { StorageTextureConstructor } from './constructors';
 import type { DeviceType, Device } from '../device';
+import type { StorageTextureConstructor } from './constructors';
 export type ExpValueNonArrayType = number | boolean | PBShaderExp;
 export type ExpValueType = ExpValueNonArrayType | Array<ExpValueType>;
-export type ShaderTypeFunc = {
-    (...args: any[]): PBShaderExp;
-    ptr: ShaderTypeFunc;
-    [dim: number]: ShaderTypeFunc;
-};
 export declare namespace ProgramBuilder {
     type VertexAttribSet = {
         [attrib: number]: PBShaderExp;
@@ -31,10 +27,6 @@ export declare namespace ProgramBuilder {
         workgroupSize: [number, number, number];
         compute: (this: PBGlobalScope) => void;
     };
-    interface ShaderExpTagRecord {
-        [name: string]: ShaderExpTagValue;
-    }
-    type ShaderExpTagValue = string[] | string | ShaderExpTagRecord;
 }
 export interface ProgramBuilder {
     float: {
@@ -523,22 +515,5 @@ export declare class PBNakedScope extends PBInsideFunctionScope {
 export declare class PBIfScope extends PBInsideFunctionScope {
     $elseif(condition: ExpValueNonArrayType, body: (this: PBIfScope) => void): PBIfScope;
     $else(body: (this: PBIfScope) => void): void;
-}
-export declare class PBShaderExp extends Proxiable<PBShaderExp> {
-    [name: string]: any;
-    uniform(group: number): PBShaderExp;
-    workgroup(): PBShaderExp;
-    storage(group: number): PBShaderExp;
-    attrib(attr: VertexSemantic): PBShaderExp;
-    tag(...args: ProgramBuilder.ShaderExpTagValue[]): PBShaderExp;
-    sampleType(type: 'float' | 'unfilterable-float' | 'sint' | 'uint' | 'depth'): PBShaderExp;
-    at(index: number | PBShaderExp): PBShaderExp;
-    setAt(index: number | PBShaderExp, val: number | boolean | PBShaderExp): void;
-    highp(): PBShaderExp;
-    mediump(): PBShaderExp;
-    lowp(): PBShaderExp;
-    isVector(): boolean;
-    numComponents(): number;
-    getTypeName(): string;
 }
 export {};

@@ -20,6 +20,7 @@ importers:
       '@typescript-eslint/parser': ^5.51.0
       '@web/dev-server': ^0.1.35
       '@webgpu/types': ^0.1.26
+      cross-env: ^7.0.3
       dts-bundle-generator: ^7.2.0
       eslint: ^8.33.0
       eslint-config-prettier: ^8.6.0
@@ -51,6 +52,7 @@ importers:
       '@typescript-eslint/eslint-plugin': 5.51.0_0fb7d53160f0e41e16372a0eab719cf9
       '@typescript-eslint/parser': 5.51.0_eslint@8.33.0+typescript@4.9.5
       '@web/dev-server': 0.1.35
+      cross-env: 7.0.3
       dts-bundle-generator: 7.2.0
       eslint: 8.33.0
       eslint-config-prettier: 8.6.0_eslint@8.33.0
@@ -84,6 +86,7 @@ importers:
       '@typescript-eslint/parser': ^5.51.0
       '@web/dev-server': ^0.1.35
       '@webgpu/types': ^0.1.26
+      cross-env: ^7.0.3
       dts-bundle-generator: ^7.2.0
       eslint: ^8.33.0
       eslint-config-prettier: ^8.6.0
@@ -116,6 +119,7 @@ importers:
       '@typescript-eslint/eslint-plugin': 5.51.0_0fb7d53160f0e41e16372a0eab719cf9
       '@typescript-eslint/parser': 5.51.0_eslint@8.33.0+typescript@4.9.5
       '@web/dev-server': 0.1.35
+      cross-env: 7.0.3
       dts-bundle-generator: 7.2.0
       eslint: 8.33.0
       eslint-config-prettier: 8.6.0_eslint@8.33.0
@@ -150,6 +154,7 @@ importers:
       '@typescript-eslint/parser': ^5.51.0
       '@web/dev-server': ^0.1.35
       '@webgpu/types': ^0.1.26
+      cross-env: ^7.0.3
       dts-bundle-generator: ^7.2.0
       eslint: ^8.33.0
       eslint-config-prettier: ^8.6.0
@@ -183,6 +188,7 @@ importers:
       '@typescript-eslint/eslint-plugin': 5.51.0_0fb7d53160f0e41e16372a0eab719cf9
       '@typescript-eslint/parser': 5.51.0_eslint@8.33.0+typescript@4.9.5
       '@web/dev-server': 0.1.35
+      cross-env: 7.0.3
       dts-bundle-generator: 7.2.0
       eslint: 8.33.0
       eslint-config-prettier: 8.6.0_eslint@8.33.0
@@ -220,6 +226,7 @@ importers:
       '@web/dev-server': ^0.1.35
       '@webgpu/types': ^0.1.26
       colors: ^1.4.0
+      cross-env: ^7.0.3
       diff: ^5.0.0
       eslint: ^8.33.0
       eslint-config-prettier: ^8.6.0
@@ -258,6 +265,7 @@ importers:
       '@typescript-eslint/eslint-plugin': 5.51.0_0fb7d53160f0e41e16372a0eab719cf9
       '@typescript-eslint/parser': 5.51.0_eslint@8.33.0+typescript@4.9.5
       '@web/dev-server': 0.1.35
+      cross-env: 7.0.3
       eslint: 8.33.0
       eslint-config-prettier: 8.6.0_eslint@8.33.0
       eslint-plugin-import: 2.27.5_eslint@8.33.0
@@ -2460,6 +2468,14 @@ packages:
     resolution: {integrity: sha512-welaYuF7ZtbYKGrIy7y3eb40d37rG1FvzEOfe7hSLd2iD6duMDqUhRfSvCGyC46HhR6Y8JXXdZ2lnRUMkPBpvg==}
     dependencies:
       browserslist: 4.21.5
+    dev: true
+
+  /cross-env/7.0.3:
+    resolution: {integrity: sha512-+/HKd6EgcQCJGh2PSjZuUitQBQynKor4wrFbRg4DtAgS1aWO+gU52xpH7M9ScGgXSYmAVS9bIJ8EzuaGw0oNAw==}
+    engines: {node: '>=10.14', npm: '>=6', yarn: '>=1'}
+    hasBin: true
+    dependencies:
+      cross-spawn: 7.0.3
     dev: true
 
   /cross-spawn/7.0.3:

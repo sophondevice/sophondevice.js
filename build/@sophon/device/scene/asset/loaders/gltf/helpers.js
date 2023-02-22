@@ -1,10 +1,7 @@
 /** sophon base library */
 import '../../../../device/builder/ast.js';
-import '../../../../device/base_types.js';
-import '../../../../device/gpuobject.js';
 import { F32_BITMASK, U32_BITMASK, I32_BITMASK, U16_BITMASK, I16_BITMASK, U8_BITMASK, I8_BITMASK } from '../../../../device/builder/types.js';
-import '../../../../device/builder/builtinfunc.js';
-import '../../../../device/builder/constructors.js';
+import '../../../../device/builder/programbuilder.js';
 
 class GLTFAccessor {
     bufferView;

@@ -2,11 +2,8 @@
 import { faceModeMap, compareFuncMap, stencilOpMap, primitiveTypeMap, blendEquationMap, blendFuncMap } from './constants_webgpu.js';
 import { WebGPURasterizerState, WebGPUDepthState, WebGPUStencilState, WebGPUBlendingState, WebGPUColorState } from './renderstates_webgpu.js';
 import '../builder/ast.js';
-import '../base_types.js';
-import '../gpuobject.js';
 import { typeU16 } from '../builder/types.js';
-import '../builder/builtinfunc.js';
-import '../builder/constructors.js';
+import '../builder/programbuilder.js';
 
 const stencilFormats = ['stencil8', 'depth24plus-stencil8', 'depth24unorm-stencil8', 'depth32float-stencil8'];
 const depthFormats = ['depth16unorm', 'depth24plus', 'depth24plus-stencil8', 'depth32float', 'depth24unorm-stencil8', 'depth32float-stencil8'];

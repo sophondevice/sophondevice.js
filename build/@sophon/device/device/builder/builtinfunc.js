@@ -1,7 +1,7 @@
 /** sophon base library */
 import { PBPrimitiveType, typeU32, typeF32, PBFunctionTypeInfo, typeF32Vec2, typeF32Vec3, typeF32Vec4, typeI32, typeI32Vec2, typeI32Vec3, typeI32Vec4, typeU32Vec2, typeU32Vec3, typeU32Vec4, typeMat2, typeMat3x2, typeMat4x2, typeMat2x3, typeMat3, typeMat4x3, typeMat2x4, typeMat3x4, typeMat4, typeFrexpResult, typeFrexpResultVec2, typeFrexpResultVec3, typeFrexpResultVec4, typeBool, typeTex1D, typeITex1D, typeUTex1D, typeTex2D, typeITex2D, typeUTex2D, typeTex2DArray, typeITex2DArray, typeUTex2DArray, typeTex3D, typeITex3D, typeUTex3D, typeTexCube, typeITexCube, typeUTexCube, typeTexCubeArray, typeITexCubeArray, typeUTexCubeArray, typeTexMultisampled2D, typeITexMultisampled2D, typeUTexMultisampled2D, typeTexDepth2D, typeTexDepth2DArray, typeTexDepthCube, typeTexDepthCubeArray, typeTexDepthMultisampled2D, typeTexStorage1D_rgba8unorm, typeTexStorage1D_rgba8snorm, typeTexStorage1D_rgba8uint, typeTexStorage1D_rgba8sint, typeTexStorage1D_rgba16uint, typeTexStorage1D_rgba16sint, typeTexStorage1D_rgba16float, typeTexStorage1D_rgba32uint, typeTexStorage1D_rgba32sint, typeTexStorage1D_rgba32float, typeTexStorage1D_rg32uint, typeTexStorage1D_rg32sint, typeTexStorage1D_rg32float, typeTexStorage1D_r32uint, typeTexStorage1D_r32sint, typeTexStorage1D_r32float, typeTexStorage2D_rgba8unorm, typeTexStorage2D_rgba8snorm, typeTexStorage2D_rgba8uint, typeTexStorage2D_rgba8sint, typeTexStorage2D_rgba16uint, typeTexStorage2D_rgba16sint, typeTexStorage2D_rgba16float, typeTexStorage2D_rgba32uint, typeTexStorage2D_rgba32sint, typeTexStorage2D_rgba32float, typeTexStorage2D_rg32uint, typeTexStorage2D_rg32sint, typeTexStorage2D_rg32float, typeTexStorage2D_r32uint, typeTexStorage2D_r32sint, typeTexStorage2D_r32float, typeTexStorage2DArray_rgba8unorm, typeTexStorage2DArray_rgba8snorm, typeTexStorage2DArray_rgba8uint, typeTexStorage2DArray_rgba8sint, typeTexStorage2DArray_rgba16uint, typeTexStorage2DArray_rgba16sint, typeTexStorage2DArray_rgba16float, typeTexStorage2DArray_rgba32uint, typeTexStorage2DArray_rgba32sint, typeTexStorage2DArray_rgba32float, typeTexStorage2DArray_rg32uint, typeTexStorage2DArray_rg32sint, typeTexStorage2DArray_rg32float, typeTexStorage2DArray_r32uint, typeTexStorage2DArray_r32sint, typeTexStorage2DArray_r32float, typeTexStorage3D_rgba8unorm, typeTexStorage3D_rgba8snorm, typeTexStorage3D_rgba8uint, typeTexStorage3D_rgba8sint, typeTexStorage3D_rgba16uint, typeTexStorage3D_rgba16sint, typeTexStorage3D_rgba16float, typeTexStorage3D_rgba32uint, typeTexStorage3D_rgba32sint, typeTexStorage3D_rgba32float, typeTexStorage3D_rg32uint, typeTexStorage3D_rg32sint, typeTexStorage3D_rg32float, typeTexStorage3D_r32uint, typeTexStorage3D_r32sint, typeTexStorage3D_r32float, typeSampler, typeSamplerComparison, typeTexExternal, typeVoid, typeBVec2, typeBVec3, typeBVec4 } from './types.js';
 import { ASTUnaryFunc, ASTBinaryFunc } from './ast.js';
-import { PBShaderExp, ProgramBuilder } from './programbuilder.js';
+import { PBShaderExp } from './base.js';
 import { PBParamLengthError, PBDeviceNotSupport, PBParamTypeError, PBParamValueError, PBOverloadingMatchError } from './errors.js';
 
 const genTypeList = [
@@ -1622,10 +1622,14 @@ const builtinFunctionsAll = {
     storageBarrier: { overloads: genType('storageBarrier', MASK_WEBGPU, typeVoid, []) },
     workgroupBarrier: { overloads: genType('workgroupBarrier', MASK_WEBGPU, typeVoid, []) },
 };
-for (const k of Object.keys(builtinFunctionsAll)) {
-    ProgramBuilder.prototype[k] = function (...args) {
-        const normalizeFunc = builtinFunctionsAll?.[k]?.normalizeFunc || callBuiltin;
-        return normalizeFunc(this, k, ...args);
-    };
+function setBuiltinFuncs(cls) {
+    for (const k of Object.keys(builtinFunctionsAll)) {
+        cls.prototype[k] = function (...args) {
+            const normalizeFunc = builtinFunctionsAll?.[k]?.normalizeFunc || callBuiltin;
+            return normalizeFunc(this, k, ...args);
+        };
+    }
 }
+
+export { setBuiltinFuncs };
 //# sourceMappingURL=builtinfunc.js.map

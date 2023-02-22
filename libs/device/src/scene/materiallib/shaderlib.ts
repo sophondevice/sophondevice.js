@@ -1,5 +1,6 @@
 import { VERTEX_ATTRIB_POSITION, VERTEX_ATTRIB_BLEND_INDICES, VERTEX_ATTRIB_BLEND_WEIGHT, VERTEX_ATTRIB_TANGENT, VERTEX_ATTRIB_NORMAL } from '../../device/gpuobject';
-import { ProgramBuilder, PBShaderExp, PBInsideFunctionScope, PBPrimitiveType } from '../../device/builder';
+import { ProgramBuilder, PBInsideFunctionScope, PBPrimitiveType } from '../../device/builder';
+import { PBShaderExp } from '../../device/builder/base';
 
 export const MAX_BONE_MATRIX_UNIFORM = 36;
 

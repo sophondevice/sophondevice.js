@@ -2,70 +2,19 @@
 import { ShaderType } from '../base_types.js';
 import { MAX_BINDING_GROUPS, getVertexAttribByName } from '../gpuobject.js';
 import { PBReflection } from './reflection.js';
-import { ASTAddressOf, ASTReferenceOf, ASTStructDefine, ASTShaderExpConstructor, getBuiltinInputStructName, getBuiltinOutputStructName, getBuiltinInputStructInstanceName, getBuiltinOutputStructInstanceName, builtinVariables, ASTDeclareVar, ASTScalar, ASTDiscard, DeclareType, ASTPrimitive, ASTAssignment, ASTLValueScalar, genSamplerName, ASTCallFunction, ASTTouch, ASTLValueDeclare, ASTHash, ASTGlobalScope, ASTFunctionParameter, ASTFunction, ASTScope, ASTReturn, ASTNakedScope, ASTIf, ASTBreak, ASTContinue, ASTRange, ASTDoWhile, ASTWhile, ShaderPrecisionType, getTextureSampleType, ASTArrayIndex, ASTLValueArray, ASTLValueHash } from './ast.js';
+import { setCurrentProgramBuilder, PBShaderExp, getCurrentProgramBuilder, makeConstructor } from './base.js';
+import { ASTAddressOf, ASTReferenceOf, ASTStructDefine, ASTShaderExpConstructor, getBuiltinInputStructName, getBuiltinOutputStructName, getBuiltinInputStructInstanceName, getBuiltinOutputStructInstanceName, builtinVariables, ASTDeclareVar, ASTScalar, ASTDiscard, DeclareType, ASTPrimitive, ASTAssignment, ASTLValueScalar, genSamplerName, ASTCallFunction, ASTTouch, ASTLValueDeclare, ASTHash, ASTGlobalScope, ASTFunctionParameter, ASTFunction, ASTScope, ASTReturn, ASTNakedScope, ASTIf, ASTBreak, ASTContinue, ASTRange, ASTDoWhile, ASTWhile } from './ast.js';
 import { PBDeviceNotSupport, PBReferenceValueRequired, PBPointerValueRequired, PBParamValueError, PBInternalError, PBParamLengthError, PBParamTypeError, PBTypeCastError, PBValueOutOfRange, PBError, PBNonScopedFunctionCall, PBASTError } from './errors.js';
-import { PBPointerTypeInfo, PBAddressSpace, PBArrayTypeInfo, PBStructTypeInfo, typeFrexpResult, typeFrexpResultVec2, typeFrexpResultVec3, typeFrexpResultVec4, PBPrimitiveType, typeBool, typeI32, typeU32, typeF32, typeTex2D, typeTexCube, PBSamplerAccessMode, typeVoid, PBPrimitiveTypeInfo } from './types.js';
+import { setBuiltinFuncs } from './builtinfunc.js';
+import { setConstructors } from './constructors.js';
+import { PBStructTypeInfo, typeFrexpResult, typeFrexpResultVec2, typeFrexpResultVec3, typeFrexpResultVec4, PBPrimitiveType, typeBool, typeI32, typeU32, typeF32, PBArrayTypeInfo, typeTex2D, typeTexCube, PBSamplerAccessMode, typeVoid } from './types.js';
 
 const COMPUTE_UNIFORM_NAME = 'ch_compute_block';
 const VERTEX_UNIFORM_NAME = 'ch_vertex_block';
 const FRAGMENT_UNIFORM_NAME = 'ch_fragment_block';
 const SHARED_UNIFORM_NAME = 'ch_shared_block';
-let currentProgramBuilder = null;
 const input_prefix = 'ch_input_';
 const output_prefix = 'ch_output_';
-const constructorCache = new Map();
-function makeConstructor(typeFunc, elementType) {
-    const wrappedTypeFunc = new Proxy(typeFunc, {
-        get: function (target, prop) {
-            if (typeof prop === 'symbol' || prop in target) {
-                return target[prop];
-            }
-            let entries = constructorCache.get(typeFunc);
-            if (!entries) {
-                entries = {};
-                constructorCache.set(typeFunc, entries);
-            }
-            let ctor = entries[prop];
-            if (!ctor) {
-                if (elementType.isPrimitiveType() || elementType.isStructType() || elementType.isArrayType()) {
-                    if (prop === 'ptr') {
-                        const pointerType = new PBPointerTypeInfo(elementType, PBAddressSpace.FUNCTION);
-                        ctor = function pointerCtor(...args) {
-                            if (args.length === 1 && typeof args[0] === 'string') {
-                                return new PBShaderExp(args[0], pointerType);
-                            }
-                            else {
-                                throw new Error(`Invalid pointer type constructor`);
-                            }
-                        };
-                    }
-                    else {
-                        const dim = Number(prop);
-                        if (Number.isInteger(dim) && dim >= 0) {
-                            const arrayType = new PBArrayTypeInfo(elementType, dim);
-                            const arrayTypeFunc = function arrayCtor(...args) {
-                                if (args.length === 1 && typeof args[0] === 'string') {
-                                    return new PBShaderExp(args[0], arrayType);
-                                }
-                                else {
-                                    const exp = new PBShaderExp('', arrayType);
-                                    exp.$ast = new ASTShaderExpConstructor(exp.$typeinfo, args.map(arg => arg instanceof PBShaderExp ? arg.$ast : arg));
-                                    return exp;
-                                }
-                            };
-                            ctor = makeConstructor(arrayTypeFunc, arrayType);
-                        }
-                    }
-                }
-            }
-            if (ctor) {
-                entries[prop] = ctor;
-            }
-            return ctor;
-        },
-    });
-    return wrappedTypeFunc;
-}
 class ProgramBuilder {
     _device;
     _workgroupSize;
@@ -188,21 +137,21 @@ class ProgramBuilder {
         return this._scopeStack[0];
     }
     buildRender(options) {
-        currentProgramBuilder = this;
+        setCurrentProgramBuilder(this);
         this._lastError = null;
         this.defineInternalStructs();
         const ret = this.buildRenderSource(options);
-        currentProgramBuilder = null;
+        setCurrentProgramBuilder(null);
         this.reset();
         return ret;
     }
     buildCompute(options) {
-        currentProgramBuilder = this;
+        setCurrentProgramBuilder(this);
         this._lastError = null;
         this._workgroupSize = options.workgroupSize;
         this.defineInternalStructs();
         const ret = this.buildComputeSource(options);
-        currentProgramBuilder = null;
+        setCurrentProgramBuilder(null);
         this.reset();
         return ret;
     }
@@ -333,7 +282,7 @@ class ProgramBuilder {
             let ctor = null;
             const structInfo = this._structInfo[shaderType];
             if (structInfo) {
-                if (currentProgramBuilder.shaderType === shaderType && structInfo.structs[structType.structName]) {
+                if (getCurrentProgramBuilder().shaderType === shaderType && structInfo.structs[structType.structName]) {
                     throw new PBParamValueError('defineStruct', 'structName', `cannot re-define struct '${structType.structName}'`);
                 }
                 for (const type of structInfo.types) {
@@ -348,12 +297,12 @@ class ProgramBuilder {
                 if (structDef.type.layout !== layout) {
                     throw new Error(`Can not redefine struct ${structDef.type.structName} with different layout`);
                 }
-                if (shaderType !== currentProgramBuilder.shaderType) {
-                    if (!this._structInfo[currentProgramBuilder.shaderType]) {
-                        this._structInfo[currentProgramBuilder.shaderType] = { structs: {}, types: [] };
+                if (shaderType !== getCurrentProgramBuilder().shaderType) {
+                    if (!this._structInfo[getCurrentProgramBuilder().shaderType]) {
+                        this._structInfo[getCurrentProgramBuilder().shaderType] = { structs: {}, types: [] };
                     }
-                    this._structInfo[currentProgramBuilder.shaderType].types.push(structDef);
-                    this._structInfo[currentProgramBuilder.shaderType].structs[structDef.getType().structName] = ctor;
+                    this._structInfo[getCurrentProgramBuilder().shaderType].types.push(structDef);
+                    this._structInfo[getCurrentProgramBuilder().shaderType].structs[structDef.getType().structName] = ctor;
                 }
                 return ctor;
             }
@@ -367,7 +316,7 @@ class ProgramBuilder {
             let ctor = null;
             const structInfo = this._structInfo[shaderType];
             if (structInfo) {
-                if (currentProgramBuilder.shaderType === shaderType && structInfo.structs[typeCopy.structName]) {
+                if (getCurrentProgramBuilder().shaderType === shaderType && structInfo.structs[typeCopy.structName]) {
                     throw new PBParamValueError('defineStruct', 'structName', `cannot re-define struct '${typeCopy.structName}'`);
                 }
                 for (const type of structInfo.types) {
@@ -382,12 +331,12 @@ class ProgramBuilder {
                 if (structDef.type.layout !== typeCopy.layout) {
                     throw new Error(`Can not redefine struct ${structDef.type.structName} with different layout`);
                 }
-                if (shaderType !== currentProgramBuilder.shaderType) {
-                    if (!this._structInfo[currentProgramBuilder.shaderType]) {
-                        this._structInfo[currentProgramBuilder.shaderType] = { structs: {}, types: [] };
+                if (shaderType !== getCurrentProgramBuilder().shaderType) {
+                    if (!this._structInfo[getCurrentProgramBuilder().shaderType]) {
+                        this._structInfo[getCurrentProgramBuilder().shaderType] = { structs: {}, types: [] };
                     }
-                    this._structInfo[currentProgramBuilder.shaderType].types.push(structDef);
-                    this._structInfo[currentProgramBuilder.shaderType].structs[structDef.getType().structName] = ctor;
+                    this._structInfo[getCurrentProgramBuilder().shaderType].types.push(structDef);
+                    this._structInfo[getCurrentProgramBuilder().shaderType].structs[structDef.getType().structName] = ctor;
                 }
                 return ctor;
             }
@@ -647,7 +596,7 @@ class ProgramBuilder {
                 return variable;
             },
             set: function (v) {
-                currentProgramBuilder.currentScope().$ast.statements.push(new ASTAssignment(new ASTLValueScalar(variable.$ast), v instanceof PBShaderExp ? v.$ast : v));
+                getCurrentProgramBuilder().currentScope().$ast.statements.push(new ASTAssignment(new ASTLValueScalar(variable.$ast), v instanceof PBShaderExp ? v.$ast : v));
             }
         });
     }
@@ -938,7 +887,7 @@ class ProgramBuilder {
             for (const k in uniformLists[i]) {
                 if (uniformLists[i][k]?.members.length > 0) {
                     const uname = `${nameList[i]}_${k}`;
-                    const t = currentProgramBuilder.internalDefineStruct(this.generateStructureName(), 'std140', maskList[i], false, ...uniformLists[i][k].members);
+                    const t = getCurrentProgramBuilder().internalDefineStruct(this.generateStructureName(), 'std140', maskList[i], false, ...uniformLists[i][k].members);
                     globalScope[uname] = t().uniform(Number(k));
                     const index = this._uniforms.findIndex(val => val.block?.name === uname);
                     this._uniforms[index].mask = maskList[i];
@@ -1008,7 +957,7 @@ class ProgramBuilder {
                 if (uniformLists[i][k]?.members.length > 0) {
                     const uname = `${nameList[i]}_${k}`;
                     const structName = this.generateStructureName();
-                    const t = currentProgramBuilder.internalDefineStruct(structName, 'std140', maskList[i], false, ...uniformLists[i][k].members);
+                    const t = getCurrentProgramBuilder().internalDefineStruct(structName, 'std140', maskList[i], false, ...uniformLists[i][k].members);
                     if (maskList[i] & ShaderType.Vertex) {
                         globalScopeVertex[uname] = t().uniform(Number(k));
                     }
@@ -1244,7 +1193,7 @@ class ProgramBuilder {
         }
         const func = this.getFunction(funcName) || null;
         const exp = new PBShaderExp('', returnType);
-        exp.$ast = new ASTCallFunction(funcName, args, returnType, func, currentProgramBuilder.getDeviceType());
+        exp.$ast = new ASTCallFunction(funcName, args, returnType, func, getCurrentProgramBuilder().getDeviceType());
         this.currentScope().$ast.statements.push(exp.$ast);
         return exp;
     }
@@ -1279,16 +1228,16 @@ class PBScope extends Proxiable {
         this.$_localScope = null;
     }
     get $builder() {
-        return currentProgramBuilder;
+        return getCurrentProgramBuilder();
     }
     get $builtins() {
-        return currentProgramBuilder.builtinScope;
+        return getCurrentProgramBuilder().builtinScope;
     }
     get $inputs() {
-        return currentProgramBuilder.inputScope;
+        return getCurrentProgramBuilder().inputScope;
     }
     get $outputs() {
-        return currentProgramBuilder.outputScope;
+        return getCurrentProgramBuilder().outputScope;
     }
     get $parent() {
         return this.$_parentScope;
@@ -1300,7 +1249,7 @@ class PBScope extends Proxiable {
         this.$_AST = ast;
     }
     $getVertexAttrib(loc) {
-        return currentProgramBuilder.reflection.attribute(loc);
+        return getCurrentProgramBuilder().reflection.attribute(loc);
     }
     get $l() {
         return this.$_getLocalScope();
@@ -1309,7 +1258,7 @@ class PBScope extends Proxiable {
         return this.$_getGlobalScope();
     }
     $local(variable, init) {
-        const initNonArray = currentProgramBuilder.normalizeExpValue(init);
+        const initNonArray = getCurrentProgramBuilder().normalizeExpValue(init);
         variable.$global = this instanceof PBGlobalScope;
         this.$_declare(variable, initNonArray);
     }
@@ -1317,7 +1266,7 @@ class PBScope extends Proxiable {
         this.$ast.statements.push(new ASTTouch(exp.$ast));
     }
     $query(name) {
-        return currentProgramBuilder.queryGlobal(name);
+        return getCurrentProgramBuilder().queryGlobal(name);
     }
     $_declareInternal(variable, init) {
         const key = variable.$str;
@@ -1325,7 +1274,7 @@ class PBScope extends Proxiable {
             throw new Error(`cannot re-declare variable '${key}'`);
         }
         if (!(variable.$ast instanceof ASTPrimitive)) {
-            throw new Error(`invalid variable declaration: '${variable.$ast.toString(currentProgramBuilder.getDeviceType())}'`);
+            throw new Error(`invalid variable declaration: '${variable.$ast.toString(getCurrentProgramBuilder().getDeviceType())}'`);
         }
         const varType = variable.$typeinfo;
         if (varType.isPointerType()) {
@@ -1381,45 +1330,45 @@ class PBScope extends Proxiable {
             };
         }
         let found = false;
-        for (const u of currentProgramBuilder._uniforms) {
+        for (const u of getCurrentProgramBuilder()._uniforms) {
             if (u.group !== uniformInfo.group) {
                 continue;
             }
             if (uniformInfo.block && u.block && u.block.name === uniformInfo.block.name && u.block.exp.$typeinfo.typeId === uniformInfo.block.exp.$typeinfo.typeId) {
-                u.mask |= currentProgramBuilder.shaderType;
+                u.mask |= getCurrentProgramBuilder().shaderType;
                 variable = u.block.exp;
                 found = true;
                 break;
             }
             if (uniformInfo.texture && u.texture && uniformInfo.texture.exp.$str === u.texture.exp.$str && uniformInfo.texture.exp.$typeinfo.typeId === u.texture.exp.$typeinfo.typeId) {
-                u.mask |= currentProgramBuilder.shaderType;
+                u.mask |= getCurrentProgramBuilder().shaderType;
                 variable = u.texture.exp;
                 found = true;
                 break;
             }
             if (uniformInfo.sampler && u.sampler && uniformInfo.sampler.$str === u.sampler.$str && uniformInfo.sampler.$typeinfo.typeId === u.sampler.$typeinfo.typeId) {
-                u.mask |= currentProgramBuilder.shaderType;
+                u.mask |= getCurrentProgramBuilder().shaderType;
                 variable = u.sampler;
                 found = true;
                 break;
             }
         }
         if (!found) {
-            uniformInfo.mask = currentProgramBuilder.shaderType;
-            currentProgramBuilder._uniforms.push(uniformInfo);
+            uniformInfo.mask = getCurrentProgramBuilder().shaderType;
+            getCurrentProgramBuilder()._uniforms.push(uniformInfo);
         }
         if (uniformInfo.texture
             && !uniformInfo.texture.exp.$typeinfo.isStorageTexture()
             && !uniformInfo.texture.exp.$typeinfo.isExternalTexture()
-            && currentProgramBuilder.getDeviceType() === 'webgpu') {
+            && getCurrentProgramBuilder().getDeviceType() === 'webgpu') {
             const isDepth = variable.$typeinfo.isTextureType() && variable.$typeinfo.isDepthTexture();
             const samplerName = genSamplerName(variable.$str, false);
-            const samplerExp = currentProgramBuilder.sampler(samplerName).uniform(uniformInfo.group).sampleType(variable.$sampleType);
+            const samplerExp = getCurrentProgramBuilder().sampler(samplerName).uniform(uniformInfo.group).sampleType(variable.$sampleType);
             samplerExp.$sampleType = variable.$sampleType;
             this.$local(samplerExp);
             if (isDepth) {
                 const samplerNameComp = genSamplerName(variable.$str, true);
-                const samplerExpComp = currentProgramBuilder.samplerComparison(samplerNameComp).uniform(uniformInfo.group).sampleType(variable.$sampleType);
+                const samplerExpComp = getCurrentProgramBuilder().samplerComparison(samplerNameComp).uniform(uniformInfo.group).sampleType(variable.$sampleType);
                 this.$local(samplerExpComp);
             }
         }
@@ -1438,20 +1387,20 @@ class PBScope extends Proxiable {
                 && !variable.$typeinfo.isTextureType()
                 && !variable.$typeinfo.isSamplerType()
                 && (!variable.$typeinfo.isConstructible() || !variable.$typeinfo.isHostSharable())) {
-                throw new PBASTError(variable.$ast, `type '${variable.$typeinfo.toTypeName(currentProgramBuilder.getDeviceType())}' cannot be declared in uniform address space`);
+                throw new PBASTError(variable.$ast, `type '${variable.$typeinfo.toTypeName(getCurrentProgramBuilder().getDeviceType())}' cannot be declared in uniform address space`);
             }
             if (variable.$declareType === DeclareType.DECLARE_TYPE_STORAGE) {
-                if (currentProgramBuilder.getDeviceType() !== 'webgpu') {
+                if (getCurrentProgramBuilder().getDeviceType() !== 'webgpu') {
                     throw new PBDeviceNotSupport('storage buffer binding');
                 }
                 else if (!variable.$typeinfo.isHostSharable()) {
-                    throw new PBASTError(variable.$ast, `type '${variable.$typeinfo.toTypeName(currentProgramBuilder.getDeviceType())}' cannot be declared in storage address space`);
+                    throw new PBASTError(variable.$ast, `type '${variable.$typeinfo.toTypeName(getCurrentProgramBuilder().getDeviceType())}' cannot be declared in storage address space`);
                 }
             }
             let originalType = null;
             if (variable.$declareType === DeclareType.DECLARE_TYPE_STORAGE && (variable.$typeinfo.isPrimitiveType() || variable.$typeinfo.isArrayType())) {
                 originalType = variable.$typeinfo;
-                const wrappedStruct = currentProgramBuilder.defineStruct(null, 'default', new PBShaderExp('value', originalType));
+                const wrappedStruct = getCurrentProgramBuilder().defineStruct(null, 'default', new PBShaderExp('value', originalType));
                 variable.$typeinfo = wrappedStruct().$typeinfo;
             }
             variable = this.$_findOrSetUniform(variable);
@@ -1461,13 +1410,13 @@ class PBScope extends Proxiable {
             }
             ast.group = variable.$group;
             ast.binding = 0;
-            ast.blockName = currentProgramBuilder.getBlockName(name);
+            ast.blockName = getCurrentProgramBuilder().getBlockName(name);
             const type = variable.$typeinfo;
             if (type.isTextureType() || type.isSamplerType() || variable.$declareType === DeclareType.DECLARE_TYPE_STORAGE || (type.isStructType() && type.detail.layout === 'std140')) {
                 this.$ast.uniforms.push(ast);
             }
             variable.$tags.forEach(val => {
-                currentProgramBuilder.tagShaderExp(() => variable, val);
+                getCurrentProgramBuilder().tagShaderExp(() => variable, val);
             });
         }
         else {
@@ -1483,7 +1432,7 @@ class PBScope extends Proxiable {
                 return variable;
             },
             set: function (val) {
-                currentProgramBuilder.currentScope().$ast.statements.push(new ASTAssignment(new ASTLValueScalar(variable.$ast), val instanceof PBShaderExp ? val.$ast : val));
+                getCurrentProgramBuilder().currentScope().$ast.statements.push(new ASTAssignment(new ASTLValueScalar(variable.$ast), val instanceof PBShaderExp ? val.$ast : val));
             },
         };
         Object.defineProperty(this, key, options);
@@ -1555,7 +1504,7 @@ class PBLocalScope extends PBScope {
         }
         const val = this.$_scope.$localGet(prop);
         if (val === undefined) {
-            const type = currentProgramBuilder.guessExpValueType(value);
+            const type = getCurrentProgramBuilder().guessExpValueType(value);
             const exp = new PBShaderExp(prop, type);
             if (value instanceof PBShaderExp && !this.$_scope.$parent) {
                 exp.$declareType = value.$declareType;
@@ -1582,16 +1531,16 @@ class PBBuiltinScope extends PBScope {
     constructor() {
         super(null);
         this.$_usedBuiltins = new Set();
-        const isWebGPU = currentProgramBuilder.getDeviceType() === 'webgpu';
+        const isWebGPU = getCurrentProgramBuilder().getDeviceType() === 'webgpu';
         if (!isWebGPU) {
             this.$_builtinVars = {};
-            const v = builtinVariables[currentProgramBuilder.getDeviceType()];
+            const v = builtinVariables[getCurrentProgramBuilder().getDeviceType()];
             for (const k in v) {
                 const info = v[k];
                 this.$_builtinVars[k] = new PBShaderExp(info.name, info.type);
             }
         }
-        const v = builtinVariables[currentProgramBuilder.getDeviceType()];
+        const v = builtinVariables[getCurrentProgramBuilder().getDeviceType()];
         const that = this;
         for (const k of Object.keys(v)) {
             Object.defineProperty(this, k, {
@@ -1603,7 +1552,7 @@ class PBBuiltinScope extends PBScope {
                         throw new Error(`Invalid output value assignment`);
                     }
                     const exp = that.$getBuiltinVar(k);
-                    currentProgramBuilder.currentScope().$ast.statements.push(new ASTAssignment(new ASTLValueScalar(exp.$ast), v instanceof PBShaderExp ? v.$ast : v));
+                    getCurrentProgramBuilder().currentScope().$ast.statements.push(new ASTAssignment(new ASTLValueScalar(exp.$ast), v instanceof PBShaderExp ? v.$ast : v));
                 },
             });
         }
@@ -1613,13 +1562,13 @@ class PBBuiltinScope extends PBScope {
     }
     $getBuiltinVar(name) {
         this.$_usedBuiltins.add(name);
-        const isWebGPU = currentProgramBuilder.getDeviceType() === 'webgpu';
+        const isWebGPU = getCurrentProgramBuilder().getDeviceType() === 'webgpu';
         if (isWebGPU) {
-            const v = builtinVariables[currentProgramBuilder.getDeviceType()];
+            const v = builtinVariables[getCurrentProgramBuilder().getDeviceType()];
             const info = v[name];
             const inout = info.inOrOut;
-            const structName = inout === 'in' ? getBuiltinInputStructInstanceName(currentProgramBuilder.shaderType) : getBuiltinOutputStructInstanceName(currentProgramBuilder.shaderType);
-            const scope = currentProgramBuilder.currentScope();
+            const structName = inout === 'in' ? getBuiltinInputStructInstanceName(getCurrentProgramBuilder().shaderType) : getBuiltinOutputStructInstanceName(getCurrentProgramBuilder().shaderType);
+            const scope = getCurrentProgramBuilder().currentScope();
             if (!scope[structName] || !scope[structName][info.name]) {
                 throw new Error(`invalid use of builtin variable ${name}`);
             }
@@ -1645,7 +1594,7 @@ class PBInputScope extends PBScope {
             throw new Error(`Can not assign to shader input variable: "${prop}"`);
         }
         else {
-            const st = currentProgramBuilder.shaderType;
+            const st = getCurrentProgramBuilder().shaderType;
             if (st !== ShaderType.Vertex) {
                 throw new Error(`shader input variables can only be declared in vertex shader: "${prop}"`);
             }
@@ -1653,7 +1602,7 @@ class PBInputScope extends PBScope {
             if (attrib === undefined) {
                 throw new Error(`can not declare shader input variable: invalid vertex attribute: "${prop}"`);
             }
-            if (currentProgramBuilder._vertexAttributes.indexOf(attrib) >= 0) {
+            if (getCurrentProgramBuilder()._vertexAttributes.indexOf(attrib) >= 0) {
                 throw new Error(`can not declare shader input variable: attribute already declared: "${prop}"`);
             }
             if (!(value instanceof PBShaderExp) || !(value.$ast instanceof ASTShaderExpConstructor)) {
@@ -1663,14 +1612,14 @@ class PBInputScope extends PBScope {
             if (!type.isPrimitiveType() || type.isMatrixType() || type.primitiveType === PBPrimitiveType.BOOL) {
                 throw new Error(`type cannot be used as pipeline input/output: ${prop}`);
             }
-            const location = currentProgramBuilder._inputs.length;
+            const location = getCurrentProgramBuilder()._inputs.length;
             const exp = new PBShaderExp(`${input_prefix}${prop}`, type).tag(...value.$tags);
-            currentProgramBuilder.in(location, prop, exp);
-            currentProgramBuilder._vertexAttributes.push(attrib);
-            currentProgramBuilder.reflection.setAttrib(attrib, exp);
-            if (currentProgramBuilder.getDeviceType() === 'webgpu') {
-                if (currentProgramBuilder.findStructType(getBuiltinInputStructName(st), st)) {
-                    currentProgramBuilder.defineBuiltinStruct(st, 'in');
+            getCurrentProgramBuilder().in(location, prop, exp);
+            getCurrentProgramBuilder()._vertexAttributes.push(attrib);
+            getCurrentProgramBuilder().reflection.setAttrib(attrib, exp);
+            if (getCurrentProgramBuilder().getDeviceType() === 'webgpu') {
+                if (getCurrentProgramBuilder().findStructType(getBuiltinInputStructName(st), st)) {
+                    getCurrentProgramBuilder().defineBuiltinStruct(st, 'in');
                 }
             }
         }
@@ -1690,7 +1639,7 @@ class PBOutputScope extends PBScope {
         }
         else {
             if (!(prop in this)) {
-                if (currentProgramBuilder.currentScope() === currentProgramBuilder.globalScope
+                if (getCurrentProgramBuilder().currentScope() === getCurrentProgramBuilder().globalScope
                     && (!(value instanceof PBShaderExp) || !(value.$ast instanceof ASTShaderExpConstructor))) {
                     throw new Error(`invalid shader output variable declaration: ${prop}`);
                 }
@@ -1698,16 +1647,16 @@ class PBOutputScope extends PBScope {
                 if (!type.isPrimitiveType() || type.isMatrixType() || type.primitiveType === PBPrimitiveType.BOOL) {
                     throw new Error(`type cannot be used as pipeline input/output: ${prop}`);
                 }
-                const location = currentProgramBuilder._outputs.length;
-                currentProgramBuilder.out(location, prop, new PBShaderExp(`${output_prefix}${prop}`, type).tag(...value.$tags));
-                if (currentProgramBuilder.getDeviceType() === 'webgpu') {
-                    const st = currentProgramBuilder.shaderType;
-                    if (currentProgramBuilder.findStructType(getBuiltinInputStructName(st), st)) {
-                        currentProgramBuilder.defineBuiltinStruct(st, 'out');
+                const location = getCurrentProgramBuilder()._outputs.length;
+                getCurrentProgramBuilder().out(location, prop, new PBShaderExp(`${output_prefix}${prop}`, type).tag(...value.$tags));
+                if (getCurrentProgramBuilder().getDeviceType() === 'webgpu') {
+                    const st = getCurrentProgramBuilder().shaderType;
+                    if (getCurrentProgramBuilder().findStructType(getBuiltinInputStructName(st), st)) {
+                        getCurrentProgramBuilder().defineBuiltinStruct(st, 'out');
                     }
                 }
             }
-            if (currentProgramBuilder.currentScope() !== currentProgramBuilder.globalScope) {
+            if (getCurrentProgramBuilder().currentScope() !== getCurrentProgramBuilder().globalScope) {
                 this[prop] = value;
             }
         }
@@ -1719,7 +1668,7 @@ class PBGlobalScope extends PBScope {
         super(new ASTGlobalScope());
     }
     $mainFunc(body) {
-        const builder = currentProgramBuilder;
+        const builder = getCurrentProgramBuilder();
         if (builder.getDeviceType() === 'webgpu') {
             const inputStruct = builder.defineBuiltinStruct(builder.shaderType, 'in');
             this.$local(inputStruct[1]);
@@ -1771,7 +1720,7 @@ class PBGlobalScope extends PBScope {
         return this.$ast.findFunction(name);
     }
     $getCurrentFunctionScope() {
-        let scope = currentProgramBuilder.currentScope();
+        let scope = getCurrentProgramBuilder().currentScope();
         while (scope && !(scope instanceof PBFunctionScope)) {
             scope = scope.$parent;
         }
@@ -1779,12 +1728,12 @@ class PBGlobalScope extends PBScope {
     }
     $internalFunction(name, params, isMain, body) {
         const numArgs = params.length;
-        const pb = currentProgramBuilder;
+        const pb = getCurrentProgramBuilder();
         params.forEach(param => {
             if (!(param.$ast instanceof ASTPrimitive)) {
                 throw new Error(`${name}(): invalid function definition`);
             }
-            param.$ast = new ASTFunctionParameter(param.$ast, currentProgramBuilder.getDeviceType());
+            param.$ast = new ASTFunctionParameter(param.$ast, getCurrentProgramBuilder().getDeviceType());
         });
         Object.defineProperty(this, name, {
             get: function () {
@@ -1801,7 +1750,7 @@ class PBGlobalScope extends PBScope {
                     if (!funcType) {
                         throw new Error(`ERROR: no matching overloads for function ${name}`);
                     }
-                    return currentProgramBuilder.$callFunction(name, funcType[1], funcType[0].returnType);
+                    return getCurrentProgramBuilder().$callFunction(name, funcType[1], funcType[0].returnType);
                 };
             },
         });
@@ -1828,7 +1777,7 @@ class PBInsideFunctionScope extends PBScope {
         const functionScope = this.findOwnerFunction();
         const astFunc = functionScope.$ast;
         let returnType = null;
-        const retValNonArray = currentProgramBuilder.normalizeExpValue(retval);
+        const retValNonArray = getCurrentProgramBuilder().normalizeExpValue(retval);
         if (retValNonArray !== undefined && retValNonArray !== null) {
             if (typeof retValNonArray === 'number') {
                 if (Number.isInteger(retValNonArray)) {
@@ -1866,7 +1815,7 @@ class PBInsideFunctionScope extends PBScope {
             astFunc.returnType = returnType;
         }
         else if (astFunc.returnType.typeId !== returnType.typeId) {
-            throw new Error(`function ${astFunc.name}: return type must be ${astFunc.returnType?.toTypeName(currentProgramBuilder.getDeviceType()) || 'void'}`);
+            throw new Error(`function ${astFunc.name}: return type must be ${astFunc.returnType?.toTypeName(getCurrentProgramBuilder().getDeviceType()) || 'void'}`);
         }
         let returnValue = null;
         if (retValNonArray !== undefined && retValNonArray !== null) {
@@ -1937,9 +1886,9 @@ class PBFunctionScope extends PBInsideFunctionScope {
             }
             this.$_registerVar(param);
         }
-        currentProgramBuilder.pushScope(this);
+        getCurrentProgramBuilder().pushScope(this);
         body && body.call(this);
-        currentProgramBuilder.popScope();
+        getCurrentProgramBuilder().popScope();
         const astFunc = this.$ast;
         if (!astFunc.returnType) {
             astFunc.returnType = typeVoid;
@@ -1950,18 +1899,18 @@ class PBWhileScope extends PBInsideFunctionScope {
     constructor(parent, ast, body) {
         super(parent);
         this.$ast = ast;
-        currentProgramBuilder.pushScope(this);
+        getCurrentProgramBuilder().pushScope(this);
         body && body.call(this);
-        currentProgramBuilder.popScope();
+        getCurrentProgramBuilder().popScope();
     }
 }
 class PBDoWhileScope extends PBInsideFunctionScope {
     constructor(parent, ast, body) {
         super(parent);
         this.$ast = ast;
-        currentProgramBuilder.pushScope(this);
+        getCurrentProgramBuilder().pushScope(this);
         body && body.call(this);
-        currentProgramBuilder.popScope();
+        getCurrentProgramBuilder().popScope();
     }
     $while(condition) {
         this.$ast.condition = condition instanceof PBShaderExp ? condition.$ast : new ASTScalar(condition, typeof condition === 'number' ? typeF32 : typeBool);
@@ -1972,27 +1921,27 @@ class PBForScope extends PBInsideFunctionScope {
         super(parent);
         this.$ast = ast;
         this.$_registerVar(counter);
-        currentProgramBuilder.pushScope(this);
+        getCurrentProgramBuilder().pushScope(this);
         body && body.call(this);
-        currentProgramBuilder.popScope();
+        getCurrentProgramBuilder().popScope();
     }
 }
 class PBNakedScope extends PBInsideFunctionScope {
     constructor(parent, ast, body) {
         super(parent);
         this.$ast = ast;
-        currentProgramBuilder.pushScope(this);
+        getCurrentProgramBuilder().pushScope(this);
         body && body.call(this);
-        currentProgramBuilder.popScope();
+        getCurrentProgramBuilder().popScope();
     }
 }
 class PBIfScope extends PBInsideFunctionScope {
     constructor(parent, ast, body) {
         super(parent);
         this.$ast = ast;
-        currentProgramBuilder.pushScope(this);
+        getCurrentProgramBuilder().pushScope(this);
         body && body.call(this);
-        currentProgramBuilder.popScope();
+        getCurrentProgramBuilder().popScope();
     }
     $elseif(condition, body) {
         const astElseIf = new ASTIf('else if', condition instanceof PBShaderExp ? condition.$ast : new ASTScalar(condition, typeof condition === 'number' ? typeF32 : typeBool));
@@ -2005,290 +1954,8 @@ class PBIfScope extends PBInsideFunctionScope {
         new PBIfScope(this.$_parentScope, astElse, body);
     }
 }
-let uidExp = 0;
-class PBShaderExp extends Proxiable {
-    $uid;
-    $str;
-    $location;
-    $typeinfo;
-    $global;
-    $sampleType;
-    $precision;
-    $ast;
-    $inout;
-    $memberCache;
-    $attrib;
-    $tags;
-    $group;
-    $declareType;
-    constructor(str, typeInfo) {
-        super();
-        if (!str && typeInfo.isPointerType()) {
-            throw new Error('no default constructor for pointer type');
-        }
-        this.$uid = uidExp++;
-        this.$str = str || '';
-        this.$location = 0;
-        this.$global = false;
-        this.$typeinfo = typeInfo;
-        this.$qualifier = null;
-        this.$precision = ShaderPrecisionType.NONE;
-        this.$ast = new ASTPrimitive(this);
-        this.$inout = null;
-        this.$memberCache = {};
-        this.$attrib = null;
-        this.$tags = [];
-        this.$group = null;
-        this.$declareType = DeclareType.DECLARE_TYPE_NONE;
-        if (typeInfo.isTextureType()) {
-            if (typeInfo.isDepthTexture()) {
-                this.$sampleType = 'depth';
-            }
-            else {
-                const t = getTextureSampleType(typeInfo);
-                if (t.primitiveType === PBPrimitiveType.I32) {
-                    this.$sampleType = 'sint';
-                }
-                else if (t.primitiveType === PBPrimitiveType.U32) {
-                    this.$sampleType = 'uint';
-                }
-                else {
-                    this.$sampleType = 'float';
-                }
-            }
-        }
-    }
-    uniform(group) {
-        this.$declareType = DeclareType.DECLARE_TYPE_UNIFORM;
-        this.$group = group;
-        return this;
-    }
-    workgroup() {
-        this.$declareType = DeclareType.DECLARE_TYPE_WORKGROUP;
-        return this;
-    }
-    storage(group) {
-        if (!this.$typeinfo.isHostSharable()) {
-            throw new PBASTError(this.$ast, 'type cannot be declared in storage address space');
-        }
-        this.$declareType = DeclareType.DECLARE_TYPE_STORAGE;
-        this.$group = group;
-        return this;
-    }
-    attrib(attr) {
-        this.$declareType = DeclareType.DECLARE_TYPE_IN;
-        this.$attrib = attr;
-        return this;
-    }
-    tag(...args) {
-        args.forEach(val => {
-            if (this.$tags.indexOf(val) < 0) {
-                this.$tags.push(val);
-            }
-        });
-        return this;
-    }
-    sampleType(type) {
-        if (type) {
-            this.$sampleType = type;
-        }
-        return this;
-    }
-    at(index) {
-        const varType = this.$ast.getType();
-        if (!varType.isArrayType()) {
-            throw new Error('at() function must be used with array types');
-        }
-        if (typeof index === 'number') {
-            if (!Number.isInteger(index)) {
-                throw new Error('at() array index must be integer type');
-            }
-            if (index < 0 || (varType.dimension > 0 && index >= varType.dimension)) {
-                throw new Error('at() array index out of bounds');
-            }
-        }
-        const result = new PBShaderExp('', varType.elementType);
-        result.$ast = new ASTArrayIndex(this.$ast, typeof index === 'number' ? new ASTScalar(index, typeI32) : index.$ast, varType.elementType);
-        return result;
-    }
-    setAt(index, val) {
-        const varType = this.$ast.getType();
-        if (!varType.isArrayType()) {
-            throw new Error('setAt() function must be used with array types');
-        }
-        if (typeof index === 'number') {
-            if (!Number.isInteger(index)) {
-                throw new Error('setAt() array index must be integer type');
-            }
-            if (index < 0 || (varType.dimension > 0 && index >= varType.dimension)) {
-                throw new Error('setAt() array index out of bounds');
-            }
-        }
-        currentProgramBuilder.currentScope().$ast.statements.push(new ASTAssignment(new ASTLValueArray(new ASTLValueScalar(this.$ast), typeof index === 'number' ? new ASTScalar(index, typeI32) : index.$ast, varType.elementType), val instanceof PBShaderExp ? val.$ast : val));
-    }
-    highp() {
-        this.$precision = ShaderPrecisionType.HIGH;
-        return this;
-    }
-    mediump() {
-        this.$precision = ShaderPrecisionType.MEDIUM;
-        return this;
-    }
-    lowp() {
-        this.$precision = ShaderPrecisionType.LOW;
-        return this;
-    }
-    isVector() {
-        const varType = this.$ast.getType();
-        return varType.isPrimitiveType() && varType.isVectorType();
-    }
-    numComponents() {
-        const varType = this.$ast.getType();
-        return varType.isPrimitiveType() ? varType.cols : 0;
-    }
-    getTypeName() {
-        return this.$ast.getType().toTypeName(currentProgramBuilder.getDeviceType());
-    }
-    $get(prop) {
-        if (typeof prop === 'string') {
-            if (prop[0] === '$' || prop in this) {
-                return this[prop];
-            }
-            else {
-                let exp = this.$memberCache[prop];
-                if (!exp) {
-                    const varType = this.$ast?.getType() || this.$typeinfo;
-                    const num = Number(prop);
-                    if (Number.isNaN(num)) {
-                        if (varType.isStructType()) {
-                            const elementIndex = varType.structMembers.findIndex(val => val.name === prop);
-                            if (elementIndex < 0) {
-                                throw new Error(`unknown struct member '${prop}'`);
-                            }
-                            const element = varType.structMembers[elementIndex];
-                            if (element.type.isStructType()) {
-                                const ctor = currentProgramBuilder.structInfo.structs[element.type.structName];
-                                exp = ctor.call(currentProgramBuilder, `${this.$str}.${prop}`);
-                            }
-                            else {
-                                exp = new PBShaderExp(`${this.$str}.${prop}`, element.type);
-                            }
-                            exp.$ast = new ASTHash(this.$ast, prop, element.type);
-                        }
-                        else {
-                            if (!varType.isPrimitiveType() || !varType.isVectorType()) {
-                                throw new Error(`invalid index operation: ${this.$ast.toString(currentProgramBuilder.getDeviceType())}[${prop}]`);
-                            }
-                            if (prop.length === 0
-                                || prop.length > varType.cols
-                                || ([...prop].some(val => 'xyzw'.slice(0, varType.cols).indexOf(val) < 0)
-                                    && [...prop].some(val => 'rgba'.slice(0, varType.cols).indexOf(val) < 0))) {
-                                throw new Error(`unknown swizzle target: ${this.$ast.toString(currentProgramBuilder.getDeviceType())}[${prop}]`);
-                            }
-                            const type = PBPrimitiveTypeInfo.getCachedTypeInfo(varType.resizeType(1, prop.length));
-                            exp = new PBShaderExp('', type);
-                            exp.$ast = new ASTHash(this.$ast, prop, type);
-                        }
-                    }
-                    else {
-                        if (varType.isArrayType()) {
-                            exp = this.at(num);
-                        }
-                        else if (varType.isPrimitiveType() && varType.isVectorType()) {
-                            if (num >= varType.cols) {
-                                throw new Error(`component index out of bounds: ${this.$str}[${num}]`);
-                            }
-                            exp = this.$get('xyzw'[num]);
-                        }
-                        else if (varType.isPrimitiveType() && varType.isMatrixType()) {
-                            const type = PBPrimitiveTypeInfo.getCachedTypeInfo(varType.resizeType(1, varType.cols));
-                            exp = new PBShaderExp('', type);
-                            exp.$ast = new ASTArrayIndex(this.$ast, new ASTScalar(num, typeI32), type);
-                        }
-                        else {
-                            throw new Error(`invalid index operation: ${this.$str}[${num}]`);
-                        }
-                    }
-                    this.$memberCache[prop] = exp;
-                }
-                return exp;
-            }
-        }
-        else {
-            return undefined;
-        }
-    }
-    $set(prop, value) {
-        if (typeof prop === 'string') {
-            if (prop[0] === '$' || prop in this) {
-                this[prop] = value;
-            }
-            else {
-                if ((typeof value !== 'number') && (typeof value !== 'boolean') && !(value instanceof PBShaderExp)) {
-                    throw new Error(`Invalid output value assignment`);
-                }
-                const varType = this.$ast?.getType() || this.$typeinfo;
-                const num = Number(prop);
-                if (Number.isNaN(num)) {
-                    if (varType.isStructType()) {
-                        const elementIndex = varType.structMembers.findIndex(val => val.name === prop);
-                        if (elementIndex < 0) {
-                            throw new Error(`unknown struct member '${prop}`);
-                        }
-                        const element = varType.structMembers[elementIndex];
-                        let dstAST;
-                        if (typeof value === 'number' || typeof value === 'boolean') {
-                            if (!element.type.isPrimitiveType() || !element.type.isScalarType()) {
-                                throw new Error(`can not set struct member '${prop}: invalid value type`);
-                            }
-                            dstAST = new ASTScalar(value, element.type);
-                        }
-                        else if (value instanceof PBShaderExp) {
-                            dstAST = value.$ast;
-                        }
-                        if (!dstAST) {
-                            throw new Error(`can not set struct member '${prop}: invalid value type`);
-                        }
-                        currentProgramBuilder.currentScope().$ast.statements.push(new ASTAssignment(new ASTLValueHash(new ASTLValueScalar(this.$ast), prop, element.type), dstAST));
-                    }
-                    else {
-                        if (prop.length > 1 || ('xyzw'.indexOf(prop) < 0 && 'rgba'.indexOf(prop) < 0)) {
-                            throw new Error(`invalid index operation: ${this.$str}[${num}]`);
-                        }
-                        if (!varType.isPrimitiveType() || !varType.isVectorType()) {
-                            throw new Error(`invalid index operation: ${this.$str}[${num}]`);
-                        }
-                        const type = PBPrimitiveTypeInfo.getCachedTypeInfo(varType.scalarType);
-                        currentProgramBuilder.currentScope().$ast.statements.push(new ASTAssignment(new ASTLValueHash(new ASTLValueScalar(this.$ast), prop, type), value instanceof PBShaderExp ? value.$ast : value));
-                    }
-                }
-                else {
-                    if (varType.isArrayType()) {
-                        this.setAt(num, value);
-                    }
-                    else if (varType.isPrimitiveType() && varType.isVectorType()) {
-                        if (num >= varType.cols) {
-                            throw new Error(`component index out of bounds: ${this.$str}[${num}]`);
-                        }
-                        this.$set('xyzw'[num], value);
-                    }
-                    else if (varType.isPrimitiveType() && varType.isMatrixType()) {
-                        if (!(value instanceof PBShaderExp)) {
-                            throw new Error(`invalid matrix column vector assignment: ${this.$str}[${num}]`);
-                        }
-                        const type = PBPrimitiveTypeInfo.getCachedTypeInfo(varType.resizeType(1, varType.cols));
-                        currentProgramBuilder.currentScope().$ast.statements.push(new ASTAssignment(new ASTLValueArray(new ASTLValueScalar(this.$ast), new ASTScalar(num, typeI32), type), value.$ast));
-                    }
-                    else {
-                        throw new Error(`invalid index operation: ${this.$str}[${num}]`);
-                    }
-                }
-            }
-            return true;
-        }
-        return false;
-    }
-}
+setBuiltinFuncs(ProgramBuilder);
+setConstructors(ProgramBuilder);
 
-export { PBBuiltinScope, PBDoWhileScope, PBForScope, PBFunctionScope, PBGlobalScope, PBIfScope, PBInputScope, PBInsideFunctionScope, PBLocalScope, PBNakedScope, PBOutputScope, PBScope, PBShaderExp, PBWhileScope, ProgramBuilder, makeConstructor };
+export { PBBuiltinScope, PBDoWhileScope, PBForScope, PBFunctionScope, PBGlobalScope, PBIfScope, PBInputScope, PBInsideFunctionScope, PBLocalScope, PBNakedScope, PBOutputScope, PBScope, PBWhileScope, ProgramBuilder };
 //# sourceMappingURL=programbuilder.js.map

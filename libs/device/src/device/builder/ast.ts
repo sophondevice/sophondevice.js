@@ -2,7 +2,8 @@ import { ShaderType } from '../base_types';
 import { semanticToAttrib } from '../gpuobject';
 import * as typeinfo from './types';
 import * as errors from './errors';
-import type { PBShaderExp, PBGlobalScope } from './programbuilder';
+import type { PBGlobalScope } from './programbuilder';
+import type { PBShaderExp } from './base';
 import type { DeviceType } from '../device';
 
 export const BuiltinInputStructNameVS = 'ch_VertexInput';

@@ -2,11 +2,9 @@
 import { WebGLGPUBuffer } from './buffer_webgl.js';
 import { StructuredBufferData } from '../uniformdata.js';
 import '../builder/ast.js';
-import '../base_types.js';
-import { GPUResourceUsageFlags } from '../gpuobject.js';
 import { PBPrimitiveType } from '../builder/types.js';
-import '../builder/builtinfunc.js';
-import '../builder/constructors.js';
+import '../builder/programbuilder.js';
+import { GPUResourceUsageFlags } from '../gpuobject.js';
 
 class WebGLStructuredBuffer extends WebGLGPUBuffer {
     _structure;

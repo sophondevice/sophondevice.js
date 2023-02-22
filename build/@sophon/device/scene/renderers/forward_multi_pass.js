@@ -6,10 +6,8 @@ import { ShaderLib } from '../materiallib/shaderlib.js';
 import { RENDER_PASS_TYPE_MULTI_FORWARD, LIGHT_TYPE_NONE, MATERIAL_FUNC_NORMAL } from '../values.js';
 import '../../device/gpuobject.js';
 import '../../device/builder/ast.js';
-import '../../device/base_types.js';
 import '../../device/builder/types.js';
-import '../../device/builder/builtinfunc.js';
-import '../../device/builder/constructors.js';
+import '../../device/builder/programbuilder.js';
 import '../materiallib/lightmodel.js';
 import '@sophon/base';
 

@@ -2,10 +2,8 @@
 import { Vector4 } from '@sophon/base';
 import { PrimitiveType, CompareFunc } from '../base_types.js';
 import '../builder/ast.js';
-import { ProgramBuilder } from '../builder/programbuilder.js';
 import '../builder/types.js';
-import '../builder/builtinfunc.js';
-import '../builder/constructors.js';
+import { ProgramBuilder } from '../builder/programbuilder.js';
 import { FaceMode, StencilOp } from '../render_states.js';
 
 class WebGPUClearQuad {
