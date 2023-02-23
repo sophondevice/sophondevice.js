@@ -1,6 +1,7 @@
 {
   "name": "@sophon/base",
   "version": "1.0.0",
+  "author": "gyk",
   "description": "device system for sophon base library",
   "homepage": "https://github.com/sophondevice/sophondevice#readme",
   "type": "module",
