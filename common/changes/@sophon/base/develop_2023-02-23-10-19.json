@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@sophon/base",
+      "comment": "add author to base/package.json",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@sophon/base"
+}
