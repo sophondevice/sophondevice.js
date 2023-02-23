@@ -110,3 +110,5 @@ common/temp/
 # rollup
 .rollup.cache
 
+# vscode
+.vscode
