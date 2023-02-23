@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@sophon/device",
+      "comment": "initial create",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@sophon/device"
+}

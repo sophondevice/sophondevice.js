@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@sophon/dom",
+      "comment": "initial create",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@sophon/dom"
+}
