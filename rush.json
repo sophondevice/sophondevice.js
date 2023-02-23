@@ -425,17 +425,20 @@
     // }
     {
       "packageName": "@sophon/base",
-      "projectFolder": "build/@sophon/base",
+      "projectFolder": "libs/base",
+      "publishFolder": "dist",
       "shouldPublish": true
     },
     {
       "packageName": "@sophon/device",
-      "projectFolder": "build/@sophon/device",
+      "projectFolder": "libs/device",
+      "publishFolder": "dist",
       "shouldPublish": true
     },
     {
       "packageName": "@sophon/dom",
-      "projectFolder": "build/@sophon/dom",
+      "projectFolder": "libs/dom",
+      "publishFolder": "dist",
       "shouldPublish": true
     },
     {

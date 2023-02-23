@@ -1,0 +1,63 @@
+{
+  "name": "@sophon/device",
+  "version": "1.0.0",
+  "description": "base system for sophon device library",
+  "homepage": "https://github.com/sophondevice/sophondevice#readme",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "**/*.js",
+    "**/*.d.ts",
+    "**/*.js.map"
+  ],
+  "sideEffects": false,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sophondevice/sophondevice.git"
+  },
+  "scripts": {
+    "build": "cross-env NODE_OPTIONS=--max_old_space_size=8192 rollup -c"
+  },
+  "keywords": [
+    "javascript",
+    "3d",
+    "rendering",
+    "engine",
+    "webgl",
+    "webgpu",
+    "canvas",
+    "sophon",
+    "device"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sophondevice/sophondevice/issues"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.20.12",
+    "@babel/eslint-parser": "^7.19.1",
+    "@babel/preset-env": "^7.20.2",
+    "@rollup/plugin-babel": "^6.0.3",
+    "@rollup/plugin-node-resolve": "^15.0.1",
+    "@rollup/plugin-strip": "^3.0.2",
+    "@rollup/plugin-terser": "^0.4.0",
+    "@rollup/pluginutils": "^5.0.2",
+    "rollup": "^3.15.0",
+    "rollup-plugin-dts": "^5.2.0",
+    "rollup-plugin-copy": "^3.4.0",
+    "rollup-plugin-typescript2": "^0.34.1",
+    "shx": "^0.3.4",
+    "cross-env": "^7.0.3",
+    "typescript": "^4.7.3",
+    "@sophon/base": "workspace:*"
+  },
+  "peerDependencies": {
+    "@sophon/base": "workspace:*"
+  },
+  "dependencies": {
+    "@webgpu/types": "^0.1.26",
+    "@types/node": "^18.13.0"
+  }
+}
