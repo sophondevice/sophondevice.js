@@ -2,9 +2,9 @@ import { TextureTarget, TextureFormat, linearTextureFormatToSRGB } from '../base
 import { textureTargetMap } from './constants_webgl';
 import { WebGLBaseTexture } from './basetexture_webgl';
 import { GPUResourceUsageFlags, TextureImageElement, Texture2DArray, GPUDataBuffer } from '../gpuobject';
+import type { TypedArray } from '@sophon/base';
 import type { WebGLDevice } from './device_webgl';
 import type { WebGLTextureCap } from './capabilities_webgl';
-import type { TypedArray } from '../misc';
 
 export class WebGLTexture2DArray extends WebGLBaseTexture implements Texture2DArray<WebGLTexture> {
   constructor(device: WebGLDevice) {

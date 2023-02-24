@@ -4,10 +4,10 @@ import { WebGPUTextureVideo } from './texturevideo_webgpu';
 import { WebGPUTextureSampler } from './sampler_webgpu';
 import { BufferCreationOptions, GPUResourceUsageFlags, StructuredValue, TextureVideo } from '../gpuobject';
 import { WebGPUObject } from './gpuobject_webgpu';
+import type { TypedArray } from '@sophon/base';
 import type { PBStructTypeInfo } from '../builder';
 import type { WebGPUDevice } from './device';
 import type { BindGroupLayout, BaseTexture, TextureSampler, BindGroup, BindGroupLayoutEntry, StructuredBuffer } from '../gpuobject';
-import type { TypedArray } from '../misc';
 
 export class WebGPUBindGroup extends WebGPUObject<unknown> implements BindGroup {
   private _layout: BindGroupLayout;

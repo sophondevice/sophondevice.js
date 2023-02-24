@@ -2,8 +2,8 @@ import { WebGLGPUBuffer } from "./buffer_webgl";
 import { StructuredBufferData } from "../uniformdata";
 import { PBTypeInfo, PBStructTypeInfo, PBPrimitiveType } from "../builder";
 import { GPUResourceUsageFlags, StructuredBuffer, StructuredValue } from "../gpuobject";
+import type { TypedArray } from "@sophon/base";
 import type { WebGLDevice } from './device_webgl';
-import type { TypedArray } from "../misc";
 
 export class WebGLStructuredBuffer extends WebGLGPUBuffer implements StructuredBuffer {
   private _structure: PBStructTypeInfo;

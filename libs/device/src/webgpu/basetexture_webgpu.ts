@@ -4,10 +4,10 @@ import { TextureTarget, TextureFilter, TextureWrapping, TextureFormat, isCompres
 import { GPUResourceUsageFlags, SamplerOptions, BaseTexture, TextureSampler, GPUDataBuffer } from '../gpuobject';
 import { UploadRingBuffer, UploadTexture, UploadImage } from './uploadringbuffer';
 import { textureFormatMap } from './constants_webgpu';
+import type { TypedArray } from '@sophon/base';
 import type { WebGPUDevice } from './device';
 import type { WebGPUBuffer } from './buffer_webgpu';
 import type { WebGPUTextureCap, ITextureFormatInfoWebGPU } from './capabilities_webgpu';
-import type { TypedArray } from '../misc';
 
 export abstract class WebGPUBaseTexture<T extends GPUTexture|GPUExternalTexture = GPUTexture> extends WebGPUObject<T> {
   protected _target: TextureTarget;

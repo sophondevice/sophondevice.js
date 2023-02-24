@@ -1,4 +1,4 @@
-import { Vector4 } from '@sophon/base';
+import { Vector4, TypedArray } from '@sophon/base';
 import { TextureFormat, WebGLContext, PrimitiveType, hasAlphaChannel, hasRedChannel, hasGreenChannel, hasBlueChannel, isIntegerTextureFormat, isSignedTextureFormat, isFloatTextureFormat, getTextureFormatBlockSize, isCompressedTextureFormat, isDepthTextureFormat } from '../base_types';
 import { isWebGL2, WebGLError } from './utils';
 import { WebGLEnum } from './webgl_enum';
@@ -46,7 +46,6 @@ import { WebGLStructuredBuffer } from './structuredbuffer_webgl';
 import { PBStructTypeInfo, typeU16 } from '../builder';
 import type { ITimer } from '../timer';
 import type { VertexData } from '../vertexdata';
-import type { TypedArray } from '../misc';
 
 declare global {
   interface WebGLRenderingContext {

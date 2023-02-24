@@ -1,4 +1,4 @@
-import { Vector4 } from '@sophon/base';
+import { Vector4, TypedArray } from '@sophon/base';
 import { getTextureFormatBlockSize, PrimitiveType, TextureFormat } from '../base_types';
 import {
   IFrameBufferOptions,
@@ -51,7 +51,6 @@ import type { PBStructTypeInfo } from '../builder';
 import type { WebGPURenderPass } from './renderpass_webgpu';
 import type { WebGPUComputePass } from './computepass_webgpu';
 import type { ITimer } from '../timer';
-import type { TypedArray } from '../misc';
 
 export class WebGPUDevice extends Device {
   private _context: GPUCanvasContext;

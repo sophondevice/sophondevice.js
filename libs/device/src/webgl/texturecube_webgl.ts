@@ -1,11 +1,10 @@
-import { CubeFace } from '@sophon/base';
+import { CubeFace, TypedArray } from '@sophon/base';
 import { TextureFormat, TextureTarget, linearTextureFormatToSRGB } from '../base_types';
 import { WebGLBaseTexture } from './basetexture_webgl';
 import { textureTargetMap, cubeMapFaceMap } from './constants_webgl';
 import { GPUResourceUsageFlags, TextureMipmapData, TextureCube, TextureImageElement, GPUDataBuffer } from '../gpuobject';
 import type { WebGLDevice } from './device_webgl';
 import type { WebGLTextureCap } from './capabilities_webgl';
-import type { TypedArray } from '../misc';
 
 export class WebGLTextureCube extends WebGLBaseTexture implements TextureCube<WebGLTexture> {
   constructor(device: WebGLDevice) {

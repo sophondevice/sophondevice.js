@@ -1,8 +1,8 @@
 import { TextureTarget, TextureFormat, linearTextureFormatToSRGB, getTextureFormatBlockWidth, getTextureFormatBlockHeight, getTextureFormatBlockSize } from '../base_types';
 import { WebGPUBaseTexture } from './basetexture_webgpu';
 import { GPUResourceUsageFlags, TextureImageElement, TextureMipmapData, Texture2D, GPUDataBuffer } from '../gpuobject';
+import type { TypedArray } from '@sophon/base';
 import type { WebGPUDevice } from './device';
-import type { TypedArray } from '../misc';
 
 export class WebGPUTexture2D extends WebGPUBaseTexture implements Texture2D<GPUTexture> {
   constructor(device: WebGPUDevice) {

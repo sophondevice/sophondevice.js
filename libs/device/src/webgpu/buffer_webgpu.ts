@@ -1,18 +1,8 @@
 import { WebGPUObject } from './gpuobject_webgpu';
 import { UploadRingBuffer, UploadBuffer } from './uploadringbuffer';
 import { GPUResourceUsageFlags, GPUDataBuffer } from '../gpuobject';
+import type { TypedArray, TypedArrayConstructor } from '@sophon/base';
 import type { WebGPUDevice } from './device';
-
-type TypedArray = Int8Array|Uint8Array|Int16Array|Uint16Array|Int32Array|Uint32Array|Float32Array;
-type TypedArrayConstructor<T extends TypedArray = any> = {
-  new(): T;
-  new(size: number): T;
-  new(elements: number[]): T;
-  new(buffer: ArrayBuffer): T;
-  new(buffer: ArrayBuffer, byteOffset: number): T;
-  new(buffer: ArrayBuffer, byteOffset: number, length: number): T;
-  BYTES_PER_ELEMENT: number;
-}
 
 export class WebGPUBuffer extends WebGPUObject<GPUBuffer> implements GPUDataBuffer<GPUBuffer> {
   private _size: number;
