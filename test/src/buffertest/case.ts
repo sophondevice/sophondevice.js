@@ -1,9 +1,9 @@
-import * as chaos from '@sophon/device';
+import { Device, makeVertexBufferType } from '@sophon/device';
 
-export async function testBufferReadWrite(device: chaos.Device) {
+export async function testBufferReadWrite(device: Device) {
   const readBuffer = device.createBuffer(4, { usage: 'read' });
   readBuffer.bufferSubData(0, new Uint8Array([1, 2, 3, 4]), 0, 4);
-  const vertexBuffer = device.createStructuredBuffer(chaos.makeVertexBufferType(100, 'position_f32'), {
+  const vertexBuffer = device.createStructuredBuffer(makeVertexBufferType(100, 'position_f32'), {
     usage: 'vertex',
     managed: true
   });

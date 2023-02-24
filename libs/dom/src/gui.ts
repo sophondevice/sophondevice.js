@@ -1,4 +1,4 @@
-import { REvent, REventTarget } from '@sophon/base';
+import { REvent, REventTarget, HttpRequest } from '@sophon/base';
 import * as Yoga from './typeflex/api';
 import { injectGUIEvents, GUIRenderer } from './renderer';
 import { RColor, GUIEventPathBuilder } from './types';
@@ -21,7 +21,7 @@ import { Button } from './components/button';
 import { ScrollBar } from './components/scrollbar';
 import { Option, Select } from './components/select';
 import { Slider } from './components/slider';
-import type { Texture2D, AssetManager } from '@sophon/device';
+import type { Texture2D } from '@sophon/device';
 import type { Font } from './font';
 import type { RPrimitiveBatchList } from './primitive';
 
@@ -416,7 +416,7 @@ export class GUI extends REventTarget {
   /** @internal */
   protected _styleElements: RElement[];
   /** @internal */
-  protected _assetManager: AssetManager;
+  protected _httpRequest: HttpRequest;
 
   constructor(renderer: GUIRenderer, bounds?: UIRect) {
     super(new GUIEventPathBuilder());
@@ -424,7 +424,7 @@ export class GUI extends REventTarget {
     this._drawVisitor = new DrawVisitor(this);
     this._imageManager = new ImageManager(this._renderer);
     this._glyphManager = new GlyphManager(this._renderer);
-    this._assetManager = this._renderer.device.createAssetManager();
+    this._httpRequest = new HttpRequest();
     this._document = null;
     this._focusElement = null;
     this._activeElement = null;
@@ -706,6 +706,9 @@ export class GUI extends REventTarget {
   }
   get bounds(): UIRect {
     return this._bounds;
+  }
+  get httpRequest(): HttpRequest {
+    return this._httpRequest;
   }
   set bounds(rect: UIRect) {
     this._bounds = rect ? { ...rect } : null;
@@ -1000,9 +1003,9 @@ export class GUI extends REventTarget {
   }
   async deserializeFromURL(url: string) {
     this._guiLoading = true;
-    const content = await this._assetManager.fetchTextData(url);
+    const content = await this._httpRequest.requestText(url);
     if (content) {
-      const normalizedURL = this._assetManager.resolveURL(url);
+      const normalizedURL = this._httpRequest.resolveURL(url);
       const index = normalizedURL.lastIndexOf('/');
       this._baseURI = normalizedURL.substring(0, index + 1);
       await this.deserializeFromXML(content);
@@ -1034,7 +1037,7 @@ export class GUI extends REventTarget {
   }
   /** @internal */
   async loadCSSFromURL(url: string) {
-    const content = await this._assetManager.fetchTextData(this._baseURI + url);
+    const content = await this._httpRequest.requestText(this._baseURI + url);
     this.loadCSS(content);
   }
   /** @internal */

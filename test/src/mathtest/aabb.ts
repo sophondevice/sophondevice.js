@@ -1,28 +1,28 @@
-import * as base from '@sophon/base';
+import { Vector3, AABB } from '@sophon/base';
 import { assert, rand } from './common';
 
 export function testAABB() {
   function randAABB() {
-    const v1 = new base.Vector3(rand(-1000, 1000), rand(-1000, 1000), rand(-1000, 1000));
-    const v2 = new base.Vector3(rand(-1000, 1000), rand(-1000, 1000), rand(-1000, 1000));
-    const [min, max] = [base.Vector3.min(v1, v2), base.Vector3.max(v1, v2)];
-    return new base.AABB(min, max);
+    const v1 = new Vector3(rand(-1000, 1000), rand(-1000, 1000), rand(-1000, 1000));
+    const v2 = new Vector3(rand(-1000, 1000), rand(-1000, 1000), rand(-1000, 1000));
+    const [min, max] = [Vector3.min(v1, v2), Vector3.max(v1, v2)];
+    return new AABB(min, max);
   }
-  function getCorners(box: base.AABB): base.Vector3[] {
+  function getCorners(box: AABB): Vector3[] {
     const [minx, miny, minz] = box.minPoint;
     const [maxx, maxy, maxz] = box.maxPoint;
     return [
-      new base.Vector3(minx, miny, minz),
-      new base.Vector3(maxx, miny, minz),
-      new base.Vector3(maxx, maxy, minz),
-      new base.Vector3(minx, maxy, minz),
-      new base.Vector3(minx, miny, maxz),
-      new base.Vector3(maxx, miny, maxz),
-      new base.Vector3(maxx, maxy, maxz),
-      new base.Vector3(minx, maxy, maxz)
+      new Vector3(minx, miny, minz),
+      new Vector3(maxx, miny, minz),
+      new Vector3(maxx, maxy, minz),
+      new Vector3(minx, maxy, minz),
+      new Vector3(minx, miny, maxz),
+      new Vector3(maxx, miny, maxz),
+      new Vector3(maxx, maxy, maxz),
+      new Vector3(minx, maxy, maxz)
     ]
   }
-  function classifyPoints(box: base.AABB, points: base.Vector3[]) {
+  function classifyPoints(box: AABB, points: Vector3[]) {
     let inside = 0;
     let outside = 0;
     for (const p of points) {

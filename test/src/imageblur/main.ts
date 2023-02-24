@@ -1,19 +1,20 @@
-import * as base from '@sophon/base';
-import * as chaos from '@sophon/device';
-import * as dom from '@sophon/dom';
+import { REvent, Vector4 } from '@sophon/base';
+import { Viewer, ProgramBuilder, TextureFormat, PrimitiveType } from '@sophon/device';
+import { AssetManager } from '@sophon/scene';
+import { GUI, GUIRenderer, ScrollBar, RValueChangeEvent, RElement } from '@sophon/dom';
 
 (async function () {
-  const viewer = new chaos.Viewer(document.getElementById('canvas') as HTMLCanvasElement);
+  const viewer = new Viewer(document.getElementById('canvas') as HTMLCanvasElement);
   await viewer.initDevice('webgpu', { msaa: true });
-  const guiRenderer = new dom.GUIRenderer(viewer.device);
-  const GUI = new dom.GUI(guiRenderer);
-  await GUI.deserializeFromXML(document.querySelector('#main-ui').innerHTML);
-  const sceneView = GUI.document.querySelector('#scene-view');
+  const guiRenderer = new GUIRenderer(viewer.device);
+  const gui = new GUI(guiRenderer);
+  await gui.deserializeFromXML(document.querySelector('#main-ui').innerHTML);
+  const sceneView = gui.document.querySelector('#scene-view');
   sceneView.customDraw = true;
 
-  const assetManager = new chaos.AssetManager(viewer.device);
+  const assetManager = new AssetManager(viewer.device);
 
-  const pb = new chaos.ProgramBuilder(viewer.device);
+  const pb = new ProgramBuilder(viewer.device);
   const fullScreenQuadProgram = pb.buildRenderProgram({
     label: 'fullScreenQuad',
     vertex() {
@@ -79,12 +80,12 @@ import * as dom from '@sophon/dom';
   });
   const cubeTexture = await assetManager.fetchTexture('./assets/images/Di-3d.png', null, false, true);
   const textures = [
-    viewer.device.createTexture2D(chaos.TextureFormat.RGBA8UNORM, cubeTexture.width, cubeTexture.height, {
+    viewer.device.createTexture2D(TextureFormat.RGBA8UNORM, cubeTexture.width, cubeTexture.height, {
       colorSpace: 'linear',
       writable: true,
       noMipmap: true
     }),
-    viewer.device.createTexture2D(chaos.TextureFormat.RGBA8UNORM, cubeTexture.width, cubeTexture.height, {
+    viewer.device.createTexture2D(TextureFormat.RGBA8UNORM, cubeTexture.width, cubeTexture.height, {
       colorSpace: 'linear',
       writable: true,
       noMipmap: true
@@ -108,8 +109,8 @@ import * as dom from '@sophon/dom';
   let blockDim: number;
   const tileDim = 128;
   const batch = [4, 4];
-  const sliderFilterSize = sceneView.querySelector('#filter-size') as dom.ScrollBar;
-  const sliderIterations = sceneView.querySelector('#iterations') as dom.ScrollBar;
+  const sliderFilterSize = sceneView.querySelector('#filter-size') as ScrollBar;
+  const sliderIterations = sceneView.querySelector('#iterations') as ScrollBar;
   const settings = {
     filterSize: Number(sliderFilterSize.value),
     iterations: Number(sliderIterations.value),
@@ -121,16 +122,16 @@ import * as dom from '@sophon/dom';
       blockDim: blockDim
     });
   };
-  sliderFilterSize.addEventListener(dom.RValueChangeEvent.NAME, function () {
+  sliderFilterSize.addEventListener(RValueChangeEvent.NAME, function () {
     settings.filterSize = sliderFilterSize.value;
     updateSettings();
   });
-  sliderIterations.addEventListener(dom.RValueChangeEvent.NAME, function () {
+  sliderIterations.addEventListener(RValueChangeEvent.NAME, function () {
     settings.iterations = sliderIterations.value;
     updateSettings();
   });
   updateSettings();
-  sceneView.addEventListener('draw', function (this: dom.RElement, evt: base.REvent) {
+  sceneView.addEventListener('draw', function (this: RElement, evt: REvent) {
     evt.preventDefault();
     viewer.device.setProgram(blurProgram);
     viewer.device.setBindGroup(0, computeUniforms);
@@ -144,15 +145,15 @@ import * as dom from '@sophon/dom';
       viewer.device.setBindGroup(1, computeBindGroup1);
       viewer.device.compute(Math.ceil(cubeTexture.height / blockDim), Math.ceil(cubeTexture.width / batch[1]), 1);
     }
-    viewer.device.clearFrameBuffer(new base.Vector4(0, 0, 0, 1), 1, 0);
+    viewer.device.clearFrameBuffer(new Vector4(0, 0, 0, 1), 1, 0);
     viewer.device.setProgram(fullScreenQuadProgram);
     viewer.device.setBindGroup(0, resultBindGroup);
     viewer.device.setBindGroup(1, null);
     viewer.device.setVertexData(null);
-    viewer.device.draw(chaos.PrimitiveType.TriangleList, 0, 6);
+    viewer.device.draw(PrimitiveType.TriangleList, 0, 6);
   });
 
-  viewer.device.runLoop(device => GUI.render());
+  viewer.device.runLoop(device => gui.render());
 
 }());
 

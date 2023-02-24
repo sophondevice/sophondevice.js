@@ -58,6 +58,7 @@
     "diff": "^5.0.0",
     "@sophon/base": "workspace:*",
     "@sophon/device": "workspace:*",
+    "@sophon/scene": "workspace:*",
     "@sophon/dom": "workspace:*"
   }
 }

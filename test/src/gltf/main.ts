@@ -1,25 +1,26 @@
-import * as base from '@sophon/base';
-import * as chaos from '@sophon/device';
-import * as dom from '@sophon/dom';
+import { REvent } from '@sophon/base';
+import { Viewer, DeviceType } from '@sophon/device';
+import { Scene } from '@sophon/scene';
+import { GUI, GUIRenderer, RElement } from '@sophon/dom';
 import * as common from '../common';
 import { GLTFViewer } from './gltfviewer';
 
 (async function () {
   const canvas = document.getElementById('canvas') as HTMLCanvasElement;
-  const viewer = new chaos.Viewer(canvas);
-  await viewer.initDevice(common.getQueryString('dev') as chaos.DeviceType || 'webgl', { msaa: true });
-  const guiRenderer = new dom.GUIRenderer(viewer.device);
-  const GUI = new dom.GUI(guiRenderer);
-  await GUI.deserializeFromXML(document.querySelector('#main-ui').innerHTML);
-  const sceneView = GUI.document.querySelector('#scene-view');
+  const viewer = new Viewer(canvas);
+  await viewer.initDevice(common.getQueryString('dev') as DeviceType || 'webgl', { msaa: true });
+  const guiRenderer = new GUIRenderer(viewer.device);
+  const gui = new GUI(guiRenderer);
+  await gui.deserializeFromXML(document.querySelector('#main-ui').innerHTML);
+  const sceneView = gui.document.querySelector('#scene-view');
   sceneView.customDraw = true;
-  const group = GUI.document.querySelector('#button-group');
-  const scene = new chaos.Scene(viewer.device);
+  const group = gui.document.querySelector('#button-group');
+  const scene = new Scene(viewer.device);
   common.createTestPanel(scene, group);
   common.createSceneTweakPanel(scene, group, { width: '200px' });
   common.createTextureViewPanel(viewer.device, sceneView, 300);
 
-  const gltfViewer = new GLTFViewer(GUI, scene);
+  const gltfViewer = new GLTFViewer(gui, scene);
   gltfViewer.camera.mouseInputSource = sceneView;
   gltfViewer.camera.keyboardInputSource = sceneView;
   // await gltfViewer.initEnvironment();
@@ -40,12 +41,12 @@ import { GLTFViewer } from './gltfviewer';
     width: '200px'
   });
   */
-  sceneView.addEventListener('layout', function (this: dom.RElement) {
+  sceneView.addEventListener('layout', function (this: RElement) {
     const rect = this.getClientRect();
     gltfViewer.aspect = rect.width / rect.height;
   });
 
-  sceneView.addEventListener('draw', function (this: dom.RElement, evt: base.REvent) {
+  sceneView.addEventListener('draw', function (this: RElement, evt: REvent) {
     evt.preventDefault();
     gltfViewer.render();
   });
@@ -55,7 +56,7 @@ import { GLTFViewer } from './gltfviewer';
     console.log(`raycast: ${intersected?.constructor.name || null}`);
   });
 
-  viewer.device.runLoop(device => GUI.render());
+  viewer.device.runLoop(device => gui.render());
 
 }());
 

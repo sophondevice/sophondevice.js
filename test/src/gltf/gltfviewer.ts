@@ -1,42 +1,41 @@
-import * as base from '@sophon/base';
-import * as chaos from '@sophon/device';
-import * as dom from '@sophon/dom';
+import { Vector4, Vector3, Matrix4x4, AABB } from '@sophon/base';
+import { SceneNode, BoundingBox, GraphNode, Material, Model, AssetManager, Scene, RenderScheme, Camera, DirectionalLight, BUILTIN_ASSET_TEXTURE_SHEEN_LUT, ForwardRenderScheme, OrbitCameraModel } from '@sophon/scene';
+import { GUI, Select, Option } from '@sophon/dom';
 
 export class GLTFViewer {
-  private _gui: dom.GUI;
-  private _animationSelector: dom.Select;
+  private _gui: GUI;
+  private _animationSelector: Select;
   private _currentAnimation: string;
-  private _modelNode: chaos.Model;
-  private _assetManager: chaos.AssetManager;
-  private _scene: chaos.Scene;
-  private _scheme: chaos.RenderScheme;
-  private _camera: chaos.Camera;
-  private _light: chaos.DirectionalLight;
+  private _modelNode: Model;
+  private _assetManager: AssetManager;
+  private _scene: Scene;
+  private _scheme: RenderScheme;
+  private _camera: Camera;
+  private _light: DirectionalLight;
   private _fov: number;
   private _aspect: number;
   private _nearPlane: number;
-  constructor(GUI: dom.GUI, scene: chaos.Scene) {
-    this._gui = GUI;
-    this._animationSelector = this._gui.document.querySelector<dom.Select>('#animation');
+  constructor(gui: GUI, scene: Scene) {
+    this._gui = gui;
+    this._animationSelector = this._gui.document.querySelector<Select>('#animation');
     this._currentAnimation = null;
     this._modelNode = null;
     this._scene = scene;
-    this._assetManager = new chaos.AssetManager(scene.device);
-    this._assetManager.fetchBuiltinTexture(chaos.BUILTIN_ASSET_TEXTURE_SHEEN_LUT);
-    this._scheme = new chaos.ForwardRenderScheme(scene.device);
+    this._assetManager = new AssetManager(scene.device);
+    this._assetManager.fetchBuiltinTexture(BUILTIN_ASSET_TEXTURE_SHEEN_LUT);
+    this._scheme = new ForwardRenderScheme(scene.device);
     this._fov = Math.PI / 3;
     this._aspect = 1;
     this._nearPlane = 1;
     this._camera = this._scene.addCamera();
     this._camera.position.set(0, 0, 15);
-    // this._camera.setModel(new chaos.FPSCameraModel());
-    this._camera.setModel(new chaos.OrbitCameraModel());
-    this._light = new chaos.DirectionalLight(this._scene)
-      .setColor(new base.Vector4(1, 1, 1, 1))
+    this._camera.setModel(new OrbitCameraModel());
+    this._light = new DirectionalLight(this._scene)
+      .setColor(new Vector4(1, 1, 1, 1))
       .setCastShadow(false);
     this._light.shadow.shadowMapSize = 1024;
-    this._light.lookAt(new base.Vector3(10, 10, 10), new base.Vector3(0, 0, 0), base.Vector3.axisPY());
-    chaos.Material.setGCOptions({ drawableCountThreshold: 0, materialCountThreshold: 0, inactiveTimeDuration: 10000, verbose: true });
+    this._light.lookAt(new Vector3(10, 10, 10), new Vector3(0, 0, 0), Vector3.axisPY());
+    Material.setGCOptions({ drawableCountThreshold: 0, materialCountThreshold: 0, inactiveTimeDuration: 10000, verbose: true });
     this._animationSelector.addEventListener('change', () => {
       if (this._animationSelector.value === 'none') {
         this.stopAnimation();
@@ -45,7 +44,7 @@ export class GLTFViewer {
       }
     });
   }
-  get light(): chaos.DirectionalLight {
+  get light(): DirectionalLight {
     return this._light;
   }
   get FOV(): number {
@@ -66,10 +65,10 @@ export class GLTFViewer {
       this.lookAt();
     }
   }
-  get camera(): chaos.Camera {
+  get camera(): Camera {
     return this._camera;
   }
-  get scene(): chaos.Scene {
+  get scene(): Scene {
     return this._scene;
   }
   get animations(): string[] {
@@ -79,7 +78,7 @@ export class GLTFViewer {
     this.resolveDraggedItems(data).then(fileMap => {
       if (fileMap) {
         console.log(fileMap);
-        this._assetManager.urlResolver = url => {
+        this._assetManager.httpRequest.urlResolver = url => {
           return fileMap.get(url) || url;
         }
         const modelFile = Array.from(fileMap.keys()).find(val => /(\.gltf|\.glb)$/i.test(val));
@@ -88,20 +87,20 @@ export class GLTFViewer {
           this._assetManager.clearCache();
           this._assetManager.createModelNode(this._scene, modelFile, null).then(node => {
             this._modelNode = node;
-            this._modelNode.pickMode = chaos.GraphNode.PICK_ENABLED;
+            this._modelNode.pickMode = GraphNode.PICK_ENABLED;
             this.lookAt();
             this._currentAnimation = null;
             while (this._animationSelector.firstChild) {
               this._animationSelector.removeChild(this._animationSelector.firstChild);
             }
-            const optionNoAnimation = this._gui.document.createElement<dom.Option>('option');
+            const optionNoAnimation = this._gui.document.createElement<Option>('option');
             optionNoAnimation.textContent = 'No animation';
             optionNoAnimation.setAttribute('value', 'none');
             this._animationSelector.appendChild(optionNoAnimation);
             let activeAnimation: string = null;
             for (let i = 0; i < this.animations.length; i++) {
               const name = this.animations[i];
-              const option = this._gui.document.createElement<dom.Option>('option');
+              const option = this._gui.document.createElement<Option>('option');
               option.textContent = name;
               option.setAttribute('value', name);
               if (i === 0) {
@@ -137,7 +136,7 @@ export class GLTFViewer {
   enableShadow(enable: boolean) {
     this._light.setCastShadow(enable);
   }
-  raycast(screenX: number, screenY: number): chaos.GraphNode {
+  raycast(screenX: number, screenY: number): GraphNode {
     return this._scene.raycast(this._camera, screenX, screenY);
   }
   render() {
@@ -160,13 +159,13 @@ export class GLTFViewer {
       }
       const dist = size / Math.tan(this._fov * 0.5) + extents.z + this._nearPlane;
 
-      this._camera.lookAt(base.Vector3.add(center, base.Vector3.scale(base.Vector3.axisPZ(), dist)), center, base.Vector3.axisPY());
-      this._camera.setProjectionMatrix(base.Matrix4x4.perspective(this._camera.getFOV(), this._aspect, Math.min(1, this._camera.getNearPlane()), Math.max(10, dist + extents.z + 100)));
-      (this._camera.model as chaos.OrbitCameraModel).setOptions({ distance: dist });
+      this._camera.lookAt(Vector3.add(center, Vector3.scale(Vector3.axisPZ(), dist)), center, Vector3.axisPY());
+      this._camera.setProjectionMatrix(Matrix4x4.perspective(this._camera.getFOV(), this._aspect, Math.min(1, this._camera.getNearPlane()), Math.max(10, dist + extents.z + 100)));
+      (this._camera.model as OrbitCameraModel).setOptions({ distance: dist });
     }
   }
-  private getBoundingBox(): base.AABB {
-    const bbox = new chaos.BoundingBox();
+  private getBoundingBox(): AABB {
+    const bbox = new BoundingBox();
     bbox.beginExtend();
     this.traverseModel(node => {
       if (node.isGraphNode()) {
@@ -179,9 +178,9 @@ export class GLTFViewer {
     });
     return bbox.isValid() ? bbox : null;
   }
-  private traverseModel(func: (node: chaos.SceneNode) => void, context?: any) {
+  private traverseModel(func: (node: SceneNode) => void, context?: any) {
     if (this._modelNode) {
-      const queue: chaos.SceneNode[] = [this._modelNode];
+      const queue: SceneNode[] = [this._modelNode];
       while (queue.length > 0) {
         const node = queue.shift();
         queue.push(...node.children);

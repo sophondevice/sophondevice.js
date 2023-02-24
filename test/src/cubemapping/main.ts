@@ -1,24 +1,25 @@
-import * as base from '@sophon/base';
-import * as chaos from '@sophon/device';
-import * as dom from '@sophon/dom';
+import { Matrix4x4, Vector3, Vector4, REvent } from '@sophon/base';
+import { Viewer, DeviceType, FrameBuffer, TextureSampler, TextureCube, Texture2D, Device, TextureFormat, PBInsideFunctionScope, PBShaderExp } from '@sophon/device';
+import { Mesh, SphereMesh, AssetManager, DirectionalLight, ForwardRenderScheme, ForwardMultiRenderPass, ForwardRenderPass, OrbitCameraModel, RenderPass, ShaderLib, Scene, Camera, GraphNode, UnlitLightModel, StandardMaterial, PBRMetallicRoughnessMaterial } from '@sophon/scene';
+import { GUIRenderer, GUI, RElement, RKeyEvent } from '@sophon/dom';
 import * as common from '../common';
 
-class MyRenderScheme extends chaos.ForwardRenderScheme {
-  cubemapRenderPass: chaos.RenderPass;
-  cubemapRenderCamera: Map<chaos.Scene, chaos.Camera>;
-  cubemapCamera: chaos.Camera;
-  fb: chaos.FrameBuffer;
-  colorAttachment: chaos.TextureCube;
-  depthAttachment: chaos.Texture2D;
-  reflectiveSphere: chaos.Mesh;
-  constructor(device: chaos.Device) {
+class MyRenderScheme extends ForwardRenderScheme {
+  cubemapRenderPass: RenderPass;
+  cubemapRenderCamera: Map<Scene, Camera>;
+  cubemapCamera: Camera;
+  fb: FrameBuffer;
+  colorAttachment: TextureCube;
+  depthAttachment: Texture2D;
+  reflectiveSphere: Mesh;
+  constructor(device: Device) {
     super(device);
-    this.cubemapRenderPass = device.getDeviceType() === 'webgl' ? new chaos.ForwardMultiRenderPass(this, 'cubemap') : new chaos.ForwardRenderPass(this, 'cubemap');
+    this.cubemapRenderPass = device.getDeviceType() === 'webgl' ? new ForwardMultiRenderPass(this, 'cubemap') : new ForwardRenderPass(this, 'cubemap');
     this.cubemapRenderCamera = new Map();
-    this.colorAttachment = device.createCubeTexture(chaos.TextureFormat.RGBA8UNORM, 512, {
+    this.colorAttachment = device.createCubeTexture(TextureFormat.RGBA8UNORM, 512, {
       colorSpace: 'linear'
     });
-    this.depthAttachment = device.createTexture2D(chaos.TextureFormat.D24S8, 512, 512, {
+    this.depthAttachment = device.createTexture2D(TextureFormat.D24S8, 512, 512, {
       noMipmap: true
     });
     this.fb = device.createFrameBuffer({
@@ -30,15 +31,15 @@ class MyRenderScheme extends chaos.ForwardRenderScheme {
       },
     });
   }
-  renderScene(scene: chaos.Scene, camera: chaos.Camera) {
+  renderScene(scene: Scene, camera: Camera) {
     if (this.reflectiveSphere) {
       if (!this.cubemapRenderCamera.get(scene)) {
-        this.cubemapRenderCamera.set(scene, new chaos.Camera(scene));
-        this.cubemapRenderCamera.get(scene).projectionMatrix = base.Matrix4x4.perspective(Math.PI / 2, 1, 1, 500);
+        this.cubemapRenderCamera.set(scene, new Camera(scene));
+        this.cubemapRenderCamera.get(scene).projectionMatrix = Matrix4x4.perspective(Math.PI / 2, 1, 1, 500);
       }
-      this.reflectiveSphere.showState = chaos.GraphNode.SHOW_HIDE;
+      this.reflectiveSphere.showState = GraphNode.SHOW_HIDE;
       this.cubemapRenderPass.renderToCubeTexture(scene, this.cubemapRenderCamera.get(scene), this.fb);
-      this.reflectiveSphere.showState = chaos.GraphNode.SHOW_DEFAULT;
+      this.reflectiveSphere.showState = GraphNode.SHOW_DEFAULT;
     }
     super.renderScene(scene, camera);
   }
@@ -53,10 +54,10 @@ class MyRenderScheme extends chaos.ForwardRenderScheme {
   }
 }
 
-class ReflectLightModel extends chaos.UnlitLightModel {
-  private _reflectTexture: chaos.TextureCube;
-  private _reflectTextureSampler: chaos.TextureSampler;
-  constructor(reflectTexture: chaos.TextureCube) {
+class ReflectLightModel extends UnlitLightModel {
+  private _reflectTexture: TextureCube;
+  private _reflectTextureSampler: TextureSampler;
+  constructor(reflectTexture: TextureCube) {
     super();
     this._reflectTexture = reflectTexture;
     this._reflectTextureSampler = reflectTexture?.getDefaultSampler(false);
@@ -65,73 +66,73 @@ class ReflectLightModel extends chaos.UnlitLightModel {
   isNormalUsed(): boolean {
     return true;
   }
-  calculateAlbedo(scope: chaos.PBInsideFunctionScope): chaos.PBShaderExp {
+  calculateAlbedo(scope: PBInsideFunctionScope): PBShaderExp {
     const pb = scope.$builder;
     const reflectTexture = scope[this.getTextureUniformName('reflection')];
-    const v = pb.normalize(pb.sub(scope.$inputs.worldPosition.xyz, scope.$query(chaos.ShaderLib.USAGE_CAMERA_POSITION)));
+    const v = pb.normalize(pb.sub(scope.$inputs.worldPosition.xyz, scope.$query(ShaderLib.USAGE_CAMERA_POSITION)));
     const r = pb.reflect(v, pb.normalize(scope.$inputs.worldNormal));
     return pb.textureSample(reflectTexture, r);
   }
 }
 
 (async function () {
-  const viewer = new chaos.Viewer(document.getElementById('canvas') as HTMLCanvasElement);
-  await viewer.initDevice(common.getQueryString('dev') as chaos.DeviceType || 'webgl', { msaa: true });
-  const guiRenderer = new dom.GUIRenderer(viewer.device);
-  const GUI = new dom.GUI(guiRenderer);
+  const viewer = new Viewer(document.getElementById('canvas') as HTMLCanvasElement);
+  await viewer.initDevice(common.getQueryString('dev') as DeviceType || 'webgl', { msaa: true });
+  const guiRenderer = new GUIRenderer(viewer.device);
+  const gui = new GUI(guiRenderer);
 
-  await GUI.deserializeFromXML(document.querySelector('#main-ui').innerHTML);
-  const sceneView = GUI.document.querySelector('#scene-view');
+  await gui.deserializeFromXML(document.querySelector('#main-ui').innerHTML);
+  const sceneView = gui.document.querySelector('#scene-view');
   sceneView.customDraw = true;
-  const scene = new chaos.Scene(viewer.device);
+  const scene = new Scene(viewer.device);
   const scheme = new MyRenderScheme(viewer.device);
-  const camera = scene.addCamera().lookAt(new base.Vector3(0, 8, 30), new base.Vector3(0, 0, 0), base.Vector3.axisPY());
-  camera.setProjectionMatrix(base.Matrix4x4.perspective(Math.PI / 3, viewer.device.getDrawingBufferWidth() / viewer.device.getDrawingBufferHeight(), 1, 160));
+  const camera = scene.addCamera().lookAt(new Vector3(0, 8, 30), new Vector3(0, 0, 0), Vector3.axisPY());
+  camera.setProjectionMatrix(Matrix4x4.perspective(Math.PI / 3, viewer.device.getDrawingBufferWidth() / viewer.device.getDrawingBufferHeight(), 1, 160));
   camera.mouseInputSource = sceneView;
   camera.keyboardInputSource = sceneView;
-  camera.setModel(new chaos.OrbitCameraModel({ distance: camera.position.magnitude }));
+  camera.setModel(new OrbitCameraModel({ distance: camera.position.magnitude }));
 
-  const assetManager = new chaos.AssetManager(scene.device);
+  const assetManager = new AssetManager(scene.device);
 
-  const reflectionTexture = scheme.fb.getColorAttachments()[0] as chaos.TextureCube;
-  const material = new chaos.StandardMaterial<ReflectLightModel>(scene.device);
+  const reflectionTexture = scheme.fb.getColorAttachments()[0] as TextureCube;
+  const material = new StandardMaterial<ReflectLightModel>(scene.device);
   material.lightModel = new ReflectLightModel(reflectionTexture);
-  const cubeTexture = await assetManager.fetchTexture<chaos.TextureCube>('./assets/images/sky2.dds', null, true);
+  const cubeTexture = await assetManager.fetchTexture<TextureCube>('./assets/images/sky2.dds', null, true);
   scene.addSkybox(cubeTexture);
-  scheme.reflectiveSphere = new chaos.SphereMesh(scene, { radius: 10, material: material });
+  scheme.reflectiveSphere = new SphereMesh(scene, { radius: 10, material: material });
 
-  const light = new chaos.DirectionalLight(scene)
-    .setColor(new base.Vector4(1, 1, 1, 1))
+  const light = new DirectionalLight(scene)
+    .setColor(new Vector4(1, 1, 1, 1))
     .setIntensity(1)
     .setCastShadow(false);
-  light.lookAt(new base.Vector3(10, 10, 10), new base.Vector3(0, 0, 0), base.Vector3.axisPY());
+  light.lookAt(new Vector3(10, 10, 10), new Vector3(0, 0, 0), Vector3.axisPY());
 
-  const stdMat = new chaos.PBRMetallicRoughnessMaterial(scene.device);
+  const stdMat = new PBRMetallicRoughnessMaterial(scene.device);
   stdMat.lightModel.setAlbedoMap(await assetManager.fetchTexture('./assets/images/rustediron2_basecolor.png', null, true), null, 0);
   stdMat.lightModel.setNormalMap(await assetManager.fetchTexture('./assets/images/rustediron2_normal.png', null, false), null, 0);
   stdMat.lightModel.setMetallicMap(await assetManager.fetchTexture('./assets/images/mr.png', null, false), null, 0);
   stdMat.lightModel.metallicIndex = 0;
   stdMat.lightModel.roughnessIndex = 1;
 
-  const sphere2 = chaos.Mesh.unitSphere(scene);
+  const sphere2 = Mesh.unitSphere(scene);
   sphere2.material = stdMat;
-  sphere2.scaling = new base.Vector3(3, 3, 3);
+  sphere2.scaling = new Vector3(3, 3, 3);
 
-  const sphere3 = chaos.Mesh.unitSphere(scene);
+  const sphere3 = Mesh.unitSphere(scene);
   sphere3.material = stdMat;
-  sphere3.scaling = new base.Vector3(3, 3, 3);
+  sphere3.scaling = new Vector3(3, 3, 3);
 
-  const sphere4 = chaos.Mesh.unitSphere(scene);
+  const sphere4 = Mesh.unitSphere(scene);
   sphere4.material = stdMat;
-  sphere4.scaling = new base.Vector3(3, 3, 3);
+  sphere4.scaling = new Vector3(3, 3, 3);
 
-  sceneView.addEventListener('layout', function (this: dom.RElement) {
+  sceneView.addEventListener('layout', function (this: RElement) {
     const rect = this.getClientRect();
-    camera.setProjectionMatrix(base.Matrix4x4.perspective(camera.getFOV(), rect.width / rect.height, camera.getNearPlane(), camera.getFarPlane()));
+    camera.setProjectionMatrix(Matrix4x4.perspective(camera.getFOV(), rect.width / rect.height, camera.getNearPlane(), camera.getFarPlane()));
   });
 
-  sceneView.addEventListener('keyup', function (evt: base.REvent) {
-    const keyEvent = evt as dom.RKeyEvent;
+  sceneView.addEventListener('keyup', function (evt: REvent) {
+    const keyEvent = evt as RKeyEvent;
     console.log(keyEvent.code, keyEvent.key);
     if (keyEvent.code === 'Space') {
       if (sphere2.attached) {
@@ -147,7 +148,7 @@ class ReflectLightModel extends chaos.UnlitLightModel {
     }
   });
 
-  sceneView.addEventListener('draw', function (this: dom.RElement, evt: base.REvent) {
+  sceneView.addEventListener('draw', function (this: RElement, evt: REvent) {
     evt.preventDefault();
     const elapsed = viewer.device.frameInfo.elapsedOverall;
     sphere2.position.set(20 * Math.sin(elapsed * 0.003), 0, 20 * Math.cos(elapsed * 0.003));
@@ -156,7 +157,7 @@ class ReflectLightModel extends chaos.UnlitLightModel {
     scheme.renderScene(scene, camera);
   });
 
-  viewer.device.runLoop(device => GUI.render());
+  viewer.device.runLoop(device => gui.render());
 
 }());
 

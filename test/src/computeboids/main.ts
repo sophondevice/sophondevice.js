@@ -1,17 +1,17 @@
-import * as base from '@sophon/base';
-import * as chaos from '@sophon/device';
-import * as dom from '@sophon/dom';
+import { REvent, Vector4 } from '@sophon/base';
+import { Viewer, ProgramBuilder, Geometry, makeVertexBufferType, PBStructTypeInfo, StructuredBuffer, BindGroup, PrimitiveType } from '@sophon/device';
+import { GUIRenderer, GUI, RElement } from '@sophon/dom';
 
 (async function () {
-  const viewer = new chaos.Viewer(document.getElementById('canvas') as HTMLCanvasElement);
+  const viewer = new Viewer(document.getElementById('canvas') as HTMLCanvasElement);
   await viewer.initDevice('webgpu', { msaa: true });
-  const guiRenderer = new dom.GUIRenderer(viewer.device);
-  const GUI = new dom.GUI(guiRenderer);
-  await GUI.deserializeFromXML(document.querySelector('#main-ui').innerHTML);
-  const sceneView = GUI.document.querySelector('#scene-view');
+  const guiRenderer = new GUIRenderer(viewer.device);
+  const gui = new GUI(guiRenderer);
+  await gui.deserializeFromXML(document.querySelector('#main-ui').innerHTML);
+  const sceneView = gui.document.querySelector('#scene-view');
   sceneView.customDraw = true;
 
-  const pb = new chaos.ProgramBuilder(viewer.device);
+  const pb = new ProgramBuilder(viewer.device);
   const spriteProgram = pb.buildRenderProgram({
     label: 'spriteRender',
     vertex() {
@@ -111,7 +111,7 @@ import * as dom from '@sophon/dom';
       });
     }
   });
-  const spriteVertexBuffer = viewer.device.createStructuredBuffer(chaos.makeVertexBufferType(3, 'position_f32x2'), {
+  const spriteVertexBuffer = viewer.device.createStructuredBuffer(makeVertexBufferType(3, 'position_f32x2'), {
     usage: 'vertex',
     managed: true
   }, new Float32Array([-0.01, -0.02, 0.01, -0.02, 0.0, 0.02]));
@@ -124,7 +124,7 @@ import * as dom from '@sophon/dom';
     rule2Scale: 0.05,
     rule3Scale: 0.005
   };
-  const uniformBuffer = viewer.device.createStructuredBuffer(spriteUpdateProgram.getBindingInfo('params').type as chaos.PBStructTypeInfo, {
+  const uniformBuffer = viewer.device.createStructuredBuffer(spriteUpdateProgram.getBindingInfo('params').type as PBStructTypeInfo, {
     usage: 'uniform'
   });
   const numParticles = 1500;
@@ -135,11 +135,11 @@ import * as dom from '@sophon/dom';
     initialParticleData[4 * i + 2] = 2 * (Math.random() - 0.5) * 0.1;
     initialParticleData[4 * i + 3] = 2 * (Math.random() - 0.5) * 0.1;
   }
-  const particleBuffers: chaos.StructuredBuffer[] = [];
-  const particleBindGroups: chaos.BindGroup[] = [];
-  const primitives: chaos.Primitive[] = [];
+  const particleBuffers: StructuredBuffer[] = [];
+  const particleBindGroups: BindGroup[] = [];
+  const primitives: Geometry[] = [];
   for (let i = 0; i < 2; i++) {
-    particleBuffers.push(viewer.device.createStructuredBuffer(chaos.makeVertexBufferType(numParticles, 'tex0_f32x2', 'tex1_f32x2'), {
+    particleBuffers.push(viewer.device.createStructuredBuffer(makeVertexBufferType(numParticles, 'tex0_f32x2', 'tex1_f32x2'), {
       usage: 'vertex',
       storage: true
     }, initialParticleData));
@@ -151,8 +151,8 @@ import * as dom from '@sophon/dom';
     bindGroup.setBuffer('particlesB', particleBuffers[(i + 1) % 2]);
     particleBindGroups.push(bindGroup);
 
-    const primitive = new chaos.Primitive(viewer.device);
-    primitive.primitiveType = chaos.PrimitiveType.TriangleList;
+    const primitive = new Geometry(viewer.device);
+    primitive.primitiveType = PrimitiveType.TriangleList;
     primitive.setVertexBuffer(spriteVertexBuffer, 'vertex');
     primitive.setVertexBuffer(particleBuffers[i], 'instance');
     primitive.indexCount = 3;
@@ -166,19 +166,19 @@ import * as dom from '@sophon/dom';
   }
   updateSimParams();
   let t = 0;
-  sceneView.addEventListener('draw', function (this: dom.RElement, evt: base.REvent) {
+  sceneView.addEventListener('draw', function (this: RElement, evt: REvent) {
     evt.preventDefault();
     viewer.device.setProgram(spriteUpdateProgram);
     viewer.device.setBindGroup(0, particleBindGroups[t % 2]);
     viewer.device.compute(Math.ceil(numParticles / 64), 1, 1);
 
-    viewer.device.clearFrameBuffer(new base.Vector4(0, 0, 0, 1), 1, 0);
+    viewer.device.clearFrameBuffer(new Vector4(0, 0, 0, 1), 1, 0);
     viewer.device.setProgram(spriteProgram);
     viewer.device.setBindGroup(0, null);
     primitives[(t + 1) % 2].drawInstanced(numParticles);
     t++;
   });
-  viewer.device.runLoop(device => GUI.render());
+  viewer.device.runLoop(device => gui.render());
 
 }());
 

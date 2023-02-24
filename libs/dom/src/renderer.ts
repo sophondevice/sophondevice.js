@@ -13,7 +13,7 @@ import {
   makeVertexBufferType,
   TextureSampler,
   TextureFilter,
-  Primitive
+  Geometry
 } from '@sophon/device';
 import { RMouseEvent, RDragEvent, RKeyEvent } from './events';
 import type { RColor } from './types';
@@ -26,7 +26,7 @@ export class GUIRenderer extends REventTarget {
   /** @internal */
   private _device: Device;
   /** @internal */
-  private _primitiveBuffer: Primitive[];
+  private _primitiveBuffer: Geometry[];
   /** @internal */
   private _activeBuffer: number;
   /** @internal */
@@ -72,7 +72,7 @@ export class GUIRenderer extends REventTarget {
       mipFilter: TextureFilter.None
     });
     this._renderStateSet = this.createStateSet();
-    this._primitiveBuffer = [new Primitive(device), new Primitive(device)];
+    this._primitiveBuffer = [new Geometry(device), new Geometry(device)];
     this._activeBuffer = 0;
     this._savedViewports = [];
     this._savedScissors = [];

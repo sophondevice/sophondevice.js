@@ -1,5 +1,5 @@
-import * as base from '@sophon/base';
-import * as chaos from '@sophon/device';
+import { Vector2, Vector3 } from '@sophon/base';
+import { Scene, AssetManager, Terrain } from '@sophon/scene';
 
 declare global {
   interface Window {
@@ -17,8 +17,8 @@ async function loadPng(url: string): Promise<{
   return await pngtoy.decode();
 }
 
-export async function loadEarthSculptorMap(scene: chaos.Scene, mapUrl: string): Promise<chaos.Terrain> {
-  const assetManager = new chaos.AssetManager(scene.device);
+export async function loadEarthSculptorMap(scene: Scene, mapUrl: string): Promise<Terrain> {
+  const assetManager = new AssetManager(scene.device);
   const map = await assetManager.fetchTextData(mapUrl);
   const baseUrl = mapUrl.slice(0, mapUrl.lastIndexOf('/'));
   const options: { [name: string]: string[] } = {};
@@ -77,15 +77,15 @@ export async function loadEarthSculptorMap(scene: chaos.Scene, mapUrl: string): 
     const h = ((heightValues[i] & 0xff) << 8) | ((heightValues[i] & 0xff00) >>> 8);
     heights[i] = h / 65535 * heightScale;
   }
-  const terrain = new chaos.Terrain(scene);
-  terrain.create(sizeX, sizeZ, heights, new base.Vector3(1, 1, 1), 33);
+  const terrain = new Terrain(scene);
+  terrain.create(sizeX, sizeZ, heights, new Vector3(1, 1, 1), 33);
   terrain.maxPixelError = 6;
   terrain.material.baseMap = await assetManager.fetchTexture(baseMap, null, true);
   terrain.material.detailMaskMap = await assetManager.fetchTexture(maskMap, null, false);
   for (let i = 0; i < 4; i++) {
     const scaleX = sizeX / detailScales[i];
     const scaleZ = sizeZ / detailScales[i];
-    terrain.material.addDetailMap(await assetManager.fetchTexture(detailMaps[i]), new base.Vector2(scaleX, scaleZ));
+    terrain.material.addDetailMap(await assetManager.fetchTexture(detailMaps[i]), new Vector2(scaleX, scaleZ));
   }
   return terrain;
 }

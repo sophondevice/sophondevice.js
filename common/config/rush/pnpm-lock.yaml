@@ -126,6 +126,49 @@ importers:
       shx: 0.3.4
       typescript: 4.9.5
 
+  ../../libs/scene:
+    specifiers:
+      '@babel/core': ^7.20.12
+      '@babel/eslint-parser': ^7.19.1
+      '@babel/preset-env': ^7.20.2
+      '@rollup/plugin-babel': ^6.0.3
+      '@rollup/plugin-node-resolve': ^15.0.1
+      '@rollup/plugin-strip': ^3.0.2
+      '@rollup/plugin-terser': ^0.4.0
+      '@rollup/pluginutils': ^5.0.2
+      '@sophon/base': workspace:*
+      '@sophon/device': workspace:*
+      '@types/node': ^18.13.0
+      '@webgpu/types': ^0.1.26
+      cross-env: ^7.0.3
+      rollup: ^3.15.0
+      rollup-plugin-copy: ^3.4.0
+      rollup-plugin-dts: ^5.2.0
+      rollup-plugin-typescript2: ^0.34.1
+      shx: ^0.3.4
+      typescript: ^4.7.3
+    dependencies:
+      '@types/node': 18.13.0
+      '@webgpu/types': 0.1.27
+    devDependencies:
+      '@babel/core': 7.20.12
+      '@babel/eslint-parser': 7.19.1_@babel+core@7.20.12
+      '@babel/preset-env': 7.20.2_@babel+core@7.20.12
+      '@rollup/plugin-babel': 6.0.3_547db84a4cf9a196cc6aaf9a2fed38ba
+      '@rollup/plugin-node-resolve': 15.0.1_rollup@3.15.0
+      '@rollup/plugin-strip': 3.0.2_rollup@3.15.0
+      '@rollup/plugin-terser': 0.4.0_rollup@3.15.0
+      '@rollup/pluginutils': 5.0.2_rollup@3.15.0
+      '@sophon/base': link:../base
+      '@sophon/device': link:../device
+      cross-env: 7.0.3
+      rollup: 3.15.0
+      rollup-plugin-copy: 3.4.0
+      rollup-plugin-dts: 5.2.0_rollup@3.15.0+typescript@4.9.5
+      rollup-plugin-typescript2: 0.34.1_rollup@3.15.0+typescript@4.9.5
+      shx: 0.3.4
+      typescript: 4.9.5
+
   ../../test:
     specifiers:
       '@babel/core': ^7.20.12
@@ -139,6 +182,7 @@ importers:
       '@sophon/base': workspace:*
       '@sophon/device': workspace:*
       '@sophon/dom': workspace:*
+      '@sophon/scene': workspace:*
       '@types/colors': ^1.2.1
       '@types/diff': ^5.0.2
       '@typescript-eslint/eslint-plugin': ^5.51.0
@@ -168,6 +212,7 @@ importers:
       '@sophon/base': link:../libs/base
       '@sophon/device': link:../libs/device
       '@sophon/dom': link:../libs/dom
+      '@sophon/scene': link:../libs/scene
       '@types/colors': 1.2.1
       '@types/diff': 5.0.2
       '@webgpu/types': 0.1.26

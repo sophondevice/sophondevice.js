@@ -1,4 +1,4 @@
-import * as base from '@sophon/base';
+import { Vector3 } from '@sophon/base';
 
-const v = new base.Vector3();
+const v = new Vector3();
 console.log(v.x, v.y, v.z);

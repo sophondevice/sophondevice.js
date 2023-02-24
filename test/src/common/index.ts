@@ -1,6 +1,7 @@
-import * as chaos from '@sophon/device';
-import * as base from '@sophon/base';
-import * as dom from '@sophon/dom';
+import { isDepthTextureFormat, makeVertexBufferType, PrimitiveType, FaceMode, BlendFunc, TextureCube, Texture2D, RenderStateSet, BindGroup, GPUProgram, DeviceFrameEnd, DeviceGPUObjectAddedEvent, DeviceGPUObjectRemovedEvent, DeviceGPUObjectRenameEvent, Device, ProgramBuilder } from '@sophon/device';
+import { Primitive, Mesh, Scene, PunctualLight, AssetManager, EnvIBL, SkyboxMaterial } from '@sophon/scene';
+import { Vector4, REvent } from '@sophon/base';
+import { RElement, ScrollBar, Button, Input, RValueChangeEvent, Select, Option } from '@sophon/dom';
 
 export function getQueryString(name: string) {
   return (new URL(window.location.toString())).searchParams.get(name) || null;
@@ -62,26 +63,26 @@ function decodeColorString(s: string) {
   const r = (value >> 16) & 0xff;
   const g = (value >> 8) & 0xff;
   const b = value & 0xff;
-  return new base.Vector4(Math.pow(r / 255, 2.2), Math.pow(g / 255, 2.2), Math.pow(b / 255, 2.2), 1);
+  return new Vector4(Math.pow(r / 255, 2.2), Math.pow(g / 255, 2.2), Math.pow(b / 255, 2.2), 1);
 }
 
 // linear to sRGB
-function encodeColorString(color: base.Vector4) {
+function encodeColorString(color: Vector4) {
   const r = ('0' + ((Math.pow(color.x, 1 / 2.2) * 255) >> 0).toString(16)).slice(-2);
   const g = ('0' + ((Math.pow(color.y, 1 / 2.2) * 255) >> 0).toString(16)).slice(-2);
   const b = ('0' + ((Math.pow(color.z, 1 / 2.2) * 255) >> 0).toString(16)).slice(-2);
   return `#${r}${g}${b}`;
 }
 
-function createText(parent: dom.RElement, value = '') {
+function createText(parent: RElement, value = '') {
   const text = parent.ownerDocument.createTextNode();
   text.textContent = value;
   parent.append(text);
   return text;
 }
 
-function createScroll(parent: dom.RElement, value: number, stepValue = 0.1, rangeStart = 0, rangeEnd = 50) {
-  const scroll = parent.ownerDocument.createElement<dom.ScrollBar>('scrollbar');
+function createScroll(parent: RElement, value: number, stepValue = 0.1, rangeStart = 0, rangeEnd = 50) {
+  const scroll = parent.ownerDocument.createElement<ScrollBar>('scrollbar');
   scroll.orientation = 'horizonal';
   scroll.stepValue = stepValue;
   scroll.rangeStart = rangeStart;
@@ -94,14 +95,14 @@ function createScroll(parent: dom.RElement, value: number, stepValue = 0.1, rang
   return scroll;
 }
 
-function createButton(parent: dom.RElement, text: string) {
-  const btn = parent.ownerDocument.createElement<dom.Button>('button');
+function createButton(parent: RElement, text: string) {
+  const btn = parent.ownerDocument.createElement<Button>('button');
   btn.textContent = text;
   parent.append(btn);
   return btn;
 }
 
-export function createLightTweakPanel(light: chaos.PunctualLight, el: dom.RElement, styles?: any): dom.RElement {
+export function createLightTweakPanel(light: PunctualLight, el: RElement, styles?: any): RElement {
   const panel = el.ownerDocument.createElement('div');
   const defaultStyles = {
     width: '100%',
@@ -120,7 +121,7 @@ export function createLightTweakPanel(light: chaos.PunctualLight, el: dom.REleme
 
   {
     const label = createText(panel);
-    const lightColorPicker = el.ownerDocument.createElement<dom.Input>('input');
+    const lightColorPicker = el.ownerDocument.createElement<Input>('input');
     lightColorPicker.type = 'color';
     lightColorPicker.value = encodeColorString(light.color);
     lightColorPicker.style.marginBottom = '5px';
@@ -137,7 +138,7 @@ export function createLightTweakPanel(light: chaos.PunctualLight, el: dom.REleme
     const lightIntensitySlider = createScroll(panel, light.intensity, 0.1, 0, 100);
     lightIntensitySlider.style.marginBottom = '5px';
     label.textContent = `light intensity: ${lightIntensitySlider.value.toFixed(2)}`;
-    lightIntensitySlider.addEventListener(dom.RValueChangeEvent.NAME, function () {
+    lightIntensitySlider.addEventListener(RValueChangeEvent.NAME, function () {
       light.intensity = lightIntensitySlider.value;
       label.textContent = `light intensity: ${lightIntensitySlider.value.toFixed(2)}`;
     });
@@ -149,7 +150,7 @@ export function createLightTweakPanel(light: chaos.PunctualLight, el: dom.REleme
       const lightRangeSlider = createScroll(panel, light.positionAndRange.w, 1, 1, 500);
       lightRangeSlider.style.marginBottom = '5px';
       label.textContent = `light range: ${lightRangeSlider.value.toFixed(3)}`;
-      lightRangeSlider.addEventListener(dom.RValueChangeEvent.NAME, function () {
+      lightRangeSlider.addEventListener(RValueChangeEvent.NAME, function () {
         light.range = lightRangeSlider.value;
         label.textContent = `light range: ${lightRangeSlider.value.toFixed(1)}`;
       });
@@ -162,7 +163,7 @@ export function createLightTweakPanel(light: chaos.PunctualLight, el: dom.REleme
       const lightCutoffSlider = createScroll(panel, light.directionAndCutoff.w, 0.02, 0, 1);
       lightCutoffSlider.style.marginBottom = '5px';
       label.textContent = `light cutoff: ${lightCutoffSlider.value.toFixed(3)}`;
-      lightCutoffSlider.addEventListener(dom.RValueChangeEvent.NAME, function () {
+      lightCutoffSlider.addEventListener(RValueChangeEvent.NAME, function () {
         light.cutoff = lightCutoffSlider.value;
         label.textContent = `light cutoff: ${lightCutoffSlider.value.toFixed(3)}`;
       });
@@ -171,16 +172,16 @@ export function createLightTweakPanel(light: chaos.PunctualLight, el: dom.REleme
 
   {
     const label = createText(panel);
-    const castShadowSelector = el.ownerDocument.createElement<dom.Select>('select');
+    const castShadowSelector = el.ownerDocument.createElement<Select>('select');
     castShadowSelector.style.marginBottom = '5px';
-    const optOn = el.ownerDocument.createElement<dom.Option>('option');
+    const optOn = el.ownerDocument.createElement<Option>('option');
     optOn.setAttribute('value', 'on');
     if (light.castShadow) {
       optOn.setAttribute('selected', 'selected');
     }
     optOn.textContent = 'On';
     castShadowSelector.append(optOn);
-    const optOff = el.ownerDocument.createElement<dom.Option>('option');
+    const optOff = el.ownerDocument.createElement<Option>('option');
     optOff.setAttribute('value', 'off');
     if (!light.castShadow) {
       optOff.setAttribute('selected', 'selected');
@@ -197,10 +198,10 @@ export function createLightTweakPanel(light: chaos.PunctualLight, el: dom.REleme
 
   {
     const label = createText(panel);
-    const shadowMapSizeSelector = el.ownerDocument.createElement<dom.Select>('select');
+    const shadowMapSizeSelector = el.ownerDocument.createElement<Select>('select');
     shadowMapSizeSelector.style.marginBottom = '5px';
     for (const size of [32, 64, 128, 256, 512, 1024, 2048]) {
-      const opt = el.ownerDocument.createElement<dom.Option>('option');
+      const opt = el.ownerDocument.createElement<Option>('option');
       opt.setAttribute('value', `${size}`);
       if (light.shadow.shadowMapSize === size) {
         opt.setAttribute('selected', 'selected');
@@ -221,7 +222,7 @@ export function createLightTweakPanel(light: chaos.PunctualLight, el: dom.REleme
     const depthBiasSlider = createScroll(panel, light.shadow.depthBias, 0.001, 0, 5);
     depthBiasSlider.style.marginBottom = '5px';
     label.textContent = `depth bias: ${depthBiasSlider.value.toFixed(3)}`;
-    depthBiasSlider.addEventListener(dom.RValueChangeEvent.NAME, function () {
+    depthBiasSlider.addEventListener(RValueChangeEvent.NAME, function () {
       light.shadow.depthBias = depthBiasSlider.value;
       label.textContent = `depth bias: ${depthBiasSlider.value.toFixed(3)}`;
     });
@@ -232,7 +233,7 @@ export function createLightTweakPanel(light: chaos.PunctualLight, el: dom.REleme
     const normalBiasSlider = createScroll(panel, light.shadow.normalBias, 0.001, 0, 5);
     normalBiasSlider.style.marginBottom = '5px';
     label.textContent = `normal bias: ${normalBiasSlider.value.toFixed(3)}`;
-    normalBiasSlider.addEventListener(dom.RValueChangeEvent.NAME, function () {
+    normalBiasSlider.addEventListener(RValueChangeEvent.NAME, function () {
       light.shadow.normalBias = normalBiasSlider.value;
       label.textContent = `normal bias: ${normalBiasSlider.value.toFixed(3)}`;
     });
@@ -244,7 +245,7 @@ export function createLightTweakPanel(light: chaos.PunctualLight, el: dom.REleme
       const numCascadesSlider = createScroll(panel, light.shadow.numShadowCascades, 1, 1, 4);
       numCascadesSlider.style.marginBottom = '5px';
       label.textContent = `cascade count: ${numCascadesSlider.value}`;
-      numCascadesSlider.addEventListener(dom.RValueChangeEvent.NAME, function () {
+      numCascadesSlider.addEventListener(RValueChangeEvent.NAME, function () {
         light.shadow.numShadowCascades = numCascadesSlider.value;
         label.textContent = `cascade count: ${numCascadesSlider.value}`;
       });
@@ -253,16 +254,16 @@ export function createLightTweakPanel(light: chaos.PunctualLight, el: dom.REleme
 
   {
     const label = createText(panel);
-    const backfaceSelector = el.ownerDocument.createElement<dom.Select>('select');
+    const backfaceSelector = el.ownerDocument.createElement<Select>('select');
     backfaceSelector.style.marginBottom = '5px';
-    const optOn = el.ownerDocument.createElement<dom.Option>('option');
+    const optOn = el.ownerDocument.createElement<Option>('option');
     optOn.setAttribute('value', 'on');
     if (light.shadow.renderBackfaceOnly) {
       optOn.setAttribute('selected', 'selected');
     }
     optOn.textContent = 'On';
     backfaceSelector.append(optOn);
-    const optOff = el.ownerDocument.createElement<dom.Option>('option');
+    const optOff = el.ownerDocument.createElement<Option>('option');
     optOff.setAttribute('value', 'off');
     if (!light.shadow.renderBackfaceOnly) {
       optOff.setAttribute('selected', 'selected');
@@ -279,10 +280,10 @@ export function createLightTweakPanel(light: chaos.PunctualLight, el: dom.REleme
 
   {
     const label = createText(panel);
-    const modeSelector = el.ownerDocument.createElement<dom.Select>('select');
+    const modeSelector = el.ownerDocument.createElement<Select>('select');
     modeSelector.style.marginBottom = '5px';
     for (const mode of ['hard', 'vsm', 'esm', 'pcf-pd', 'pcf-opt']) {
-      const opt = el.ownerDocument.createElement<dom.Option>('option');
+      const opt = el.ownerDocument.createElement<Option>('option');
       opt.setAttribute('value', mode);
       if (light.shadow.mode === mode) {
         opt.setAttribute('selected', 'selected');
@@ -303,7 +304,7 @@ export function createLightTweakPanel(light: chaos.PunctualLight, el: dom.REleme
     const depthScaleSlider = createScroll(panel, light.shadow.esmDepthScale, 1, 1, 2000);
     depthScaleSlider.style.marginBottom = '5px';
     label.textContent = `ESM depth scale: ${depthScaleSlider.value.toFixed(3)}`;
-    depthScaleSlider.addEventListener(dom.RValueChangeEvent.NAME, function () {
+    depthScaleSlider.addEventListener(RValueChangeEvent.NAME, function () {
       light.shadow.esmDepthScale = depthScaleSlider.value;
       label.textContent = `depth scale: ${depthScaleSlider.value.toFixed(3)}`;
     });
@@ -314,7 +315,7 @@ export function createLightTweakPanel(light: chaos.PunctualLight, el: dom.REleme
     const esmKernelSizeScaleSlider = createScroll(panel, light.shadow.esmBlurKernelSize, 2, 3, 25);
     esmKernelSizeScaleSlider.style.marginBottom = '5px';
     label.textContent = `ESM blur kernel: ${esmKernelSizeScaleSlider.value}`;
-    esmKernelSizeScaleSlider.addEventListener(dom.RValueChangeEvent.NAME, function () {
+    esmKernelSizeScaleSlider.addEventListener(RValueChangeEvent.NAME, function () {
       light.shadow.esmBlurKernelSize = esmKernelSizeScaleSlider.value;
       label.textContent = `ESM blur kernel: ${esmKernelSizeScaleSlider.value}`;
     });
@@ -325,7 +326,7 @@ export function createLightTweakPanel(light: chaos.PunctualLight, el: dom.REleme
     const esmBlurSizeScaleSlider = createScroll(panel, light.shadow.esmBlurRadius, 0.1, 0, 20);
     esmBlurSizeScaleSlider.style.marginBottom = '5px';
     label.textContent = `ESM blur radius: ${esmBlurSizeScaleSlider.value.toFixed(1)}`;
-    esmBlurSizeScaleSlider.addEventListener(dom.RValueChangeEvent.NAME, function () {
+    esmBlurSizeScaleSlider.addEventListener(RValueChangeEvent.NAME, function () {
       light.shadow.esmBlurRadius = esmBlurSizeScaleSlider.value;
       label.textContent = `ESM blur radius: ${esmBlurSizeScaleSlider.value.toFixed(1)}`;
     });
@@ -336,7 +337,7 @@ export function createLightTweakPanel(light: chaos.PunctualLight, el: dom.REleme
     const pcfTapCountSlider = createScroll(panel, light.shadow.pdSampleCount, 1, 1, 64);
     pcfTapCountSlider.style.marginBottom = '5px';
     label.textContent = `Poisson sample count: ${pcfTapCountSlider.value}`;
-    pcfTapCountSlider.addEventListener(dom.RValueChangeEvent.NAME, function () {
+    pcfTapCountSlider.addEventListener(RValueChangeEvent.NAME, function () {
       light.shadow.pdSampleCount = pcfTapCountSlider.value;
       label.textContent = `Poisson sample count: ${pcfTapCountSlider.value}`;
     });
@@ -347,7 +348,7 @@ export function createLightTweakPanel(light: chaos.PunctualLight, el: dom.REleme
     const pcfSampleRadiusSlider = createScroll(panel, light.shadow.pdSampleRadius, 0.1, 0, 50);
     pcfSampleRadiusSlider.style.marginBottom = '5px';
     label.textContent = `Poisson sample radius: ${pcfSampleRadiusSlider.value.toFixed(3)}`;
-    pcfSampleRadiusSlider.addEventListener(dom.RValueChangeEvent.NAME, function () {
+    pcfSampleRadiusSlider.addEventListener(RValueChangeEvent.NAME, function () {
       light.shadow.pdSampleRadius = pcfSampleRadiusSlider.value;
       label.textContent = `Poisson sample radius: ${pcfSampleRadiusSlider.value.toFixed(3)}`;
     });
@@ -355,10 +356,10 @@ export function createLightTweakPanel(light: chaos.PunctualLight, el: dom.REleme
 
   {
     const label = createText(panel);
-    const pcfKenelSizeSelctor = el.ownerDocument.createElement<dom.Select>('select');
+    const pcfKenelSizeSelctor = el.ownerDocument.createElement<Select>('select');
     pcfKenelSizeSelctor.style.marginBottom = '5px';
     for (const kernelSize of [3, 5, 7]) {
-      const opt = el.ownerDocument.createElement<dom.Option>('option');
+      const opt = el.ownerDocument.createElement<Option>('option');
       opt.setAttribute('value', String(kernelSize));
       if (light.shadow.pcfKernelSize === kernelSize) {
         opt.setAttribute('selected', 'selected');
@@ -379,7 +380,7 @@ export function createLightTweakPanel(light: chaos.PunctualLight, el: dom.REleme
     const vsmKernelSizeScaleSlider = createScroll(panel, light.shadow.vsmBlurKernelSize, 2, 3, 25);
     vsmKernelSizeScaleSlider.style.marginBottom = '5px';
     label.textContent = `VSM blur kernel: ${vsmKernelSizeScaleSlider.value}`;
-    vsmKernelSizeScaleSlider.addEventListener(dom.RValueChangeEvent.NAME, function () {
+    vsmKernelSizeScaleSlider.addEventListener(RValueChangeEvent.NAME, function () {
       light.shadow.vsmBlurKernelSize = vsmKernelSizeScaleSlider.value;
       label.textContent = `VSM blur kernel: ${vsmKernelSizeScaleSlider.value}`;
     });
@@ -390,7 +391,7 @@ export function createLightTweakPanel(light: chaos.PunctualLight, el: dom.REleme
     const vsmBlurRadiusSlider = createScroll(panel, light.shadow.vsmBlurRadius, 0.1, 0, 20);
     vsmBlurRadiusSlider.style.marginBottom = '5px';
     label.textContent = `VSM blur radius: ${vsmBlurRadiusSlider.value.toFixed(3)}`;
-    vsmBlurRadiusSlider.addEventListener(dom.RValueChangeEvent.NAME, function () {
+    vsmBlurRadiusSlider.addEventListener(RValueChangeEvent.NAME, function () {
       light.shadow.vsmBlurRadius = vsmBlurRadiusSlider.value;
       label.textContent = `VSM blur radius: ${vsmBlurRadiusSlider.value.toFixed(3)}`;
     });
@@ -401,7 +402,7 @@ export function createLightTweakPanel(light: chaos.PunctualLight, el: dom.REleme
     const vsmDarknessSlider = createScroll(panel, light.shadow.vsmDarkness, 0.01, 0, 0.999);
     vsmDarknessSlider.style.marginBottom = '5px';
     label.textContent = `VSM darkness: ${vsmDarknessSlider.value.toFixed(3)}`;
-    vsmDarknessSlider.addEventListener(dom.RValueChangeEvent.NAME, function () {
+    vsmDarknessSlider.addEventListener(RValueChangeEvent.NAME, function () {
       light.shadow.vsmDarkness = vsmDarknessSlider.value;
       label.textContent = `VSM darkness: ${vsmDarknessSlider.value.toFixed(3)}`;
     });
@@ -411,7 +412,7 @@ export function createLightTweakPanel(light: chaos.PunctualLight, el: dom.REleme
   return panel;
 }
 
-export function createSceneTweakPanel(scene: chaos.Scene, el: dom.RElement, styles?: any): dom.RElement {
+export function createSceneTweakPanel(scene: Scene, el: RElement, styles?: any): RElement {
   const panel = el.ownerDocument.createElement('div');
   const defaultStyles = {
     width: '100%',
@@ -432,7 +433,7 @@ export function createSceneTweakPanel(scene: chaos.Scene, el: dom.RElement, styl
     panel.append('env light strength:');
     const envLightStrengthSlider = createScroll(panel, scene.envLightStrength, 0.01, 0, 1);
     envLightStrengthSlider.style.marginBottom = '5px';
-    envLightStrengthSlider.addEventListener(dom.RValueChangeEvent.NAME, function () {
+    envLightStrengthSlider.addEventListener(RValueChangeEvent.NAME, function () {
       scene.envLightStrength = Math.min(1, (Math.max(0, envLightStrengthSlider.value)));
     });
   }
@@ -455,8 +456,8 @@ export function createSceneTweakPanel(scene: chaos.Scene, el: dom.RElement, styl
   return panel;
 }
 
-export function createTestPanel(scene: chaos.Scene, el: dom.RElement, styles?: any): dom.RElement {
-  const assetManager = new chaos.AssetManager(scene.device);
+export function createTestPanel(scene: Scene, el: RElement, styles?: any): RElement {
+  const assetManager = new AssetManager(scene.device);
   const panel = el.ownerDocument.createElement('div');
   const defaultStyles = {
     width: '100%',
@@ -501,9 +502,9 @@ export function createTestPanel(scene: chaos.Scene, el: dom.RElement, styles?: a
   lblComputeCall.style.marginTop = '5px';
   panel.append(lblComputeCall);
 
-  const env = el.ownerDocument.createElement<dom.Select>('select');
+  const env = el.ownerDocument.createElement<Select>('select');
   env.style.marginTop = '5px';
-  const optNone = el.ownerDocument.createElement<dom.Option>('option');
+  const optNone = el.ownerDocument.createElement<Option>('option');
   optNone.setAttribute('value', 'none');
   optNone.textContent = 'None';
   env.append(optNone);
@@ -522,10 +523,10 @@ export function createTestPanel(scene: chaos.Scene, el: dom.RElement, styles?: a
   env.append(optCristmas);
   panel.append(env);
 
-  let radianceMap: chaos.TextureCube = null;
-  let irradianceMap: chaos.TextureCube = null;
-  let skyMap: chaos.TextureCube = null;
-  let skyBox: chaos.Mesh = null;
+  let radianceMap: TextureCube = null;
+  let irradianceMap: TextureCube = null;
+  let skyMap: TextureCube = null;
+  let skyBox: Mesh = null;
   let loading = false;
   let currentEnv = 'none';
   function changeEnv() {
@@ -541,9 +542,9 @@ export function createTestPanel(scene: chaos.Scene, el: dom.RElement, styles?: a
     currentEnv = name;
     const promises = name !== 'none'
       ? [
-        assetManager.fetchTexture<chaos.TextureCube>(`./assets/images/environments/${name}/output_skybox.dds`),
-        assetManager.fetchTexture<chaos.TextureCube>(`./assets/images/environments/${name}/output_pmrem.dds`),
-        assetManager.fetchTexture<chaos.TextureCube>(`./assets/images/environments/${name}/output_iem.dds`)
+        assetManager.fetchTexture<TextureCube>(`./assets/images/environments/${name}/output_skybox.dds`),
+        assetManager.fetchTexture<TextureCube>(`./assets/images/environments/${name}/output_pmrem.dds`),
+        assetManager.fetchTexture<TextureCube>(`./assets/images/environments/${name}/output_iem.dds`)
       ]
       : [];
     Promise.all(promises).then(textures => {
@@ -559,16 +560,16 @@ export function createTestPanel(scene: chaos.Scene, el: dom.RElement, styles?: a
         radianceMap = textures[1];
         irradianceMap = textures[2];
         if (scene.environment) {
-          (scene.environment as chaos.EnvIBL).radianceMap = radianceMap;
-          (scene.environment as chaos.EnvIBL).irradianceMap = irradianceMap;
+          (scene.environment as EnvIBL).radianceMap = radianceMap;
+          (scene.environment as EnvIBL).irradianceMap = irradianceMap;
         } else {
-          scene.environment = new chaos.EnvIBL(radianceMap, irradianceMap);
+          scene.environment = new EnvIBL(radianceMap, irradianceMap);
         }
         if (skyBox) {
-          (skyBox.material as chaos.SkyboxMaterial).skyCubeMap = skyMap;
+          (skyBox.material as SkyboxMaterial).skyCubeMap = skyMap;
           skyBox.reparent(scene.rootNode);
         } else {
-          skyBox = scene.addSkybox(skyMap) as chaos.Mesh;
+          skyBox = scene.addSkybox(skyMap) as Mesh;
         }
       }
     }).catch(err => {
@@ -580,7 +581,7 @@ export function createTestPanel(scene: chaos.Scene, el: dom.RElement, styles?: a
     changeEnv();
   });
   scene.device.addEventListener('frameend', evt => {
-    const e = evt as chaos.DeviceFrameEnd;
+    const e = evt as DeviceFrameEnd;
     const frameInfo = e.device.frameInfo;
     if (frameInfo.frameCounter % 60 === 0) {
       timerCPU.textContent = `CPU time: ${frameInfo.elapsedTimeCPU.toFixed(2)}ms`;
@@ -596,7 +597,7 @@ export function createTestPanel(scene: chaos.Scene, el: dom.RElement, styles?: a
   return panel;
 }
 
-export function createTextureViewPanel(device: chaos.Device, el: dom.RElement, width: number): dom.RElement {
+export function createTextureViewPanel(device: Device, el: RElement, width: number): RElement {
   const textureViewerPanel = el.ownerDocument.createElement('div');
   textureViewerPanel.style.position = 'absolute';
   textureViewerPanel.style.right = 0;
@@ -606,7 +607,7 @@ export function createTextureViewPanel(device: chaos.Device, el: dom.RElement, w
   return textureViewerPanel;
 }
 
-export function initTextureViewPanel(device: chaos.Device, el: dom.RElement, width: number) {
+export function initTextureViewPanel(device: Device, el: RElement, width: number) {
   el.style.display = 'flex';
   el.style.flexFlow = 'column nowrap';
   el.style.padding = '10px';
@@ -614,7 +615,7 @@ export function initTextureViewPanel(device: chaos.Device, el: dom.RElement, wid
   el.style.height = 'auto';
   el.style.backgroundColor = 'white';
   el.style.color = 'yellow';
-  const textureSelect = el.ownerDocument.createElement<dom.Select>('select');
+  const textureSelect = el.ownerDocument.createElement<Select>('select');
   textureSelect.id = 'select-textures';
   textureSelect.style.padding = '5px';
   textureSelect.style.backgroundColor = '#aaa';
@@ -626,7 +627,7 @@ export function initTextureViewPanel(device: chaos.Device, el: dom.RElement, wid
   const textureList = device.getGPUObjects().textures;
   for (const tex of textureList) {
     if (tex.isTexture2D()) {
-      const option = el.ownerDocument.createElement<dom.Option>('option');
+      const option = el.ownerDocument.createElement<Option>('option');
       option.setAttribute('value', String(tex.uid));
       option.textContent = tex.name;
       textureSelect.append(option);
@@ -640,21 +641,21 @@ export function initTextureViewPanel(device: chaos.Device, el: dom.RElement, wid
     const texture = device.getGPUObjectById(Number(textureSelect.value));
     (textureViewer as any).viewer.texture = texture;
   });
-  function onDeviceAddGPUObject(this: chaos.Device, e: base.REvent) {
-    const evt = e as chaos.DeviceGPUObjectAddedEvent;
+  function onDeviceAddGPUObject(this: Device, e: REvent) {
+    const evt = e as DeviceGPUObjectAddedEvent;
     if (evt.object.isTexture2D()) {
-      const option = textureSelect.ownerDocument.createElement<dom.Option>('option');
-      option.setAttribute('value', String((evt as chaos.DeviceGPUObjectAddedEvent).object.uid));
+      const option = textureSelect.ownerDocument.createElement<Option>('option');
+      option.setAttribute('value', String((evt as DeviceGPUObjectAddedEvent).object.uid));
       option.textContent = evt.object.name;
       textureSelect.prepend(option);
     }
   }
-  function onDeviceRemoveGPUObject(this: chaos.Device, e: base.REvent) {
-    const evt = e as chaos.DeviceGPUObjectRemovedEvent;
+  function onDeviceRemoveGPUObject(this: Device, e: REvent) {
+    const evt = e as DeviceGPUObjectRemovedEvent;
     if (evt.object.isTexture2D()) {
       const options = textureSelect.querySelectorAll('option');
       for (const node of options.values()) {
-        const option = node as dom.Option;
+        const option = node as Option;
         if (Number(option.getAttribute('value')) === evt.object.uid) {
           option.remove();
           break;
@@ -662,12 +663,12 @@ export function initTextureViewPanel(device: chaos.Device, el: dom.RElement, wid
       }
     }
   }
-  function onRenameGPUObject(this: chaos.Device, e: base.REvent) {
-    const evt = e as chaos.DeviceGPUObjectRenameEvent;
+  function onRenameGPUObject(this: Device, e: REvent) {
+    const evt = e as DeviceGPUObjectRenameEvent;
     if (evt.object.isTexture2D()) {
       const options = textureSelect.querySelectorAll('option');
       for (const node of options.values()) {
-        const option = node as dom.Option;
+        const option = node as Option;
         if (Number(option.getAttribute('value')) === evt.object.uid) {
           option.textContent = evt.object.name;
           break;
@@ -681,21 +682,21 @@ export function initTextureViewPanel(device: chaos.Device, el: dom.RElement, wid
 }
 
 export class TextureView {
-  private _el: dom.RElement;
-  private _device: chaos.Device;
-  private _tex: chaos.Texture2D;
-  private _program: chaos.GPUProgram;
-  private _programNonFilterable: chaos.GPUProgram;
-  private _programDepth: chaos.GPUProgram;
-  private _programBk: chaos.GPUProgram;
-  private _rect: chaos.Primitive;
-  private _bindGroup: chaos.BindGroup;
-  private _bindGroupNonFilterable: chaos.BindGroup;
-  private _bindGroupDepth: chaos.BindGroup;
-  private _renderStates: chaos.RenderStateSet;
+  private _el: RElement;
+  private _device: Device;
+  private _tex: Texture2D;
+  private _program: GPUProgram;
+  private _programNonFilterable: GPUProgram;
+  private _programDepth: GPUProgram;
+  private _programBk: GPUProgram;
+  private _rect: Primitive;
+  private _bindGroup: BindGroup;
+  private _bindGroupNonFilterable: BindGroup;
+  private _bindGroupDepth: BindGroup;
+  private _renderStates: RenderStateSet;
   private _width: number;
   private _mode: number;
-  constructor(device: chaos.Device, container: dom.RElement, width: number) {
+  constructor(device: Device, container: RElement, width: number) {
     this._device = device;
     this._el = container;
     this._el.customDraw = true;
@@ -704,7 +705,7 @@ export class TextureView {
     this._mode = 0;
     this.init();
     const that = this;
-    this._el.addEventListener('draw', function (this: dom.RElement, evt: base.REvent) {
+    this._el.addEventListener('draw', function (this: RElement, evt: REvent) {
       evt.preventDefault();
       that._device.setBindGroup(0, null);
       that._device.setBindGroup(1, null);
@@ -714,7 +715,7 @@ export class TextureView {
       that._device.setRenderStates(that._renderStates);
       that._rect.draw();
       if (that._tex && that._tex.isTexture2D() && !that._tex.disposed) {
-        const depth = chaos.isDepthTextureFormat(that._tex.format);
+        const depth = isDepthTextureFormat(that._tex.format);
         const filterable = that._tex.isFilterable();
         const program = depth ? that._programDepth : filterable ? that._program : that._programNonFilterable;
         const bindGroup = depth ? that._bindGroupDepth : filterable ? that._bindGroup : that._bindGroupNonFilterable;
@@ -727,10 +728,10 @@ export class TextureView {
       }
     });
   }
-  get texture(): chaos.Texture2D {
+  get texture(): Texture2D {
     return this._tex;
   }
-  set texture(tex: chaos.Texture2D) {
+  set texture(tex: Texture2D) {
     if (this._tex !== tex) {
       this._tex = tex;
       this._el.style.height = `${Math.max(1, Math.floor(this._width * (tex.height / tex.width)))}px`;
@@ -744,20 +745,20 @@ export class TextureView {
   }
   private init() {
     const vb = this._device.createStructuredBuffer(
-      chaos.makeVertexBufferType(4, 'position_f32x2', 'tex0_f32x2'), {
+      makeVertexBufferType(4, 'position_f32x2', 'tex0_f32x2'), {
         usage: 'vertex',
         managed: true
       },
       new Float32Array([-1, -1, 0, 1, 1, -1, 1, 1, -1, 1, 0, 0, 1, 1, 1, 0]));
-    this._rect = new chaos.Primitive(this._device);
+    this._rect = new Primitive(this._device);
     this._rect.setVertexBuffer(vb);
     this._rect.indexStart = 0;
     this._rect.indexCount = 4;
-    this._rect.primitiveType = chaos.PrimitiveType.TriangleStrip;
+    this._rect.primitiveType = PrimitiveType.TriangleStrip;
     this._renderStates = this._device.createRenderStateSet();
-    this._renderStates.useRasterizerState().setCullMode(chaos.FaceMode.NONE);
+    this._renderStates.useRasterizerState().setCullMode(FaceMode.NONE);
     this._renderStates.useDepthState().enableTest(false).enableWrite(false);
-    this._renderStates.useBlendingState().enable(true).setBlendFunc(chaos.BlendFunc.ONE, chaos.BlendFunc.INV_SRC_ALPHA);
+    this._renderStates.useBlendingState().enable(true).setBlendFunc(BlendFunc.ONE, BlendFunc.INV_SRC_ALPHA);
     this._program = this.createDefaultShader(false, false);
     this._programNonFilterable = this.createDefaultShader(false, true);
     this._programDepth = this.createDefaultShader(true, false);
@@ -766,8 +767,8 @@ export class TextureView {
     this._bindGroupNonFilterable = this._device.createBindGroup(this._programNonFilterable.bindGroupLayouts[0]);
     this._bindGroupDepth = this._device.createBindGroup(this._programDepth.bindGroupLayouts[0]);
   }
-  private createDefaultShader(depth: boolean, unfilterableFloat: boolean): chaos.GPUProgram {
-    const pb = new chaos.ProgramBuilder(this._device);
+  private createDefaultShader(depth: boolean, unfilterableFloat: boolean): GPUProgram {
+    const pb = new ProgramBuilder(this._device);
     return pb.buildRenderProgram({
       vertex() {
         this.$inputs.pos = pb.vec2().attrib('position');
@@ -803,8 +804,8 @@ export class TextureView {
       }
     });
   }
-  private createBkShader(): chaos.GPUProgram {
-    const pb = new chaos.ProgramBuilder(this._device);
+  private createBkShader(): GPUProgram {
+    const pb = new ProgramBuilder(this._device);
     return pb.buildRenderProgram({
       vertex() {
         this.$inputs.pos = pb.vec2().attrib('position');

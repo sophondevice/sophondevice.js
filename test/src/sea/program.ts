@@ -1,7 +1,7 @@
-import * as chaos from '@sophon/device';
+import { ProgramBuilder, Device } from '@sophon/device';
 
-export function createSeaProgram(device: chaos.Device) {
-  const pb = new chaos.ProgramBuilder(device);
+export function createSeaProgram(device: Device) {
+  const pb = new ProgramBuilder(device);
   return pb.buildRenderProgram({
     label: 'seaMaterial',
     vertex() {

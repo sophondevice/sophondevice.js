@@ -1,4 +1,4 @@
-import * as chaos from '@sophon/device';
+import { Viewer, ProgramBuilder, GPUProgram } from '@sophon/device';
 
 const defaultVS =
   `this.$inputs.pos = pb.vec3().attrib('position');
@@ -72,10 +72,10 @@ this.$mainFunc(function(){
   const vsgenerated = document.querySelector<HTMLTextAreaElement>('#vertexshader-generated');
   const fsgenerated = document.querySelector<HTMLTextAreaElement>('#fragmentshader-generated');
   const bg = document.querySelector<HTMLTextAreaElement>('#bindgroups');
-  const viewers: { [name: string]: chaos.Viewer } = {};
+  const viewers: { [name: string]: Viewer } = {};
   const deviceNames = ['webgl', 'webgl2'/*, 'webgpu'*/] as const;
   for (const name of deviceNames) {
-    viewers[name] = new chaos.Viewer(document.querySelector<HTMLCanvasElement>(`#${name}`))
+    viewers[name] = new Viewer(document.querySelector<HTMLCanvasElement>(`#${name}`))
     await viewers[name].initDevice(name);
   }
   function reset(resetSource: boolean) {
@@ -106,7 +106,7 @@ this.$mainFunc(function(){
   });
   buttonRun.addEventListener('click', function () {
     const deviceType = document.querySelector<HTMLSelectElement>('#device-type').value;
-    const pb = new chaos.ProgramBuilder(viewers[deviceType].device);
+    const pb = new ProgramBuilder(viewers[deviceType].device);
     pb.emulateDepthClamp = true;
     try {
       const isCompute = selectDeviceType.selectedIndex === 3;
@@ -122,7 +122,7 @@ this.$mainFunc(function(){
           vsgenerated.value = ret[0];
           fsgenerated.value = ret[1];
         }
-        let program: chaos.GPUProgram;
+        let program: GPUProgram;
         if (isCompute) {
           program = viewers[deviceType].device.createGPUProgram({
             type: 'compute',

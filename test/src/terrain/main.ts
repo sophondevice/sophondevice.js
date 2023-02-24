@@ -1,31 +1,32 @@
-import * as base from '@sophon/base';
-import * as chaos from '@sophon/device';
-import * as dom from '@sophon/dom';
+import { Vector3, Vector4, Quaternion, Matrix4x4, REvent } from '@sophon/base';
+import { Viewer, DeviceType } from '@sophon/device';
+import { Scene, ForwardRenderScheme, FPSCameraModel, DirectionalLight } from '@sophon/scene';
+import { GUI, GUIRenderer, RElement, RKeyEvent } from '@sophon/dom';
 import * as common from '../common';
 import { loadEarthSculptorMap } from './earthscuptor';
 
 (async function () {
-  const viewer = new chaos.Viewer(document.getElementById('canvas') as HTMLCanvasElement);
-  await viewer.initDevice(common.getQueryString('dev') as chaos.DeviceType || 'webgl', { msaa: true });
-  const guiRenderer = new dom.GUIRenderer(viewer.device);
-  const GUI = new dom.GUI(guiRenderer);
+  const viewer = new Viewer(document.getElementById('canvas') as HTMLCanvasElement);
+  await viewer.initDevice(common.getQueryString('dev') as DeviceType || 'webgl', { msaa: true });
+  const guiRenderer = new GUIRenderer(viewer.device);
+  const gui = new GUI(guiRenderer);
 
-  await GUI.deserializeFromXML(document.querySelector('#main-ui').innerHTML);
-  const sceneView = GUI.document.querySelector('#scene-view');
+  await gui.deserializeFromXML(document.querySelector('#main-ui').innerHTML);
+  const sceneView = gui.document.querySelector('#scene-view');
   sceneView.customDraw = true;
-  const scene = new chaos.Scene(viewer.device);
-  const scheme = new chaos.ForwardRenderScheme(viewer.device);
+  const scene = new Scene(viewer.device);
+  const scheme = new ForwardRenderScheme(viewer.device);
   const camera = scene.addCamera();
-  camera.setProjectionMatrix(base.Matrix4x4.perspective(Math.PI / 3, viewer.device.getDrawingBufferWidth() / viewer.device.getDrawingBufferHeight(), 1, 300));
+  camera.setProjectionMatrix(Matrix4x4.perspective(Math.PI / 3, viewer.device.getDrawingBufferWidth() / viewer.device.getDrawingBufferHeight(), 1, 300));
   camera.mouseInputSource = sceneView;
   camera.keyboardInputSource = sceneView;
-  camera.setModel(new chaos.FPSCameraModel({ moveSpeed: 0.5 }));
+  camera.setModel(new FPSCameraModel({ moveSpeed: 0.5 }));
   scene.envLightStrength = 0.5;
 
-  const light = new chaos.DirectionalLight(scene)
-    .setColor(new base.Vector4(1, 1, 1, 1))
+  const light = new DirectionalLight(scene)
+    .setColor(new Vector4(1, 1, 1, 1))
     .setCastShadow(false);
-  light.lookAt(new base.Vector3(10, 3, 10), new base.Vector3(0, 0, 0), base.Vector3.axisPY());
+  light.lookAt(new Vector3(10, 3, 10), new Vector3(0, 0, 0), Vector3.axisPY());
   light.shadow.shadowMapSize = 2048;
   light.shadow.numShadowCascades = 4;
 
@@ -43,11 +44,11 @@ import { loadEarthSculptorMap } from './earthscuptor';
       terrain.castShadow = true;
       const eyePos = terrain.getBoundingVolume().toAABB().maxPoint;
       const destPos = terrain.getBoundingVolume().toAABB().center;
-      camera.lookAt(eyePos, destPos, base.Vector3.axisPY());
+      camera.lookAt(eyePos, destPos, Vector3.axisPY());
       let timer: number = null;
       let rot = 0;
-      sceneView.addEventListener('keydown', function (evt: base.REvent) {
-        const keyEvent = evt as dom.RKeyEvent;
+      sceneView.addEventListener('keydown', function (evt: REvent) {
+        const keyEvent = evt as RKeyEvent;
         if (keyEvent.code === 'Space') {
           terrain.wireframe = !terrain.wireframe;
         } else if (keyEvent.code === 'KeyR') {
@@ -60,10 +61,10 @@ import { loadEarthSculptorMap } from './earthscuptor';
           } else {
             timer = window.setInterval(() => {
               const center = terrain.getBoundingVolume().toAABB().center;
-              const t1 = base.Matrix4x4.translation(new base.Vector3(-center.x, 0, -center.z));
-              const r = base.Quaternion.fromAxisAngle(base.Vector3.axisPY(), rot).toMatrix4x4();
-              const t2 = base.Matrix4x4.translation(new base.Vector3(center.x, 0, center.z));
-              const matrix = base.Matrix4x4.multiply(base.Matrix4x4.multiply(t2, r), t1);
+              const t1 = Matrix4x4.translation(new Vector3(-center.x, 0, -center.z));
+              const r = Quaternion.fromAxisAngle(Vector3.axisPY(), rot).toMatrix4x4();
+              const t2 = Matrix4x4.translation(new Vector3(center.x, 0, center.z));
+              const matrix = Matrix4x4.multiply(Matrix4x4.multiply(t2, r), t1);
               matrix.decompose(terrain.scaling, terrain.rotation, terrain.position);
               rot += 0.02;
             }, 20);
@@ -72,18 +73,18 @@ import { loadEarthSculptorMap } from './earthscuptor';
       });
     });
   }
-  sceneView.addEventListener('layout', function (this: dom.RElement) {
+  sceneView.addEventListener('layout', function (this: RElement) {
     const rect = this.getClientRect();
-    camera.setProjectionMatrix(base.Matrix4x4.perspective(camera.getFOV(), rect.width / rect.height, camera.getNearPlane(), camera.getFarPlane()));
+    camera.setProjectionMatrix(Matrix4x4.perspective(camera.getFOV(), rect.width / rect.height, camera.getNearPlane(), camera.getFarPlane()));
   });
 
-  sceneView.addEventListener('draw', function (this: dom.RElement, evt: base.REvent) {
+  sceneView.addEventListener('draw', function (this: RElement, evt: REvent) {
     evt.preventDefault();
     scheme.renderScene(scene, camera);
   });
 
   loadTerrain('./assets/maps/map1/test1.map');
-  viewer.device.runLoop(device => GUI.render());
+  viewer.device.runLoop(device => gui.render());
 
 }());
 

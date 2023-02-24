@@ -436,6 +436,12 @@
       "shouldPublish": true
     },
     {
+      "packageName": "@sophon/scene",
+      "projectFolder": "libs/scene",
+      "publishFolder": "dist",
+      "shouldPublish": true
+    },
+    {
       "packageName": "@sophon/dom",
       "projectFolder": "libs/dom",
       "publishFolder": "dist",
