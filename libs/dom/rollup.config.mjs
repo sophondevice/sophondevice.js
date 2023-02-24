@@ -52,7 +52,14 @@ function getTargetES6() {
       }),
       // terser()
       copy({
-        targets: [{ src: "./package.pub.json", dest: "dist", rename: "package.json" }]
+        targets: [{
+          src: "./package.pub.json",
+          dest: "dist",
+          rename: "package.json"
+        }, {
+          src: "./src",
+          dest: "dist"
+        }]
       })
     ]
   };

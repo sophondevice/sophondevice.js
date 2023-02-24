@@ -12,9 +12,7 @@
     "url": "git+https://github.com/sophondevice/sophondevice.git"
   },
   "scripts": {
-    "build-js": "node build.js",
     "copy-assets": "shx mkdir -p dist/js && shx cp -R src/assets dist && shx cp src/index.html dist",
-    "build-xx": "shx rm -rf dist dist-tmp && npm run build-js && npm run copy-assets && shx rm -rf dist-tmp",
     "build": "shx rm -rf dist && cross-env NODE_OPTIONS=--max_old_space_size=8192 rollup -c && npm run copy-assets",
     "dev-test": "web-dev-server --port 8000 --open dist/index.html",
     "lint": "eslint src --ext .ts",
