@@ -1,7 +1,30 @@
 import { WebGLContext, CompareFunc } from '../base_types';
 import { WebGLEnum } from './webgl_enum';
-import { ColorState, BlendEquation, BlendFunc, BlendingState, FaceMode, FaceWinding, RasterizerState, DepthState, StencilOp, StencilState, RenderStateSet } from '../render_states';
-import { blendEquationMap, blendEquationInvMap, blendFuncMap, blendFuncInvMap, faceModeMap, faceModeInvMap, stencilOpMap, stencilOpInvMap, compareFuncMap, compareFuncInvMap } from './constants_webgl';
+import {
+  ColorState,
+  BlendEquation,
+  BlendFunc,
+  BlendingState,
+  FaceMode,
+  FaceWinding,
+  RasterizerState,
+  DepthState,
+  StencilOp,
+  StencilState,
+  RenderStateSet
+} from '../render_states';
+import {
+  blendEquationMap,
+  blendEquationInvMap,
+  blendFuncMap,
+  blendFuncInvMap,
+  faceModeMap,
+  faceModeInvMap,
+  stencilOpMap,
+  stencilOpInvMap,
+  compareFuncMap,
+  compareFuncInvMap
+} from './constants_webgl';
 
 export abstract class WebGLRenderState {
   protected static _defaultState: WebGLRenderState;
@@ -137,12 +160,7 @@ export class WebGLBlendingState extends WebGLRenderState implements BlendingStat
       if (this._srcBlendRGB === this._srcBlendAlpha && this._dstBlendRGB === this._dstBlendAlpha) {
         gl.blendFunc(this._srcBlendRGB, this._dstBlendRGB);
       } else {
-        gl.blendFuncSeparate(
-          this._srcBlendRGB,
-          this._dstBlendRGB,
-          this._srcBlendAlpha,
-          this._dstBlendAlpha,
-        );
+        gl.blendFuncSeparate(this._srcBlendRGB, this._dstBlendRGB, this._srcBlendAlpha, this._dstBlendAlpha);
       }
     } else {
       gl.disable(WebGLEnum.BLEND);

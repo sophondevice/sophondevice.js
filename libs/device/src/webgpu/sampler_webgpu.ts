@@ -8,18 +8,21 @@ export class WebGPUTextureSampler extends WebGPUObject<GPUSampler> implements Te
   private _options: SamplerOptions;
   constructor(device: WebGPUDevice, options: SamplerOptions) {
     super(device);
-    this._options = Object.assign({
-      addressU: TextureWrapping.ClampToEdge,
-      addressV: TextureWrapping.ClampToEdge,
-      addressW: TextureWrapping.ClampToEdge,
-      magFilter: TextureFilter.Nearest,
-      minFilter: TextureFilter.Nearest,
-      mipFilter: TextureFilter.None,
-      lodMin: 0,
-      lodMax: 32,
-      compare: null,
-      maxAnisotropy: 1
-    }, options || {});
+    this._options = Object.assign(
+      {
+        addressU: TextureWrapping.ClampToEdge,
+        addressV: TextureWrapping.ClampToEdge,
+        addressW: TextureWrapping.ClampToEdge,
+        magFilter: TextureFilter.Nearest,
+        minFilter: TextureFilter.Nearest,
+        mipFilter: TextureFilter.None,
+        lodMin: 0,
+        lodMax: 32,
+        compare: null,
+        maxAnisotropy: 1
+      },
+      options || {}
+    );
     this._load();
   }
   get hash(): number {

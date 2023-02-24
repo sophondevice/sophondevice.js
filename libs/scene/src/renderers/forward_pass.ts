@@ -19,18 +19,21 @@ export class ForwardRenderPass extends RenderPass {
   /** @internal */
   private _lightUniform: {
     light: {
-      numLights: number,
-      lightIndices: Int32Array,
-      lightParams: Float32Array,
-      envLightStrength: number
-    }
+      numLights: number;
+      lightIndices: Int32Array;
+      lightParams: Float32Array;
+      envLightStrength: number;
+    };
   };
   constructor(renderScheme: RenderScheme, name: string) {
     super(renderScheme, name);
     this._overriddenState = renderScheme.device.createRenderStateSet();
     this._overriddenState.useBlendingState().enable(true).setBlendFunc(BlendFunc.ONE, BlendFunc.ONE);
     this._overriddenStateTrans = renderScheme.device.createRenderStateSet();
-    this._overriddenStateTrans.useBlendingState().enable(true).setBlendFunc(BlendFunc.ONE, BlendFunc.INV_SRC_ALPHA);
+    this._overriddenStateTrans
+      .useBlendingState()
+      .enable(true)
+      .setBlendFunc(BlendFunc.ONE, BlendFunc.INV_SRC_ALPHA);
     this._overriddenStateTrans.useDepthState().enableTest(true).enableWrite(false);
     this._shadowMapHash = null;
     this._lightUniform = {
@@ -86,7 +89,7 @@ export class ForwardRenderPass extends RenderPass {
       pb.mat4('viewProjectionMatrix'),
       pb.mat4('viewMatrix'),
       pb.mat4('projectionMatrix'),
-      pb.vec4('params'),
+      pb.vec4('params')
     );
     const structLight = pb.defineStruct(
       null,
@@ -94,33 +97,39 @@ export class ForwardRenderPass extends RenderPass {
       pb.int('numLights'),
       pb.ivec4[MAX_FORWARD_LIGHT_COUNT + 1]('lightIndices'),
       pb.vec4[MAX_FORWARD_LIGHT_COUNT * 23]('lightParams'),
-      pb.float('envLightStrength'),
+      pb.float('envLightStrength')
     );
-    const structGlobal = pb.defineStruct(
-      null,
-      'std140',
-      structCamera('camera'),
-      structLight('light'),
-    );
-    pb.globalScope.global = structGlobal().uniform(0).tag({
-      camera: {
-        position: ShaderLib.USAGE_CAMERA_POSITION,
-        viewProjectionMatrix: ShaderLib.USAGE_VIEW_PROJ_MATRIX,
-        viewMatrix: ShaderLib.USAGE_VIEW_MATRIX,
-        projectionMatrix: ShaderLib.USAGE_PROJECTION_MATRIX,
-        params: ShaderLib.USAGE_CAMERA_PARAMS,
-      },
-      light: {
-        envLightStrength: ShaderLib.USAGE_ENV_LIGHT_STRENGTH
-      }
-    });
+    const structGlobal = pb.defineStruct(null, 'std140', structCamera('camera'), structLight('light'));
+    pb.globalScope.global = structGlobal()
+      .uniform(0)
+      .tag({
+        camera: {
+          position: ShaderLib.USAGE_CAMERA_POSITION,
+          viewProjectionMatrix: ShaderLib.USAGE_VIEW_PROJ_MATRIX,
+          viewMatrix: ShaderLib.USAGE_VIEW_MATRIX,
+          projectionMatrix: ShaderLib.USAGE_PROJECTION_MATRIX,
+          params: ShaderLib.USAGE_CAMERA_PARAMS
+        },
+        light: {
+          envLightStrength: ShaderLib.USAGE_ENV_LIGHT_STRENGTH
+        }
+      });
     if (scope.$builder.shaderType === ShaderType.Fragment && ctx.shadowMapper) {
       const tex = ctx.shadowMapper.shadowMap.isTextureCube()
-        ? ctx.shadowMapper.shadowMap.isDepth() ? scope.$builder.texCubeShadow() : scope.$builder.texCube()
+        ? ctx.shadowMapper.shadowMap.isDepth()
+          ? scope.$builder.texCubeShadow()
+          : scope.$builder.texCube()
         : ctx.shadowMapper.shadowMap.isTexture2D()
-          ? ctx.shadowMapper.shadowMap.isDepth() ? scope.$builder.tex2DShadow() : scope.$builder.tex2D()
-          : ctx.shadowMapper.shadowMap.isDepth() ? scope.$builder.tex2DArrayShadow() : scope.$builder.tex2DArray();
-      if (!ctx.shadowMapper.shadowMap.isDepth() && !this.device.getTextureCaps().getTextureFormatInfo(ctx.shadowMapper.shadowMap.format).filterable) {
+        ? ctx.shadowMapper.shadowMap.isDepth()
+          ? scope.$builder.tex2DShadow()
+          : scope.$builder.tex2D()
+        : ctx.shadowMapper.shadowMap.isDepth()
+        ? scope.$builder.tex2DArrayShadow()
+        : scope.$builder.tex2DArray();
+      if (
+        !ctx.shadowMapper.shadowMap.isDepth() &&
+        !this.device.getTextureCaps().getTextureFormatInfo(ctx.shadowMapper.shadowMap.format).filterable
+      ) {
         tex.sampleType('unfilterable-float');
       }
       scope.shadowMap = tex.uniform(0);
@@ -128,7 +137,15 @@ export class ForwardRenderPass extends RenderPass {
     ctx.environment?.initShaderBindings(pb);
   }
   /** @internal */
-  protected renderLightPass(camera: Camera, ctx: DrawContext, items: IRenderQueueItem[], lights: PunctualLight[], trans: boolean, blend: boolean, flip: boolean) {
+  protected renderLightPass(
+    camera: Camera,
+    ctx: DrawContext,
+    items: IRenderQueueItem[],
+    lights: PunctualLight[],
+    trans: boolean,
+    blend: boolean,
+    flip: boolean
+  ) {
     ctx.environment = blend ? null : camera.scene.environment;
     ctx.renderPassHash = this.getGlobalBindGroupHash(ctx);
     const bindGroup = this.getGlobalBindGroup(ctx);
@@ -160,7 +177,7 @@ export class ForwardRenderPass extends RenderPass {
       renderPassHash: null,
       materialFunc: values.MATERIAL_FUNC_NORMAL,
       environment: camera.scene.environment,
-      envStrength: camera.scene.envLightStrength ?? 1,
+      envStrength: camera.scene.envLightStrength ?? 1
     };
     const flip = this._verticalFlip !== this.isAutoFlip();
     renderQueue.sortItems();
@@ -168,7 +185,9 @@ export class ForwardRenderPass extends RenderPass {
     if (ll.length === 0) {
       ll = [null];
     }
-    for (const order of Object.keys(renderQueue.items).map(val => Number(val)).sort((a, b) => a - b)) {
+    for (const order of Object.keys(renderQueue.items)
+      .map((val) => Number(val))
+      .sort((a, b) => a - b)) {
       const items = renderQueue.items[order];
       const lists = [items.opaqueList, items.transList];
       for (let i = 0; i < 2; i++) {

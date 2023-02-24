@@ -183,4 +183,3 @@ export class GUIEventPathBuilder implements REventPathBuilder {
     return path;
   }
 }
-

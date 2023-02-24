@@ -2,7 +2,13 @@ import { CubeFace, TypedArray } from '@sophon/base';
 import { TextureFormat, TextureTarget, linearTextureFormatToSRGB } from '../base_types';
 import { WebGLBaseTexture } from './basetexture_webgl';
 import { textureTargetMap, cubeMapFaceMap } from './constants_webgl';
-import { GPUResourceUsageFlags, TextureMipmapData, TextureCube, TextureImageElement, GPUDataBuffer } from '../gpuobject';
+import {
+  GPUResourceUsageFlags,
+  TextureMipmapData,
+  TextureCube,
+  TextureImageElement,
+  GPUDataBuffer
+} from '../gpuobject';
 import type { WebGLDevice } from './device_webgl';
 import type { WebGLTextureCap } from './capabilities_webgl';
 
@@ -19,7 +25,7 @@ export class WebGLTextureCube extends WebGLBaseTexture implements TextureCube<We
     yOffset: number,
     width: number,
     height: number,
-    face: CubeFace,
+    face: CubeFace
   ): void {
     if (this._device.isContextLost()) {
       return;
@@ -39,13 +45,22 @@ export class WebGLTextureCube extends WebGLBaseTexture implements TextureCube<We
       height,
       params.glFormat,
       params.glType[0],
-      data,
+      data
     );
     if (this._mipLevelCount > 1) {
       this.generateMipmaps();
     }
   }
-  updateFromElement(data: TextureImageElement, xOffset: number, yOffset: number, face: number, x: number, y: number, width: number, height: number): void {
+  updateFromElement(
+    data: TextureImageElement,
+    xOffset: number,
+    yOffset: number,
+    face: number,
+    x: number,
+    y: number,
+    width: number,
+    height: number
+  ): void {
     if (this._device.isContextLost()) {
       return;
     }
@@ -56,14 +71,30 @@ export class WebGLTextureCube extends WebGLBaseTexture implements TextureCube<We
     this._device.context.bindTexture(textureTargetMap[this._target], this._object);
     this._device.context.pixelStorei(this._device.context.UNPACK_ALIGNMENT, 1);
     if (x === 0 && y === 0 && width === data.width && height === data.height) {
-      this._device.context.texSubImage2D(cubeMapFaceMap[face], 0, xOffset, yOffset, params.glFormat, params.glType[0], data);
+      this._device.context.texSubImage2D(
+        cubeMapFaceMap[face],
+        0,
+        xOffset,
+        yOffset,
+        params.glFormat,
+        params.glType[0],
+        data
+      );
     } else {
       const cvs = document.createElement('canvas');
       cvs.width = width;
       cvs.height = height;
       const ctx = cvs.getContext('2d');
       ctx.drawImage(data, x, y, width, height, 0, 0, width, height);
-      this._device.context.texSubImage2D(textureTargetMap[this._target], 0, xOffset, yOffset, params.glFormat, params.glType[0], cvs);
+      this._device.context.texSubImage2D(
+        textureTargetMap[this._target],
+        0,
+        xOffset,
+        yOffset,
+        params.glFormat,
+        params.glType[0],
+        cvs
+      );
       cvs.width = 0;
       cvs.height = 0;
     }
@@ -76,12 +107,15 @@ export class WebGLTextureCube extends WebGLBaseTexture implements TextureCube<We
     if (this._flags & GPUResourceUsageFlags.TF_WRITABLE) {
       console.error(new Error('webgl device does not support storage texture'));
     } else {
-      format = (this._flags & GPUResourceUsageFlags.TF_LINEAR_COLOR_SPACE) ? format : linearTextureFormatToSRGB(format);
+      format =
+        this._flags & GPUResourceUsageFlags.TF_LINEAR_COLOR_SPACE
+          ? format
+          : linearTextureFormatToSRGB(format);
       this.loadEmpty(format, size, 0);
     }
   }
   readPixels(face: number, x: number, y: number, w: number, h: number, buffer: TypedArray): Promise<void> {
-    return new Promise<void>(resolve => {
+    return new Promise<void>((resolve) => {
       const fb = this._device.createFrameBuffer({
         colorAttachments: [{ texture: this, face }]
       });
@@ -119,7 +153,10 @@ export class WebGLTextureCube extends WebGLBaseTexture implements TextureCube<We
     } else if (this._flags & GPUResourceUsageFlags.TF_WRITABLE) {
       console.error(new Error('webgl device does not support storage texture'));
     } else {
-      const format = (this._flags & GPUResourceUsageFlags.TF_LINEAR_COLOR_SPACE) ? TextureFormat.RGBA8UNORM : TextureFormat.RGBA8UNORM_SRGB;
+      const format =
+        this._flags & GPUResourceUsageFlags.TF_LINEAR_COLOR_SPACE
+          ? TextureFormat.RGBA8UNORM
+          : TextureFormat.RGBA8UNORM_SRGB;
       this.loadImages(images, format);
     }
   }
@@ -201,7 +238,9 @@ export class WebGLTextureCube extends WebGLBaseTexture implements TextureCube<We
     const height = levels.height;
     const mipLevelCount = levels.mipLevels;
     if (levels.isCompressed) {
-      if (sRGB ? !this._device.getTextureCaps().supportS3TCSRGB : !this._device.getTextureCaps().supportS3TC) {
+      if (
+        sRGB ? !this._device.getTextureCaps().supportS3TCSRGB : !this._device.getTextureCaps().supportS3TC
+      ) {
         console.warn('No s3tc compression format support');
         return;
       }
@@ -227,7 +266,7 @@ export class WebGLTextureCube extends WebGLBaseTexture implements TextureCube<We
               levels.mipDatas[face][i].width,
               levels.mipDatas[face][i].height,
               params.glInternalFormat,
-              levels.mipDatas[face][i].data,
+              levels.mipDatas[face][i].data
             );
           } else {
             this._device.context.texSubImage2D(
@@ -239,7 +278,7 @@ export class WebGLTextureCube extends WebGLBaseTexture implements TextureCube<We
               levels.mipDatas[face][i].height,
               params.glFormat,
               params.glType[0],
-              levels.mipDatas[face][i].data,
+              levels.mipDatas[face][i].data
             );
           }
           const err = (this.device as WebGLDevice).getError();

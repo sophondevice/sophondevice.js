@@ -1,4 +1,4 @@
-import type {RNode} from './node';
+import type { RNode } from './node';
 
 export class GUIHitTestVisitor {
   /** @internal */
@@ -6,13 +6,13 @@ export class GUIHitTestVisitor {
   /** @internal */
   private _y: number;
   /** @internal */
-  private _hits: {element: RNode; x: number; y: number}[];
+  private _hits: { element: RNode; x: number; y: number }[];
   constructor(x: number, y: number) {
     this._x = x;
     this._y = y;
     this._hits = [];
   }
-  getHits(): {element: RNode; x: number; y: number}[] {
+  getHits(): { element: RNode; x: number; y: number }[] {
     return this._hits;
   }
   beginTraverseNode() {}
@@ -22,10 +22,10 @@ export class GUIHitTestVisitor {
       this._hits.push({
         element: w,
         x: this._x,
-        y: this._y,
+        y: this._y
       });
     } else if (w._isVisible() && !w._isText()) {
-      const v = w.toAbsolute({x: 0, y: 0});
+      const v = w.toAbsolute({ x: 0, y: 0 });
       const x = this._x - v.x;
       const y = this._y - v.y;
       const rc = w.getClippedRect();
@@ -37,7 +37,7 @@ export class GUIHitTestVisitor {
         this._hits.push({
           element: w,
           x: x,
-          y: y,
+          y: y
         });
       }
     }

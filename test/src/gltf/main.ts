@@ -8,7 +8,7 @@ import { GLTFViewer } from './gltfviewer';
 (async function () {
   const canvas = document.getElementById('canvas') as HTMLCanvasElement;
   const viewer = new Viewer(canvas);
-  await viewer.initDevice(common.getQueryString('dev') as DeviceType || 'webgl', { msaa: true });
+  await viewer.initDevice((common.getQueryString('dev') as DeviceType) || 'webgl', { msaa: true });
   const guiRenderer = new GUIRenderer(viewer.device);
   const gui = new GUI(guiRenderer);
   await gui.deserializeFromXML(document.querySelector('#main-ui').innerHTML);
@@ -51,13 +51,10 @@ import { GLTFViewer } from './gltfviewer';
     gltfViewer.render();
   });
 
-  sceneView.addEventListener('mousemove', evt => {
+  sceneView.addEventListener('mousemove', (evt) => {
     const intersected = gltfViewer.raycast(evt.offsetX, evt.offsetY);
     console.log(`raycast: ${intersected?.constructor.name || null}`);
   });
 
-  viewer.device.runLoop(device => gui.render());
-
-}());
-
-
+  viewer.device.runLoop((device) => gui.render());
+})();

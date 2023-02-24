@@ -1,9 +1,9 @@
-import {RNode} from './node';
-import {RNodeList, RStaticNodeList} from './nodelist';
-import type {RElement} from './element';
+import { RNode } from './node';
+import { RNodeList, RStaticNodeList } from './nodelist';
+import type { RElement } from './element';
 import type { RText } from './components/text';
-import type {GUI} from './gui';
-import type {IStyleSheet} from './style';
+import type { GUI } from './gui';
+import type { IStyleSheet } from './style';
 
 export class RDocument extends RNode {
   /** @internal */
@@ -55,9 +55,7 @@ export class RDocument extends RNode {
     if (child.nodeType !== RNode.ELEMENT_NODE) {
       throw new Error('Failed to execute appendChild: only element can be inserted into document');
     } else if (this.childElementCount > 0) {
-      throw new Error(
-        'Failed to execute appendChild: only one element can be inserted into document',
-      );
+      throw new Error('Failed to execute appendChild: only one element can be inserted into document');
     }
     return super.appendChild(child);
   }
@@ -65,9 +63,7 @@ export class RDocument extends RNode {
     if (!newElement || newElement.nodeType !== RNode.ELEMENT_NODE) {
       throw new Error('Failed to execute insertBefore: only element can be inserted into document');
     } else if (referenceElement || this.childElementCount > 0) {
-      throw new Error(
-        'Failed to execute insertBefore: only one element can be inserted into document',
-      );
+      throw new Error('Failed to execute insertBefore: only one element can be inserted into document');
     }
     return super.appendChild(newElement);
   }
@@ -120,7 +116,7 @@ export class RDocument extends RNode {
       right: '0px',
       bottom: '0px',
       overflow: 'auto',
-      backgroundColor: 'rgba(0,0,0,0)',
+      backgroundColor: 'rgba(0,0,0,0)'
     };
   }
 }

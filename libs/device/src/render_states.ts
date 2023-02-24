@@ -13,7 +13,7 @@ export enum BlendEquation {
   SUBTRACT,
   REVERSE_SUBTRACT,
   MIN,
-  MAX,
+  MAX
 }
 
 export enum BlendFunc {
@@ -31,7 +31,7 @@ export enum BlendFunc {
   CONSTANT_COLOR,
   INV_CONSTANT_COLOR,
   CONSTANT_ALPHA,
-  INV_CONSTANT_ALPHA,
+  INV_CONSTANT_ALPHA
 }
 
 export interface BlendingState {
@@ -52,12 +52,12 @@ export interface BlendingState {
 export enum FaceMode {
   NONE = 1,
   FRONT,
-  BACK,
+  BACK
 }
 
 export enum FaceWinding {
   CW = 1,
-  CCW,
+  CCW
 }
 
 export interface RasterizerState {
@@ -82,7 +82,7 @@ export enum StencilOp {
   INCR_WRAP,
   DECR,
   DECR_WRAP,
-  INVERT,
+  INVERT
 }
 
 export interface StencilState {

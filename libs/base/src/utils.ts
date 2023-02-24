@@ -36,13 +36,15 @@ export class HttpRequest {
     }
     HttpRequest._tempElement.href = url;
     return HttpRequest._tempElement.href;
-  }  
+  }
   async request(url: string): Promise<Response> {
     url = this._urlResolver ? this._urlResolver(url) : this.resolveURL(url);
-    return url ? fetch(url, {
-      credentials: this._crossOrigin === 'anonymous' ? 'same-origin' : 'include',
-      headers: this._headers || {}
-    }) : null;
+    return url
+      ? fetch(url, {
+          credentials: this._crossOrigin === 'anonymous' ? 'same-origin' : 'include',
+          headers: this._headers || {}
+        })
+      : null;
   }
   async requestText(url: string): Promise<string> {
     const response = await this.request(url);
@@ -54,14 +56,14 @@ export class HttpRequest {
   async requestArrayBuffer(url: string): Promise<ArrayBuffer> {
     const response = await this.request(url);
     if (!response.ok) {
-      throw new Error(`Asset download failed: ${url}`)
+      throw new Error(`Asset download failed: ${url}`);
     }
     return response.arrayBuffer();
   }
   async requestBlob(url: string): Promise<Blob> {
     const response = await this.request(url);
     if (!response.ok) {
-      throw new Error(`Asset download failed: ${url}`)
+      throw new Error(`Asset download failed: ${url}`);
     }
     return response.blob();
   }

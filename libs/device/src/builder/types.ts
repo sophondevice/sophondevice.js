@@ -2,7 +2,7 @@ import { TextureFormat } from '../base_types';
 import { DeviceType } from '../device';
 import type { UniformBufferLayout } from '../gpuobject';
 
-export const F16_BITMASK = 1
+export const F16_BITMASK = 1;
 export const F32_BITMASK = 2;
 export const BOOL_BITMASK = 3;
 export const I8_BITMASK = 4;
@@ -23,7 +23,7 @@ type LayoutableType = PBPrimitiveTypeInfo | PBArrayTypeInfo | PBStructTypeInfo;
 
 export interface ILayoutableType {
   getLayoutAlignment(layout: PBStructLayout): number;
-  getLayoutSize(layout: PBStructLayout): number
+  getLayoutSize(layout: PBStructLayout): number;
 }
 
 function align(n: number, alignment: number): number {
@@ -32,7 +32,7 @@ function align(n: number, alignment: number): number {
 
 function getAlignment(type: LayoutableType): number {
   if (type.isPrimitiveType()) {
-    return type.isScalarType() ? 4 : 1 << Math.min(4, (type.cols + 1));
+    return type.isScalarType() ? 4 : 1 << Math.min(4, type.cols + 1);
   } else if (type.isArrayType()) {
     return getAlignment(type.elementType);
   } else {
@@ -98,7 +98,12 @@ function getSizePacked(type: LayoutableType): number {
   }
 }
 
-export function makePrimitiveType(scalarTypeMask: number, rows: number, cols: number, norm: 0 | 1): PBPrimitiveType {
+export function makePrimitiveType(
+  scalarTypeMask: number,
+  rows: number,
+  cols: number,
+  norm: 0 | 1
+): PBPrimitiveType {
   return scalarTypeMask | (rows << ROWS_BITSHIFT) | (cols << COLS_BITSHIFT) | (norm << NORM_BITSHIFT);
 }
 
@@ -184,7 +189,7 @@ export enum PBPrimitiveType {
   MAT3x4 = makePrimitiveType(F32_BITMASK, 3, 4, 0),
   MAT4x2 = makePrimitiveType(F32_BITMASK, 4, 2, 0),
   MAT4x3 = makePrimitiveType(F32_BITMASK, 4, 3, 0),
-  MAT4 = makePrimitiveType(F32_BITMASK, 4, 4, 0),
+  MAT4 = makePrimitiveType(F32_BITMASK, 4, 4, 0)
 }
 
 const primitiveTypeMapWebGL = {
@@ -212,7 +217,7 @@ const primitiveTypeMapWebGL = {
   [PBPrimitiveType.MAT3x4]: 'mat3x4',
   [PBPrimitiveType.MAT4x2]: 'mat4x2',
   [PBPrimitiveType.MAT4x3]: 'mat4x3',
-  [PBPrimitiveType.MAT4]: 'mat4',
+  [PBPrimitiveType.MAT4]: 'mat4'
 };
 
 const primitiveTypeMapWGSL = {
@@ -240,21 +245,21 @@ const primitiveTypeMapWGSL = {
   [PBPrimitiveType.MAT3x4]: 'mat3x4<f32>',
   [PBPrimitiveType.MAT4x2]: 'mat4x2<f32>',
   [PBPrimitiveType.MAT4x3]: 'mat4x3<f32>',
-  [PBPrimitiveType.MAT4]: 'mat4x4<f32>',
+  [PBPrimitiveType.MAT4]: 'mat4x4<f32>'
 };
 
-const BITFLAG_1D = (1 << 0);
-const BITFLAG_2D = (1 << 1);
-const BITFLAG_3D = (1 << 2);
-const BITFLAG_CUBE = (1 << 3);
-const BITFLAG_ARRAY = (1 << 4);
-const BITFLAG_MULTISAMPLED = (1 << 5);
-const BITFLAG_STORAGE = (1 << 6);
-const BITFLAG_DEPTH = (1 << 7);
-const BITFLAG_FLOAT = (1 << 8);
-const BITFLAG_INT = (1 << 9);
-const BITFLAG_UINT = (1 << 10);
-const BITFLAG_EXTERNAL = (1 << 11);
+const BITFLAG_1D = 1 << 0;
+const BITFLAG_2D = 1 << 1;
+const BITFLAG_3D = 1 << 2;
+const BITFLAG_CUBE = 1 << 3;
+const BITFLAG_ARRAY = 1 << 4;
+const BITFLAG_MULTISAMPLED = 1 << 5;
+const BITFLAG_STORAGE = 1 << 6;
+const BITFLAG_DEPTH = 1 << 7;
+const BITFLAG_FLOAT = 1 << 8;
+const BITFLAG_INT = 1 << 9;
+const BITFLAG_UINT = 1 << 10;
+const BITFLAG_EXTERNAL = 1 << 11;
 
 export enum PBTextureType {
   TEX_1D = BITFLAG_1D | BITFLAG_FLOAT,
@@ -287,14 +292,14 @@ export enum PBTextureType {
   TEX_DEPTH_CUBE = BITFLAG_CUBE | BITFLAG_DEPTH,
   TEX_DEPTH_CUBE_ARRAY = BITFLAG_CUBE | BITFLAG_ARRAY | BITFLAG_DEPTH,
   TEX_DEPTH_MULTISAMPLED_2D = BITFLAG_2D | BITFLAG_MULTISAMPLED | BITFLAG_DEPTH,
-  TEX_EXTERNAL = BITFLAG_EXTERNAL,
+  TEX_EXTERNAL = BITFLAG_EXTERNAL
 }
 
 const textureTypeMapWebGL = {
   [PBTextureType.TEX_1D]: 'highp sampler2D',
   [PBTextureType.TEX_2D]: 'highp sampler2D',
   [PBTextureType.TEX_CUBE]: 'highp samplerCube',
-  [PBTextureType.TEX_EXTERNAL]: 'highp sampler2D',
+  [PBTextureType.TEX_EXTERNAL]: 'highp sampler2D'
 };
 
 const textureTypeMapWebGL2 = {
@@ -316,7 +321,7 @@ const textureTypeMapWebGL2 = {
   [PBTextureType.TEX_DEPTH_2D]: 'highp sampler2DShadow',
   [PBTextureType.TEX_DEPTH_2D_ARRAY]: 'highp sampler2DArrayShadow',
   [PBTextureType.TEX_DEPTH_CUBE]: 'highp samplerCubeShadow',
-  [PBTextureType.TEX_EXTERNAL]: 'highp sampler2D',
+  [PBTextureType.TEX_EXTERNAL]: 'highp sampler2D'
 };
 
 const textureTypeMapWGSL = {
@@ -350,7 +355,7 @@ const textureTypeMapWGSL = {
   [PBTextureType.TEX_DEPTH_CUBE]: 'texture_depth_cube',
   [PBTextureType.TEX_DEPTH_CUBE_ARRAY]: 'texture_depth_cube_array',
   [PBTextureType.TEX_DEPTH_MULTISAMPLED_2D]: 'texture_depth_multisampled_2d',
-  [PBTextureType.TEX_EXTERNAL]: 'texture_external',
+  [PBTextureType.TEX_EXTERNAL]: 'texture_external'
 };
 
 const storageTexelFormatMap = {
@@ -370,7 +375,7 @@ const storageTexelFormatMap = {
   [TextureFormat.RG32I]: 'rg32sint',
   [TextureFormat.RGBA32F]: 'rgba32float',
   [TextureFormat.RGBA32UI]: 'rgba32uint',
-  [TextureFormat.RGBA32I]: 'rgba32sint',
+  [TextureFormat.RGBA32I]: 'rgba32sint'
 };
 
 export enum PBSamplerAccessMode {
@@ -385,7 +390,7 @@ export enum PBAddressSpace {
   PRIVATE = 'private',
   WORKGROUP = 'workgroup',
   UNIFORM = 'uniform',
-  STORAGE = 'storage',
+  STORAGE = 'storage'
 }
 
 export enum PBTypeClass {
@@ -397,25 +402,34 @@ export enum PBTypeClass {
   TEXTURE,
   SAMPLER,
   FUNCTION,
-  VOID,
+  VOID
 }
 
-export type TypeInfo = PrimitiveTypeDetail | StructTypeDetail | ArrayTypeDetail | PointerTypeDetail | AtomicTypeInfoDetail | SamplerTypeDetail | TextureTypeDetail | FunctionTypeDetail | null;
+export type TypeInfo =
+  | PrimitiveTypeDetail
+  | StructTypeDetail
+  | ArrayTypeDetail
+  | PointerTypeDetail
+  | AtomicTypeInfoDetail
+  | SamplerTypeDetail
+  | TextureTypeDetail
+  | FunctionTypeDetail
+  | null;
 
 export interface PrimitiveTypeDetail {
-  primitiveType?: PBPrimitiveType,
+  primitiveType?: PBPrimitiveType;
 }
 
 export interface StructTypeDetail {
   layout: PBStructLayout;
   structName?: string;
   structMembers?: {
-    name: string,
-    type: PBPrimitiveTypeInfo | PBArrayTypeInfo | PBStructTypeInfo,
-    alignment: number,
-    size: number,
-    defaultAlignment: number,
-    defaultSize: number,
+    name: string;
+    type: PBPrimitiveTypeInfo | PBArrayTypeInfo | PBStructTypeInfo;
+    alignment: number;
+    size: number;
+    defaultAlignment: number;
+    defaultSize: number;
   }[];
 }
 
@@ -447,10 +461,10 @@ export interface TextureTypeDetail {
 export interface FunctionTypeDetail {
   name: string;
   returnType: PBTypeInfo;
-  argTypes: { type: PBTypeInfo, byRef?: boolean }[];
+  argTypes: { type: PBTypeInfo; byRef?: boolean }[];
 }
 
-export abstract class PBTypeInfo<DetailType extends TypeInfo = TypeInfo>  {
+export abstract class PBTypeInfo<DetailType extends TypeInfo = TypeInfo> {
   /** @internal */
   cls: PBTypeClass;
   /** @internal */
@@ -532,7 +546,9 @@ export class PBPrimitiveTypeInfo extends PBTypeInfo<PrimitiveTypeDetail> impleme
   /** @internal */
   private static cachedTypes: { [primitiveType: number]: PBPrimitiveTypeInfo } = {};
   /** @internal */
-  private static cachedCtorOverloads: { [deviceType: string]: { [primitiveType: number]: PBFunctionTypeInfo[] } } = {};
+  private static cachedCtorOverloads: {
+    [deviceType: string]: { [primitiveType: number]: PBFunctionTypeInfo[] };
+  } = {};
   constructor(type: PBPrimitiveType) {
     super(PBTypeClass.PLAIN, { primitiveType: type });
   }
@@ -556,10 +572,18 @@ export class PBPrimitiveTypeInfo extends PBTypeInfo<PrimitiveTypeDetail> impleme
       const name = typeinfo.toTypeName(deviceType);
       result = [new PBFunctionTypeInfo(name, typeinfo, [])];
       if (typeinfo.isScalarType()) {
-        result.push(new PBFunctionTypeInfo(name, typeinfo, [{ type: this.getCachedTypeInfo(PBPrimitiveType.F32) }]));
-        result.push(new PBFunctionTypeInfo(name, typeinfo, [{ type: this.getCachedTypeInfo(PBPrimitiveType.I32) }]));
-        result.push(new PBFunctionTypeInfo(name, typeinfo, [{ type: this.getCachedTypeInfo(PBPrimitiveType.U32) }]));
-        result.push(new PBFunctionTypeInfo(name, typeinfo, [{ type: this.getCachedTypeInfo(PBPrimitiveType.BOOL) }]));
+        result.push(
+          new PBFunctionTypeInfo(name, typeinfo, [{ type: this.getCachedTypeInfo(PBPrimitiveType.F32) }])
+        );
+        result.push(
+          new PBFunctionTypeInfo(name, typeinfo, [{ type: this.getCachedTypeInfo(PBPrimitiveType.I32) }])
+        );
+        result.push(
+          new PBFunctionTypeInfo(name, typeinfo, [{ type: this.getCachedTypeInfo(PBPrimitiveType.U32) }])
+        );
+        result.push(
+          new PBFunctionTypeInfo(name, typeinfo, [{ type: this.getCachedTypeInfo(PBPrimitiveType.BOOL) }])
+        );
       } else if (typeinfo.isVectorType()) {
         const scalarTypeInfo = { type: this.getCachedTypeInfo(typeinfo.scalarType) };
         const vec2TypeInfo = { type: this.getCachedTypeInfo(typeinfo.resizeType(1, 2)) };
@@ -574,7 +598,9 @@ export class PBPrimitiveTypeInfo extends PBTypeInfo<PrimitiveTypeDetail> impleme
             result.push(new PBFunctionTypeInfo(name, typeinfo, [{ type: typeBVec2 }]));
             break;
           case 3:
-            result.push(new PBFunctionTypeInfo(name, typeinfo, [scalarTypeInfo, scalarTypeInfo, scalarTypeInfo]));
+            result.push(
+              new PBFunctionTypeInfo(name, typeinfo, [scalarTypeInfo, scalarTypeInfo, scalarTypeInfo])
+            );
             result.push(new PBFunctionTypeInfo(name, typeinfo, [scalarTypeInfo, vec2TypeInfo]));
             result.push(new PBFunctionTypeInfo(name, typeinfo, [vec2TypeInfo, scalarTypeInfo]));
             result.push(new PBFunctionTypeInfo(name, typeinfo, [{ type: typeF32Vec3 }]));
@@ -583,10 +609,23 @@ export class PBPrimitiveTypeInfo extends PBTypeInfo<PrimitiveTypeDetail> impleme
             result.push(new PBFunctionTypeInfo(name, typeinfo, [{ type: typeBVec3 }]));
             break;
           case 4:
-            result.push(new PBFunctionTypeInfo(name, typeinfo, [scalarTypeInfo, scalarTypeInfo, scalarTypeInfo, scalarTypeInfo]));
-            result.push(new PBFunctionTypeInfo(name, typeinfo, [scalarTypeInfo, scalarTypeInfo, vec2TypeInfo]));
-            result.push(new PBFunctionTypeInfo(name, typeinfo, [scalarTypeInfo, vec2TypeInfo, scalarTypeInfo]));
-            result.push(new PBFunctionTypeInfo(name, typeinfo, [vec2TypeInfo, scalarTypeInfo, scalarTypeInfo]));
+            result.push(
+              new PBFunctionTypeInfo(name, typeinfo, [
+                scalarTypeInfo,
+                scalarTypeInfo,
+                scalarTypeInfo,
+                scalarTypeInfo
+              ])
+            );
+            result.push(
+              new PBFunctionTypeInfo(name, typeinfo, [scalarTypeInfo, scalarTypeInfo, vec2TypeInfo])
+            );
+            result.push(
+              new PBFunctionTypeInfo(name, typeinfo, [scalarTypeInfo, vec2TypeInfo, scalarTypeInfo])
+            );
+            result.push(
+              new PBFunctionTypeInfo(name, typeinfo, [vec2TypeInfo, scalarTypeInfo, scalarTypeInfo])
+            );
             result.push(new PBFunctionTypeInfo(name, typeinfo, [vec2TypeInfo, vec2TypeInfo]));
             result.push(new PBFunctionTypeInfo(name, typeinfo, [scalarTypeInfo, vec3TypeInfo]));
             result.push(new PBFunctionTypeInfo(name, typeinfo, [vec3TypeInfo, scalarTypeInfo]));
@@ -597,8 +636,20 @@ export class PBPrimitiveTypeInfo extends PBTypeInfo<PrimitiveTypeDetail> impleme
         }
       } else if (typeinfo.isMatrixType()) {
         const colType = this.getCachedTypeInfo(typeinfo.resizeType(1, typeinfo.cols));
-        result.push(new PBFunctionTypeInfo(name, typeinfo, Array.from({ length: typeinfo.rows }).map(() => ({ type: colType }))));
-        result.push(new PBFunctionTypeInfo(name, typeinfo, Array.from({ length: typeinfo.rows * typeinfo.cols }).map(() => ({ type: typeF32 }))));
+        result.push(
+          new PBFunctionTypeInfo(
+            name,
+            typeinfo,
+            Array.from({ length: typeinfo.rows }).map(() => ({ type: colType }))
+          )
+        );
+        result.push(
+          new PBFunctionTypeInfo(
+            name,
+            typeinfo,
+            Array.from({ length: typeinfo.rows * typeinfo.cols }).map(() => ({ type: typeF32 }))
+          )
+        );
       }
       deviceOverloads[primitiveType] = result;
     }
@@ -620,7 +671,7 @@ export class PBPrimitiveTypeInfo extends PBTypeInfo<PrimitiveTypeDetail> impleme
     return !!((this.primitiveType >> NORM_BITSHIFT) & NORM_BITMASK);
   }
   getLayoutAlignment(layout: PBStructLayout): number {
-    return layout === 'packed' ? 1 : this.isScalarType() ? 4 : 1 << Math.min(4, (this.cols + 1));
+    return layout === 'packed' ? 1 : this.isScalarType() ? 4 : 1 << Math.min(4, this.cols + 1);
   }
   getLayoutSize(): number {
     return this.getSize();
@@ -665,7 +716,7 @@ export class PBPrimitiveTypeInfo extends PBTypeInfo<PrimitiveTypeDetail> impleme
     return true;
   }
   isHostSharable(): boolean {
-    return this.scalarType !== PBPrimitiveType.BOOL
+    return this.scalarType !== PBPrimitiveType.BOOL;
   }
   isConstructible(): boolean {
     return true;
@@ -695,11 +746,15 @@ export class PBPrimitiveTypeInfo extends PBTypeInfo<PrimitiveTypeDetail> impleme
 }
 
 export class PBStructTypeInfo extends PBTypeInfo<StructTypeDetail> implements ILayoutableType {
-  constructor(name: string, layout: PBStructLayout, members: { name: string, type: PBPrimitiveTypeInfo | PBArrayTypeInfo | PBStructTypeInfo }[]) {
+  constructor(
+    name: string,
+    layout: PBStructLayout,
+    members: { name: string; type: PBPrimitiveTypeInfo | PBArrayTypeInfo | PBStructTypeInfo }[]
+  ) {
     super(PBTypeClass.PLAIN, {
       layout: layout || 'default',
       structName: name,
-      structMembers: members.map(val => {
+      structMembers: members.map((val) => {
         const defaultAlignment = getAlignment(val.type);
         const defaultSize = getSize(val.type);
         return {
@@ -708,9 +763,9 @@ export class PBStructTypeInfo extends PBTypeInfo<StructTypeDetail> implements IL
           alignment: defaultAlignment,
           size: defaultSize,
           defaultAlignment: defaultAlignment,
-          defaultSize: defaultSize,
+          defaultSize: defaultSize
         };
-      }),
+      })
     });
     if (this.layout === 'std140') {
       this.calcAlignmentAndSizeSTD140();
@@ -730,18 +785,21 @@ export class PBStructTypeInfo extends PBTypeInfo<StructTypeDetail> implements IL
   get structMembers() {
     return this.detail.structMembers;
   }
-  extends(name: string, members: { name: string, type: PBPrimitiveTypeInfo | PBArrayTypeInfo | PBStructTypeInfo }[]): PBStructTypeInfo {
-    const oldMembers = this.structMembers.map(member => ({ name: member.name, type: member.type }));
+  extends(
+    name: string,
+    members: { name: string; type: PBPrimitiveTypeInfo | PBArrayTypeInfo | PBStructTypeInfo }[]
+  ): PBStructTypeInfo {
+    const oldMembers = this.structMembers.map((member) => ({ name: member.name, type: member.type }));
     return new PBStructTypeInfo(name, this.layout, [...oldMembers, ...members]);
   }
   isStructType(): this is PBStructTypeInfo {
     return true;
   }
   isHostSharable(): boolean {
-    return this.detail.structMembers.every(val => val.type.isHostSharable());
+    return this.detail.structMembers.every((val) => val.type.isHostSharable());
   }
   isConstructible(): boolean {
-    return this.detail.structMembers.every(val => val.type.isConstructible());
+    return this.detail.structMembers.every((val) => val.type.isConstructible());
   }
   isStorable(): boolean {
     return true;
@@ -749,7 +807,13 @@ export class PBStructTypeInfo extends PBTypeInfo<StructTypeDetail> implements IL
   getConstructorOverloads(): PBFunctionTypeInfo[] {
     const result: PBFunctionTypeInfo[] = [new PBFunctionTypeInfo(this.structName, this, [])];
     if (this.isConstructible()) {
-      result.push(new PBFunctionTypeInfo(this.structName, this, this.structMembers.map(val => ({ type: val.type }))));
+      result.push(
+        new PBFunctionTypeInfo(
+          this.structName,
+          this,
+          this.structMembers.map((val) => ({ type: val.type }))
+        )
+      );
     }
     return result;
   }
@@ -806,7 +870,7 @@ export class PBStructTypeInfo extends PBTypeInfo<StructTypeDetail> implements IL
         byteSize: size,
         type: typeToTypedArray(member.type),
         subLayout: member.type.isStructType() ? member.type.toBufferLayout(offset, layout) : null,
-        arraySize: member.type.isArrayType() ? member.type.dimension : 0,
+        arraySize: member.type.isArrayType() ? member.type.dimension : 0
       });
       offset += size;
     }
@@ -816,11 +880,15 @@ export class PBStructTypeInfo extends PBTypeInfo<StructTypeDetail> implements IL
   clone(newName?: string): PBStructTypeInfo {
     return new PBStructTypeInfo(newName || this.structName, this.layout, this.structMembers);
   }
-  reset(name: string, layout: PBStructLayout, members: { name: string, type: PBPrimitiveTypeInfo | PBArrayTypeInfo | PBStructTypeInfo }[]) {
+  reset(
+    name: string,
+    layout: PBStructLayout,
+    members: { name: string; type: PBPrimitiveTypeInfo | PBArrayTypeInfo | PBStructTypeInfo }[]
+  ) {
     this.detail = {
       layout: layout || 'default',
       structName: name,
-      structMembers: members.map(val => {
+      structMembers: members.map((val) => {
         const defaultAlignment = getAlignment(val.type);
         const defaultSize = getSize(val.type);
         return {
@@ -829,10 +897,10 @@ export class PBStructTypeInfo extends PBTypeInfo<StructTypeDetail> implements IL
           alignment: defaultAlignment,
           size: defaultSize,
           defaultAlignment: defaultAlignment,
-          defaultSize: defaultSize,
+          defaultSize: defaultSize
         };
-      }),
-    }
+      })
+    };
     if (this.layout === 'std140') {
       this.calcAlignmentAndSizeSTD140();
     } else if (this.layout === 'packed') {
@@ -842,7 +910,9 @@ export class PBStructTypeInfo extends PBTypeInfo<StructTypeDetail> implements IL
   }
   /** @internal */
   protected genTypeId(): string {
-    return `STRUCT:${this.structName}:${this.layout}:${this.structMembers.map(val => `${val.name}(${val.type.typeId})`).join(':')}`
+    return `STRUCT:${this.structName}:${this.layout}:${this.structMembers
+      .map((val) => `${val.name}(${val.type.typeId})`)
+      .join(':')}`;
   }
   /** @internal */
   private calcAlignmentAndSizeSTD140() {
@@ -872,7 +942,7 @@ export class PBArrayTypeInfo extends PBTypeInfo<ArrayTypeDetail> implements ILay
   constructor(elementType: PBPrimitiveTypeInfo | PBArrayTypeInfo | PBStructTypeInfo, dimension?: number) {
     super(PBTypeClass.ARRAY, {
       elementType: elementType,
-      dimension: Number(dimension) || 0,
+      dimension: Number(dimension) || 0
     });
   }
   get elementType(): PBPrimitiveTypeInfo | PBArrayTypeInfo | PBStructTypeInfo {
@@ -897,7 +967,13 @@ export class PBArrayTypeInfo extends PBTypeInfo<ArrayTypeDetail> implements ILay
     const name = this.toTypeName(deviceType);
     const result: PBFunctionTypeInfo[] = [new PBFunctionTypeInfo(name, this, [])];
     if (deviceType !== 'webgl' && this.isConstructible()) {
-      result.push(new PBFunctionTypeInfo(name, this, Array.from({ length: this.dimension }).map(() => ({ type: this.elementType }))));
+      result.push(
+        new PBFunctionTypeInfo(
+          name,
+          this,
+          Array.from({ length: this.dimension }).map(() => ({ type: this.elementType }))
+        )
+      );
     }
     return result;
   }
@@ -939,7 +1015,7 @@ export class PBPointerTypeInfo extends PBTypeInfo<PointerTypeDetail> {
   constructor(pointerType: PBTypeInfo, addressSpace: PBAddressSpace) {
     super(PBTypeClass.POINTER, {
       pointerType,
-      addressSpace,
+      addressSpace
     });
     console.assert(pointerType.isStorable(), 'the pointee type must be storable');
     this.writable = false;
@@ -961,7 +1037,8 @@ export class PBPointerTypeInfo extends PBTypeInfo<PointerTypeDetail> {
   }
   toTypeName(device: DeviceType, varName?: string): string {
     if (device === 'webgpu') {
-      const addressSpace = this.addressSpace === PBAddressSpace.UNKNOWN ? PBAddressSpace.FUNCTION : this.addressSpace;
+      const addressSpace =
+        this.addressSpace === PBAddressSpace.UNKNOWN ? PBAddressSpace.FUNCTION : this.addressSpace;
       /*
       const mode = addressSpace === PBAddressSpace.UNIFORM || (addressSpace === PBAddressSpace.STORAGE && !this.writable) ? 'read' : 'read_write'
       const typename = `ptr<${addressSpace}, ${this.pointerType.toTypeName(device)}, ${mode}>`;
@@ -1056,7 +1133,12 @@ export class PBSamplerTypeInfo extends PBTypeInfo<SamplerTypeDetail> {
 }
 
 export class PBTextureTypeInfo extends PBTypeInfo<TextureTypeDetail> {
-  constructor(textureType: PBTextureType, texelFormat?: TextureFormat, readable?: boolean, writable?: boolean) {
+  constructor(
+    textureType: PBTextureType,
+    texelFormat?: TextureFormat,
+    readable?: boolean,
+    writable?: boolean
+  ) {
     super(PBTypeClass.TEXTURE, {
       textureType: textureType,
       readable,
@@ -1064,7 +1146,10 @@ export class PBTextureTypeInfo extends PBTypeInfo<TextureTypeDetail> {
       storageTexelFormat: texelFormat || null
     });
     console.assert(!!textureTypeMapWGSL[textureType], 'unsupported texture type');
-    console.assert(!(textureType & BITFLAG_STORAGE) || !!storageTexelFormatMap[texelFormat], 'invalid texel format for storage texture');
+    console.assert(
+      !(textureType & BITFLAG_STORAGE) || !!storageTexelFormatMap[texelFormat],
+      'invalid texel format for storage texture'
+    );
   }
   get textureType(): PBTextureType {
     return this.detail.textureType;
@@ -1128,7 +1213,9 @@ export class PBTextureTypeInfo extends PBTypeInfo<TextureTypeDetail> {
       }
       return varName ? `${varName}: ${typename}` : typename;
     } else {
-      const typename = (deviceType === 'webgl' ? textureTypeMapWebGL : textureTypeMapWebGL2)[this.textureType];
+      const typename = (deviceType === 'webgl' ? textureTypeMapWebGL : textureTypeMapWebGL2)[
+        this.textureType
+      ];
       console.assert(!!typename, 'unsupported texture type');
       return varName ? `${typename} ${varName}` : typename;
     }
@@ -1143,7 +1230,7 @@ export class PBTextureTypeInfo extends PBTypeInfo<TextureTypeDetail> {
 }
 
 export class PBFunctionTypeInfo extends PBTypeInfo<FunctionTypeDetail> {
-  constructor(name: string, returnType: PBTypeInfo, argTypes: { type: PBTypeInfo, byRef?: boolean }[]) {
+  constructor(name: string, returnType: PBTypeInfo, argTypes: { type: PBTypeInfo; byRef?: boolean }[]) {
     super(PBTypeClass.FUNCTION, {
       name,
       returnType,
@@ -1156,12 +1243,14 @@ export class PBFunctionTypeInfo extends PBTypeInfo<FunctionTypeDetail> {
   get returnType(): PBTypeInfo {
     return this.detail.returnType;
   }
-  get argTypes(): { type: PBTypeInfo, byRef?: boolean }[] {
+  get argTypes(): { type: PBTypeInfo; byRef?: boolean }[] {
     return this.detail.argTypes;
   }
   /** @internal */
   protected genTypeId(): string {
-    return `FUNCTION:(${this.argTypes.map(val => val.type.typeId).join(',')}):${this.returnType?.typeId || 'void'}`;
+    return `FUNCTION:(${this.argTypes.map((val) => val.type.typeId).join(',')}):${
+      this.returnType?.typeId || 'void'
+    }`;
   }
   toBufferLayout(offset: number): UniformBufferLayout {
     return null;
@@ -1262,74 +1351,278 @@ export const typeUTexCubeArray = new PBTextureTypeInfo(PBTextureType.UTEX_CUBE_A
 export const typeTexMultisampled2D = new PBTextureTypeInfo(PBTextureType.TEX_MULTISAMPLED_2D);
 export const typeITexMultisampled2D = new PBTextureTypeInfo(PBTextureType.ITEX_MULTISAMPLED_2D);
 export const typeUTexMultisampled2D = new PBTextureTypeInfo(PBTextureType.UTEX_MULTISAMPLED_2D);
-export const typeTexStorage1D_rgba8unorm = new PBTextureTypeInfo(PBTextureType.TEX_STORAGE_1D, TextureFormat.RGBA8UNORM);
-export const typeTexStorage1D_rgba8snorm = new PBTextureTypeInfo(PBTextureType.TEX_STORAGE_1D, TextureFormat.RGBA8SNORM);
-export const typeTexStorage1D_bgra8unorm = new PBTextureTypeInfo(PBTextureType.TEX_STORAGE_1D, TextureFormat.BGRA8UNORM);
-export const typeTexStorage1D_rgba8uint = new PBTextureTypeInfo(PBTextureType.TEX_STORAGE_1D, TextureFormat.RGBA8UI);
-export const typeTexStorage1D_rgba8sint = new PBTextureTypeInfo(PBTextureType.TEX_STORAGE_1D, TextureFormat.RGBA8I);
-export const typeTexStorage1D_rgba16uint = new PBTextureTypeInfo(PBTextureType.TEX_STORAGE_1D, TextureFormat.RGBA16UI);
-export const typeTexStorage1D_rgba16sint = new PBTextureTypeInfo(PBTextureType.TEX_STORAGE_1D, TextureFormat.RGBA16I);
-export const typeTexStorage1D_rgba16float = new PBTextureTypeInfo(PBTextureType.TEX_STORAGE_1D, TextureFormat.RGBA16F);
-export const typeTexStorage1D_rgba32uint = new PBTextureTypeInfo(PBTextureType.TEX_STORAGE_1D, TextureFormat.RGBA32UI);
-export const typeTexStorage1D_rgba32sint = new PBTextureTypeInfo(PBTextureType.TEX_STORAGE_1D, TextureFormat.RGBA32I);
-export const typeTexStorage1D_rgba32float = new PBTextureTypeInfo(PBTextureType.TEX_STORAGE_1D, TextureFormat.RGBA32F);
-export const typeTexStorage1D_rg32uint = new PBTextureTypeInfo(PBTextureType.TEX_STORAGE_1D, TextureFormat.RG32UI);
-export const typeTexStorage1D_rg32sint = new PBTextureTypeInfo(PBTextureType.TEX_STORAGE_1D, TextureFormat.RG32I);
-export const typeTexStorage1D_rg32float = new PBTextureTypeInfo(PBTextureType.TEX_STORAGE_1D, TextureFormat.RG32F);
-export const typeTexStorage1D_r32uint = new PBTextureTypeInfo(PBTextureType.TEX_STORAGE_1D, TextureFormat.R32UI);
-export const typeTexStorage1D_r32sint = new PBTextureTypeInfo(PBTextureType.TEX_STORAGE_1D, TextureFormat.R32I);
-export const typeTexStorage1D_r32float = new PBTextureTypeInfo(PBTextureType.TEX_STORAGE_1D, TextureFormat.R32F);
-export const typeTexStorage2D_rgba8unorm = new PBTextureTypeInfo(PBTextureType.TEX_STORAGE_2D, TextureFormat.RGBA8UNORM);
-export const typeTexStorage2D_rgba8snorm = new PBTextureTypeInfo(PBTextureType.TEX_STORAGE_2D, TextureFormat.RGBA8SNORM);
-export const typeTexStorage2D_bgra8unorm = new PBTextureTypeInfo(PBTextureType.TEX_STORAGE_2D, TextureFormat.BGRA8UNORM);
-export const typeTexStorage2D_rgba8uint = new PBTextureTypeInfo(PBTextureType.TEX_STORAGE_2D, TextureFormat.RGBA8UI);
-export const typeTexStorage2D_rgba8sint = new PBTextureTypeInfo(PBTextureType.TEX_STORAGE_2D, TextureFormat.RGBA8I);
-export const typeTexStorage2D_rgba16uint = new PBTextureTypeInfo(PBTextureType.TEX_STORAGE_2D, TextureFormat.RGBA16UI);
-export const typeTexStorage2D_rgba16sint = new PBTextureTypeInfo(PBTextureType.TEX_STORAGE_2D, TextureFormat.RGBA16I);
-export const typeTexStorage2D_rgba16float = new PBTextureTypeInfo(PBTextureType.TEX_STORAGE_2D, TextureFormat.RGBA16F);
-export const typeTexStorage2D_rgba32uint = new PBTextureTypeInfo(PBTextureType.TEX_STORAGE_2D, TextureFormat.RGBA32UI);
-export const typeTexStorage2D_rgba32sint = new PBTextureTypeInfo(PBTextureType.TEX_STORAGE_2D, TextureFormat.RGBA32I);
-export const typeTexStorage2D_rgba32float = new PBTextureTypeInfo(PBTextureType.TEX_STORAGE_2D, TextureFormat.RGBA32F);
-export const typeTexStorage2D_rg32uint = new PBTextureTypeInfo(PBTextureType.TEX_STORAGE_2D, TextureFormat.RG32UI);
-export const typeTexStorage2D_rg32sint = new PBTextureTypeInfo(PBTextureType.TEX_STORAGE_2D, TextureFormat.RG32I);
-export const typeTexStorage2D_rg32float = new PBTextureTypeInfo(PBTextureType.TEX_STORAGE_2D, TextureFormat.RG32F);
-export const typeTexStorage2D_r32uint = new PBTextureTypeInfo(PBTextureType.TEX_STORAGE_2D, TextureFormat.R32UI);
-export const typeTexStorage2D_r32sint = new PBTextureTypeInfo(PBTextureType.TEX_STORAGE_2D, TextureFormat.R32I);
-export const typeTexStorage2D_r32float = new PBTextureTypeInfo(PBTextureType.TEX_STORAGE_2D, TextureFormat.R32F);
-export const typeTexStorage2DArray_rgba8unorm = new PBTextureTypeInfo(PBTextureType.TEX_STORAGE_2D_ARRAY, TextureFormat.RGBA8UNORM);
-export const typeTexStorage2DArray_rgba8snorm = new PBTextureTypeInfo(PBTextureType.TEX_STORAGE_2D_ARRAY, TextureFormat.RGBA8SNORM);
-export const typeTexStorage2DArray_bgra8unorm = new PBTextureTypeInfo(PBTextureType.TEX_STORAGE_2D_ARRAY, TextureFormat.BGRA8UNORM);
-export const typeTexStorage2DArray_rgba8uint = new PBTextureTypeInfo(PBTextureType.TEX_STORAGE_2D_ARRAY, TextureFormat.RGBA8UI);
-export const typeTexStorage2DArray_rgba8sint = new PBTextureTypeInfo(PBTextureType.TEX_STORAGE_2D_ARRAY, TextureFormat.RGBA8I);
-export const typeTexStorage2DArray_rgba16uint = new PBTextureTypeInfo(PBTextureType.TEX_STORAGE_2D_ARRAY, TextureFormat.RGBA16UI);
-export const typeTexStorage2DArray_rgba16sint = new PBTextureTypeInfo(PBTextureType.TEX_STORAGE_2D_ARRAY, TextureFormat.RGBA16I);
-export const typeTexStorage2DArray_rgba16float = new PBTextureTypeInfo(PBTextureType.TEX_STORAGE_2D_ARRAY, TextureFormat.RGBA16F);
-export const typeTexStorage2DArray_rgba32uint = new PBTextureTypeInfo(PBTextureType.TEX_STORAGE_2D_ARRAY, TextureFormat.RGBA32UI);
-export const typeTexStorage2DArray_rgba32sint = new PBTextureTypeInfo(PBTextureType.TEX_STORAGE_2D_ARRAY, TextureFormat.RGBA32I);
-export const typeTexStorage2DArray_rgba32float = new PBTextureTypeInfo(PBTextureType.TEX_STORAGE_2D_ARRAY, TextureFormat.RGBA32F);
-export const typeTexStorage2DArray_rg32uint = new PBTextureTypeInfo(PBTextureType.TEX_STORAGE_2D_ARRAY, TextureFormat.RG32UI);
-export const typeTexStorage2DArray_rg32sint = new PBTextureTypeInfo(PBTextureType.TEX_STORAGE_2D_ARRAY, TextureFormat.RG32I);
-export const typeTexStorage2DArray_rg32float = new PBTextureTypeInfo(PBTextureType.TEX_STORAGE_2D_ARRAY, TextureFormat.RG32F);
-export const typeTexStorage2DArray_r32uint = new PBTextureTypeInfo(PBTextureType.TEX_STORAGE_2D_ARRAY, TextureFormat.R32UI);
-export const typeTexStorage2DArray_r32sint = new PBTextureTypeInfo(PBTextureType.TEX_STORAGE_2D_ARRAY, TextureFormat.R32I);
-export const typeTexStorage2DArray_r32float = new PBTextureTypeInfo(PBTextureType.TEX_STORAGE_2D_ARRAY, TextureFormat.R32F);
-export const typeTexStorage3D_rgba8unorm = new PBTextureTypeInfo(PBTextureType.TEX_STORAGE_3D, TextureFormat.RGBA8UNORM);
-export const typeTexStorage3D_rgba8snorm = new PBTextureTypeInfo(PBTextureType.TEX_STORAGE_3D, TextureFormat.RGBA8SNORM);
-export const typeTexStorage3D_bgra8unorm = new PBTextureTypeInfo(PBTextureType.TEX_STORAGE_3D, TextureFormat.BGRA8UNORM);
-export const typeTexStorage3D_rgba8uint = new PBTextureTypeInfo(PBTextureType.TEX_STORAGE_3D, TextureFormat.RGBA8UI);
-export const typeTexStorage3D_rgba8sint = new PBTextureTypeInfo(PBTextureType.TEX_STORAGE_3D, TextureFormat.RGBA8I);
-export const typeTexStorage3D_rgba16uint = new PBTextureTypeInfo(PBTextureType.TEX_STORAGE_3D, TextureFormat.RGBA16UI);
-export const typeTexStorage3D_rgba16sint = new PBTextureTypeInfo(PBTextureType.TEX_STORAGE_3D, TextureFormat.RGBA16I);
-export const typeTexStorage3D_rgba16float = new PBTextureTypeInfo(PBTextureType.TEX_STORAGE_3D, TextureFormat.RGBA16F);
-export const typeTexStorage3D_rgba32uint = new PBTextureTypeInfo(PBTextureType.TEX_STORAGE_3D, TextureFormat.RGBA32UI);
-export const typeTexStorage3D_rgba32sint = new PBTextureTypeInfo(PBTextureType.TEX_STORAGE_3D, TextureFormat.RGBA32I);
-export const typeTexStorage3D_rgba32float = new PBTextureTypeInfo(PBTextureType.TEX_STORAGE_3D, TextureFormat.RGBA32F);
-export const typeTexStorage3D_rg32uint = new PBTextureTypeInfo(PBTextureType.TEX_STORAGE_3D, TextureFormat.RG32UI);
-export const typeTexStorage3D_rg32sint = new PBTextureTypeInfo(PBTextureType.TEX_STORAGE_3D, TextureFormat.RG32I);
-export const typeTexStorage3D_rg32float = new PBTextureTypeInfo(PBTextureType.TEX_STORAGE_3D, TextureFormat.RG32F);
-export const typeTexStorage3D_r32uint = new PBTextureTypeInfo(PBTextureType.TEX_STORAGE_3D, TextureFormat.R32UI);
-export const typeTexStorage3D_r32sint = new PBTextureTypeInfo(PBTextureType.TEX_STORAGE_3D, TextureFormat.R32I);
-export const typeTexStorage3D_r32float = new PBTextureTypeInfo(PBTextureType.TEX_STORAGE_3D, TextureFormat.R32F);
+export const typeTexStorage1D_rgba8unorm = new PBTextureTypeInfo(
+  PBTextureType.TEX_STORAGE_1D,
+  TextureFormat.RGBA8UNORM
+);
+export const typeTexStorage1D_rgba8snorm = new PBTextureTypeInfo(
+  PBTextureType.TEX_STORAGE_1D,
+  TextureFormat.RGBA8SNORM
+);
+export const typeTexStorage1D_bgra8unorm = new PBTextureTypeInfo(
+  PBTextureType.TEX_STORAGE_1D,
+  TextureFormat.BGRA8UNORM
+);
+export const typeTexStorage1D_rgba8uint = new PBTextureTypeInfo(
+  PBTextureType.TEX_STORAGE_1D,
+  TextureFormat.RGBA8UI
+);
+export const typeTexStorage1D_rgba8sint = new PBTextureTypeInfo(
+  PBTextureType.TEX_STORAGE_1D,
+  TextureFormat.RGBA8I
+);
+export const typeTexStorage1D_rgba16uint = new PBTextureTypeInfo(
+  PBTextureType.TEX_STORAGE_1D,
+  TextureFormat.RGBA16UI
+);
+export const typeTexStorage1D_rgba16sint = new PBTextureTypeInfo(
+  PBTextureType.TEX_STORAGE_1D,
+  TextureFormat.RGBA16I
+);
+export const typeTexStorage1D_rgba16float = new PBTextureTypeInfo(
+  PBTextureType.TEX_STORAGE_1D,
+  TextureFormat.RGBA16F
+);
+export const typeTexStorage1D_rgba32uint = new PBTextureTypeInfo(
+  PBTextureType.TEX_STORAGE_1D,
+  TextureFormat.RGBA32UI
+);
+export const typeTexStorage1D_rgba32sint = new PBTextureTypeInfo(
+  PBTextureType.TEX_STORAGE_1D,
+  TextureFormat.RGBA32I
+);
+export const typeTexStorage1D_rgba32float = new PBTextureTypeInfo(
+  PBTextureType.TEX_STORAGE_1D,
+  TextureFormat.RGBA32F
+);
+export const typeTexStorage1D_rg32uint = new PBTextureTypeInfo(
+  PBTextureType.TEX_STORAGE_1D,
+  TextureFormat.RG32UI
+);
+export const typeTexStorage1D_rg32sint = new PBTextureTypeInfo(
+  PBTextureType.TEX_STORAGE_1D,
+  TextureFormat.RG32I
+);
+export const typeTexStorage1D_rg32float = new PBTextureTypeInfo(
+  PBTextureType.TEX_STORAGE_1D,
+  TextureFormat.RG32F
+);
+export const typeTexStorage1D_r32uint = new PBTextureTypeInfo(
+  PBTextureType.TEX_STORAGE_1D,
+  TextureFormat.R32UI
+);
+export const typeTexStorage1D_r32sint = new PBTextureTypeInfo(
+  PBTextureType.TEX_STORAGE_1D,
+  TextureFormat.R32I
+);
+export const typeTexStorage1D_r32float = new PBTextureTypeInfo(
+  PBTextureType.TEX_STORAGE_1D,
+  TextureFormat.R32F
+);
+export const typeTexStorage2D_rgba8unorm = new PBTextureTypeInfo(
+  PBTextureType.TEX_STORAGE_2D,
+  TextureFormat.RGBA8UNORM
+);
+export const typeTexStorage2D_rgba8snorm = new PBTextureTypeInfo(
+  PBTextureType.TEX_STORAGE_2D,
+  TextureFormat.RGBA8SNORM
+);
+export const typeTexStorage2D_bgra8unorm = new PBTextureTypeInfo(
+  PBTextureType.TEX_STORAGE_2D,
+  TextureFormat.BGRA8UNORM
+);
+export const typeTexStorage2D_rgba8uint = new PBTextureTypeInfo(
+  PBTextureType.TEX_STORAGE_2D,
+  TextureFormat.RGBA8UI
+);
+export const typeTexStorage2D_rgba8sint = new PBTextureTypeInfo(
+  PBTextureType.TEX_STORAGE_2D,
+  TextureFormat.RGBA8I
+);
+export const typeTexStorage2D_rgba16uint = new PBTextureTypeInfo(
+  PBTextureType.TEX_STORAGE_2D,
+  TextureFormat.RGBA16UI
+);
+export const typeTexStorage2D_rgba16sint = new PBTextureTypeInfo(
+  PBTextureType.TEX_STORAGE_2D,
+  TextureFormat.RGBA16I
+);
+export const typeTexStorage2D_rgba16float = new PBTextureTypeInfo(
+  PBTextureType.TEX_STORAGE_2D,
+  TextureFormat.RGBA16F
+);
+export const typeTexStorage2D_rgba32uint = new PBTextureTypeInfo(
+  PBTextureType.TEX_STORAGE_2D,
+  TextureFormat.RGBA32UI
+);
+export const typeTexStorage2D_rgba32sint = new PBTextureTypeInfo(
+  PBTextureType.TEX_STORAGE_2D,
+  TextureFormat.RGBA32I
+);
+export const typeTexStorage2D_rgba32float = new PBTextureTypeInfo(
+  PBTextureType.TEX_STORAGE_2D,
+  TextureFormat.RGBA32F
+);
+export const typeTexStorage2D_rg32uint = new PBTextureTypeInfo(
+  PBTextureType.TEX_STORAGE_2D,
+  TextureFormat.RG32UI
+);
+export const typeTexStorage2D_rg32sint = new PBTextureTypeInfo(
+  PBTextureType.TEX_STORAGE_2D,
+  TextureFormat.RG32I
+);
+export const typeTexStorage2D_rg32float = new PBTextureTypeInfo(
+  PBTextureType.TEX_STORAGE_2D,
+  TextureFormat.RG32F
+);
+export const typeTexStorage2D_r32uint = new PBTextureTypeInfo(
+  PBTextureType.TEX_STORAGE_2D,
+  TextureFormat.R32UI
+);
+export const typeTexStorage2D_r32sint = new PBTextureTypeInfo(
+  PBTextureType.TEX_STORAGE_2D,
+  TextureFormat.R32I
+);
+export const typeTexStorage2D_r32float = new PBTextureTypeInfo(
+  PBTextureType.TEX_STORAGE_2D,
+  TextureFormat.R32F
+);
+export const typeTexStorage2DArray_rgba8unorm = new PBTextureTypeInfo(
+  PBTextureType.TEX_STORAGE_2D_ARRAY,
+  TextureFormat.RGBA8UNORM
+);
+export const typeTexStorage2DArray_rgba8snorm = new PBTextureTypeInfo(
+  PBTextureType.TEX_STORAGE_2D_ARRAY,
+  TextureFormat.RGBA8SNORM
+);
+export const typeTexStorage2DArray_bgra8unorm = new PBTextureTypeInfo(
+  PBTextureType.TEX_STORAGE_2D_ARRAY,
+  TextureFormat.BGRA8UNORM
+);
+export const typeTexStorage2DArray_rgba8uint = new PBTextureTypeInfo(
+  PBTextureType.TEX_STORAGE_2D_ARRAY,
+  TextureFormat.RGBA8UI
+);
+export const typeTexStorage2DArray_rgba8sint = new PBTextureTypeInfo(
+  PBTextureType.TEX_STORAGE_2D_ARRAY,
+  TextureFormat.RGBA8I
+);
+export const typeTexStorage2DArray_rgba16uint = new PBTextureTypeInfo(
+  PBTextureType.TEX_STORAGE_2D_ARRAY,
+  TextureFormat.RGBA16UI
+);
+export const typeTexStorage2DArray_rgba16sint = new PBTextureTypeInfo(
+  PBTextureType.TEX_STORAGE_2D_ARRAY,
+  TextureFormat.RGBA16I
+);
+export const typeTexStorage2DArray_rgba16float = new PBTextureTypeInfo(
+  PBTextureType.TEX_STORAGE_2D_ARRAY,
+  TextureFormat.RGBA16F
+);
+export const typeTexStorage2DArray_rgba32uint = new PBTextureTypeInfo(
+  PBTextureType.TEX_STORAGE_2D_ARRAY,
+  TextureFormat.RGBA32UI
+);
+export const typeTexStorage2DArray_rgba32sint = new PBTextureTypeInfo(
+  PBTextureType.TEX_STORAGE_2D_ARRAY,
+  TextureFormat.RGBA32I
+);
+export const typeTexStorage2DArray_rgba32float = new PBTextureTypeInfo(
+  PBTextureType.TEX_STORAGE_2D_ARRAY,
+  TextureFormat.RGBA32F
+);
+export const typeTexStorage2DArray_rg32uint = new PBTextureTypeInfo(
+  PBTextureType.TEX_STORAGE_2D_ARRAY,
+  TextureFormat.RG32UI
+);
+export const typeTexStorage2DArray_rg32sint = new PBTextureTypeInfo(
+  PBTextureType.TEX_STORAGE_2D_ARRAY,
+  TextureFormat.RG32I
+);
+export const typeTexStorage2DArray_rg32float = new PBTextureTypeInfo(
+  PBTextureType.TEX_STORAGE_2D_ARRAY,
+  TextureFormat.RG32F
+);
+export const typeTexStorage2DArray_r32uint = new PBTextureTypeInfo(
+  PBTextureType.TEX_STORAGE_2D_ARRAY,
+  TextureFormat.R32UI
+);
+export const typeTexStorage2DArray_r32sint = new PBTextureTypeInfo(
+  PBTextureType.TEX_STORAGE_2D_ARRAY,
+  TextureFormat.R32I
+);
+export const typeTexStorage2DArray_r32float = new PBTextureTypeInfo(
+  PBTextureType.TEX_STORAGE_2D_ARRAY,
+  TextureFormat.R32F
+);
+export const typeTexStorage3D_rgba8unorm = new PBTextureTypeInfo(
+  PBTextureType.TEX_STORAGE_3D,
+  TextureFormat.RGBA8UNORM
+);
+export const typeTexStorage3D_rgba8snorm = new PBTextureTypeInfo(
+  PBTextureType.TEX_STORAGE_3D,
+  TextureFormat.RGBA8SNORM
+);
+export const typeTexStorage3D_bgra8unorm = new PBTextureTypeInfo(
+  PBTextureType.TEX_STORAGE_3D,
+  TextureFormat.BGRA8UNORM
+);
+export const typeTexStorage3D_rgba8uint = new PBTextureTypeInfo(
+  PBTextureType.TEX_STORAGE_3D,
+  TextureFormat.RGBA8UI
+);
+export const typeTexStorage3D_rgba8sint = new PBTextureTypeInfo(
+  PBTextureType.TEX_STORAGE_3D,
+  TextureFormat.RGBA8I
+);
+export const typeTexStorage3D_rgba16uint = new PBTextureTypeInfo(
+  PBTextureType.TEX_STORAGE_3D,
+  TextureFormat.RGBA16UI
+);
+export const typeTexStorage3D_rgba16sint = new PBTextureTypeInfo(
+  PBTextureType.TEX_STORAGE_3D,
+  TextureFormat.RGBA16I
+);
+export const typeTexStorage3D_rgba16float = new PBTextureTypeInfo(
+  PBTextureType.TEX_STORAGE_3D,
+  TextureFormat.RGBA16F
+);
+export const typeTexStorage3D_rgba32uint = new PBTextureTypeInfo(
+  PBTextureType.TEX_STORAGE_3D,
+  TextureFormat.RGBA32UI
+);
+export const typeTexStorage3D_rgba32sint = new PBTextureTypeInfo(
+  PBTextureType.TEX_STORAGE_3D,
+  TextureFormat.RGBA32I
+);
+export const typeTexStorage3D_rgba32float = new PBTextureTypeInfo(
+  PBTextureType.TEX_STORAGE_3D,
+  TextureFormat.RGBA32F
+);
+export const typeTexStorage3D_rg32uint = new PBTextureTypeInfo(
+  PBTextureType.TEX_STORAGE_3D,
+  TextureFormat.RG32UI
+);
+export const typeTexStorage3D_rg32sint = new PBTextureTypeInfo(
+  PBTextureType.TEX_STORAGE_3D,
+  TextureFormat.RG32I
+);
+export const typeTexStorage3D_rg32float = new PBTextureTypeInfo(
+  PBTextureType.TEX_STORAGE_3D,
+  TextureFormat.RG32F
+);
+export const typeTexStorage3D_r32uint = new PBTextureTypeInfo(
+  PBTextureType.TEX_STORAGE_3D,
+  TextureFormat.R32UI
+);
+export const typeTexStorage3D_r32sint = new PBTextureTypeInfo(
+  PBTextureType.TEX_STORAGE_3D,
+  TextureFormat.R32I
+);
+export const typeTexStorage3D_r32float = new PBTextureTypeInfo(
+  PBTextureType.TEX_STORAGE_3D,
+  TextureFormat.R32F
+);
 export const typeTexDepth2D = new PBTextureTypeInfo(PBTextureType.TEX_DEPTH_2D);
 export const typeTexDepth2DArray = new PBTextureTypeInfo(PBTextureType.TEX_DEPTH_2D_ARRAY);
 export const typeTexDepthCube = new PBTextureTypeInfo(PBTextureType.TEX_DEPTH_CUBE);
@@ -1338,7 +1631,19 @@ export const typeTexDepthMultisampled2D = new PBTextureTypeInfo(PBTextureType.TE
 export const typeSampler = new PBSamplerTypeInfo(PBSamplerAccessMode.SAMPLE);
 export const typeSamplerComparison = new PBSamplerTypeInfo(PBSamplerAccessMode.COMPARISON);
 export const typeVoid = new PBVoidTypeInfo();
-export const typeFrexpResult = new PBStructTypeInfo('FrexpResult', 'default', [{ name: 'sig', type: typeF32 }, { name: 'exp', type: typeI32 }]);
-export const typeFrexpResultVec2 = new PBStructTypeInfo('FrexpResultVec2', 'default', [{ name: 'sig', type: typeF32Vec2 }, { name: 'exp', type: typeI32Vec2 }]);
-export const typeFrexpResultVec3 = new PBStructTypeInfo('FrexpResultVec3', 'default', [{ name: 'sig', type: typeF32Vec3 }, { name: 'exp', type: typeI32Vec3 }]);
-export const typeFrexpResultVec4 = new PBStructTypeInfo('FrexpResultVec4', 'default', [{ name: 'sig', type: typeF32Vec4 }, { name: 'exp', type: typeI32Vec4 }]);
+export const typeFrexpResult = new PBStructTypeInfo('FrexpResult', 'default', [
+  { name: 'sig', type: typeF32 },
+  { name: 'exp', type: typeI32 }
+]);
+export const typeFrexpResultVec2 = new PBStructTypeInfo('FrexpResultVec2', 'default', [
+  { name: 'sig', type: typeF32Vec2 },
+  { name: 'exp', type: typeI32Vec2 }
+]);
+export const typeFrexpResultVec3 = new PBStructTypeInfo('FrexpResultVec3', 'default', [
+  { name: 'sig', type: typeF32Vec3 },
+  { name: 'exp', type: typeI32Vec3 }
+]);
+export const typeFrexpResultVec4 = new PBStructTypeInfo('FrexpResultVec4', 'default', [
+  { name: 'sig', type: typeF32Vec4 },
+  { name: 'exp', type: typeI32Vec4 }
+]);

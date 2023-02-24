@@ -1,6 +1,6 @@
-import { StandardMaterial } from "./standard";
-import { UnlitLightModel } from "./lightmodel";
-import type { Device } from "@sophon/device";
+import { StandardMaterial } from './standard';
+import { UnlitLightModel } from './lightmodel';
+import type { Device } from '@sophon/device';
 
 export class UnlitMaterial extends StandardMaterial<UnlitLightModel> {
   constructor(device: Device) {

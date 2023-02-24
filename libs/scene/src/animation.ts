@@ -1,11 +1,11 @@
-import { Matrix4x4, Quaternion, Vector3 } from "@sophon/base";
-import { AnimationTrack } from "./animationtrack";
-import { InterpolationTarget, Interpolator } from "./interpolator";
-import { BoundingBox } from "./bounding_volume";
-import type { SceneNode } from "./scene_node";
-import type { Skeleton } from "./skeleton";
-import type { Mesh } from "./mesh";
-import type { Model } from "./model";
+import { Matrix4x4, Quaternion, Vector3 } from '@sophon/base';
+import { AnimationTrack } from './animationtrack';
+import { InterpolationTarget, Interpolator } from './interpolator';
+import { BoundingBox } from './bounding_volume';
+import type { SceneNode } from './scene_node';
+import type { Skeleton } from './skeleton';
+import type { Mesh } from './mesh';
+import type { Model } from './model';
 
 export interface SkinnedBoundingBox {
   boundingVertices: Vector3[];
@@ -23,16 +23,19 @@ export class AnimationClip {
   protected _isPlaying: boolean;
   protected _lastUpdateFrame: number;
   protected _currentPlayTime: number;
-  protected _tracks: Map<SceneNode, {
-    poseTranslation: Vector3,
-    poseRotation: Quaternion,
-    poseScaling: Vector3,
-    translationTrack?: AnimationTrack,
-    rotationTrack?: AnimationTrack,
-    scalingTrack?: AnimationTrack,
-    weightsTrack?: AnimationTrack,
-  }>;
-  protected _skeletons: Map<Skeleton, { mesh: Mesh, bounding: SkinnedBoundingBox, box: BoundingBox }[]>;
+  protected _tracks: Map<
+    SceneNode,
+    {
+      poseTranslation: Vector3;
+      poseRotation: Quaternion;
+      poseScaling: Vector3;
+      translationTrack?: AnimationTrack;
+      rotationTrack?: AnimationTrack;
+      scalingTrack?: AnimationTrack;
+      weightsTrack?: AnimationTrack;
+    }
+  >;
+  protected _skeletons: Map<Skeleton, { mesh: Mesh; bounding: SkinnedBoundingBox; box: BoundingBox }[]>;
   constructor(name: string, model: Model) {
     this._name = name;
     this._model = model;
@@ -67,7 +70,7 @@ export class AnimationClip {
       this._skeletons.set(skeleton, meshes);
     }
     for (let i = 0; i < meshList.length; i++) {
-      meshes.push({ mesh: meshList[i], bounding: boundingBoxInfo[i], box: new BoundingBox });
+      meshes.push({ mesh: meshList[i], bounding: boundingBoxInfo[i], box: new BoundingBox() });
     }
   }
   addAnimationTrack(node: SceneNode, interpolator: Interpolator): AnimationTrack {
@@ -123,9 +126,21 @@ export class AnimationClip {
         this._currentPlayTime = this._duration;
       }
       this._tracks.forEach((trackInfo, node) => {
-        trackInfo.translationTrack?.interpolator.interpolate(this._currentPlayTime, this._duration, node.position.getArray());
-        trackInfo.rotationTrack?.interpolator.interpolate(this._currentPlayTime, this._duration, node.rotation.getArray());
-        trackInfo.scalingTrack?.interpolator.interpolate(this._currentPlayTime, this._duration, node.scaling.getArray());
+        trackInfo.translationTrack?.interpolator.interpolate(
+          this._currentPlayTime,
+          this._duration,
+          node.position.getArray()
+        );
+        trackInfo.rotationTrack?.interpolator.interpolate(
+          this._currentPlayTime,
+          this._duration,
+          node.rotation.getArray()
+        );
+        trackInfo.scalingTrack?.interpolator.interpolate(
+          this._currentPlayTime,
+          this._duration,
+          node.scaling.getArray()
+        );
         node.notifyChanged(true, false);
       });
       this._skeletons.forEach((meshes, skeleton) => {

@@ -1,9 +1,9 @@
-import {WebGPUTextureSampler} from './sampler_webgpu';
-import type {SamplerOptions} from '../gpuobject';
-import type {WebGPUDevice} from './device';
+import { WebGPUTextureSampler } from './sampler_webgpu';
+import type { SamplerOptions } from '../gpuobject';
+import type { WebGPUDevice } from './device';
 export class SamplerCache {
   private _device: WebGPUDevice;
-  private _samplers: {[hash: string]: WebGPUTextureSampler};
+  private _samplers: { [hash: string]: WebGPUTextureSampler };
   constructor(device: WebGPUDevice) {
     this._device = device;
     this._samplers = {};

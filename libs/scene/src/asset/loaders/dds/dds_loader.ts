@@ -10,7 +10,15 @@ export class DDSLoader extends AbstractTextureLoader {
   supportMIMEType(mimeType: string): boolean {
     return mimeType === 'image/dds';
   }
-  async load(assetManager: AssetManager, url: string, mimeType: string, data: ArrayBuffer, srgb: boolean, noMipmap: boolean, texture?: BaseTexture): Promise<BaseTexture> {
+  async load(
+    assetManager: AssetManager,
+    url: string,
+    mimeType: string,
+    data: ArrayBuffer,
+    srgb: boolean,
+    noMipmap: boolean,
+    texture?: BaseTexture
+  ): Promise<BaseTexture> {
     const arrayBuffer = data;
     const mipmapLevelData = getDDSMipLevelsInfo(arrayBuffer);
     if (!mipmapLevelData) {
@@ -20,7 +28,7 @@ export class DDSLoader extends AbstractTextureLoader {
       colorSpace: srgb ? 'srgb' : 'linear',
       noMipmap: !!noMipmap,
       texture: texture
-    }
+    };
     if (mipmapLevelData.isCubemap) {
       return assetManager.device.createCubeTextureFromMipmapData(mipmapLevelData, options);
     } else if (mipmapLevelData.isVolume) {
@@ -30,4 +38,3 @@ export class DDSLoader extends AbstractTextureLoader {
     }
   }
 }
-

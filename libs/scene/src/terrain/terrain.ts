@@ -1,16 +1,23 @@
-import { REvent, Vector3 } from "@sophon/base";
-import { FaceMode, GPUObject, PBStructTypeInfo, RenderStateSet, StructuredBuffer, Texture2D } from "@sophon/device";
-import { Quadtree } from "./quadtree";
-import { MAX_DETAIL_TEXTURE_LEVELS, TerrainMaterial } from "./terrainmaterial";
-import { Drawable, DrawContext } from "../drawable";
-import { GraphNode } from "../graph_node";
-import { MATERIAL_FUNC_DEPTH_SHADOW } from "../values";
-import type { Camera } from "../camera";
-import type { TerrainPatch } from "./patch";
-import type { BoundingVolume } from "../bounding_volume";
-import type { Scene } from "../scene";
-import type { SceneNode } from "../scene_node";
-import type { CullVisitor } from "../visitors";
+import { REvent, Vector3 } from '@sophon/base';
+import {
+  FaceMode,
+  GPUObject,
+  PBStructTypeInfo,
+  RenderStateSet,
+  StructuredBuffer,
+  Texture2D
+} from '@sophon/device';
+import { Quadtree } from './quadtree';
+import { MAX_DETAIL_TEXTURE_LEVELS, TerrainMaterial } from './terrainmaterial';
+import { Drawable, DrawContext } from '../drawable';
+import { GraphNode } from '../graph_node';
+import { MATERIAL_FUNC_DEPTH_SHADOW } from '../values';
+import type { Camera } from '../camera';
+import type { TerrainPatch } from './patch';
+import type { BoundingVolume } from '../bounding_volume';
+import type { Scene } from '../scene';
+import type { SceneNode } from '../scene_node';
+import type { CullVisitor } from '../visitors';
 
 export class Terrain extends GraphNode implements Drawable {
   private _quadtree: Quadtree;
@@ -137,7 +144,11 @@ export class Terrain extends GraphNode implements Drawable {
   frameUpdate(camera: Camera) {
     const viewportH = this.scene.device.getViewport()[3];
     const tanHalfFovy = camera.getTanHalfFovy();
-    if (viewportH !== this._lastViewportH || tanHalfFovy !== this._lastTanHalfFOVY || this._maxPixelErrorDirty) {
+    if (
+      viewportH !== this._lastViewportH ||
+      tanHalfFovy !== this._lastTanHalfFOVY ||
+      this._maxPixelErrorDirty
+    ) {
       this._maxPixelErrorDirty = false;
       this._lastViewportH = viewportH;
       this._lastTanHalfFOVY = tanHalfFovy;
@@ -164,13 +175,16 @@ export class Terrain extends GraphNode implements Drawable {
   draw(ctx: DrawContext) {
     if (!this._terrainInfoBuffer) {
       const program = this._material.getOrCreateProgram(ctx).programs[ctx.materialFunc];
-      this._terrainInfoBuffer = this.scene.device.createStructuredBuffer(program.getBindingInfo('terrainInfo').type as PBStructTypeInfo, { usage: 'uniform' });
+      this._terrainInfoBuffer = this.scene.device.createStructuredBuffer(
+        program.getBindingInfo('terrainInfo').type as PBStructTypeInfo,
+        { usage: 'uniform' }
+      );
       const bbox = this.getBoundingVolume().toAABB();
       const terrainSizeX = bbox.extents.x * 2;
       const terrainSizeZ = bbox.extents.z * 2;
-      this._terrainInfoBuffer.bufferSubData(0, new Int32Array([terrainSizeX, terrainSizeZ, 0, 0]))
+      this._terrainInfoBuffer.bufferSubData(0, new Int32Array([terrainSizeX, terrainSizeZ, 0, 0]));
       this._terrainInfoBuffer.restoreHandler = async (obj: GPUObject) => {
-        this._terrainInfoBuffer.bufferSubData(0, new Int32Array([terrainSizeX, terrainSizeZ, 0, 0]))
+        this._terrainInfoBuffer.bufferSubData(0, new Int32Array([terrainSizeX, terrainSizeZ, 0, 0]));
       };
     }
     if (ctx.materialFunc === MATERIAL_FUNC_DEPTH_SHADOW) {

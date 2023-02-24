@@ -2,7 +2,13 @@ import { Vector3, Vector4, Matrix4x4 } from '@sophon/base';
 import { GraphNode } from './graph_node';
 import { BoundingVolume, BoundingBox } from './bounding_volume';
 import { ShadowMapper } from './shadow/shadowmapper';
-import { LIGHT_TYPE_DIRECTIONAL, LIGHT_TYPE_ENVIRONMENT, LIGHT_TYPE_HEMISPHERIC, LIGHT_TYPE_POINT, LIGHT_TYPE_SPOT } from './values';
+import {
+  LIGHT_TYPE_DIRECTIONAL,
+  LIGHT_TYPE_ENVIRONMENT,
+  LIGHT_TYPE_HEMISPHERIC,
+  LIGHT_TYPE_POINT,
+  LIGHT_TYPE_SPOT
+} from './values';
 import type { TextureCube } from '@sophon/device';
 import type { Scene } from './scene';
 
@@ -10,7 +16,7 @@ export enum LightingFalloffMode {
   UNKNOWN = 0,
   CONSTANT = 1,
   LINEAR = 2,
-  QUADRATIC = 3,
+  QUADRATIC = 3
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -138,8 +144,7 @@ export class EnvironmentLight extends AmbientLight {
   set irradianceMap(map: TextureCube) {
     this._irradianceMap = map || null;
   }
-  computeUniforms() {
-  }
+  computeUniforms() {}
 }
 export class HemiSphericLight extends AmbientLight {
   /** @internal */
@@ -265,8 +270,12 @@ export class DirectionalLight extends PunctualLight {
   }
   // adapt from DXSDK
   /** @internal */
-  private _computeNearAndFar(frustumMin: Vector3, frustumMax: Vector3, aabbLightSpace: Vector3[]): [number, number] {
-    type Triangle = { pt: [Vector3, Vector3, Vector3], culled: boolean };
+  private _computeNearAndFar(
+    frustumMin: Vector3,
+    frustumMax: Vector3,
+    aabbLightSpace: Vector3[]
+  ): [number, number] {
+    type Triangle = { pt: [Vector3, Vector3, Vector3]; culled: boolean };
     function dupTriangle(src: Triangle): Triangle {
       return {
         pt: [
@@ -279,12 +288,18 @@ export class DirectionalLight extends PunctualLight {
     }
     let nearPlane = Number.MAX_VALUE;
     let farPlane = -Number.MAX_VALUE;
-    const triangleList: Triangle[] = Array.from({ length: 16 }).map(val => ({ pt: [null, null, null], culled: false }));
+    const triangleList: Triangle[] = Array.from({ length: 16 }).map((val) => ({
+      pt: [null, null, null],
+      culled: false
+    }));
     let triangleCount = 1;
     triangleList[0].pt[0] = aabbLightSpace[0];
     triangleList[0].pt[1] = aabbLightSpace[1];
     triangleList[0].pt[2] = aabbLightSpace[2];
-    const triIndices = [0, 1, 2, 1, 2, 3, 4, 5, 6, 5, 6, 7, 0, 2, 4, 2, 4, 6, 1, 3, 5, 3, 5, 7, 0, 1, 4, 1, 4, 5, 2, 3, 6, 3, 6, 7];
+    const triIndices = [
+      0, 1, 2, 1, 2, 3, 4, 5, 6, 5, 6, 7, 0, 2, 4, 2, 4, 6, 1, 3, 5, 3, 5, 7, 0, 1, 4, 1, 4, 5, 2, 3, 6, 3, 6,
+      7
+    ];
     const pointPassesCollision: number[] = [0, 0, 0];
     const minx = frustumMin.x;
     const maxx = frustumMax.x;

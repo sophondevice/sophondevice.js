@@ -44,9 +44,9 @@ export class OrbitCameraModel extends BaseCameraModel implements AbstractCameraM
         damping: 0.1,
         moveSpeed: 0.2,
         rotateSpeed: 0.01,
-        zoomSpeed: 1,
+        zoomSpeed: 1
       },
-      options || {},
+      options || {}
     );
     this.rotateX = 0;
     this.rotateY = 0;
@@ -126,7 +126,11 @@ export class OrbitCameraModel extends BaseCameraModel implements AbstractCameraM
       this.quat.transform(this.xVector, this.xVector).inplaceNormalize();
       Vector3.normalize(this.eyePos, this.direction).inplaceNormalize();
       Vector3.cross(this.direction, this.xVector, this.upVector).inplaceNormalize();
-      Vector3.add(this.target, Vector3.scale(this.direction, this.options.distance * this.scale), this.eyePos);
+      Vector3.add(
+        this.target,
+        Vector3.scale(this.direction, this.options.distance * this.scale),
+        this.eyePos
+      );
       this._getCamera().lookAt(this.eyePos, this.target, this.upVector);
       // this._loadCameraParams();
       if (this.mouseDown) {

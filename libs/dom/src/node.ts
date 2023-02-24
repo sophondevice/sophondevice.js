@@ -5,7 +5,15 @@ import { RRectPrimitive, RPolygonPrimitive, RPrimitiveBatchList } from './primit
 import { RNodeList, RLiveNodeList } from './nodelist';
 import { UIRect, UILayout } from './layout';
 import { unescapeCSSString, ElementStyle, IStyleSheet } from './style';
-import { RValueChangeEvent, RElementLayoutEvent, RDOMTreeEvent, RElementDrawEvent, RElementBuildContentEvent, RTextContentChangeEvent, RMouseEvent } from './events';
+import {
+  RValueChangeEvent,
+  RElementLayoutEvent,
+  RDOMTreeEvent,
+  RElementDrawEvent,
+  RElementBuildContentEvent,
+  RTextContentChangeEvent,
+  RMouseEvent
+} from './events';
 import { NodeType } from './values';
 import { Font } from './font';
 import type { RText } from './components/text';
@@ -19,7 +27,7 @@ export interface RNode extends REventTarget {
   addEventListener(
     type: 'mousedown' | 'mouseup' | 'mousemove' | 'mouseclick' | 'mousedblclick',
     listener: REventListener<RMouseEvent>,
-    options?: REventHandlerOptions,
+    options?: REventHandlerOptions
   ): void;
   addEventListener(type: string, listener: REventListener, options?: REventHandlerOptions): void;
 }
@@ -163,11 +171,11 @@ export class RNode extends REventTarget {
     this._customDraw = false;
     this._preBuildContentEvent = new RElementBuildContentEvent(
       RElementBuildContentEvent.NAME_PREBUILD,
-      this._batchList,
+      this._batchList
     );
     this._postBuildContentEvent = new RElementBuildContentEvent(
       RElementBuildContentEvent.NAME_POSTBUILD,
-      this._batchList,
+      this._batchList
     );
     this._insertEvent = new RDOMTreeEvent(RDOMTreeEvent.NAME_INSERTED, null, this);
     this._removeEvent = new RDOMTreeEvent(RDOMTreeEvent.NAME_REMOVED, null, this);
@@ -238,11 +246,7 @@ export class RNode extends REventTarget {
     for (const child of childrenToBeRemoved) {
       child._remove();
     }
-    if (
-      this._pseudo === RNode.PSEUDO_BEFORE ||
-      this._pseudo === RNode.PSEUDO_AFTER ||
-      text !== ''
-    ) {
+    if (this._pseudo === RNode.PSEUDO_BEFORE || this._pseudo === RNode.PSEUDO_AFTER || text !== '') {
       this._append(text);
     }
   }
@@ -450,9 +454,7 @@ export class RNode extends REventTarget {
   }
   appendChild(child: RNode): RNode {
     console.assert(!!child, `Failed to appendChild: element to be append is ${child}`);
-    console.assert(
-      !this._isSucceedingOf(child),
-      `Failed to appendChild: cannot append parent element`);
+    console.assert(!this._isSucceedingOf(child), `Failed to appendChild: cannot append parent element`);
     const ref = this.lastChild?._layout.nextSibling()?.element;
     child._reparent(this, ref);
     return child;
@@ -460,11 +462,10 @@ export class RNode extends REventTarget {
   insertBefore(newElement: RNode, referenceElement: RNode) {
     console.assert(
       referenceElement && this === referenceElement.parentNode,
-      'Failed to insertBefore: reference element is not a valid elememnt or is not a child of this node');
+      'Failed to insertBefore: reference element is not a valid elememnt or is not a child of this node'
+    );
     console.assert(!!newElement, `Failed to insertBefore: element to be insert is ${newElement}`);
-    console.assert(
-      !this._isSucceedingOf(newElement),
-      `Failed to insertBefore: cannot insert parent element`);
+    console.assert(!this._isSucceedingOf(newElement), `Failed to insertBefore: cannot insert parent element`);
     newElement._reparent(this, referenceElement);
     return newElement;
   }
@@ -472,7 +473,8 @@ export class RNode extends REventTarget {
     console.assert(!!child, `Failed to removeChild: element to be remove is ${child}`);
     console.assert(
       this === child.parentNode,
-      'Failed to removeChild: element to be remove is not a child of this node');
+      'Failed to removeChild: element to be remove is not a child of this node'
+    );
     return child._remove();
   }
   replaceChild(newChild: RNode, oldChild: RNode) {
@@ -480,7 +482,8 @@ export class RNode extends REventTarget {
     console.assert(!!oldChild, `Failed to replaceChild: element to be replaced is ${oldChild}`);
     console.assert(
       this === oldChild.parentNode,
-      'Failed to replaceChild: element to be replaced is not a child of this node');
+      'Failed to replaceChild: element to be replaced is not a child of this node'
+    );
     if (newChild !== oldChild) {
       const next = oldChild.nextSibling;
       this.removeChild(oldChild);
@@ -596,23 +599,22 @@ export class RNode extends REventTarget {
   }
   /** @internal */
   _getCachedFontFamily(): string {
-    return (
-      this._cachedFontFamily || this.parentNode?._getCachedFontFamily() || RNode._defaultFontFamily
-    );
+    return this._cachedFontFamily || this.parentNode?._getCachedFontFamily() || RNode._defaultFontFamily;
   }
   /** @internal */
   _getCachedFont(): Font {
     if (!this._font) {
-      this._font = Font.fetchFont(`${this._getCachedFontSize()} ${this._getCachedFontFamily()}`, this._uiscene.renderer.screenToDevice(1));
+      this._font = Font.fetchFont(
+        `${this._getCachedFontSize()} ${this._getCachedFontFamily()}`,
+        this._uiscene.renderer.screenToDevice(1)
+      );
       // this._font = new Font(`${this._getCachedFontSize()} ${this._getCachedFontFamily()}`);
     }
     return this._font;
   }
   /** @internal */
   _getCachedFontColor(): RColor {
-    return (
-      this._fontColor || this.parentNode?._getCachedFontColor() || ElementStyle.defaultFontColor
-    );
+    return this._fontColor || this.parentNode?._getCachedFontColor() || ElementStyle.defaultFontColor;
   }
   /** @internal */
   _updatePseudoElementStyles(types: Map<string, { stylesheet: IStyleSheet; extra: unknown }[]>) {
@@ -629,8 +631,7 @@ export class RNode extends REventTarget {
       } else {
         pseudo = RNode.PSEUDO_AFTER;
         node =
-          this._childNodes.length > 0 &&
-            this._childNodes[this._childNodes.length - 1]._getPseudo() === pseudo
+          this._childNodes.length > 0 && this._childNodes[this._childNodes.length - 1]._getPseudo() === pseudo
             ? this._childNodes[this._childNodes.length - 1]
             : null;
       }
@@ -639,10 +640,7 @@ export class RNode extends REventTarget {
         node._setInternal();
         node._setPseudo(pseudo);
         node.style.flex = '0 0 auto';
-        node._reparent(
-          this,
-          name === 'before' && this._childNodes.length > 0 ? this._childNodes[0] : null,
-        );
+        node._reparent(this, name === 'before' && this._childNodes.length > 0 ? this._childNodes[0] : null);
         for (const s of info) {
           node.style.applyStyleSheet(s.stylesheet, true);
         }
@@ -679,7 +677,7 @@ export class RNode extends REventTarget {
     return this;
   }
   /** @internal */
-  _updateCursor(val: string): void { }
+  _updateCursor(val: string): void {}
   /** @internal */
   _updateDisplay(val: string): void {
     this._hide = val === 'none';
@@ -796,10 +794,7 @@ export class RNode extends REventTarget {
   }
   /** @internal */
   _invalidateFont(sizeChange: boolean, familyChange: boolean) {
-    if (
-      (sizeChange && this._cachedFontSize === null) ||
-      (familyChange && this._cachedFontFamily === null)
-    ) {
+    if ((sizeChange && this._cachedFontSize === null) || (familyChange && this._cachedFontFamily === null)) {
       this._font = null;
       this._invalidateContent();
       for (const child of this._childNodes) {
@@ -833,11 +828,11 @@ export class RNode extends REventTarget {
       (clipToClient
         ? this._layout.clientRect
         : {
-          x: 0,
-          y: 0,
-          width: this._layout.actualRect.width,
-          height: this._layout.actualRect.height,
-        });
+            x: 0,
+            y: 0,
+            width: this._layout.actualRect.width,
+            height: this._layout.actualRect.height
+          });
     return clipper.width > 0 && clipper.height > 0 ? clipper : null;
   }
   /** @internal */
@@ -854,7 +849,7 @@ export class RNode extends REventTarget {
     }
   }
   /** @internal */
-  _onMouseOut(x: number, y: number) { }
+  _onMouseOut(x: number, y: number) {}
   /** @internal */
   _onMouseEnter(x: number, y: number) {
     this._mouseIn = true;
@@ -892,7 +887,7 @@ export class RNode extends REventTarget {
     this.style.applyStyleSheet(this._getDefaultStyleSheet(), false);
   }
   /** @internal */
-  _applyInlineStyles() { }
+  _applyInlineStyles() {}
   /** @internal */
   _isVisible(): boolean {
     return !this._hide && (!this._parent || this._parent._isVisible());
@@ -946,7 +941,7 @@ export class RNode extends REventTarget {
             new RRectPrimitive(0, 0, w, h, u1, v1, u2, v2),
             clipper,
             this._backgroundImage?.texture || null,
-            color,
+            color
           );
         } else {
           let t = img.topLeftPatch9.x;
@@ -976,7 +971,7 @@ export class RNode extends REventTarget {
             t + b === h ? null : [w - r, t, r, h - t - b, ur, vt, u2, vb],
             b === 0 || l === 0 ? null : [0, h - b, l, b, u1, vb, ul, v2],
             b === 0 ? null : [l, h - b, w - l - r, b, ul, vb, ur, v2],
-            b === 0 || r === 0 ? null : [w - r, h - b, r, b, ur, vb, u2, v2],
+            b === 0 || r === 0 ? null : [w - r, h - b, r, b, ur, vb, u2, v2]
           ];
           for (const q of quads) {
             if (q) {
@@ -988,22 +983,16 @@ export class RNode extends REventTarget {
                 new RRectPrimitive(q[0], q[1], q[2], q[3], q[4], q[5], q[6], q[7]),
                 clipper,
                 this._backgroundImage?.texture || null,
-                color,
+                color
               );
             }
           }
         }
       }
 
-      const borderLeft = this.style.borderLeftWidth
-        ? parseInt(this.style.borderLeftWidth as string)
-        : 0;
-      const borderTop = this.style.borderTopWidth
-        ? parseInt(this.style.borderTopWidth as string)
-        : 0;
-      const borderRight = this.style.borderRightWidth
-        ? parseInt(this.style.borderRightWidth as string)
-        : 0;
+      const borderLeft = this.style.borderLeftWidth ? parseInt(this.style.borderLeftWidth as string) : 0;
+      const borderTop = this.style.borderTopWidth ? parseInt(this.style.borderTopWidth as string) : 0;
+      const borderRight = this.style.borderRightWidth ? parseInt(this.style.borderRightWidth as string) : 0;
       const borderBottom = this.style.borderBottomWidth
         ? parseInt(this.style.borderBottomWidth as string)
         : 0;
@@ -1017,11 +1006,11 @@ export class RNode extends REventTarget {
             { x: 0, y: 0 },
             { x: borderLeft, y: borderTop },
             { x: borderLeft, y: h - borderBottom },
-            { x: 0, y: h },
+            { x: 0, y: h }
           ]),
           clipper,
           null,
-          borderColorLeft,
+          borderColorLeft
         );
       }
       if (borderTop && borderColorTop.a > 0) {
@@ -1030,11 +1019,11 @@ export class RNode extends REventTarget {
             { x: 0, y: 0 },
             { x: w, y: 0 },
             { x: w - borderRight, y: borderTop },
-            { x: borderLeft, y: borderTop },
+            { x: borderLeft, y: borderTop }
           ]),
           clipper,
           null,
-          borderColorTop,
+          borderColorTop
         );
       }
       if (borderRight && borderColorRight.a > 0) {
@@ -1043,11 +1032,11 @@ export class RNode extends REventTarget {
             { x: w - borderRight, y: borderTop },
             { x: w, y: 0 },
             { x: w, y: h },
-            { x: w - borderRight, y: h - borderBottom },
+            { x: w - borderRight, y: h - borderBottom }
           ]),
           clipper,
           null,
-          borderColorRight,
+          borderColorRight
         );
       }
       if (borderBottom && borderColorBottom.a > 0) {
@@ -1056,11 +1045,11 @@ export class RNode extends REventTarget {
             { x: 0, y: h },
             { x: borderLeft, y: h - borderBottom },
             { x: w - borderRight, y: h - borderBottom },
-            { x: w, y: h },
+            { x: w, y: h }
           ]),
           clipper,
           null,
-          borderColorBottom,
+          borderColorBottom
         );
       }
     }
@@ -1109,7 +1098,7 @@ export class RNode extends REventTarget {
     this._renderOrder = this._childNodes.map((val, index) => index);
     // do stable sort
     this._renderOrder.sort(
-      (a, b) => this._childNodes[a]._getZIndex() - this._childNodes[b]._getZIndex() || a - b,
+      (a, b) => this._childNodes[a]._getZIndex() - this._childNodes[b]._getZIndex() || a - b
     );
   }
   /** @internal */
@@ -1198,10 +1187,7 @@ export class RNode extends REventTarget {
     let result: RNode = this;
     do {
       result = result._layout.nextSibling()?.element || null;
-    } while (
-      result &&
-      (result._isInternal() || (!!element && result.nodeType !== RNode.ELEMENT_NODE))
-    );
+    } while (result && (result._isInternal() || (!!element && result.nodeType !== RNode.ELEMENT_NODE)));
     return result;
   }
   /** @internal */
@@ -1209,15 +1195,11 @@ export class RNode extends REventTarget {
     let result: RNode = this;
     do {
       result = result._layout.previousSibling()?.element || null;
-    } while (
-      result &&
-      (result._isInternal() || (!!element && result.nodeType !== RNode.ELEMENT_NODE))
-    );
+    } while (result && (result._isInternal() || (!!element && result.nodeType !== RNode.ELEMENT_NODE)));
     return result;
   }
   /** @internal */
-  _init(): void {
-  }
+  _init(): void {}
   /** @internal */
   protected _updateScrollState(): void {
     const overflowX = this.style.overflowX || 'auto';
@@ -1236,9 +1218,7 @@ export class RNode extends REventTarget {
     const blockSize = 8;
     const buttonSize = 12;
     if (xOverflow) {
-      const width = yOverflow
-        ? this._layout.clientRect.width - scrollBarSize
-        : this._layout.clientRect.width;
+      const width = yOverflow ? this._layout.clientRect.width - scrollBarSize : this._layout.clientRect.width;
       if (this._layout.clientRect.height < scrollBarSize || width < 2 * buttonSize + blockSize) {
         xOverflow = false;
       } else {

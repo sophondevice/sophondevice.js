@@ -58,10 +58,7 @@ export class Viewer {
   /** @internal */
   private _onresize() {
     const canvas = this._canvas;
-    if (
-      this._canvasClientWidth !== canvas.clientWidth ||
-      this._canvasClientHeight !== canvas.clientHeight
-    ) {
+    if (this._canvasClientWidth !== canvas.clientWidth || this._canvasClientHeight !== canvas.clientHeight) {
       this._canvasClientWidth = canvas.clientWidth;
       this._canvasClientHeight = canvas.clientHeight;
       this._device.dispatchEvent(new DeviceResizeEvent(canvas.clientWidth, canvas.clientHeight));
@@ -72,9 +69,9 @@ export class Viewer {
     const canvas: HTMLCanvasElement = this._canvas;
     const that = this;
     if (window.ResizeObserver) {
-      new window.ResizeObserver(entries => {
+      new window.ResizeObserver((entries) => {
         that._onresize();
-      }).observe(canvas, {})
+      }).observe(canvas, {});
     } else {
       new MutationObserver(function (mutations) {
         if (mutations.length > 0) {

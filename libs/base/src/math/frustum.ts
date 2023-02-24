@@ -55,7 +55,7 @@ export class Frustum {
   }
   setViewProjectionMatrix(m: Matrix4x4) {
     this._viewProjMatrix = (this._viewProjMatrix || new Matrix4x4()).assign(
-      (m || Matrix4x4.identity()).getArray(),
+      (m || Matrix4x4.identity()).getArray()
     );
     this._invalidate();
     return this;
@@ -98,57 +98,25 @@ export class Frustum {
     const matrix = Matrix4x4.multiply(this._viewProjMatrix, this._worldMatrix);
     this._planes = this._planes || Array.from({ length: 6 }).map(() => new Plane());
     this._planes[BoxSide.LEFT]
-      .set(
-        matrix.m30 + matrix.m00,
-        matrix.m31 + matrix.m01,
-        matrix.m32 + matrix.m02,
-        matrix.m33 + matrix.m03,
-      )
+      .set(matrix.m30 + matrix.m00, matrix.m31 + matrix.m01, matrix.m32 + matrix.m02, matrix.m33 + matrix.m03)
       .inplaceNormalize();
     this._planes[BoxSide.RIGHT]
-      .set(
-        matrix.m30 - matrix.m00,
-        matrix.m31 - matrix.m01,
-        matrix.m32 - matrix.m02,
-        matrix.m33 - matrix.m03,
-      )
+      .set(matrix.m30 - matrix.m00, matrix.m31 - matrix.m01, matrix.m32 - matrix.m02, matrix.m33 - matrix.m03)
       .inplaceNormalize();
     this._planes[BoxSide.BOTTOM]
-      .set(
-        matrix.m30 + matrix.m10,
-        matrix.m31 + matrix.m11,
-        matrix.m32 + matrix.m12,
-        matrix.m33 + matrix.m13,
-      )
+      .set(matrix.m30 + matrix.m10, matrix.m31 + matrix.m11, matrix.m32 + matrix.m12, matrix.m33 + matrix.m13)
       .inplaceNormalize();
     this._planes[BoxSide.TOP]
-      .set(
-        matrix.m30 - matrix.m10,
-        matrix.m31 - matrix.m11,
-        matrix.m32 - matrix.m12,
-        matrix.m33 - matrix.m13,
-      )
+      .set(matrix.m30 - matrix.m10, matrix.m31 - matrix.m11, matrix.m32 - matrix.m12, matrix.m33 - matrix.m13)
       .inplaceNormalize();
     this._planes[BoxSide.FRONT]
-      .set(
-        matrix.m30 + matrix.m20,
-        matrix.m31 + matrix.m21,
-        matrix.m32 + matrix.m22,
-        matrix.m33 + matrix.m23,
-      )
+      .set(matrix.m30 + matrix.m20, matrix.m31 + matrix.m21, matrix.m32 + matrix.m22, matrix.m33 + matrix.m23)
       .inplaceNormalize();
     this._planes[BoxSide.BACK]
-      .set(
-        matrix.m30 - matrix.m20,
-        matrix.m31 - matrix.m21,
-        matrix.m32 - matrix.m22,
-        matrix.m33 - matrix.m23,
-      )
+      .set(matrix.m30 - matrix.m20, matrix.m31 - matrix.m21, matrix.m32 - matrix.m22, matrix.m33 - matrix.m23)
       .inplaceNormalize();
     const invMatrix = Matrix4x4.inverse(matrix);
-    const ndcVertices: Vector3[] = BoundingBoxData.ndcVertices.map(
-      (v) => new Vector3(v[0], v[1], v[2]),
-    );
+    const ndcVertices: Vector3[] = BoundingBoxData.ndcVertices.map((v) => new Vector3(v[0], v[1], v[2]));
     this._corners = this._corners || [];
     for (let i = 0; i < 8; i++) {
       const v = invMatrix.transformPoint(ndcVertices[i]);

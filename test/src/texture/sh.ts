@@ -31,16 +31,26 @@ class SphericalHarmonicsBasis {
   }
   static eval(c: number, v: Vector3): number {
     switch (c) {
-    case 0: return this.Y0(v);
-    case 1: return this.Y1(v);
-    case 2: return this.Y2(v);
-    case 3: return this.Y3(v);
-    case 4: return this.Y4(v);
-    case 5: return this.Y5(v);
-    case 6: return this.Y6(v);
-    case 7: return this.Y7(v);
-    case 8: return this.Y8(v);
-    default: return 0;
+      case 0:
+        return this.Y0(v);
+      case 1:
+        return this.Y1(v);
+      case 2:
+        return this.Y2(v);
+      case 3:
+        return this.Y3(v);
+      case 4:
+        return this.Y4(v);
+      case 5:
+        return this.Y5(v);
+      case 6:
+        return this.Y6(v);
+      case 7:
+        return this.Y7(v);
+      case 8:
+        return this.Y8(v);
+      default:
+        return 0;
     }
   }
 }
@@ -63,46 +73,49 @@ function differentialSolidAngle(textureSize: number, U: number, V: number): numb
 function directionFromCubemapTexel(face: number, u: number, v: number): Vector3 {
   const dir = Vector3.zero();
   switch (face) {
-  case 0: //+X
-    dir.x = 1;
-    dir.y = v * -2 + 1;
-    dir.z = u * -2 + 1;
-    break;
-  case 1: //-X
-    dir.x = -1;
-    dir.y = v * -2 + 1;
-    dir.z = u * 2 - 1;
-    break;
-  case 2: //+Y
-    dir.x = u * 2 - 1;
-    dir.y = 1;
-    dir.z = v * 2 - 1;
-    break;
-  case 3: //-Y
-    dir.x = u * 2 - 1;
-    dir.y = -1;
-    dir.z = v * -2 + 1;
-    break;
-  case 4: //+Z
-    dir.x = u * 2 - 1;
-    dir.y = v * -2 + 1;
-    dir.z = 1;
-    break;
-  case 5: //-Z
-    dir.x = u * -2 + 1;
-    dir.y = v * -2 + 1;
-    dir.z = -1;
-    break;
+    case 0: //+X
+      dir.x = 1;
+      dir.y = v * -2 + 1;
+      dir.z = u * -2 + 1;
+      break;
+    case 1: //-X
+      dir.x = -1;
+      dir.y = v * -2 + 1;
+      dir.z = u * 2 - 1;
+      break;
+    case 2: //+Y
+      dir.x = u * 2 - 1;
+      dir.y = 1;
+      dir.z = v * 2 - 1;
+      break;
+    case 3: //-Y
+      dir.x = u * 2 - 1;
+      dir.y = -1;
+      dir.z = v * -2 + 1;
+      break;
+    case 4: //+Z
+      dir.x = u * 2 - 1;
+      dir.y = v * -2 + 1;
+      dir.z = 1;
+      break;
+    case 5: //-Z
+      dir.x = u * -2 + 1;
+      dir.y = v * -2 + 1;
+      dir.z = -1;
+      break;
   }
   return dir.inplaceNormalize();
 }
 
 export async function projectCubemapCPU(input: TextureCube): Promise<Vector3[]> {
-  if (!input || (input.format !== TextureFormat.RGBA8UNORM && input.format !== TextureFormat.RGBA8UNORM_SRGB)) {
+  if (
+    !input ||
+    (input.format !== TextureFormat.RGBA8UNORM && input.format !== TextureFormat.RGBA8UNORM_SRGB)
+  ) {
     throw new Error(`cubemap must be rgba8unorm format`);
   }
   const size = input.width;
-  const output: Vector3[] = Array.from({length: 9}).map(() => Vector3.zero());
+  const output: Vector3[] = Array.from({ length: 9 }).map(() => Vector3.zero());
   for (let face = 0; face < 6; face++) {
     const input_face = new Uint8Array(size * size * 4);
     await input.readPixels(face, 0, 0, size, size, input_face);

@@ -1,4 +1,4 @@
-import { Quaternion, numberClamp, TypedArray } from "@sophon/base";
+import { Quaternion, numberClamp, TypedArray } from '@sophon/base';
 
 export enum InterpolationMode {
   UNKNOWN = 0,
@@ -12,7 +12,7 @@ export enum InterpolationTarget {
   ROTATION = 1,
   TRANSLATION = 2,
   SCALING = 3,
-  WEIGHTS = 4,
+  WEIGHTS = 4
 }
 
 const tmpQuat1 = new Quaternion();
@@ -27,14 +27,21 @@ export class Interpolator {
   private _target: InterpolationTarget;
   private _stride: number;
   private _maxTime: number;
-  constructor(mode: InterpolationMode, target: InterpolationTarget, inputs: TypedArray, outputs: TypedArray, stride?: number) {
+  constructor(
+    mode: InterpolationMode,
+    target: InterpolationTarget,
+    inputs: TypedArray,
+    outputs: TypedArray,
+    stride?: number
+  ) {
     this._prevKey = 0;
     this._prevT = 0;
     this._inputs = inputs;
     this._outputs = outputs;
     this._mode = mode;
     this._target = target;
-    this._stride = target === InterpolationTarget.WEIGHTS ? (stride ?? 0) : target === InterpolationTarget.ROTATION ? 4 : 3;
+    this._stride =
+      target === InterpolationTarget.WEIGHTS ? stride ?? 0 : target === InterpolationTarget.ROTATION ? 4 : 3;
     this._maxTime = inputs[inputs.length - 1];
   }
   get mode(): InterpolationMode {
@@ -47,7 +54,9 @@ export class Interpolator {
     return this._maxTime;
   }
   slerpQuat(q1: Quaternion, q2: Quaternion, t: number, result?: Float32Array): Float32Array {
-    return Quaternion.slerp(Quaternion.normalize(q1), Quaternion.normalize(q2), t, new Quaternion(result)).inplaceNormalize().getArray();
+    return Quaternion.slerp(Quaternion.normalize(q1), Quaternion.normalize(q2), t, new Quaternion(result))
+      .inplaceNormalize()
+      .getArray();
   }
   step(prevKey: number, result?: Float32Array): Float32Array {
     result = result || new Float32Array(this._stride);
@@ -59,11 +68,18 @@ export class Interpolator {
   linear(prevKey: number, nextKey: number, t: number, result?: Float32Array): Float32Array {
     result = result || new Float32Array(this._stride);
     for (let i = 0; i < this._stride; i++) {
-      result[i] = this._outputs[prevKey * this._stride + i] * (1 - t) + this._outputs[nextKey * this._stride + i] * t;
+      result[i] =
+        this._outputs[prevKey * this._stride + i] * (1 - t) + this._outputs[nextKey * this._stride + i] * t;
     }
     return result;
   }
-  cubicSpline(prevKey: number, nextKey: number, keyDelta: number, t: number, result?: Float32Array): Float32Array {
+  cubicSpline(
+    prevKey: number,
+    nextKey: number,
+    keyDelta: number,
+    t: number,
+    result?: Float32Array
+  ): Float32Array {
     result = result || new Float32Array(this._stride);
     const prevIndex = prevKey * this._stride * 3;
     const nextIndex = nextKey * this._stride * 3;
@@ -77,7 +93,11 @@ export class Interpolator {
       const a = keyDelta * this._outputs[nextIndex + i + A];
       const b = keyDelta * this._outputs[prevIndex + i + B];
       const v1 = this._outputs[nextIndex + i + V];
-      result[i] = ((2 * tCub - 3 * tSq + 1) * v0) + ((tCub - 2 * tSq + t) * b) + ((-2 * tCub + 3 * tSq) * v1) + ((tCub - tSq) * a);
+      result[i] =
+        (2 * tCub - 3 * tSq + 1) * v0 +
+        (tCub - 2 * tSq + t) * b +
+        (-2 * tCub + 3 * tSq) * v1 +
+        (tCub - tSq) * a;
     }
     return result;
   }
@@ -116,7 +136,7 @@ export class Interpolator {
         this.getQuat(this._prevKey, tmpQuat1.getArray());
         this.getQuat(nextKey, tmpQuat2.getArray());
         return this.slerpQuat(tmpQuat1, tmpQuat2, tn, result);
-      } else /* if (this._mode === InterpolationMode.STEP) */ {
+      } /* if (this._mode === InterpolationMode.STEP) */ else {
         return this.getQuat(this._prevKey, result);
       }
     }
@@ -139,4 +159,3 @@ export class Interpolator {
     return result;
   }
 }
-

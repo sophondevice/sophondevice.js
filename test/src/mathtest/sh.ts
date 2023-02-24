@@ -200,5 +200,5 @@ export function testSH() {
     console.log(c4.toString());
     const c5 = shLookup(R, G, B, Vector3.scale(dir, -1));
     console.log(c5.toString());
-  }());
+  })();
 }

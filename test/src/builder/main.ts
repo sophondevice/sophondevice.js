@@ -1,7 +1,6 @@
 import { Viewer, ProgramBuilder, GPUProgram } from '@sophon/device';
 
-const defaultVS =
-  `this.$inputs.pos = pb.vec3().attrib('position');
+const defaultVS = `this.$inputs.pos = pb.vec3().attrib('position');
 this.$inputs.uv = pb.vec2().attrib('texCoord0');
 this.$outputs.uv = pb.vec2();
 this.xform = pb.defineStruct(null, 'std140', pb.mat4('mvpMatrix'))().uniform(0);
@@ -9,14 +8,12 @@ this.$mainFunc(function(){
   this.$builtins.position = pb.mul(this.xform.mvpMatrix, pb.vec4(this.$inputs.pos, 1));
   this.$outputs.uv = this.$inputs.uv;
 });`;
-const defaultFS =
-  `this.$outputs.color = pb.vec4();
+const defaultFS = `this.$outputs.color = pb.vec4();
 this.tex = pb.tex2D().uniform(0);
 this.$mainFunc(function(){
   this.$outputs.color = pb.textureSample(this.tex, this.$inputs.uv);
 });`;
-const defaultCS =
-  `const structParams = pb.defineStruct(null, 'default', pb.uint('filterDim'), pb.uint('blockDim'));
+const defaultCS = `const structParams = pb.defineStruct(null, 'default', pb.uint('filterDim'), pb.uint('blockDim'));
 const structFlip = pb.defineStruct(null, 'default', pb.uint('value'));
 this.params = structParams().uniform(0);
 this.inputTex = pb.tex2D().uniform(1);
@@ -73,9 +70,9 @@ this.$mainFunc(function(){
   const fsgenerated = document.querySelector<HTMLTextAreaElement>('#fragmentshader-generated');
   const bg = document.querySelector<HTMLTextAreaElement>('#bindgroups');
   const viewers: { [name: string]: Viewer } = {};
-  const deviceNames = ['webgl', 'webgl2'/*, 'webgpu'*/] as const;
+  const deviceNames = ['webgl', 'webgl2' /*, 'webgpu'*/] as const;
   for (const name of deviceNames) {
-    viewers[name] = new Viewer(document.querySelector<HTMLCanvasElement>(`#${name}`))
+    viewers[name] = new Viewer(document.querySelector<HTMLCanvasElement>(`#${name}`));
     await viewers[name].initDevice(name);
   }
   function reset(resetSource: boolean) {
@@ -128,8 +125,8 @@ this.$mainFunc(function(){
             type: 'compute',
             params: {
               source: ret[0],
-              bindGroupLayouts: ret[1],
-            },
+              bindGroupLayouts: ret[1]
+            }
           });
         } else {
           program = viewers[deviceType].device.createGPUProgram({
@@ -160,4 +157,4 @@ this.$mainFunc(function(){
     }
   });
   reset(true);
-}());
+})();

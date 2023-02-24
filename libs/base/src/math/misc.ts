@@ -2,7 +2,7 @@ export function formatNumber(
   val: number,
   fractLength: number,
   totalLength?: number,
-  fillchar?: string,
+  fillchar?: string
 ): string {
   const fixed = val === (val | 0) ? String(val) : val.toFixed(fractLength);
   const ch = fillchar || '0';
@@ -42,4 +42,3 @@ export function nextPowerOf2(value: number) {
   value++;
   return value;
 }
-

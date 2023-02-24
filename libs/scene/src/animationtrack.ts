@@ -1,5 +1,5 @@
-import type { Device } from "@sophon/device";
-import type { Interpolator } from "./interpolator";
+import type { Device } from '@sophon/device';
+import type { Interpolator } from './interpolator';
 
 export class AnimationTrack {
   protected _interpolator: Interpolator;

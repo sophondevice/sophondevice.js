@@ -34,4 +34,3 @@ export class CPUTimer implements ITimer {
     return this._cpuTime;
   }
 }
-

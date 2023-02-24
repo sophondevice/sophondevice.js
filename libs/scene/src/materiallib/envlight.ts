@@ -1,5 +1,5 @@
-import { Vector4 } from "@sophon/base";
-import type { BaseTexture, BindGroup, ProgramBuilder, TextureCube, TextureSampler } from "@sophon/device";
+import { Vector4 } from '@sophon/base';
+import type { BaseTexture, BindGroup, ProgramBuilder, TextureCube, TextureSampler } from '@sophon/device';
 
 export abstract class EnvironmentLighting {
   abstract initShaderBindings(pb: ProgramBuilder): void;
@@ -48,7 +48,10 @@ export class EnvIBL extends EnvironmentLighting {
   initShaderBindings(pb: ProgramBuilder): void {
     pb.globalScope.iblRadianceMap = pb.texCube().uniform(0).tag(EnvIBL.USAGE_IBL_RADIANCE_MAP);
     pb.globalScope.iblIrradianceMap = pb.texCube().uniform(0).tag(EnvIBL.USAGE_IBL_IRRADIANCE_MAP);
-    pb.globalScope.iblParams = pb.defineStruct(null, 'std140', pb.float('radianceMaxLod'))().uniform(0).tag({ radianceMaxLod: EnvIBL.USAGE_IBL_RADIANCE_MAP_MAX_LOD });
+    pb.globalScope.iblParams = pb
+      .defineStruct(null, 'std140', pb.float('radianceMaxLod'))()
+      .uniform(0)
+      .tag({ radianceMaxLod: EnvIBL.USAGE_IBL_RADIANCE_MAP_MAX_LOD });
   }
   updateBindGroup(bg: BindGroup): void {
     bg.setValue('iblParams', { radianceMaxLod: this._radianceMap ? this._radianceMap.mipLevelCount - 1 : 0 });
@@ -80,7 +83,10 @@ export class EnvConstantAmbient extends EnvironmentLighting {
     }
   }
   initShaderBindings(pb: ProgramBuilder): void {
-    pb.globalScope.envLight = pb.defineStruct(null, 'std140', pb.vec4('ambient'))().uniform(0).tag({ ambient: EnvConstantAmbient.USAGE_CONSTANT_AMBIENT_LIGHTING });
+    pb.globalScope.envLight = pb
+      .defineStruct(null, 'std140', pb.vec4('ambient'))()
+      .uniform(0)
+      .tag({ ambient: EnvConstantAmbient.USAGE_CONSTANT_AMBIENT_LIGHTING });
   }
   updateBindGroup(bg: BindGroup): void {
     bg.setValue('envLight', { ambient: this._ambientColor });

@@ -7,11 +7,7 @@
   "main": "./index.js",
   "module": "./index.js",
   "types": "./index.d.ts",
-  "files": [
-    "**/*.js",
-    "**/*.d.ts",
-    "**/*.js.map"
-  ],
+  "files": ["**/*.js", "**/*.d.ts", "**/*.js.map"],
   "sideEffects": false,
   "repository": {
     "type": "git",
@@ -20,17 +16,7 @@
   "scripts": {
     "build": "cross-env NODE_OPTIONS=--max_old_space_size=8192 rollup -c"
   },
-  "keywords": [
-    "javascript",
-    "3d",
-    "rendering",
-    "engine",
-    "webgl",
-    "webgpu",
-    "canvas",
-    "sophon",
-    "device"
-  ],
+  "keywords": ["javascript", "3d", "rendering", "engine", "webgl", "webgpu", "canvas", "sophon", "device"],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/sophondevice/sophondevice/issues"

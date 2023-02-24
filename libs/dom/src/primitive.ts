@@ -57,17 +57,13 @@ export class RPolygonPrimitive extends RPrimitive {
       (v: Vertex): boolean => v.x >= x, // left
       (v: Vertex): boolean => v.x <= x + w, // right
       (v: Vertex): boolean => v.y >= y, // top
-      (v: Vertex): boolean => v.y <= y + h, // bottom
+      (v: Vertex): boolean => v.y <= y + h // bottom
     ];
     const intersect: ((v1: Vertex, v2: Vertex) => Vertex)[] = [
-      (v1: Vertex, v2: Vertex): Vertex =>
-        this._interpolateVertex(v1, v2, (x - v1.x) / (v2.x - v1.x)), // left
-      (v1: Vertex, v2: Vertex): Vertex =>
-        this._interpolateVertex(v1, v2, (x + w - v1.x) / (v2.x - v1.x)), // right
-      (v1: Vertex, v2: Vertex): Vertex =>
-        this._interpolateVertex(v1, v2, (y - v1.y) / (v2.y - v1.y)), // top
-      (v1: Vertex, v2: Vertex): Vertex =>
-        this._interpolateVertex(v1, v2, (y + h - v1.y) / (v2.y - v1.y)), // bottom
+      (v1: Vertex, v2: Vertex): Vertex => this._interpolateVertex(v1, v2, (x - v1.x) / (v2.x - v1.x)), // left
+      (v1: Vertex, v2: Vertex): Vertex => this._interpolateVertex(v1, v2, (x + w - v1.x) / (v2.x - v1.x)), // right
+      (v1: Vertex, v2: Vertex): Vertex => this._interpolateVertex(v1, v2, (y - v1.y) / (v2.y - v1.y)), // top
+      (v1: Vertex, v2: Vertex): Vertex => this._interpolateVertex(v1, v2, (y + h - v1.y) / (v2.y - v1.y)) // bottom
     ];
     for (let pass = 0; pass < 4; pass++) {
       const fnClassify = classify[pass];
@@ -108,7 +104,7 @@ export class RPolygonPrimitive extends RPrimitive {
       x: Math.round(v1.x + (v2.x - v1.x) * factor),
       y: Math.round(v1.y + (v2.y - v1.y) * factor),
       u: s1 + (s2 - s1) * factor,
-      v: t1 + (t2 - t1) * factor,
+      v: t1 + (t2 - t1) * factor
     };
   }
 }
@@ -138,7 +134,7 @@ export class RRectPrimitive extends RPrimitive {
     uMin: number,
     vMin: number,
     uMax: number,
-    vMax: number,
+    vMax: number
   ) {
     super();
     this._x1 = x;
@@ -159,7 +155,7 @@ export class RRectPrimitive extends RPrimitive {
       this._u1,
       this._v1,
       this._u2,
-      this._v2,
+      this._v2
     );
   }
   forEach(callback: (x: number, y: number, u: number, v: number) => void, thisArg?: unknown) {
@@ -306,17 +302,7 @@ export class RPrimitiveBatchList {
         const primitive = batch.batch.getPrimitive(prim);
         const color = batch.batch.color;
         primitive.forEach((x, y, u, v) => {
-          verts.push(
-            x + this._absoluteX,
-            y + this._absoluteY,
-            -50,
-            color.r,
-            color.g,
-            color.b,
-            color.a,
-            u,
-            v,
-          );
+          verts.push(x + this._absoluteX, y + this._absoluteY, -50, color.r, color.g, color.b, color.a, u, v);
         });
       }
       batch.vertices = new Float32Array(verts);
@@ -385,7 +371,7 @@ export class RPrimitiveBatch {
           this._clippedRect.x,
           this._clippedRect.y,
           this._clippedRect.width,
-          this._clippedRect.height,
+          this._clippedRect.height
         );
       }
       if (prim) {

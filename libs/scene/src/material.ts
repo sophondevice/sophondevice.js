@@ -1,23 +1,33 @@
 import { Matrix4x4, List, ListIterator } from '@sophon/base';
-import { TextureFilter, Geometry, BindGroup, GPUProgram, RenderStateSet, Device, ProgramBuilder, BindGroupLayout, TextureSampler } from '@sophon/device';
+import {
+  TextureFilter,
+  Geometry,
+  BindGroup,
+  GPUProgram,
+  RenderStateSet,
+  Device,
+  ProgramBuilder,
+  BindGroupLayout,
+  TextureSampler
+} from '@sophon/device';
 import { ShaderLib } from './materiallib/shaderlib';
 import type { Drawable, DrawContext } from './drawable';
 
 export type MaterialGCOptions = {
-  disabled?: boolean,
+  disabled?: boolean;
   drawableCountThreshold?: number;
   materialCountThreshold?: number;
   inactiveTimeDuration?: number;
-  verbose?: boolean,
-}
+  verbose?: boolean;
+};
 
 type ProgramInfo = {
-  programs: GPUProgram[],
-  hash: string
+  programs: GPUProgram[];
+  hash: string;
 };
 
 class InstanceBindGroupPool {
-  private _bindGroups: { bindGroup: BindGroup, freeSize: number }[];
+  private _bindGroups: { bindGroup: BindGroup; freeSize: number }[];
   private _frameStamp: number;
   constructor() {
     this._bindGroups = [];
@@ -40,7 +50,9 @@ class InstanceBindGroupPool {
     }
     if (bindGroupIndex < 0) {
       const program = Material.getProgramByHashIndex(hash, index);
-      const bindGroup = program?.bindGroupLayouts[3] ? device.createBindGroup(program.bindGroupLayouts[3]) : null;
+      const bindGroup = program?.bindGroupLayouts[3]
+        ? device.createBindGroup(program.bindGroupLayouts[3])
+        : null;
       this._bindGroups.push({ bindGroup: bindGroup, freeSize: maxSize });
       bindGroupIndex = this._bindGroups.length - 1;
     }
@@ -60,7 +72,7 @@ export class Material {
   private static _nextId = 0;
   /** @internal */
   protected static _programMap: {
-    [hash: string]: ProgramInfo
+    [hash: string]: ProgramInfo;
   } = {};
   /** @internal */
   protected static _defaultBindGroupLayouts: { [env: string]: BindGroupLayout[] } = {};
@@ -73,20 +85,23 @@ export class Material {
     disabled: false,
     drawableCountThreshold: 500,
     materialCountThreshold: 200,
-    inactiveTimeDuration: 30000,
+    inactiveTimeDuration: 30000
   };
   /** @internal */
   protected static _boneMatrixTextureSampler: TextureSampler = null;
   /** @internal */
   protected static _instanceBindGroupPool: InstanceBindGroupPool = new InstanceBindGroupPool();
   /** @internal */
-  protected static _drawableBindGroupMap: WeakMap<Drawable, {
-    [hash: string]: {
-      bindGroup: BindGroup[],
-      xformTag: number[],
-      bindGroupTag: number[]
+  protected static _drawableBindGroupMap: WeakMap<
+    Drawable,
+    {
+      [hash: string]: {
+        bindGroup: BindGroup[];
+        xformTag: number[];
+        bindGroupTag: number[];
+      };
     }
-  }> = new WeakMap();
+  > = new WeakMap();
   /** @internal */
   protected _device: Device;
   /** @internal */
@@ -96,10 +111,10 @@ export class Material {
   /** @internal */
   protected _bindGroupMap: {
     [hash: string]: {
-      materialBindGroup: BindGroup[],
-      materialTag: number[],
-      bindGroupTag: number[],
-    }
+      materialBindGroup: BindGroup[];
+      materialTag: number[];
+      bindGroupTag: number[];
+    };
   };
   /** @internal */
   protected _optionTag: number;
@@ -209,7 +224,9 @@ export class Material {
   getOrCreateProgram(ctx: DrawContext): ProgramInfo {
     const func = ctx.materialFunc;
     const programMap = Material._programMap;
-    const hash = `${this.getHash()}:${!!ctx.target.getBoneMatrices()}:${Number(!!(ctx.instanceData?.worldMatrices.length > 1))}:${ctx.renderPassHash}`;
+    const hash = `${this.getHash()}:${!!ctx.target.getBoneMatrices()}:${Number(
+      !!(ctx.instanceData?.worldMatrices.length > 1)
+    )}:${ctx.renderPassHash}`;
     let programInfo = programMap[hash];
     if (!programInfo || !programInfo.programs[func] || programInfo.programs[func].disposed) {
       console.time(hash);
@@ -235,12 +252,26 @@ export class Material {
       pb.globalScope.worldMatrix = pb.mat4().uniform(1).tag(ShaderLib.USAGE_WORLD_MATRIX);
     } else {
       pb.globalScope.instanceBufferOffset = pb.uint().uniform(1);
-      pb.globalScope.worldMatrix = pb.defineStruct(null, 'std140', pb.mat4[ctx.renderPass.device.getShaderCaps().maxUniformBufferSize / 64]('matrices'))().uniform(3);
-      pb.reflection.tag(ShaderLib.USAGE_WORLD_MATRIX, () => pb.globalScope.worldMatrix.matrices.at(pb.add(pb.globalScope.instanceBufferOffset, pb.uint(pb.globalScope.$builtins.instanceIndex))));
+      pb.globalScope.worldMatrix = pb
+        .defineStruct(
+          null,
+          'std140',
+          pb.mat4[ctx.renderPass.device.getShaderCaps().maxUniformBufferSize / 64]('matrices')
+        )()
+        .uniform(3);
+      pb.reflection.tag(ShaderLib.USAGE_WORLD_MATRIX, () =>
+        pb.globalScope.worldMatrix.matrices.at(
+          pb.add(pb.globalScope.instanceBufferOffset, pb.uint(pb.globalScope.$builtins.instanceIndex))
+        )
+      );
     }
     if (ctx.target.getBoneMatrices()) {
       // pb.globalScope.boneMatrices = pb.mat4[MAX_BONE_MATRIX_UNIFORM]().uniform(1).tag(ShaderLib.USAGE_BONE_MATRICIES);
-      pb.globalScope.boneMatrices = pb.tex2D().uniform(1).sampleType('unfilterable-float').tag(ShaderLib.USAGE_BONE_MATRICIES);
+      pb.globalScope.boneMatrices = pb
+        .tex2D()
+        .uniform(1)
+        .sampleType('unfilterable-float')
+        .tag(ShaderLib.USAGE_BONE_MATRICIES);
       pb.globalScope.invBindMatrix = pb.mat4().uniform(1).tag(ShaderLib.USAGE_INV_BIND_MATRIX);
       pb.globalScope.boneTextureSize = pb.int().uniform(1).tag(ShaderLib.USAGE_BONE_TEXTURE_SIZE);
     }
@@ -300,7 +331,7 @@ export class Material {
   }
   /** @internal */
   static getProgramByHashIndex(hash: string, index: number) {
-    return this._programMap[hash].programs[index]
+    return this._programMap[hash].programs[index];
   }
   /** @internal */
   private applyMaterialBindGroups(ctx: DrawContext, hash: string): BindGroup {
@@ -308,9 +339,11 @@ export class Material {
     let bindGroupInfo = this._bindGroupMap[hash];
     if (!bindGroupInfo) {
       // bindGroups not created or have been garbage collected
-      const materialBindGroup = [0, 1, 2].map(k => {
+      const materialBindGroup = [0, 1, 2].map((k) => {
         const program = Material._programMap[hash].programs[k];
-        return program?.bindGroupLayouts[2] ? this._device.createBindGroup(program.bindGroupLayouts[2]) : null;
+        return program?.bindGroupLayouts[2]
+          ? this._device.createBindGroup(program.bindGroupLayouts[2])
+          : null;
       });
       bindGroupInfo = this._bindGroupMap[hash] = {
         materialBindGroup,
@@ -320,7 +353,12 @@ export class Material {
     }
     const bindGroup = bindGroupInfo.materialBindGroup[index];
     if (bindGroup) {
-      this.applyUniforms(bindGroup, ctx, bindGroupInfo.materialTag[index] < this._optionTag || bindGroupInfo.bindGroupTag[index] !== bindGroup.cid);
+      this.applyUniforms(
+        bindGroup,
+        ctx,
+        bindGroupInfo.materialTag[index] < this._optionTag ||
+          bindGroupInfo.bindGroupTag[index] !== bindGroup.cid
+      );
       bindGroupInfo.materialTag[index] = this._optionTag;
       bindGroupInfo.bindGroupTag[index] = bindGroup.cid;
       this._device.setBindGroup(2, bindGroup);
@@ -330,10 +368,13 @@ export class Material {
     return bindGroup;
   }
   /** @internal */
-  private getDrawableBindGroup(ctx: DrawContext, hash: string): {
-    bindGroup: BindGroup[],
-    xformTag: number[],
-    bindGroupTag: number[]
+  private getDrawableBindGroup(
+    ctx: DrawContext,
+    hash: string
+  ): {
+    bindGroup: BindGroup[];
+    xformTag: number[];
+    bindGroupTag: number[];
   } {
     let drawableBindGroups = Material._drawableBindGroupMap.get(ctx.target);
     if (!drawableBindGroups) {
@@ -342,14 +383,16 @@ export class Material {
     }
     let drawableBindGroup = drawableBindGroups[hash];
     if (!drawableBindGroup) {
-      const bindGroup = [0, 1, 2].map(k => {
+      const bindGroup = [0, 1, 2].map((k) => {
         const program = Material._programMap[hash].programs[k];
-        return program?.bindGroupLayouts[1] ? this._device.createBindGroup(program.bindGroupLayouts[1]) : null
+        return program?.bindGroupLayouts[1]
+          ? this._device.createBindGroup(program.bindGroupLayouts[1])
+          : null;
       });
       drawableBindGroup = drawableBindGroups[hash] = {
         bindGroup,
         bindGroupTag: [0, 0, 0],
-        xformTag: [-1, -1, -1],
+        xformTag: [-1, -1, -1]
       };
     }
     return drawableBindGroup;
@@ -357,7 +400,12 @@ export class Material {
   /** @internal */
   private applyInstanceBindGroups(ctx: DrawContext, hash: string): void {
     const index = ctx.materialFunc;
-    const offset = Material._instanceBindGroupPool.apply(this.device, hash, index, ctx.instanceData.worldMatrices);
+    const offset = Material._instanceBindGroupPool.apply(
+      this.device,
+      hash,
+      index,
+      ctx.instanceData.worldMatrices
+    );
     const bindGroup = this.getDrawableBindGroup(ctx, hash).bindGroup?.[index];
     if (bindGroup) {
       bindGroup.setValue('instanceBufferOffset', offset);
@@ -369,10 +417,13 @@ export class Material {
   /** @internal */
   private applyDrawableBindGroups(ctx: DrawContext, hash: string): void {
     const index = ctx.materialFunc;
-    const drawableBindGroup = this.getDrawableBindGroup(ctx, hash)
+    const drawableBindGroup = this.getDrawableBindGroup(ctx, hash);
     if (drawableBindGroup.bindGroup) {
       const bindGroup = drawableBindGroup.bindGroup[index];
-      if (drawableBindGroup.xformTag[index] < ctx.target.getXForm().getTag() || drawableBindGroup.bindGroupTag[index] !== bindGroup.cid) {
+      if (
+        drawableBindGroup.xformTag[index] < ctx.target.getXForm().getTag() ||
+        drawableBindGroup.bindGroupTag[index] !== bindGroup.cid
+      ) {
         bindGroup.setValue('worldMatrix', ctx.target.getXForm().worldMatrix);
         drawableBindGroup.xformTag[index] = ctx.target.getXForm().getTag();
         drawableBindGroup.bindGroupTag[index] = bindGroup.cid;
@@ -454,8 +505,7 @@ export class Material {
     return null;
   }
   /** @internal */
-  protected _applyUniforms(bindGroup: BindGroup, ctx: DrawContext) {
-  }
+  protected _applyUniforms(bindGroup: BindGroup, ctx: DrawContext) {}
   /** @internal */
   protected _createHash(): string {
     return '';

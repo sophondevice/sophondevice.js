@@ -55,12 +55,21 @@ export class WebGLTexture3D extends WebGLBaseTexture implements Texture3D<WebGLT
       data
     );
   }
-  createEmpty(format: TextureFormat, width: number, height: number, depth: number, creationFlags?: number): void {
+  createEmpty(
+    format: TextureFormat,
+    width: number,
+    height: number,
+    depth: number,
+    creationFlags?: number
+  ): void {
     this._flags = Number(creationFlags) || 0;
     if (this._flags & GPUResourceUsageFlags.TF_WRITABLE) {
       console.error(new Error('webgl device does not support storage texture'));
     } else {
-      format = (this._flags & GPUResourceUsageFlags.TF_LINEAR_COLOR_SPACE) ? format : linearTextureFormatToSRGB(format);
+      format =
+        this._flags & GPUResourceUsageFlags.TF_LINEAR_COLOR_SPACE
+          ? format
+          : linearTextureFormatToSRGB(format);
       this.loadEmpty(format, width, height, depth, 0);
     }
   }
@@ -68,7 +77,7 @@ export class WebGLTexture3D extends WebGLBaseTexture implements Texture3D<WebGLT
     // No mipmap support for 3d texture
   }
   readPixels(layer: number, x: number, y: number, w: number, h: number, buffer: TypedArray): Promise<void> {
-    return new Promise<void>(resolve => {
+    return new Promise<void>((resolve) => {
       const fb = this._device.createFrameBuffer({
         colorAttachments: [{ texture: this, layer }]
       });
@@ -100,7 +109,13 @@ export class WebGLTexture3D extends WebGLBaseTexture implements Texture3D<WebGLT
     fb.dispose();
   }
   /** @internal */
-  private loadEmpty(format: TextureFormat, width: number, height: number, depth: number, numMipLevels: number): void {
+  private loadEmpty(
+    format: TextureFormat,
+    width: number,
+    height: number,
+    depth: number,
+    numMipLevels: number
+  ): void {
     this.allocInternal(format, width, height, depth, numMipLevels);
     if (this._mipLevelCount > 1 && !this._device.isContextLost()) {
       this.generateMipmaps();

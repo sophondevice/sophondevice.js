@@ -1,8 +1,8 @@
-import { WebGPUBuffer } from "./buffer_webgpu";
-import { StructuredBufferData } from "../uniformdata";
-import { GPUResourceUsageFlags, StructuredBuffer, StructuredValue } from "../gpuobject";
+import { WebGPUBuffer } from './buffer_webgpu';
+import { StructuredBufferData } from '../uniformdata';
+import { GPUResourceUsageFlags, StructuredBuffer, StructuredValue } from '../gpuobject';
 import * as typeinfo from '../builder/types';
-import type { TypedArray } from "@sophon/base";
+import type { TypedArray } from '@sophon/base';
 import type { WebGPUDevice } from './device';
 
 const vertexFormatTable: { [id: string]: GPUVertexFormat } = {
@@ -31,20 +31,25 @@ const vertexFormatTable: { [id: string]: GPUVertexFormat } = {
   [typeinfo.typeI32.typeId]: 'sint32',
   [typeinfo.typeI32Vec2.typeId]: 'sint32x2',
   [typeinfo.typeI32Vec3.typeId]: 'sint32x3',
-  [typeinfo.typeI32Vec4.typeId]: 'sint32x4',
-}
+  [typeinfo.typeI32Vec4.typeId]: 'sint32x4'
+};
 
 export class WebGPUStructuredBuffer extends WebGPUBuffer implements StructuredBuffer {
   private _structure: typeinfo.PBStructTypeInfo;
   private _data: StructuredBufferData;
-  constructor(device: WebGPUDevice, structure: typeinfo.PBStructTypeInfo, usage: number, source?: TypedArray) {
-    if (!(structure?.isStructType())) {
+  constructor(
+    device: WebGPUDevice,
+    structure: typeinfo.PBStructTypeInfo,
+    usage: number,
+    source?: TypedArray
+  ) {
+    if (!structure?.isStructType()) {
       throw new Error('invalid structure type');
     }
     if (usage & GPUResourceUsageFlags.BF_INDEX) {
       throw new Error('structured buffer must not have Index usage flag');
     }
-    if ((usage & GPUResourceUsageFlags.BF_READ) || (usage & GPUResourceUsageFlags.BF_WRITE)) {
+    if (usage & GPUResourceUsageFlags.BF_READ || usage & GPUResourceUsageFlags.BF_WRITE) {
       throw new Error('structured buffer must not have Read or Write usage flags');
     }
     if (usage & GPUResourceUsageFlags.BF_VERTEX) {
@@ -52,12 +57,14 @@ export class WebGPUStructuredBuffer extends WebGPUBuffer implements StructuredBu
         throw new Error('structured buffer for vertex usage must have only one array member');
       }
     }
-    if ((usage & GPUResourceUsageFlags.BF_UNIFORM) || (usage & GPUResourceUsageFlags.BF_STORAGE)) {
+    if (usage & GPUResourceUsageFlags.BF_UNIFORM || usage & GPUResourceUsageFlags.BF_STORAGE) {
       usage |= GPUResourceUsageFlags.DYNAMIC;
     }
     const layout = structure.toBufferLayout(0, structure.layout);
     if (source && layout.byteSize !== source.byteLength) {
-      throw new Error(`create structured buffer failed: invalid source size: ${source.byteLength}, should be ${layout.byteSize}`);
+      throw new Error(
+        `create structured buffer failed: invalid source size: ${source.byteLength}, should be ${layout.byteSize}`
+      );
     }
     super(device, usage, source || layout.byteSize);
     this._data = new StructuredBufferData(layout, this);

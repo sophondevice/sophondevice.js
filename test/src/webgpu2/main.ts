@@ -26,7 +26,7 @@ import { frag, vert } from './testshader';
     code: frag
   });
   if (sm && sm.compilationInfo) {
-    sm.compilationInfo().then(compilationInfo => {
+    sm.compilationInfo().then((compilationInfo) => {
       let err = false;
       if (compilationInfo?.messages?.length > 0) {
         let msg = '';
@@ -43,8 +43,7 @@ import { frag, vert } from './testshader';
     });
   }
 
-  const vertexShaderWgslCode =
-    `
+  const vertexShaderWgslCode = `
     struct VERTEX_INPUT {
       @builtin(instance_index) instance_id: u32,
       @builtin(vertex_index) vertex_id: u32,
@@ -61,8 +60,7 @@ import { frag, vert } from './testshader';
     }
     `;
 
-  const fragmentShaderWgslCode =
-    `
+  const fragmentShaderWgslCode = `
     struct FRAG_OUTPUT {
       @location(0) outColor: vec4<f32>
     };
@@ -80,7 +78,11 @@ import { frag, vert } from './testshader';
     }
   `;
 
-  const bgl: GPUBindGroupLayoutEntry = { binding: 0, buffer: { type: 'uniform' }, visibility: GPUShaderStage.VERTEX };
+  const bgl: GPUBindGroupLayoutEntry = {
+    binding: 0,
+    buffer: { type: 'uniform' },
+    visibility: GPUShaderStage.VERTEX
+  };
   const bindGroupLayout = device.createBindGroupLayout({
     entries: [bgl]
   });
@@ -99,37 +101,40 @@ import { frag, vert } from './testshader';
         code: fragmentShaderWgslCode
       }),
       entryPoint: 'main',
-      targets: [{
-        format: swapChainFormat,
-      }]
+      targets: [
+        {
+          format: swapChainFormat
+        }
+      ]
     },
     primitive: {
       topology: 'triangle-strip',
       cullMode: 'none'
-    },
+    }
   });
 
   const ubo = device.createBuffer({
     size: 128,
-    usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+    usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST
   });
 
   const bindGroup = device.createBindGroup({
     layout: bindGroupLayout,
     // layout: device.createBindGroupLayout({ entries: [{ binding: 0, buffer: {}, visibility: 1}] }),
-    entries: [{
-      binding: 0,
-      resource: {
-        buffer: ubo,
-        offset: 0,
-        size: 128
+    entries: [
+      {
+        binding: 0,
+        resource: {
+          buffer: ubo,
+          offset: 0,
+          size: 128
+        }
       }
-    }]
+    ]
   });
 
   const v = new Float32Array([
-    1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1,
-    1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0.2, 0.2, 0, 1,
+    1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0.2, 0.2, 0, 1
   ]);
   device.queue.writeBuffer(ubo, 0, v);
 
@@ -143,12 +148,14 @@ import { frag, vert } from './testshader';
     const textureView = context.getCurrentTexture().createView();
 
     const renderPassDescriptor: GPURenderPassDescriptor = {
-      colorAttachments: [{
-        view: textureView,
-        loadOp: 'clear',
-        clearValue: [0.5, 0.5, 0.5, 1],
-        storeOp: 'store'
-      }]
+      colorAttachments: [
+        {
+          view: textureView,
+          loadOp: 'clear',
+          clearValue: [0.5, 0.5, 0.5, 1],
+          storeOp: 'store'
+        }
+      ]
     };
 
     const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);

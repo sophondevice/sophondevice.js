@@ -1,5 +1,5 @@
 import * as Yoga from './typeflex/api';
-import type {RColor} from './types';
+import type { RColor } from './types';
 
 const colorNames = {
   aliceblue: '#f0f8ff',
@@ -142,14 +142,14 @@ const colorNames = {
   whitesmoke: '#f5f5f5',
   yellow: '#ffff00',
   yellowgreen: '#9acd32',
-  transparent: 'rgba(0,0,0,0)',
+  transparent: 'rgba(0,0,0,0)'
 };
 
 const overflowConstantMap = {
   hidden: 'hidden',
   auto: 'auto',
   scroll: 'scroll',
-  visible: 'visible',
+  visible: 'visible'
 };
 
 const alignmentConstantMap = {
@@ -160,14 +160,14 @@ const alignmentConstantMap = {
   stretch: Yoga.ALIGN_STRETCH,
   baseline: Yoga.ALIGN_BASELINE,
   'space-between': Yoga.ALIGN_SPACE_BETWEEN,
-  'space-around': Yoga.ALIGN_SPACE_AROUND,
+  'space-around': Yoga.ALIGN_SPACE_AROUND
 };
 
 const directionConstantMap = {
   row: Yoga.FLEX_DIRECTION_ROW,
   'row-reverse': Yoga.FLEX_DIRECTION_ROW_REVERSE,
   column: Yoga.FLEX_DIRECTION_COLUMN,
-  'column-reverse': Yoga.FLEX_DIRECTION_COLUMN_REVERSE,
+  'column-reverse': Yoga.FLEX_DIRECTION_COLUMN_REVERSE
 };
 
 const justifyConstantMap = {
@@ -176,24 +176,24 @@ const justifyConstantMap = {
   'flex-end': Yoga.JUSTIFY_FLEX_END,
   'space-between': Yoga.JUSTIFY_SPACE_BETWEEN,
   'space-around': Yoga.JUSTIFY_SPACE_AROUND,
-  'space-evenly': Yoga.JUSTIFY_SPACE_EVENLY,
+  'space-evenly': Yoga.JUSTIFY_SPACE_EVENLY
 };
 
 const wrapConstantMap = {
   wrap: Yoga.WRAP_WRAP,
   nowrap: Yoga.WRAP_NO_WRAP,
-  'wrap-reverse': Yoga.WRAP_WRAP_REVERSE,
+  'wrap-reverse': Yoga.WRAP_WRAP_REVERSE
 };
 
 const positionConstantMap = {
   fixed: Yoga.POSITION_TYPE_ABSOLUTE,
   relative: Yoga.POSITION_TYPE_RELATIVE,
-  absolute: Yoga.POSITION_TYPE_ABSOLUTE,
+  absolute: Yoga.POSITION_TYPE_ABSOLUTE
 };
 
 const displayConstantMap = {
   flex: Yoga.DISPLAY_FLEX,
-  none: Yoga.DISPLAY_NONE,
+  none: Yoga.DISPLAY_NONE
 };
 
 /** @internal */
@@ -335,45 +335,45 @@ export function unescapeCSSString(input: string): string {
     if (ch === '\\') {
       const next = input[i + 1];
       switch (next) {
-      case '\n':
-        codepoint = -2;
-        inputoffset = i + 1;
-        break;
-      case ' ':
-      case '!':
-      case '"':
-      case "'":
-      case '#':
-      case '$':
-      case '%':
-      case '&':
-      case '\\':
-      case '(':
-      case ')':
-      case '*':
-      case '+':
-      case ',':
-      case '-':
-      case '.':
-      case '/':
-      case ':':
-      case '<':
-      case '=':
-      case '>':
-      case '?':
-      case '@':
-      case '[':
-      case ']':
-      case '^':
-      case '_':
-      case '`':
-      case '{':
-      case '|':
-      case '}':
-      case '~':
-        codepoint = next.charCodeAt(0);
-        inputoffset = i + 1;
-        break;
+        case '\n':
+          codepoint = -2;
+          inputoffset = i + 1;
+          break;
+        case ' ':
+        case '!':
+        case '"':
+        case "'":
+        case '#':
+        case '$':
+        case '%':
+        case '&':
+        case '\\':
+        case '(':
+        case ')':
+        case '*':
+        case '+':
+        case ',':
+        case '-':
+        case '.':
+        case '/':
+        case ':':
+        case '<':
+        case '=':
+        case '>':
+        case '?':
+        case '@':
+        case '[':
+        case ']':
+        case '^':
+        case '_':
+        case '`':
+        case '{':
+        case '|':
+        case '}':
+        case '~':
+          codepoint = next.charCodeAt(0);
+          inputoffset = i + 1;
+          break;
       }
       if (codepoint === -1) {
         const cc = next.charCodeAt(0);
@@ -520,13 +520,13 @@ export class ElementStyle {
     this._setNonInline = false;
   }
   static get defaultBackgroundColor(): RColor {
-    return {r: 0, g: 0, b: 0, a: 0};
+    return { r: 0, g: 0, b: 0, a: 0 };
   }
   static get defaultBorderColor(): RColor {
-    return {r: 0, g: 0, b: 0, a: 1};
+    return { r: 0, g: 0, b: 0, a: 1 };
   }
   static get defaultFontColor(): RColor {
-    return {r: 0, g: 0, b: 0, a: 1};
+    return { r: 0, g: 0, b: 0, a: 1 };
   }
   get display(): string {
     return this._stylesheet.display || '';
@@ -965,7 +965,7 @@ export class ElementStyle {
     }
   }
   /** @internal */
-  _syncValues(values: {[k: string]: string}) {
+  _syncValues(values: { [k: string]: string }) {
     for (const k in values) {
       const val = values[k];
       val ? (this._stylesheet[k] = val) : delete this._stylesheet[k];
@@ -1039,7 +1039,7 @@ export class ElementStyle {
     k: string,
     v: string,
     defaultValue: any,
-    constantMap: {[k: string]: any},
+    constantMap: { [k: string]: any }
   ): any {
     if (v !== this[k] && (v === '' || constantMap[v] !== undefined)) {
       const val = v === '' ? defaultValue : constantMap[v];
@@ -1058,12 +1058,7 @@ export class ElementStyle {
   }
   /** @internal */
   setPositionType(val: string) {
-    const v = this._checkStringConstant(
-      'position',
-      val,
-      Yoga.POSITION_TYPE_RELATIVE,
-      positionConstantMap,
-    );
+    const v = this._checkStringConstant('position', val, Yoga.POSITION_TYPE_RELATIVE, positionConstantMap);
     if (v !== undefined) {
       this._layout.node.setPositionType(v);
       this._layout.invalidateLayout();
@@ -1159,12 +1154,7 @@ export class ElementStyle {
   }
   /** @internal */
   setFlexDirection(val: string) {
-    const v = this._checkStringConstant(
-      'flexDirection',
-      val,
-      Yoga.FLEX_DIRECTION_ROW,
-      directionConstantMap,
-    );
+    const v = this._checkStringConstant('flexDirection', val, Yoga.FLEX_DIRECTION_ROW, directionConstantMap);
     if (v !== undefined) {
       this._layout.node.setFlexDirection(v);
       this._layout.invalidateLayout();
@@ -1216,12 +1206,7 @@ export class ElementStyle {
   }
   /** @internal */
   setAlignItems(val: string) {
-    const v = this._checkStringConstant(
-      'alignItems',
-      val,
-      Yoga.ALIGN_STRETCH,
-      alignmentConstantMap,
-    );
+    const v = this._checkStringConstant('alignItems', val, Yoga.ALIGN_STRETCH, alignmentConstantMap);
     if (v !== undefined) {
       this._layout.node.setAlignItems(v);
       this._layout.invalidateLayout();
@@ -1229,12 +1214,7 @@ export class ElementStyle {
   }
   /** @internal */
   setAlignContent(val: string) {
-    const v = this._checkStringConstant(
-      'alignContent',
-      val,
-      Yoga.ALIGN_FLEX_START,
-      alignmentConstantMap,
-    );
+    const v = this._checkStringConstant('alignContent', val, Yoga.ALIGN_FLEX_START, alignmentConstantMap);
     if (v !== undefined) {
       this._layout.node.setAlignContent(v);
       this._layout.invalidateLayout();
@@ -1250,12 +1230,7 @@ export class ElementStyle {
   }
   /** @internal */
   setJustifyContent(val: string) {
-    const v = this._checkStringConstant(
-      'justifyContent',
-      val,
-      Yoga.JUSTIFY_FLEX_START,
-      justifyConstantMap,
-    );
+    const v = this._checkStringConstant('justifyContent', val, Yoga.JUSTIFY_FLEX_START, justifyConstantMap);
     if (v !== undefined) {
       this._layout.node.setJustifyContent(v);
       this._layout.invalidateLayout();
@@ -1308,8 +1283,7 @@ export class ElementStyle {
         const tuples = String(val).trim().split(/\s+/);
         if (tuples.length < 4) {
           for (let i = 0; i < tuples.length; i++) {
-            const val =
-              i < 2 ? this.parseGrowOrShrink(tuples[i]) : this.parseLengthOrAuto(tuples[i]);
+            const val = i < 2 ? this.parseGrowOrShrink(tuples[i]) : this.parseLengthOrAuto(tuples[i]);
             if (val === undefined) {
               invalid = true;
               break;
@@ -1383,30 +1357,30 @@ export class ElementStyle {
           }
           if (!invalid) {
             switch (values.length) {
-            case 1:
-              this.setMarginTop(values[0]);
-              this.setMarginRight(values[0]);
-              this.setMarginBottom(values[0]);
-              this.setMarginLeft(values[0]);
-              break;
-            case 2:
-              this.setMarginTop(values[0]);
-              this.setMarginRight(values[1]);
-              this.setMarginBottom(values[0]);
-              this.setMarginLeft(values[1]);
-              break;
-            case 3:
-              this.setMarginTop(values[0]);
-              this.setMarginRight(values[1]);
-              this.setMarginBottom(values[2]);
-              this.setMarginLeft(values[1]);
-              break;
-            case 4:
-              this.setMarginTop(values[0]);
-              this.setMarginRight(values[1]);
-              this.setMarginBottom(values[2]);
-              this.setMarginLeft(values[3]);
-              break;
+              case 1:
+                this.setMarginTop(values[0]);
+                this.setMarginRight(values[0]);
+                this.setMarginBottom(values[0]);
+                this.setMarginLeft(values[0]);
+                break;
+              case 2:
+                this.setMarginTop(values[0]);
+                this.setMarginRight(values[1]);
+                this.setMarginBottom(values[0]);
+                this.setMarginLeft(values[1]);
+                break;
+              case 3:
+                this.setMarginTop(values[0]);
+                this.setMarginRight(values[1]);
+                this.setMarginBottom(values[2]);
+                this.setMarginLeft(values[1]);
+                break;
+              case 4:
+                this.setMarginTop(values[0]);
+                this.setMarginRight(values[1]);
+                this.setMarginBottom(values[2]);
+                this.setMarginLeft(values[3]);
+                break;
             }
             this._layout.invalidateLayout();
           }
@@ -1435,10 +1409,7 @@ export class ElementStyle {
     if (
       val !== this.borderColor ||
       (val === '' &&
-        (this.borderLeftColor ||
-          this.borderTopColor ||
-          this.borderRightColor ||
-          this.borderBottomColor))
+        (this.borderLeftColor || this.borderTopColor || this.borderRightColor || this.borderBottomColor))
     ) {
       if (val === '') {
         this.setBorderLeftColor('');
@@ -1460,30 +1431,30 @@ export class ElementStyle {
           }
           if (!invalid) {
             switch (values.length) {
-            case 1:
-              this.setBorderTopColor(values[0]);
-              this.setBorderRightColor(values[0]);
-              this.setBorderBottomColor(values[0]);
-              this.setBorderLeftColor(values[0]);
-              break;
-            case 2:
-              this.setBorderTopColor(values[0]);
-              this.setBorderRightColor(values[1]);
-              this.setBorderBottomColor(values[0]);
-              this.setBorderLeftColor(values[1]);
-              break;
-            case 3:
-              this.setBorderTopColor(values[0]);
-              this.setBorderRightColor(values[1]);
-              this.setBorderBottomColor(values[2]);
-              this.setBorderLeftColor(values[1]);
-              break;
-            case 4:
-              this.setBorderTopColor(values[0]);
-              this.setBorderRightColor(values[1]);
-              this.setBorderBottomColor(values[2]);
-              this.setBorderLeftColor(values[3]);
-              break;
+              case 1:
+                this.setBorderTopColor(values[0]);
+                this.setBorderRightColor(values[0]);
+                this.setBorderBottomColor(values[0]);
+                this.setBorderLeftColor(values[0]);
+                break;
+              case 2:
+                this.setBorderTopColor(values[0]);
+                this.setBorderRightColor(values[1]);
+                this.setBorderBottomColor(values[0]);
+                this.setBorderLeftColor(values[1]);
+                break;
+              case 3:
+                this.setBorderTopColor(values[0]);
+                this.setBorderRightColor(values[1]);
+                this.setBorderBottomColor(values[2]);
+                this.setBorderLeftColor(values[1]);
+                break;
+              case 4:
+                this.setBorderTopColor(values[0]);
+                this.setBorderRightColor(values[1]);
+                this.setBorderBottomColor(values[2]);
+                this.setBorderLeftColor(values[3]);
+                break;
             }
             this._layout.invalidateLayout();
           }
@@ -1512,10 +1483,7 @@ export class ElementStyle {
     if (
       val !== this.borderWidth ||
       (val === '' &&
-        (this.borderLeftWidth ||
-          this.borderTopWidth ||
-          this.borderRightWidth ||
-          this.borderBottomWidth))
+        (this.borderLeftWidth || this.borderTopWidth || this.borderRightWidth || this.borderBottomWidth))
     ) {
       if (val === '') {
         this.setBorderLeftWidth('');
@@ -1537,30 +1505,30 @@ export class ElementStyle {
           }
           if (!invalid) {
             switch (values.length) {
-            case 1:
-              this.setBorderTopWidth(values[0]);
-              this.setBorderRightWidth(values[0]);
-              this.setBorderBottomWidth(values[0]);
-              this.setBorderLeftWidth(values[0]);
-              break;
-            case 2:
-              this.setBorderTopWidth(values[0]);
-              this.setBorderRightWidth(values[1]);
-              this.setBorderBottomWidth(values[0]);
-              this.setBorderLeftWidth(values[1]);
-              break;
-            case 3:
-              this.setBorderTopWidth(values[0]);
-              this.setBorderRightWidth(values[1]);
-              this.setBorderBottomWidth(values[2]);
-              this.setBorderLeftWidth(values[1]);
-              break;
-            case 4:
-              this.setBorderTopWidth(values[0]);
-              this.setBorderRightWidth(values[1]);
-              this.setBorderBottomWidth(values[2]);
-              this.setBorderLeftWidth(values[3]);
-              break;
+              case 1:
+                this.setBorderTopWidth(values[0]);
+                this.setBorderRightWidth(values[0]);
+                this.setBorderBottomWidth(values[0]);
+                this.setBorderLeftWidth(values[0]);
+                break;
+              case 2:
+                this.setBorderTopWidth(values[0]);
+                this.setBorderRightWidth(values[1]);
+                this.setBorderBottomWidth(values[0]);
+                this.setBorderLeftWidth(values[1]);
+                break;
+              case 3:
+                this.setBorderTopWidth(values[0]);
+                this.setBorderRightWidth(values[1]);
+                this.setBorderBottomWidth(values[2]);
+                this.setBorderLeftWidth(values[1]);
+                break;
+              case 4:
+                this.setBorderTopWidth(values[0]);
+                this.setBorderRightWidth(values[1]);
+                this.setBorderBottomWidth(values[2]);
+                this.setBorderLeftWidth(values[3]);
+                break;
             }
             this._layout.invalidateLayout();
           }
@@ -1588,8 +1556,7 @@ export class ElementStyle {
   setPadding(val: string) {
     if (
       val !== this.padding ||
-      (val === '' &&
-        (this.paddingLeft || this.paddingTop || this.paddingRight || this.paddingBottom))
+      (val === '' && (this.paddingLeft || this.paddingTop || this.paddingRight || this.paddingBottom))
     ) {
       if (val === '') {
         this.setPaddingLeft('');
@@ -1611,30 +1578,30 @@ export class ElementStyle {
           }
           if (!invalid) {
             switch (values.length) {
-            case 1:
-              this.setPaddingTop(values[0]);
-              this.setPaddingRight(values[0]);
-              this.setPaddingBottom(values[0]);
-              this.setPaddingLeft(values[0]);
-              break;
-            case 2:
-              this.setPaddingTop(values[0]);
-              this.setPaddingRight(values[1]);
-              this.setPaddingBottom(values[0]);
-              this.setPaddingLeft(values[1]);
-              break;
-            case 3:
-              this.setPaddingTop(values[0]);
-              this.setPaddingRight(values[1]);
-              this.setPaddingBottom(values[2]);
-              this.setPaddingLeft(values[1]);
-              break;
-            case 4:
-              this.setPaddingTop(values[0]);
-              this.setPaddingRight(values[1]);
-              this.setPaddingBottom(values[2]);
-              this.setPaddingLeft(values[3]);
-              break;
+              case 1:
+                this.setPaddingTop(values[0]);
+                this.setPaddingRight(values[0]);
+                this.setPaddingBottom(values[0]);
+                this.setPaddingLeft(values[0]);
+                break;
+              case 2:
+                this.setPaddingTop(values[0]);
+                this.setPaddingRight(values[1]);
+                this.setPaddingBottom(values[0]);
+                this.setPaddingLeft(values[1]);
+                break;
+              case 3:
+                this.setPaddingTop(values[0]);
+                this.setPaddingRight(values[1]);
+                this.setPaddingBottom(values[2]);
+                this.setPaddingLeft(values[1]);
+                break;
+              case 4:
+                this.setPaddingTop(values[0]);
+                this.setPaddingRight(values[1]);
+                this.setPaddingBottom(values[2]);
+                this.setPaddingLeft(values[3]);
+                break;
             }
             this._layout.invalidateLayout();
           }
@@ -1763,29 +1730,27 @@ export class ElementStyle {
         r: (parseInt(input.substr(1, collen), 16) * fact) / 255,
         g: (parseInt(input.substr(1 + collen, collen), 16) * fact) / 255,
         b: (parseInt(input.substr(1 + 2 * collen, collen), 16) * fact) / 255,
-        a: 1,
+        a: 1
       };
     } else {
       let m: RegExpMatchArray;
-      if (
-        (m = input.match(/^\s*rgb\s*\(\s*(\d*\.?\d*)\s*,\s*(\d*\.?\d*)\s*,\s*(\d\.?\d*)\s*\)\s*$/i))
-      ) {
+      if ((m = input.match(/^\s*rgb\s*\(\s*(\d*\.?\d*)\s*,\s*(\d*\.?\d*)\s*,\s*(\d\.?\d*)\s*\)\s*$/i))) {
         v = {
           r: Number(m[1]) / 255,
           g: Number(m[2]) / 255,
           b: Number(m[3]) / 255,
-          a: 1,
+          a: 1
         };
       } else if (
         (m = input.match(
-          /^\s*rgba\s*\(\s*(\d*\.?\d*)\s*,\s*(\d*\.?\d*)\s*,\s*([\d*.?\d*]+)\s*,\s*(\d*\.?\d*)\s*\)\s*$/i,
+          /^\s*rgba\s*\(\s*(\d*\.?\d*)\s*,\s*(\d*\.?\d*)\s*,\s*([\d*.?\d*]+)\s*,\s*(\d*\.?\d*)\s*\)\s*$/i
         ))
       ) {
         v = {
           r: Number(m[1]) / 255,
           g: Number(m[2]) / 255,
           b: Number(m[3]) / 255,
-          a: Number(m[4]),
+          a: Number(m[4])
         };
       }
     }
@@ -1916,7 +1881,7 @@ export class ElementStyle {
   }
 }
 
-const styleSetters: {[k: string]: (v: string) => void} = {
+const styleSetters: { [k: string]: (v: string) => void } = {
   'border-color': ElementStyle.prototype.setBorderColor,
   'border-left-color': ElementStyle.prototype.setBorderLeftColor,
   'border-top-color': ElementStyle.prototype.setBorderTopColor,
@@ -1971,5 +1936,5 @@ const styleSetters: {[k: string]: (v: string) => void} = {
   'font-size': ElementStyle.prototype.setFontSize,
   'font-family': ElementStyle.prototype.setFontFamily,
   color: ElementStyle.prototype.setFontColor,
-  'pointer-events': ElementStyle.prototype.setPointerEvents,
+  'pointer-events': ElementStyle.prototype.setPointerEvents
 };

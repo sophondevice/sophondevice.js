@@ -1,6 +1,18 @@
-import {CompareFunc} from '../base_types';
-import {ColorState, BlendEquation, BlendFunc, BlendingState, FaceMode, FaceWinding, RasterizerState, DepthState, StencilOp, StencilState, RenderStateSet} from '../render_states';
-import type {WebGPUDevice} from './device';
+import { CompareFunc } from '../base_types';
+import {
+  ColorState,
+  BlendEquation,
+  BlendFunc,
+  BlendingState,
+  FaceMode,
+  FaceWinding,
+  RasterizerState,
+  DepthState,
+  StencilOp,
+  StencilState,
+  RenderStateSet
+} from '../render_states';
+import type { WebGPUDevice } from './device';
 
 export abstract class WebGPURenderState {
   protected static _defaultState: WebGPURenderState;
@@ -86,16 +98,16 @@ export class WebGPUColorState extends WebGPURenderState implements ColorState {
   protected computeHash(): string {
     let val = 0;
     if (this.redMask) {
-      val += (1 << 0);
+      val += 1 << 0;
     }
     if (this.greenMask) {
-      val += (1 << 1);
+      val += 1 << 1;
     }
     if (this.blueMask) {
-      val += (1 << 2);
+      val += 1 << 2;
     }
     if (this.alphaMask) {
-      val += (1 << 3);
+      val += 1 << 3;
     }
     return String(val);
   }
@@ -509,8 +521,8 @@ export class WebGPUStencilState extends WebGPURenderState implements StencilStat
     return this;
   }
   protected computeHash(): string {
-    return this._enabled ?
-      this._enableTwoSided
+    return this._enabled
+      ? this._enableTwoSided
         ? `${this.sideHash(false)}-${this.sideHash(true)}`
         : `${this.sideHash(false)}`
       : '';
@@ -538,7 +550,9 @@ export class WebGPURenderStateSet implements RenderStateSet {
     this.defaultStencilState();
   }
   get hash(): string {
-    return `${this._colorState?.hash || ''}:${this._blendingState?.hash || ''}:${this._rasterizerState?.hash || ''}:${this.depthState?.hash || ''}:${this._stencilState?.hash || ''}`;
+    return `${this._colorState?.hash || ''}:${this._blendingState?.hash || ''}:${
+      this._rasterizerState?.hash || ''
+    }:${this.depthState?.hash || ''}:${this._stencilState?.hash || ''}`;
   }
   get colorState() {
     return this._colorState;

@@ -63,7 +63,8 @@ export class Ray {
 
   set(origin: Vector3, directionNormalized: Vector3) {
     this._origin = this._origin?.assign(origin.getArray()) ?? new Vector3(origin);
-    this._direction = this._direction?.assign(directionNormalized.getArray()) ?? new Vector3(directionNormalized);
+    this._direction =
+      this._direction?.assign(directionNormalized.getArray()) ?? new Vector3(directionNormalized);
     this.prepare();
   }
 
@@ -73,7 +74,10 @@ export class Ray {
       matrix.transformVectorAffine(this._direction, other._direction);
       other.prepare();
     } else {
-      other = new Ray(matrix.transformPointAffine(this._origin), matrix.transformVectorAffine(this._direction));
+      other = new Ray(
+        matrix.transformPointAffine(this._origin),
+        matrix.transformVectorAffine(this._direction)
+      );
     }
     return other;
   }

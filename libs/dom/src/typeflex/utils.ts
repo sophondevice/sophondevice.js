@@ -1,11 +1,11 @@
-import {YGUnit, YGFlexDirection, YGDirection} from './enums';
+import { YGUnit, YGFlexDirection, YGDirection } from './enums';
 
-import {YGFloatOptional} from './ygfloatoptional';
+import { YGFloatOptional } from './ygfloatoptional';
 
-import {YGFloatIsUndefined, YGUndefined} from './yoga';
+import { YGFloatIsUndefined, YGUndefined } from './yoga';
 
-import {YGNode} from './ygnode';
-import {YGValue} from './ygvalue';
+import { YGNode } from './ygnode';
+import { YGValue } from './ygvalue';
 
 export class YGCollectFlexItemsRowValues {
   public itemsOnLine = 0;
@@ -86,7 +86,7 @@ export function YGUnwrapFloatOptional(op: YGFloatOptional): number {
 
 export function YGFlexDirectionCross(
   flexDirection: YGFlexDirection,
-  direction: YGDirection,
+  direction: YGDirection
 ): YGFlexDirection {
   return YGFlexDirectionIsColumn(flexDirection)
     ? YGResolveFlexDirection(YGFlexDirection.Row, direction)
@@ -99,13 +99,13 @@ export function YGFlexDirectionIsRow(flexDirection: YGFlexDirection): boolean {
 
 export function YGResolveValue(value: YGValue, ownerSize: number): YGFloatOptional {
   switch (value.unit) {
-  case YGUnit.Undefined:
-  case YGUnit.Auto:
-    return new YGFloatOptional();
-  case YGUnit.Point:
-    return new YGFloatOptional(value.value);
-  case YGUnit.Percent:
-    return new YGFloatOptional(value.value * ownerSize * 0.01);
+    case YGUnit.Undefined:
+    case YGUnit.Auto:
+      return new YGFloatOptional();
+    case YGUnit.Point:
+      return new YGFloatOptional(value.value);
+    case YGUnit.Percent:
+      return new YGFloatOptional(value.value * ownerSize * 0.01);
   }
   return new YGFloatOptional();
 }
@@ -116,7 +116,7 @@ export function YGFlexDirectionIsColumn(flexDirection: YGFlexDirection): boolean
 
 export function YGResolveFlexDirection(
   flexDirection: YGFlexDirection,
-  direction: YGDirection,
+  direction: YGDirection
 ): YGFlexDirection {
   if (direction == YGDirection.RTL) {
     if (flexDirection == YGFlexDirection.Row) {

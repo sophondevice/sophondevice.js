@@ -1,9 +1,9 @@
-import {RText} from './text';
-import {RElementLayoutEvent, RTextEvent, RChangeEvent} from '../events';
-import {RNode} from '../node';
-import {RElement} from '../element';
-import type {GUI} from '../gui';
-import type {IStyleSheet} from '../style';
+import { RText } from './text';
+import { RElementLayoutEvent, RTextEvent, RChangeEvent } from '../events';
+import { RNode } from '../node';
+import { RElement } from '../element';
+import type { GUI } from '../gui';
+import type { IStyleSheet } from '../style';
 
 export class Option extends RElement {
   /** @internal */
@@ -117,8 +117,7 @@ export class Select extends RElement {
     this._text.textContent = this._hiddenInput.options[this._hiddenInput.selectedIndex].textContent;
   }
   /** @internal */
-  _init(): void {
-  }
+  _init(): void {}
   /** @internal */
   _getDefaultStyleSheet(): IStyleSheet {
     const style = super._getDefaultStyleSheet();
@@ -141,7 +140,7 @@ export class Select extends RElement {
   _updateHiddenInput() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let el: any = this._uiscene.renderer.getCanvas();
-    const v = this.toAbsolute({x: 0, y: 0});
+    const v = this.toAbsolute({ x: 0, y: 0 });
     let t = v.y;
     let l = v.x;
     if (el instanceof HTMLCanvasElement) {
@@ -158,9 +157,7 @@ export class Select extends RElement {
     this._hiddenInput.style.top = `${t}px`;
     this._hiddenInput.style.width = `${this.getRect().width}px`;
     this._hiddenInput.style.height = `${this.getRect().height}px`;
-    this._hiddenInput.style.font = `${this._getCachedFont().size}px ${
-      this._getCachedFont().family
-    }`;
+    this._hiddenInput.style.font = `${this._getCachedFont().size}px ${this._getCachedFont().family}`;
   }
   /** @internal */
   _insertChild(child: RNode, index: number) {

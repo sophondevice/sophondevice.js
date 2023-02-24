@@ -2,7 +2,11 @@
 import { WebGPUObject } from './gpuobject_webgpu';
 import { ShaderType } from '../base_types';
 import type { GPUProgram, BindGroupLayout, BindPointInfo } from '../gpuobject';
-import type { GPUProgramConstructParams, RenderProgramConstructParams, ComputeProgramConstructParams } from '../device';
+import type {
+  GPUProgramConstructParams,
+  RenderProgramConstructParams,
+  ComputeProgramConstructParams
+} from '../device';
 import type { WebGPUDevice } from './device';
 
 export class WebGPUProgram extends WebGPUObject<unknown> implements GPUProgram {
@@ -49,9 +53,12 @@ export class WebGPUProgram extends WebGPUObject<unknown> implements GPUProgram {
   }
   getShaderSource(shaderType: ShaderType): string {
     switch (shaderType) {
-      case ShaderType.Vertex: return this._vs;
-      case ShaderType.Fragment: return this._fs;
-      case ShaderType.Compute: return this._cs;
+      case ShaderType.Vertex:
+        return this._vs;
+      case ShaderType.Fragment:
+        return this._fs;
+      case ShaderType.Compute:
+        return this._cs;
     }
   }
   getBindingInfo(name: string): BindPointInfo {
@@ -82,7 +89,12 @@ export class WebGPUProgram extends WebGPUObject<unknown> implements GPUProgram {
   getPipelineLayout(): GPUPipelineLayout {
     return this._pipelineLayout;
   }
-  getShaderModule(): { vsModule: GPUShaderModule, fsModule: GPUShaderModule, csModule: GPUShaderModule, pipelineLayout: GPUPipelineLayout } {
+  getShaderModule(): {
+    vsModule: GPUShaderModule;
+    fsModule: GPUShaderModule;
+    csModule: GPUShaderModule;
+    pipelineLayout: GPUPipelineLayout;
+  } {
     return {
       vsModule: this._vsModule,
       fsModule: this._fsModule,
@@ -119,7 +131,7 @@ export class WebGPUProgram extends WebGPUObject<unknown> implements GPUProgram {
   }
   private createPipelineLayout(bindGroupLayouts: BindGroupLayout[]): GPUPipelineLayout {
     const layouts: GPUBindGroupLayout[] = [];
-    bindGroupLayouts.forEach(val => {
+    bindGroupLayouts.forEach((val) => {
       layouts.push(this._device.fetchBindGroupLayout(val));
     });
     return this._device.device.createPipelineLayout({
@@ -130,7 +142,7 @@ export class WebGPUProgram extends WebGPUObject<unknown> implements GPUProgram {
     const t0 = Date.now();
     let sm = this._device.device.createShaderModule({ code });
     if (sm && sm.compilationInfo) {
-      sm.compilationInfo().then(compilationInfo => {
+      sm.compilationInfo().then((compilationInfo) => {
         const elapsed = Date.now() - t0;
         if (elapsed > 1000) {
           console.log(`compile shader took ${elapsed}ms: \n${code}`);
@@ -160,4 +172,3 @@ export class WebGPUProgram extends WebGPUObject<unknown> implements GPUProgram {
     this._device.setProgram(this);
   }
 }
-

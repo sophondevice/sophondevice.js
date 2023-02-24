@@ -1,11 +1,11 @@
-import { WebGPUProgram } from "./gpuprogram_webgpu";
-import { WebGPUBindGroup } from "./bindgroup_webgpu";
-import { WebGPUMipmapGenerator } from "./utils_webgpu";
-import type { WebGPUBaseTexture } from "./basetexture_webgpu";
-import type { WebGPUBuffer } from "./buffer_webgpu";
-import type { WebGPUDevice } from "./device";
-import type { WebGPUFrameBuffer } from "./framebuffer_webgpu";
-import type { UploadBuffer, UploadImage, UploadTexture } from "./uploadringbuffer";
+import { WebGPUProgram } from './gpuprogram_webgpu';
+import { WebGPUBindGroup } from './bindgroup_webgpu';
+import { WebGPUMipmapGenerator } from './utils_webgpu';
+import type { WebGPUBaseTexture } from './basetexture_webgpu';
+import type { WebGPUBuffer } from './buffer_webgpu';
+import type { WebGPUDevice } from './device';
+import type { WebGPUFrameBuffer } from './framebuffer_webgpu';
+import type { UploadBuffer, UploadImage, UploadTexture } from './uploadringbuffer';
 
 const VALIDATION_NEED_NEW_PASS = 1 << 0;
 const VALIDATION_NEED_GENERATE_MIPMAP = 1 << 1;
@@ -35,9 +35,16 @@ export class WebGPUComputePass {
   isTextureUploading(tex: WebGPUBaseTexture): boolean {
     return !!this._textureUploads.has(tex);
   }
-  compute(program: WebGPUProgram, bindGroups: WebGPUBindGroup[], bindGroupOffsets: Iterable<number>[], workgroupCountX: number, workgroupCountY: number, workgroupCountZ: number): void {
+  compute(
+    program: WebGPUProgram,
+    bindGroups: WebGPUBindGroup[],
+    bindGroupOffsets: Iterable<number>[],
+    workgroupCountX: number,
+    workgroupCountY: number,
+    workgroupCountZ: number
+  ): void {
     const validation = this.validateCompute(bindGroups);
-    if ((validation & VALIDATION_NEED_NEW_PASS) || (validation & VALIDATION_NEED_GENERATE_MIPMAP)) {
+    if (validation & VALIDATION_NEED_NEW_PASS || validation & VALIDATION_NEED_GENERATE_MIPMAP) {
       if (this._computePassEncoder) {
         this.end();
       }
@@ -57,7 +64,12 @@ export class WebGPUComputePass {
       }
     }
   }
-  private setBindGroupsForCompute(computePassEncoder: GPUComputePassEncoder, program: WebGPUProgram, bindGroups: WebGPUBindGroup[], bindGroupOffsets: Iterable<number>[]): boolean {
+  private setBindGroupsForCompute(
+    computePassEncoder: GPUComputePassEncoder,
+    program: WebGPUProgram,
+    bindGroups: WebGPUBindGroup[],
+    bindGroupOffsets: Iterable<number>[]
+  ): boolean {
     if (bindGroups) {
       for (let i = 0; i < bindGroups.length; i++) {
         if (bindGroups[i]) {
@@ -84,11 +96,14 @@ export class WebGPUComputePass {
     if (this.active) {
       this._computePassEncoder.end();
       this._computePassEncoder = null;
-      this._bufferUploads.forEach(buffer => buffer.beginSyncChanges(this._uploadCommandEncoder));
-      this._textureUploads.forEach(tex => tex.beginSyncChanges(this._uploadCommandEncoder));
-      this._device.device.queue.submit([this._uploadCommandEncoder.finish(), this._computeCommandEncoder.finish()]);
-      this._bufferUploads.forEach(buffer => buffer.endSyncChanges());
-      this._textureUploads.forEach(tex => tex.endSyncChanges());
+      this._bufferUploads.forEach((buffer) => buffer.beginSyncChanges(this._uploadCommandEncoder));
+      this._textureUploads.forEach((tex) => tex.beginSyncChanges(this._uploadCommandEncoder));
+      this._device.device.queue.submit([
+        this._uploadCommandEncoder.finish(),
+        this._computeCommandEncoder.finish()
+      ]);
+      this._bufferUploads.forEach((buffer) => buffer.endSyncChanges());
+      this._textureUploads.forEach((tex) => tex.endSyncChanges());
       this._bufferUploads.clear();
       this._textureUploads.clear();
       this._uploadCommandEncoder = null;

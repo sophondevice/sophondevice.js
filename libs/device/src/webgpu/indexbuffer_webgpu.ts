@@ -1,7 +1,7 @@
-import { WebGPUBuffer } from "./buffer_webgpu";
-import { PBPrimitiveTypeInfo, typeU16, typeU32 } from "../builder";
-import { GPUResourceUsageFlags, IndexBuffer } from "../gpuobject";
-import type { WebGPUDevice } from "./device";
+import { WebGPUBuffer } from './buffer_webgpu';
+import { PBPrimitiveTypeInfo, typeU16, typeU32 } from '../builder';
+import { GPUResourceUsageFlags, IndexBuffer } from '../gpuobject';
+import type { WebGPUDevice } from './device';
 
 export class WebGPUIndexBuffer extends WebGPUBuffer implements IndexBuffer {
   readonly indexType: PBPrimitiveTypeInfo;

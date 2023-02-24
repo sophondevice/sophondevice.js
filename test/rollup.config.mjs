@@ -18,12 +18,14 @@ fs.readdirSync(srcdir).filter((dir) => {
   if (fs.statSync(fullpath).isDirectory()) {
     const main = path.join(fullpath, 'main.ts');
     const html = path.join('src', dir, 'index.html');
-    if (fs.existsSync(main) && fs.statSync(main).isFile() && fs.existsSync(html) && fs.statSync(html).isFile()) {
+    if (
+      fs.existsSync(main) &&
+      fs.statSync(main).isFile() &&
+      fs.existsSync(html) &&
+      fs.statSync(html).isFile()
+    ) {
       console.log('src files added: ' + main);
-      srcfiles.push([
-        main,
-        dir
-      ]);
+      srcfiles.push([main, dir]);
     }
   }
 });
@@ -37,7 +39,7 @@ function getTargetES6(input, output) {
       banner: '/** sophon dom library */',
       file: path.join(destdir, 'js', `${output}.js`),
       format: 'esm',
-      sourcemap: true,
+      sourcemap: true
     },
     plugins: [
       nodeResolve(),
@@ -48,31 +50,36 @@ function getTargetES6(input, output) {
         compact: false,
         minified: false,
         presets: [
-          ['@babel/preset-env', {
-            bugfixes: true,
-            loose: true,
-            modules: false,
-            targets: {
-              esmodules: true
+          [
+            '@babel/preset-env',
+            {
+              bugfixes: true,
+              loose: true,
+              modules: false,
+              targets: {
+                esmodules: true
+              }
             }
-          }]
+          ]
         ]
       }),
       // terser()
       copy({
-        targets: [{
-          src: `src/${output}/index.html`,
-          dest: 'dist',
-          rename: `${output}.html`
-        }],
-        verbose: true,
+        targets: [
+          {
+            src: `src/${output}/index.html`,
+            dest: 'dist',
+            rename: `${output}.html`
+          }
+        ],
+        verbose: true
       })
     ]
   };
 }
 
 export default (args) => {
-  const targets = srcfiles.map(f => getTargetES6(f[0], f[1]));
+  const targets = srcfiles.map((f) => getTargetES6(f[0], f[1]));
   console.log(JSON.stringify(targets));
   return targets;
 };

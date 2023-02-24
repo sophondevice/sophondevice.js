@@ -20,7 +20,13 @@ export class CullVisitor implements Visitor {
   /** @internal */
   private _renderPass: RenderPass;
   /** @internal */
-  private _postCullHook: (camera: Camera, drawable: Drawable, castShadow: boolean, clipState: ClipState, box: AABB) => boolean;
+  private _postCullHook: (
+    camera: Camera,
+    drawable: Drawable,
+    castShadow: boolean,
+    clipState: ClipState,
+    box: AABB
+  ) => boolean;
   constructor(renderPass: RenderPass, camera?: Camera) {
     this._camera = camera || null;
     this._renderQueue = new RenderQueue(renderPass);
@@ -43,13 +49,34 @@ export class CullVisitor implements Visitor {
   get frustum() {
     return this._camera?.frustum || null;
   }
-  get postCullHook(): (camera: Camera, drawable: Drawable, castShadow: boolean, clipState: ClipState, box: AABB) => boolean {
+  get postCullHook(): (
+    camera: Camera,
+    drawable: Drawable,
+    castShadow: boolean,
+    clipState: ClipState,
+    box: AABB
+  ) => boolean {
     return this._postCullHook;
   }
-  set postCullHook(hook: (camera: Camera, drawable: Drawable, castShadow: boolean, clipState: ClipState, box: AABB) => boolean) {
+  set postCullHook(
+    hook: (
+      camera: Camera,
+      drawable: Drawable,
+      castShadow: boolean,
+      clipState: ClipState,
+      box: AABB
+    ) => boolean
+  ) {
     this._postCullHook = hook;
   }
-  push(camera: Camera, drawable: Drawable, renderOrder: number, castShadow: boolean, clipState: ClipState, box: AABB) {
+  push(
+    camera: Camera,
+    drawable: Drawable,
+    renderOrder: number,
+    castShadow: boolean,
+    clipState: ClipState,
+    box: AABB
+  ) {
     if (!this._postCullHook || this._postCullHook(camera, drawable, castShadow, clipState, box)) {
       this.renderQueue.push(camera, drawable, renderOrder);
     }
@@ -64,28 +91,46 @@ export class CullVisitor implements Visitor {
     }
   }
   visitTerrain(node: Terrain) {
-    if (node.computedShowState !== GraphNode.SHOW_HIDE && (node.castShadow || this._renderPass.getRenderPassType() !== RENDER_PASS_TYPE_SHADOWMAP)) {
+    if (
+      node.computedShowState !== GraphNode.SHOW_HIDE &&
+      (node.castShadow || this._renderPass.getRenderPassType() !== RENDER_PASS_TYPE_SHADOWMAP)
+    ) {
       const clipState = this.getClipState(node);
       if (clipState !== ClipState.NOT_CLIPPED) {
         if (node.cull(this)) {
-          this.push(this._camera, node, node.computedRenderOrder, node.castShadow, clipState, node.getWorldBoundingVolume()?.toAABB());
+          this.push(
+            this._camera,
+            node,
+            node.computedRenderOrder,
+            node.castShadow,
+            clipState,
+            node.getWorldBoundingVolume()?.toAABB()
+          );
         }
       }
     }
   }
   visitMesh(node: Mesh) {
-    if (node.computedShowState !== GraphNode.SHOW_HIDE && (node.castShadow || this._renderPass.getRenderPassType() !== RENDER_PASS_TYPE_SHADOWMAP)) {
+    if (
+      node.computedShowState !== GraphNode.SHOW_HIDE &&
+      (node.castShadow || this._renderPass.getRenderPassType() !== RENDER_PASS_TYPE_SHADOWMAP)
+    ) {
       const clipState = this.getClipState(node);
       if (clipState !== ClipState.NOT_CLIPPED) {
-        this.push(this._camera, node, node.computedRenderOrder, node.castShadow, clipState, node.getWorldBoundingVolume()?.toAABB());
+        this.push(
+          this._camera,
+          node,
+          node.computedRenderOrder,
+          node.castShadow,
+          clipState,
+          node.getWorldBoundingVolume()?.toAABB()
+        );
       }
     }
   }
   visitOctreeNode(node: OctreeNode) {
     const clipState =
-      node.getLevel() > 0
-        ? node.getBoxLoosed().getClipStateWithFrustum(this.frustum)
-        : ClipState.CLIPPED;
+      node.getLevel() > 0 ? node.getBoxLoosed().getClipStateWithFrustum(this.frustum) : ClipState.CLIPPED;
     if (clipState !== ClipState.NOT_CLIPPED) {
       const saveSkipFlag = this._skipClipTest;
       this._skipClipTest = clipState === ClipState.A_INSIDE_B;

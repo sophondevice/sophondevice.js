@@ -15,14 +15,9 @@ export interface IGlyphInfo {
 }
 
 export class GlyphManager extends AtlasManager {
-  constructor(
-    renderer: GUIRenderer,
-    cacheWidth?: number,
-    cacheHeight?: number,
-    cachePadding?: number,
-  ) {
+  constructor(renderer: GUIRenderer, cacheWidth?: number, cacheHeight?: number, cachePadding?: number) {
     super(renderer, Math.max(cacheWidth || 0, 0), cacheHeight, cachePadding, true);
-    this._atlasRestoreHandler = async tex => {
+    this._atlasRestoreHandler = async (tex) => {
       if (this._atlasList.length > 0) {
         this.clear();
       }
@@ -91,14 +86,14 @@ export class GlyphManager extends AtlasManager {
     if (typeof metric.actualBoundingBoxRight === 'number') {
       w = Math.floor(Math.max(w, metric.actualBoundingBoxRight) + 0.8);
     }
-    w = Math.round(w * (font.maxHeight / font.maxHeightScaled))
+    w = Math.round(w * (font.maxHeight / font.maxHeightScaled));
     return w;
   }
   /** @internal */
   private _getGlyphBitmap(
     char: string,
     font: Font,
-    color: RColor,
+    color: RColor
   ): ImageData | { x: number; y: number; w: number; h: number } {
     if (!font) {
       return null;

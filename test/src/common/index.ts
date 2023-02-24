@@ -1,10 +1,27 @@
-import { isDepthTextureFormat, makeVertexBufferType, PrimitiveType, FaceMode, BlendFunc, TextureCube, Texture2D, RenderStateSet, BindGroup, GPUProgram, DeviceFrameEnd, DeviceGPUObjectAddedEvent, DeviceGPUObjectRemovedEvent, DeviceGPUObjectRenameEvent, Device, ProgramBuilder } from '@sophon/device';
+import {
+  isDepthTextureFormat,
+  makeVertexBufferType,
+  PrimitiveType,
+  FaceMode,
+  BlendFunc,
+  TextureCube,
+  Texture2D,
+  RenderStateSet,
+  BindGroup,
+  GPUProgram,
+  DeviceFrameEnd,
+  DeviceGPUObjectAddedEvent,
+  DeviceGPUObjectRemovedEvent,
+  DeviceGPUObjectRenameEvent,
+  Device,
+  ProgramBuilder
+} from '@sophon/device';
 import { Primitive, Mesh, Scene, PunctualLight, AssetManager, EnvIBL, SkyboxMaterial } from '@sophon/scene';
 import { Vector4, REvent } from '@sophon/base';
 import { RElement, ScrollBar, Button, Input, RValueChangeEvent, Select, Option } from '@sophon/dom';
 
 export function getQueryString(name: string) {
-  return (new URL(window.location.toString())).searchParams.get(name) || null;
+  return new URL(window.location.toString()).searchParams.get(name) || null;
 }
 
 export interface ITestCase {
@@ -37,7 +54,7 @@ function asyncWrapper(fn: Function, msg: HTMLElement, times: number) {
       msg.style.color = '#ff0000';
       msg.innerHTML = `${err}`;
     }
-  }
+  };
 }
 
 export async function doTest(desc: string, cases: ITestCase[]) {
@@ -434,14 +451,14 @@ export function createSceneTweakPanel(scene: Scene, el: RElement, styles?: any):
     const envLightStrengthSlider = createScroll(panel, scene.envLightStrength, 0.01, 0, 1);
     envLightStrengthSlider.style.marginBottom = '5px';
     envLightStrengthSlider.addEventListener(RValueChangeEvent.NAME, function () {
-      scene.envLightStrength = Math.min(1, (Math.max(0, envLightStrengthSlider.value)));
+      scene.envLightStrength = Math.min(1, Math.max(0, envLightStrengthSlider.value));
     });
   }
 
   {
     panel.append('Press L to force context lost');
     panel.append('Press R to force context restore');
-    window.addEventListener('keyup', key => {
+    window.addEventListener('keyup', (key) => {
       if (key.code === 'KeyL') {
         console.log('force context lost');
         scene.device.looseContext();
@@ -449,7 +466,7 @@ export function createSceneTweakPanel(scene: Scene, el: RElement, styles?: any):
         console.log('force context restored');
         scene.device.restoreContext();
       }
-    })
+    });
   }
 
   el.append(panel);
@@ -540,47 +557,50 @@ export function createTestPanel(scene: Scene, el: RElement, styles?: any): RElem
     }
     loading = true;
     currentEnv = name;
-    const promises = name !== 'none'
-      ? [
-        assetManager.fetchTexture<TextureCube>(`./assets/images/environments/${name}/output_skybox.dds`),
-        assetManager.fetchTexture<TextureCube>(`./assets/images/environments/${name}/output_pmrem.dds`),
-        assetManager.fetchTexture<TextureCube>(`./assets/images/environments/${name}/output_iem.dds`)
-      ]
-      : [];
-    Promise.all(promises).then(textures => {
-      loading = false;
-      radianceMap = null;
-      irradianceMap = null;
-      skyMap = null;
-      if (textures.length === 0) {
-        skyBox?.remove();
-        scene.environment = null;
-      } else {
-        skyMap = textures[0];
-        radianceMap = textures[1];
-        irradianceMap = textures[2];
-        if (scene.environment) {
-          (scene.environment as EnvIBL).radianceMap = radianceMap;
-          (scene.environment as EnvIBL).irradianceMap = irradianceMap;
+    const promises =
+      name !== 'none'
+        ? [
+            assetManager.fetchTexture<TextureCube>(`./assets/images/environments/${name}/output_skybox.dds`),
+            assetManager.fetchTexture<TextureCube>(`./assets/images/environments/${name}/output_pmrem.dds`),
+            assetManager.fetchTexture<TextureCube>(`./assets/images/environments/${name}/output_iem.dds`)
+          ]
+        : [];
+    Promise.all(promises)
+      .then((textures) => {
+        loading = false;
+        radianceMap = null;
+        irradianceMap = null;
+        skyMap = null;
+        if (textures.length === 0) {
+          skyBox?.remove();
+          scene.environment = null;
         } else {
-          scene.environment = new EnvIBL(radianceMap, irradianceMap);
+          skyMap = textures[0];
+          radianceMap = textures[1];
+          irradianceMap = textures[2];
+          if (scene.environment) {
+            (scene.environment as EnvIBL).radianceMap = radianceMap;
+            (scene.environment as EnvIBL).irradianceMap = irradianceMap;
+          } else {
+            scene.environment = new EnvIBL(radianceMap, irradianceMap);
+          }
+          if (skyBox) {
+            (skyBox.material as SkyboxMaterial).skyCubeMap = skyMap;
+            skyBox.reparent(scene.rootNode);
+          } else {
+            skyBox = scene.addSkybox(skyMap) as Mesh;
+          }
         }
-        if (skyBox) {
-          (skyBox.material as SkyboxMaterial).skyCubeMap = skyMap;
-          skyBox.reparent(scene.rootNode);
-        } else {
-          skyBox = scene.addSkybox(skyMap) as Mesh;
-        }
-      }
-    }).catch(err => {
-      loading = false;
-      throw new Error(`load environment failed: ${name}`);
-    });
+      })
+      .catch((err) => {
+        loading = false;
+        throw new Error(`load environment failed: ${name}`);
+      });
   }
   env.addEventListener('change', function () {
     changeEnv();
   });
-  scene.device.addEventListener('frameend', evt => {
+  scene.device.addEventListener('frameend', (evt) => {
     const e = evt as DeviceFrameEnd;
     const frameInfo = e.device.frameInfo;
     if (frameInfo.frameCounter % 60 === 0) {
@@ -718,7 +738,11 @@ export class TextureView {
         const depth = isDepthTextureFormat(that._tex.format);
         const filterable = that._tex.isFilterable();
         const program = depth ? that._programDepth : filterable ? that._program : that._programNonFilterable;
-        const bindGroup = depth ? that._bindGroupDepth : filterable ? that._bindGroup : that._bindGroupNonFilterable;
+        const bindGroup = depth
+          ? that._bindGroupDepth
+          : filterable
+          ? that._bindGroup
+          : that._bindGroupNonFilterable;
         bindGroup.setTexture('tex', that._tex);
         bindGroup.setValue('linearOutput', 0);
         bindGroup.setValue('mode', that._mode);
@@ -745,11 +769,13 @@ export class TextureView {
   }
   private init() {
     const vb = this._device.createStructuredBuffer(
-      makeVertexBufferType(4, 'position_f32x2', 'tex0_f32x2'), {
+      makeVertexBufferType(4, 'position_f32x2', 'tex0_f32x2'),
+      {
         usage: 'vertex',
         managed: true
       },
-      new Float32Array([-1, -1, 0, 1, 1, -1, 1, 1, -1, 1, 0, 0, 1, 1, 1, 0]));
+      new Float32Array([-1, -1, 0, 1, 1, -1, 1, 1, -1, 1, 0, 0, 1, 1, 1, 0])
+    );
     this._rect = new Primitive(this._device);
     this._rect.setVertexBuffer(vb);
     this._rect.indexStart = 0;
@@ -764,7 +790,9 @@ export class TextureView {
     this._programDepth = this.createDefaultShader(true, false);
     this._programBk = this.createBkShader();
     this._bindGroup = this._device.createBindGroup(this._program.bindGroupLayouts[0]);
-    this._bindGroupNonFilterable = this._device.createBindGroup(this._programNonFilterable.bindGroupLayouts[0]);
+    this._bindGroupNonFilterable = this._device.createBindGroup(
+      this._programNonFilterable.bindGroupLayouts[0]
+    );
     this._bindGroupDepth = this._device.createBindGroup(this._programDepth.bindGroupLayouts[0]);
   }
   private createDefaultShader(depth: boolean, unfilterableFloat: boolean): GPUProgram {
@@ -780,7 +808,12 @@ export class TextureView {
         });
       },
       fragment() {
-        this.tex = depth ? pb.tex2DShadow().uniform(0) : pb.tex2D().sampleType(unfilterableFloat ? 'unfilterable-float' : null).uniform(0);
+        this.tex = depth
+          ? pb.tex2DShadow().uniform(0)
+          : pb
+              .tex2D()
+              .sampleType(unfilterableFloat ? 'unfilterable-float' : null)
+              .uniform(0);
         this.linearOutput = pb.int().uniform(0);
         this.mode = pb.int().uniform(0);
         this.$outputs.color = pb.vec4();
@@ -788,13 +821,16 @@ export class TextureView {
           this.c = pb.textureSample(this.tex, this.$inputs.uv);
           this.$if(pb.equal(this.mode, 1), function () {
             this.c = this.c.xxxw;
-          }).$elseif(pb.equal(this.mode, 2), function () {
-            this.c = this.c.yyyw;
-          }).$elseif(pb.equal(this.mode, 3), function () {
-            this.c = this.c.zzzw;
-          }).$elseif(pb.equal(this.mode, 4), function () {
-            this.c = this.c.wwww;
-          });
+          })
+            .$elseif(pb.equal(this.mode, 2), function () {
+              this.c = this.c.yyyw;
+            })
+            .$elseif(pb.equal(this.mode, 3), function () {
+              this.c = this.c.zzzw;
+            })
+            .$elseif(pb.equal(this.mode, 4), function () {
+              this.c = this.c.wwww;
+            });
           this.$if(pb.notEqual(this.linearOutput, 0), function () {
             this.$outputs.color = pb.vec4(pb.mul(this.c.xyz, this.c.w), this.c.w);
           }).$else(function () {
@@ -823,7 +859,10 @@ export class TextureView {
           this.color1 = pb.vec4(0.6, 0.6, 0.6, 1);
           this.c = pb.div(pb.floor(this.$inputs.uv), 2);
           this.checker = pb.mul(pb.fract(pb.add(this.c.x, this.c.y)), 2);
-          this.$outputs.color = pb.add(pb.mul(this.color0, this.checker), pb.mul(this.color1, pb.sub(1, this.checker)));
+          this.$outputs.color = pb.add(
+            pb.mul(this.color0, this.checker),
+            pb.mul(this.color1, pb.sub(1, this.checker))
+          );
         });
       }
     });

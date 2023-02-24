@@ -34,7 +34,7 @@ export class RaycastVisitor implements Visitor {
       return this.visitTerrain(target);
     }
   }
-  
+
   visitTerrain(node: Terrain) {
     if (node.computedShowState !== GraphNode.SHOW_HIDE && node.computedPickMode !== GraphNode.PICK_DISABLED) {
       this._ray.transform(node.invWorldMatrix, this._rayLocal);
@@ -45,7 +45,7 @@ export class RaycastVisitor implements Visitor {
       }
     }
   }
-  
+
   visitMesh(node: Mesh) {
     if (node.computedShowState !== GraphNode.SHOW_HIDE && node.computedPickMode !== GraphNode.PICK_DISABLED) {
       this._ray.transform(node.invWorldMatrix, this._rayLocal);
@@ -56,7 +56,7 @@ export class RaycastVisitor implements Visitor {
       }
     }
   }
-  
+
   visitOctreeNode(node: OctreeNode) {
     if (node.getLevel() === 0 || this._ray.bboxIntersectionTest(node.getBoxLoosed()) !== null) {
       const nodes = node.getNodes();

@@ -1,8 +1,8 @@
-import { Matrix4x4, Quaternion, Vector3, Vector4, TypedArray } from "@sophon/base";
-import type { Texture2D, TextureSampler } from "@sophon/device";
-import type { Primitive } from "../primitive";
-import type { StandardMaterial } from "../materiallib";
-import type { Interpolator } from "../interpolator";
+import { Matrix4x4, Quaternion, Vector3, Vector4, TypedArray } from '@sophon/base';
+import type { Texture2D, TextureSampler } from '@sophon/device';
+import type { Primitive } from '../primitive';
+import type { StandardMaterial } from '../materiallib';
+import type { Interpolator } from '../interpolator';
 
 export class AssetModelObject {
   name: string;
@@ -83,8 +83,8 @@ export interface AssetPBRMaterialSG extends AssetPBRMaterialCommon {
 }
 
 export interface AssetSubMeshData {
-  primitive: Primitive,
-  material: StandardMaterial,
+  primitive: Primitive;
+  material: StandardMaterial;
   rawPositions: Float32Array;
   rawBlendIndices: TypedArray;
   rawJointWeights: TypedArray;
@@ -108,7 +108,7 @@ export interface AssetAnimationData {
 
 export interface AssetSkeletalAnimationTrack extends AssetAnimationTrack {
   skeleton: AssetSkeleton;
-  keyFrames: { [t: number]: { translation: Vector3, rotation: Quaternion, scale: Vector3 }[] };
+  keyFrames: { [t: number]: { translation: Vector3; rotation: Quaternion; scale: Vector3 }[] };
 }
 
 export interface AssetRotationTrack extends AssetAnimationTrack {
@@ -209,7 +209,9 @@ export class AssetHierarchyNode extends AssetModelObject {
   }
   computeTransforms(parentTransform: Matrix4x4) {
     this._matrix = Matrix4x4.scaling(this._scaling).rotateLeft(this._rotation).translateLeft(this._position);
-    this._worldMatrix = parentTransform ? Matrix4x4.multiply(parentTransform, this._matrix) : new Matrix4x4(this._matrix);
+    this._worldMatrix = parentTransform
+      ? Matrix4x4.multiply(parentTransform, this._matrix)
+      : new Matrix4x4(this._matrix);
     for (const child of this._children) {
       child.computeTransforms(this._worldMatrix);
     }

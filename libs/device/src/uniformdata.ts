@@ -1,16 +1,16 @@
 import { PBPrimitiveType } from './builder/types';
 import type { StructuredValue, UniformBufferLayout, StructuredBuffer } from './gpuobject';
 
-type TypedArray = Int8Array|Uint8Array|Int16Array|Uint16Array|Int32Array|Uint32Array|Float32Array;
+type TypedArray = Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array | Float32Array;
 type TypedArrayConstructor<T extends TypedArray = any> = {
-  new(): T;
-  new(size: number): T;
-  new(elements: number[]): T;
-  new(buffer: ArrayBuffer): T;
-  new(buffer: ArrayBuffer, byteOffset: number): T;
-  new(buffer: ArrayBuffer, byteOffset: number, length: number): T;
+  new (): T;
+  new (size: number): T;
+  new (elements: number[]): T;
+  new (buffer: ArrayBuffer): T;
+  new (buffer: ArrayBuffer, byteOffset: number): T;
+  new (buffer: ArrayBuffer, byteOffset: number, length: number): T;
   BYTES_PER_ELEMENT: number;
-}
+};
 
 export class StructuredBufferData {
   protected _cache: ArrayBuffer;
@@ -132,7 +132,11 @@ export class StructuredBufferData {
           throw new Error(`UniformBuffer(): invalid byte size for uniform: ${name}`);
         }
         if (this._cache) {
-          this._uniformMap[name] = new viewCtor(this._cache, entry.offset, entry.byteSize / viewCtor.BYTES_PER_ELEMENT);
+          this._uniformMap[name] = new viewCtor(
+            this._cache,
+            entry.offset,
+            entry.byteSize / viewCtor.BYTES_PER_ELEMENT
+          );
         } else {
           this._uniformMap[name] = new viewCtor(1);
         }

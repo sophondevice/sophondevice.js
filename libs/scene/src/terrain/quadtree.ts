@@ -1,5 +1,12 @@
 import { ClipState, Frustum, Matrix4x4, Vector3, isPowerOf2, nextPowerOf2 } from '@sophon/base';
-import { IndexBuffer, makeVertexBufferType, PrimitiveType, StructuredBuffer, Texture2D, TextureFormat } from '@sophon/device';
+import {
+  IndexBuffer,
+  makeVertexBufferType,
+  PrimitiveType,
+  StructuredBuffer,
+  Texture2D,
+  TextureFormat
+} from '@sophon/device';
 import { PatchPosition } from './types';
 import { BoundingBox } from '../bounding_volume';
 import { TerrainPatch } from './patch';
@@ -17,11 +24,29 @@ export class QuadtreeNode {
     this._parent = null;
     this._children = null;
   }
-  initialize(scene: Scene, quadtree: Quadtree, parent: QuadtreeNode, position: PatchPosition, baseVertices: StructuredBuffer, normals: Float32Array, elevations: Float32Array): boolean {
+  initialize(
+    scene: Scene,
+    quadtree: Quadtree,
+    parent: QuadtreeNode,
+    position: PatchPosition,
+    baseVertices: StructuredBuffer,
+    normals: Float32Array,
+    elevations: Float32Array
+  ): boolean {
     this._parent = parent;
     this._children = [];
     this._patch = new TerrainPatch();
-    if (!this._patch.initialize(scene, quadtree, this._parent?._patch || null, position, baseVertices, normals, elevations)) {
+    if (
+      !this._patch.initialize(
+        scene,
+        quadtree,
+        this._parent?._patch || null,
+        position,
+        baseVertices,
+        normals,
+        elevations
+      )
+    ) {
       return false;
     }
     if (this._patch.getStep() > 1) {
@@ -123,12 +148,23 @@ export class Quadtree {
   get normalMap(): Texture2D {
     return this._normalMap;
   }
-  build(scene: Scene, patchSize: number, rootSizeX: number, rootSizeZ: number, elevations: Float32Array, scaleX: number, scaleZ: number, vertexCacheSize: number): boolean {
+  build(
+    scene: Scene,
+    patchSize: number,
+    rootSizeX: number,
+    rootSizeZ: number,
+    elevations: Float32Array,
+    scaleX: number,
+    scaleZ: number,
+    vertexCacheSize: number
+  ): boolean {
     const device = scene.device;
-    if (!isPowerOf2(patchSize - 1)
-      || !!((rootSizeX - 1) % (patchSize - 1))
-      || !!((rootSizeZ - 1) % (patchSize - 1))
-      || !elevations) {
+    if (
+      !isPowerOf2(patchSize - 1) ||
+      !!((rootSizeX - 1) % (patchSize - 1)) ||
+      !!((rootSizeZ - 1) % (patchSize - 1)) ||
+      !elevations
+    ) {
       return false;
     }
     this._heightField = new HeightField();
@@ -139,7 +175,7 @@ export class Quadtree {
     this._patchSize = patchSize;
     this._rootSizeX = rootSizeX;
     this._rootSizeZ = rootSizeZ;
-    this._rootSize = nextPowerOf2(Math.max((rootSizeX - 1), (rootSizeZ - 1))) + 1;
+    this._rootSize = nextPowerOf2(Math.max(rootSizeX - 1, rootSizeZ - 1)) + 1;
     this._scaleX = scaleX;
     this._scaleZ = scaleZ;
     // Create base vertex buffer
@@ -187,7 +223,11 @@ export class Quadtree {
     vertices[offset + (dimension - 1) * 3 + 0] = dimension - 3;
     vertices[offset + (dimension - 1) * 3 + 1] = 0;
     vertices[offset + (dimension - 1) * 3 + 2] = dimension - 3;
-    this._baseVertices = device.createStructuredBuffer(makeVertexBufferType(dimension * dimension, 'position_f32x3'), { usage: 'vertex', managed: true }, vertices);
+    this._baseVertices = device.createStructuredBuffer(
+      makeVertexBufferType(dimension * dimension, 'position_f32x3'),
+      { usage: 'vertex', managed: true },
+      vertices
+    );
     // Create base index buffer
     const indices = this.strip(vertexCacheSize);
     this._indices = device.createIndexBuffer(indices, { managed: true });
@@ -197,17 +237,27 @@ export class Quadtree {
     this._primitiveType = PrimitiveType.TriangleStrip;
     this._rootNode = new QuadtreeNode();
     const normals = this._heightField.computeNormalVectors();
-    const normalMapBytes = new Uint8Array(normals.length / 3 * 4);
+    const normalMapBytes = new Uint8Array((normals.length / 3) * 4);
     for (let i = 0; i < normals.length / 3; i++) {
       normalMapBytes[i * 4 + 0] = Math.floor((normals[i * 3 + 0] * 0.5 + 0.5) * 255);
       normalMapBytes[i * 4 + 1] = Math.floor((normals[i * 3 + 1] * 0.5 + 0.5) * 255);
       normalMapBytes[i * 4 + 2] = Math.floor((normals[i * 3 + 2] * 0.5 + 0.5) * 255);
       normalMapBytes[i * 4 + 3] = 255;
     }
-    this._normalMap = device.createTexture2D(TextureFormat.RGBA8UNORM, rootSizeX, rootSizeZ, { colorSpace: 'linear' });
+    this._normalMap = device.createTexture2D(TextureFormat.RGBA8UNORM, rootSizeX, rootSizeZ, {
+      colorSpace: 'linear'
+    });
     this._normalMap.name = `TerrainNormalMap-${this._normalMap.uid}`;
     this._normalMap.update(normalMapBytes, 0, 0, this._normalMap.width, this._normalMap.height);
-    return this._rootNode.initialize(scene, this, null, PatchPosition.LeftTop, this._baseVertices, normals, elevations);
+    return this._rootNode.initialize(
+      scene,
+      this,
+      null,
+      PatchPosition.LeftTop,
+      this._baseVertices,
+      normals,
+      elevations
+    );
   }
   strip(vertexCacheSize: number): Uint16Array {
     const dimension = this._patchSize + 2;
@@ -215,14 +265,16 @@ export class Quadtree {
     const indices: number[] = [];
     for (let i = 0; i < dimension - 1; i += step) {
       const start = i;
-      const end = (i + step > dimension - 1) ? dimension - 1 : i + step;
+      const end = i + step > dimension - 1 ? dimension - 1 : i + step;
       for (let j = 0; j < dimension - 1; ++j) {
         for (let k = start; k <= end; ++k) {
           indices.push((dimension - 1 - k) * dimension + j);
           indices.push((dimension - 1 - k) * dimension + j + 1);
         }
         indices.push((dimension - 1 - end) * dimension + j + 1);
-        indices.push((j == dimension - 2) ? (dimension - 1 - end) * dimension : (dimension - 1 - start) * dimension + j + 1);
+        indices.push(
+          j == dimension - 2 ? (dimension - 1 - end) * dimension : (dimension - 1 - start) * dimension + j + 1
+        );
       }
     }
     indices.length = indices.length - 2;
@@ -320,7 +372,14 @@ export class Quadtree {
     }
   }
   /** @internal */
-  cull_r(camera: Camera, node: QuadtreeNode, viewPoint: Vector3, worldMatrix: Matrix4x4, frustum: Frustum, cliptest: boolean) {
+  cull_r(
+    camera: Camera,
+    node: QuadtreeNode,
+    viewPoint: Vector3,
+    worldMatrix: Matrix4x4,
+    frustum: Frustum,
+    cliptest: boolean
+  ) {
     const bbox = node.getBoundingbox();
     if (cliptest) {
       const clipState = bbox.getClipStateWithFrustum(frustum);
@@ -334,7 +393,11 @@ export class Quadtree {
     const lodDistance = ld >= 0 ? ld * ld : Number.MAX_VALUE;
     const eyeDistSq = ld >= 0 ? node.getPatch().sqrDistanceToPoint(viewPoint) : 0;
     const lodLevel = this._terrain.detailLODLevel;
-    if (eyeDistSq < lodDistance && node.getChild(0) && (lodLevel === 0 || node.getPatch().getMipLevel() < lodLevel)) {
+    if (
+      eyeDistSq < lodDistance &&
+      node.getChild(0) &&
+      (lodLevel === 0 || node.getPatch().getMipLevel() < lodLevel)
+    ) {
       for (let i = 0; i < 4; i++) {
         const child = node.getChild(i);
         if (child) {

@@ -41,8 +41,8 @@ export class Font {
   /** @internal */
   private static fontCache: {
     [name: string]: {
-      [scale: number]: Font
-    }
+      [scale: number]: Font;
+    };
   } = {};
   /** @internal */
   private _name: string;
@@ -127,7 +127,12 @@ export class Font {
     return this._size === other._size && this._family === other._family;
   }
   /** @internal */
-  private _measureFontHeight(fontName: string): { size: number, family: string, top: number, bottom: number } {
+  private _measureFontHeight(fontName: string): {
+    size: number;
+    family: string;
+    top: number;
+    bottom: number;
+  } {
     const oldFont = FontCanvas.context.font;
     const oldTextBaseline = FontCanvas.context.textBaseline;
     const oldFillStyle = FontCanvas.context.fillStyle;

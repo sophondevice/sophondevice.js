@@ -108,13 +108,13 @@ export const DEVICE_TYPE_WEBGPU = 'webgpu';
 export interface RenderProgramConstructParams {
   vs: string;
   fs: string;
-  bindGroupLayouts: BindGroupLayout[],
-  vertexAttributes: number[],
+  bindGroupLayouts: BindGroupLayout[];
+  vertexAttributes: number[];
 }
 
 export interface ComputeProgramConstructParams {
   source: string;
-  bindGroupLayouts: BindGroupLayout[],
+  bindGroupLayouts: BindGroupLayout[];
 }
 
 export interface GPUProgramConstructParams {
@@ -226,7 +226,7 @@ export abstract class Device extends REventTarget {
   protected _runningLoop: number;
   protected _frameBeginEvent: DeviceFrameBegin;
   protected _frameEndEvent: DeviceFrameEnd;
-  protected _fpsCounter: { time: number, frame: number };
+  protected _fpsCounter: { time: number; frame: number };
   protected _runLoopFunc: (device: Device) => void;
   constructor() {
     super();
@@ -280,13 +280,43 @@ export abstract class Device extends REventTarget {
   abstract createGPUTimer(): ITimer;
   abstract createRenderStateSet(): RenderStateSet;
   abstract createSampler(options: SamplerOptions): TextureSampler;
-  abstract createTexture2D(format: TextureFormat, width: number, height: number, options?: TextureCreationOptions): Texture2D;
-  abstract createTexture2DFromMipmapData(data: TextureMipmapData, options?: TextureCreationOptions): Texture2D;
-  abstract createTexture2DFromImage(element: TextureImageElement, options?: TextureCreationOptions): Texture2D;
-  abstract createTexture2DArray(format: TextureFormat, width: number, height: number, depth: number, options?: TextureCreationOptions): Texture2DArray;
-  abstract createTexture3D(format: TextureFormat, width: number, height: number, depth: number, options?: TextureCreationOptions): Texture3D;
-  abstract createCubeTexture(format: TextureFormat, size: number, options?: TextureCreationOptions): TextureCube;
-  abstract createCubeTextureFromMipmapData(data: TextureMipmapData, options?: TextureCreationOptions): TextureCube;
+  abstract createTexture2D(
+    format: TextureFormat,
+    width: number,
+    height: number,
+    options?: TextureCreationOptions
+  ): Texture2D;
+  abstract createTexture2DFromMipmapData(
+    data: TextureMipmapData,
+    options?: TextureCreationOptions
+  ): Texture2D;
+  abstract createTexture2DFromImage(
+    element: TextureImageElement,
+    options?: TextureCreationOptions
+  ): Texture2D;
+  abstract createTexture2DArray(
+    format: TextureFormat,
+    width: number,
+    height: number,
+    depth: number,
+    options?: TextureCreationOptions
+  ): Texture2DArray;
+  abstract createTexture3D(
+    format: TextureFormat,
+    width: number,
+    height: number,
+    depth: number,
+    options?: TextureCreationOptions
+  ): Texture3D;
+  abstract createCubeTexture(
+    format: TextureFormat,
+    size: number,
+    options?: TextureCreationOptions
+  ): TextureCube;
+  abstract createCubeTextureFromMipmapData(
+    data: TextureMipmapData,
+    options?: TextureCreationOptions
+  ): TextureCube;
   abstract createTextureVideo(el: HTMLVideoElement): TextureVideo;
   abstract reverseVertexWindingOrder(reverse: boolean): void;
   abstract isWindingOrderReversed(): boolean;
@@ -296,7 +326,11 @@ export abstract class Device extends REventTarget {
   abstract createBindGroup(layout: BindGroupLayout): BindGroup;
   abstract createBuffer(sizeInBytes: number, options: BufferCreationOptions): GPUDataBuffer;
   abstract createIndexBuffer(data: Uint16Array | Uint32Array, options?: BufferCreationOptions): IndexBuffer;
-  abstract createStructuredBuffer(structureType: PBStructTypeInfo, options: BufferCreationOptions, data?: TypedArray): StructuredBuffer;
+  abstract createStructuredBuffer(
+    structureType: PBStructTypeInfo,
+    options: BufferCreationOptions,
+    data?: TypedArray
+  ): StructuredBuffer;
   abstract createVAO(vertexData: VertexData): VertexInputLayout;
   abstract createFrameBuffer(options?: IFrameBufferOptions): FrameBuffer;
   // render related
@@ -305,7 +339,7 @@ export abstract class Device extends REventTarget {
   abstract getViewport(): number[];
   abstract setScissor(scissor?: number[]): number[];
   abstract setScissor(x: number, y: number, w: number, h: number): void;
-  abstract getScissor(): number[]
+  abstract getScissor(): number[];
   abstract setProgram(program: GPUProgram): void;
   abstract getProgram(): GPUProgram;
   abstract setVertexData(vertexData: VertexInputLayout): void;
@@ -323,7 +357,12 @@ export abstract class Device extends REventTarget {
   abstract restoreContext(): void;
   // draw
   protected abstract _draw(primitiveType: PrimitiveType, first: number, count: number): void;
-  protected abstract _drawInstanced(primitiveType: PrimitiveType, first: number, count: number, numInstances: number): void;
+  protected abstract _drawInstanced(
+    primitiveType: PrimitiveType,
+    first: number,
+    count: number,
+    numInstances: number
+  ): void;
   protected abstract _compute(workgroupCountX, workgroupCountY, workgroupCountZ): void;
 
   get videoMemoryUsage(): number {
@@ -435,7 +474,7 @@ export abstract class Device extends REventTarget {
         that._runLoopFunc(that);
         that.endFrame();
       }
-    }());
+    })();
   }
   getGPUObjects(): GPUObjectList {
     return this._gpuObjectList;
@@ -520,7 +559,8 @@ export abstract class Device extends REventTarget {
       }
       this._frameInfo.frameTimestamp = now;
       if (now >= this._fpsCounter.time + 1000) {
-        this._frameInfo.FPS = (this._frameInfo.frameCounter - this._fpsCounter.frame) * 1000 / (now - this._fpsCounter.time);
+        this._frameInfo.FPS =
+          ((this._frameInfo.frameCounter - this._fpsCounter.frame) * 1000) / (now - this._fpsCounter.time);
         this._fpsCounter.time = now;
         this._fpsCounter.frame = this._frameInfo.frameCounter;
       }
@@ -594,27 +634,30 @@ export abstract class Device extends REventTarget {
   /** @internal */
   protected parseTextureOptions(options?: TextureCreationOptions): number {
     const colorSpace = options?.colorSpace ?? 'srgb';
-    console.assert(colorSpace === 'srgb' || colorSpace === 'linear', `invalid texture color space: ${colorSpace}`);
+    console.assert(
+      colorSpace === 'srgb' || colorSpace === 'linear',
+      `invalid texture color space: ${colorSpace}`
+    );
     const colorSpaceFlag = colorSpace === 'srgb' ? 0 : GPUResourceUsageFlags.TF_LINEAR_COLOR_SPACE;
     const noMipmapFlag = !!options?.noMipmap ? GPUResourceUsageFlags.TF_NO_MIPMAP : 0;
     const writableFlag = !!options?.writable ? GPUResourceUsageFlags.TF_WRITABLE : 0;
     const dynamicFlag = !!options?.dynamic ? GPUResourceUsageFlags.DYNAMIC : 0;
     const managedFlag = !!options?.managed ? GPUResourceUsageFlags.MANAGED : 0;
-    return colorSpaceFlag|noMipmapFlag|writableFlag|dynamicFlag|managedFlag;
+    return colorSpaceFlag | noMipmapFlag | writableFlag | dynamicFlag | managedFlag;
   }
   /** @internal */
   protected parseBufferOptions(options: BufferCreationOptions, defaultUsage?: BufferUsage): number {
     const usage = options?.usage || defaultUsage;
     let usageFlag: number;
-    switch(usage) {
+    switch (usage) {
       case 'uniform':
         usageFlag = GPUResourceUsageFlags.BF_UNIFORM;
         break;
       case 'vertex':
         usageFlag = GPUResourceUsageFlags.BF_VERTEX;
         break;
-      case 'index': 
-        usageFlag = GPUResourceUsageFlags.BF_INDEX; 
+      case 'index':
+        usageFlag = GPUResourceUsageFlags.BF_INDEX;
         break;
       case 'read':
         usageFlag = GPUResourceUsageFlags.BF_READ;
@@ -629,6 +672,6 @@ export abstract class Device extends REventTarget {
     const storageFlag = !!options?.storage ? GPUResourceUsageFlags.BF_STORAGE : 0;
     const dynamicFlag = !!options?.dynamic ? GPUResourceUsageFlags.DYNAMIC : 0;
     const managedFlag = !!options?.managed ? GPUResourceUsageFlags.MANAGED : 0;
-    return usageFlag|storageFlag|dynamicFlag|managedFlag;
+    return usageFlag | storageFlag | dynamicFlag | managedFlag;
   }
 }

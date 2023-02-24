@@ -1,12 +1,20 @@
 import { Vector3, Vector4, Quaternion, REvent } from '@sophon/base';
 import { Viewer, DeviceType } from '@sophon/device';
-import { Scene, ForwardRenderScheme, OrbitCameraModel, AssetManager, PBRMetallicRoughnessMaterial, Mesh, DirectionalLight } from '@sophon/scene';
+import {
+  Scene,
+  ForwardRenderScheme,
+  OrbitCameraModel,
+  AssetManager,
+  PBRMetallicRoughnessMaterial,
+  Mesh,
+  DirectionalLight
+} from '@sophon/scene';
 import { GUI, GUIRenderer, RElement } from '@sophon/dom';
 import * as common from '../common';
 
 (async function () {
   const viewer = new Viewer(document.getElementById('canvas') as HTMLCanvasElement);
-  await viewer.initDevice(common.getQueryString('dev') as DeviceType || 'webgl', { msaa: true });
+  await viewer.initDevice((common.getQueryString('dev') as DeviceType) || 'webgl', { msaa: true });
   const guiRenderer = new GUIRenderer(viewer.device);
   const gui = new GUI(guiRenderer);
   await gui.deserializeFromXML(document.querySelector('#main-ui').innerHTML);
@@ -24,9 +32,21 @@ import * as common from '../common';
   const assetManager = new AssetManager(viewer.device);
 
   const boxMaterial = new PBRMetallicRoughnessMaterial(viewer.device);
-  boxMaterial.lightModel.setAlbedoMap(await assetManager.fetchTexture('./assets/images/rustediron2_basecolor.png', null, true), null, 0);
-  boxMaterial.lightModel.setNormalMap(await assetManager.fetchTexture('./assets/images/rustediron2_normal.png', null, false), null, 0);
-  boxMaterial.lightModel.setMetallicMap(await assetManager.fetchTexture('./assets/images/mr.png', null, false), null, 0);
+  boxMaterial.lightModel.setAlbedoMap(
+    await assetManager.fetchTexture('./assets/images/rustediron2_basecolor.png', null, true),
+    null,
+    0
+  );
+  boxMaterial.lightModel.setNormalMap(
+    await assetManager.fetchTexture('./assets/images/rustediron2_normal.png', null, false),
+    null,
+    0
+  );
+  boxMaterial.lightModel.setMetallicMap(
+    await assetManager.fetchTexture('./assets/images/mr.png', null, false),
+    null,
+    0
+  );
   boxMaterial.lightModel.metallicIndex = 0;
   boxMaterial.lightModel.roughnessIndex = 1;
   for (let x = -20; x <= 20; x += 2) {
@@ -42,14 +62,12 @@ import * as common from '../common';
   const light = new DirectionalLight(scene)
     .setCastShadow(false)
     .setColor(new Vector4(1, 1, 1, 1))
-    .setRotation(Quaternion.fromAxisAngle(new Vector3(1, 1, 0).inplaceNormalize(), Math.PI * 2 / 3));
+    .setRotation(Quaternion.fromAxisAngle(new Vector3(1, 1, 0).inplaceNormalize(), (Math.PI * 2) / 3));
 
   sceneView.addEventListener('draw', function (this: RElement, evt: REvent) {
     evt.preventDefault();
     scheme.renderScene(scene, camera);
   });
 
-  viewer.device.runLoop(device => gui.render());
-
-}());
-
+  viewer.device.runLoop((device) => gui.render());
+})();

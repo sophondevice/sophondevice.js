@@ -17,7 +17,7 @@ export class TextureAtlas {
     uvMin?: RCoord,
     uvMax?: RCoord,
     topLeftPatch9?: RCoord,
-    bottomRightPatch9?: RCoord,
+    bottomRightPatch9?: RCoord
   ) {
     this._texture = texture || null;
     this._uvMin = uvMin || { x: 0, y: 0 };

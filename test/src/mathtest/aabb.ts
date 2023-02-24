@@ -20,7 +20,7 @@ export function testAABB() {
       new Vector3(maxx, miny, maxz),
       new Vector3(maxx, maxy, maxz),
       new Vector3(minx, maxy, maxz)
-    ]
+    ];
   }
   function classifyPoints(box: AABB, points: Vector3[]) {
     let inside = 0;
@@ -45,13 +45,19 @@ export function testAABB() {
     if ((a_inside_b !== 0 && a_outside_b !== 0) || (b_inside_a !== 0 && b_outside_a !== 0)) {
       intersected = true;
     } else if (a_inside_b === 0) {
-      assert(b_inside_a === 0 || b_outside_a === 0, `intersection test failed: (${a_inside_b},${a_outside_b})(${b_inside_a},${b_outside_a})`);
+      assert(
+        b_inside_a === 0 || b_outside_a === 0,
+        `intersection test failed: (${a_inside_b},${a_outside_b})(${b_inside_a},${b_outside_a})`
+      );
       a_contains_b = b_inside_a !== 0;
     } else {
       b_contains_a = true;
     }
     if (intersected) {
-      assert(a.intersectedWithBox(b) && b.intersectedWithBox(a), 'intersection test failed: intersectedWithBox()');
+      assert(
+        a.intersectedWithBox(b) && b.intersectedWithBox(a),
+        'intersection test failed: intersectedWithBox()'
+      );
     }
     if (a_contains_b) {
       assert(a.containsBox(b), 'intersection test failed: containsBox()');
@@ -59,5 +65,5 @@ export function testAABB() {
     if (b_contains_a) {
       assert(b.containsBox(a), 'intersection test failed');
     }
-  }());
+  })();
 }

@@ -1,12 +1,19 @@
-import { Vector3 } from "@sophon/base";
-import { Device, GPUDataBuffer, makeVertexBufferType, PBStructTypeInfo, PrimitiveType, StructuredBuffer } from "@sophon/device";
-import { BoundingBox } from "../bounding_volume";
-import { Primitive } from "../primitive";
-import { PatchPosition } from "./types";
+import { Vector3 } from '@sophon/base';
+import {
+  Device,
+  GPUDataBuffer,
+  makeVertexBufferType,
+  PBStructTypeInfo,
+  PrimitiveType,
+  StructuredBuffer
+} from '@sophon/device';
+import { BoundingBox } from '../bounding_volume';
+import { Primitive } from '../primitive';
+import { PatchPosition } from './types';
 import type { Terrain } from './terrain';
-import type { Quadtree } from "./quadtree";
-import type { Scene } from "../scene";
-import type { DrawContext } from "../drawable";
+import type { Quadtree } from './quadtree';
+import type { Scene } from '../scene';
+import type { DrawContext } from '../drawable';
 
 let patchId = 0;
 export class TerrainPatch {
@@ -37,7 +44,15 @@ export class TerrainPatch {
     this._lodDistance = 0;
     this._id = patchId++;
   }
-  initialize(scene: Scene, quadtree: Quadtree, parent: TerrainPatch, position: PatchPosition, baseVertices: StructuredBuffer, normals: Float32Array, elevations: Float32Array): boolean {
+  initialize(
+    scene: Scene,
+    quadtree: Quadtree,
+    parent: TerrainPatch,
+    position: PatchPosition,
+    baseVertices: StructuredBuffer,
+    normals: Float32Array,
+    elevations: Float32Array
+  ): boolean {
     const device = scene.device;
     const patchSize = quadtree.getPatchSize();
     const rootSize = quadtree.getRootSize();
@@ -66,7 +81,10 @@ export class TerrainPatch {
       default:
         return false;
     }
-    if (this._offsetX + interval >= quadtree.getRootSizeX() || this._offsetZ + interval >= quadtree.getRootSizeZ()) {
+    if (
+      this._offsetX + interval >= quadtree.getRootSizeX() ||
+      this._offsetZ + interval >= quadtree.getRootSizeZ()
+    ) {
       baseVertices = null;
     }
     this._quadtree = quadtree;
@@ -83,9 +101,11 @@ export class TerrainPatch {
         this._boundingBox.minPoint.x = this._offsetX * scaleX;
         this._boundingBox.minPoint.y = Number.MAX_VALUE;
         this._boundingBox.minPoint.z = this._offsetZ * scaleZ;
-        this._boundingBox.maxPoint.x = this._offsetX * scaleX + (this._quadtree.getPatchSize() - 1) * this._step * scaleX;
+        this._boundingBox.maxPoint.x =
+          this._offsetX * scaleX + (this._quadtree.getPatchSize() - 1) * this._step * scaleX;
         this._boundingBox.maxPoint.y = -Number.MAX_VALUE;
-        this._boundingBox.maxPoint.z = this._offsetZ * scaleZ + (this._quadtree.getPatchSize() - 1) * this._step * scaleZ;
+        this._boundingBox.maxPoint.z =
+          this._offsetZ * scaleZ + (this._quadtree.getPatchSize() - 1) * this._step * scaleZ;
       }
       this.setupVertices(device, this.computeSkirtLength(), baseVertices, normals, elevations);
     }
@@ -98,9 +118,24 @@ export class TerrainPatch {
       this._lodDistance = -1;
     }
   }
-  setupVertices(device: Device, skirtLength: number, baseVertices: StructuredBuffer, normalVectors: Float32Array, elevations: Float32Array): void {
+  setupVertices(
+    device: Device,
+    skirtLength: number,
+    baseVertices: StructuredBuffer,
+    normalVectors: Float32Array,
+    elevations: Float32Array
+  ): void {
     const that = this;
-    function setNormalAndHeight(heights: Float32Array, normals: Float32Array, index: number, x: number, z: number, width: number, height: number, hDelta: number): number {
+    function setNormalAndHeight(
+      heights: Float32Array,
+      normals: Float32Array,
+      index: number,
+      x: number,
+      z: number,
+      width: number,
+      height: number,
+      hDelta: number
+    ): number {
       const k = x + z * width;
       const h = elevations[k];
       normals[index * 3 + 0] = normalVectors[k * 3 + 0];
@@ -148,8 +183,16 @@ export class TerrainPatch {
       t = setNormalAndHeight(heights, normals, t, x, z, w, h, -skirtLength);
     }
     t = setNormalAndHeight(heights, normals, t, x - this._step, z, w, h, -skirtLength);
-    const heightArray = device.createStructuredBuffer(makeVertexBufferType(numVerts, 'custom0_f32'), { usage: 'vertex', managed: true }, heights);
-    const normalArray = device.createStructuredBuffer(makeVertexBufferType(numVerts, 'normal_f32x3'), { usage: 'vertex', managed: true }, normals);
+    const heightArray = device.createStructuredBuffer(
+      makeVertexBufferType(numVerts, 'custom0_f32'),
+      { usage: 'vertex', managed: true },
+      heights
+    );
+    const normalArray = device.createStructuredBuffer(
+      makeVertexBufferType(numVerts, 'normal_f32x3'),
+      { usage: 'vertex', managed: true },
+      normals
+    );
     this._geometry.setVertexBuffer(baseVertices);
     this._geometry.setVertexBuffer(normalArray);
     this._geometry.setVertexBuffer(heightArray);
@@ -170,9 +213,18 @@ export class TerrainPatch {
       const terrainProgram = terrain.material.getOrCreateProgram(ctx);
       const scaleX = this._quadtree.getScaleX();
       const scaleZ = this._quadtree.getScaleZ();
-      const v = new Float32Array([this._step * scaleX, this._offsetX * scaleX, this._step * scaleZ, this._offsetZ * scaleZ]);
-      this._offsetScale = ctx.renderPass.device.createStructuredBuffer(terrainProgram.programs[ctx.materialFunc].getBindingInfo('scaleOffset').type as PBStructTypeInfo, { usage: 'uniform' }, v);
-      this._offsetScale.restoreHandler = async obj => {
+      const v = new Float32Array([
+        this._step * scaleX,
+        this._offsetX * scaleX,
+        this._step * scaleZ,
+        this._offsetZ * scaleZ
+      ]);
+      this._offsetScale = ctx.renderPass.device.createStructuredBuffer(
+        terrainProgram.programs[ctx.materialFunc].getBindingInfo('scaleOffset').type as PBStructTypeInfo,
+        { usage: 'uniform' },
+        v
+      );
+      this._offsetScale.restoreHandler = async (obj) => {
         (obj as GPUDataBuffer).bufferSubData(0, v);
       };
     }
@@ -301,10 +353,14 @@ export class TerrainPatch {
     const scaleX = this._quadtree.getScaleX();
     const scaleZ = this._quadtree.getScaleZ();
     box.minPoint = new Vector3(this._offsetX * scaleX, minHeight, this._offsetZ * scaleZ);
-    box.maxPoint = new Vector3(this._offsetX * scaleX + (this._quadtree.getPatchSize() - 1) * this._step * scaleX, maxHeight, this._offsetZ * scaleZ + (this._quadtree.getPatchSize() - 1) * this._step * scaleZ);
+    box.maxPoint = new Vector3(
+      this._offsetX * scaleX + (this._quadtree.getPatchSize() - 1) * this._step * scaleX,
+      maxHeight,
+      this._offsetZ * scaleZ + (this._quadtree.getPatchSize() - 1) * this._step * scaleZ
+    );
   }
   computeLodDistance(viewportH: number, tanHalfFovy: number, maxPixelError: number): number {
-    return 0.5 * this._maxError * viewportH / (maxPixelError * tanHalfFovy);
+    return (0.5 * this._maxError * viewportH) / (maxPixelError * tanHalfFovy);
   }
   sqrDistanceToPoint(point: Vector3) {
     const bbox = this.getBoundingBox();
@@ -312,7 +368,12 @@ export class TerrainPatch {
     const dx = point.x - bbox.center.x;
     const dz = point.z - bbox.center.z;
     const s = Math.max(0, Math.sqrt(dx * dx + dz * dz) - radius);
-    const t = point.y > bbox.maxPoint.y ? point.y - bbox.maxPoint.y : point.y < bbox.minPoint.y ? bbox.minPoint.y - point.y : 0;
+    const t =
+      point.y > bbox.maxPoint.y
+        ? point.y - bbox.maxPoint.y
+        : point.y < bbox.minPoint.y
+        ? bbox.minPoint.y - point.y
+        : 0;
     return s * s + t * t;
   }
   sqrDistancePointToTriangle(P: Vector3, t0: Vector3, t1: Vector3, t2: Vector3): number {

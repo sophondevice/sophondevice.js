@@ -1,7 +1,7 @@
-import {Vector3, Vector4, Matrix4x4} from './vector';
-import {BoxSide, ClipState} from './clip_test';
-import {Plane} from './plane';
-import {Frustum} from './frustum';
+import { Vector3, Vector4, Matrix4x4 } from './vector';
+import { BoxSide, ClipState } from './clip_test';
+import { Plane } from './plane';
+import { Frustum } from './frustum';
 
 const ClipLeft = 1 << BoxSide.LEFT;
 const ClipRight = 1 << BoxSide.RIGHT;
@@ -65,25 +65,17 @@ export class AABB {
       new Vector3(minx, miny, maxz),
       new Vector3(minx, maxy, maxz),
       new Vector3(maxx, miny, maxz),
-      new Vector3(maxx, maxy, maxz),
+      new Vector3(maxx, maxy, maxz)
     ];
   }
   inplaceTransform(matrix: Matrix4x4) {
     return AABB.transform(this, matrix, this);
   }
   beginExtend() {
-    this._minPoint.set(
-      Number.POSITIVE_INFINITY,
-      Number.POSITIVE_INFINITY,
-      Number.POSITIVE_INFINITY,
-    );
-    this._maxPoint.set(
-      Number.NEGATIVE_INFINITY,
-      Number.NEGATIVE_INFINITY,
-      Number.NEGATIVE_INFINITY,
-    );
+    this._minPoint.set(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY);
+    this._maxPoint.set(Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY);
   }
-  extend(v: Vector3|Vector4) {
+  extend(v: Vector3 | Vector4) {
     this._minPoint.inplaceMin(v);
     this._maxPoint.inplaceMax(v);
   }
@@ -110,10 +102,7 @@ export class AABB {
     );
   }
   equalsTo(other: AABB, epsl?: number) {
-    return (
-      this._minPoint.equalsTo(other._minPoint, epsl) &&
-      this._maxPoint.equalsTo(other._maxPoint, epsl)
-    );
+    return this._minPoint.equalsTo(other._minPoint, epsl) && this._maxPoint.equalsTo(other._maxPoint, epsl);
   }
   intersectedWithBox(other: AABB): boolean {
     return !(
@@ -163,7 +152,7 @@ export class AABB {
       v0.set(
         i & 1 ? minPoint.x : maxPoint.x,
         i & 2 ? minPoint.y : maxPoint.y,
-        i & 3 ? minPoint.z : maxPoint.z,
+        i & 3 ? minPoint.z : maxPoint.z
       );
       viewProjMatrix.transformPoint(v0, v1);
       if (clipLeft && v1.x < -v1.w) {
@@ -204,7 +193,7 @@ export class AABB {
       v0.set(
         i & 1 ? minPoint.x : maxPoint.x,
         i & 2 ? minPoint.y : maxPoint.y,
-        i & 3 ? minPoint.z : maxPoint.z,
+        i & 3 ? minPoint.z : maxPoint.z
       );
       viewProjMatrix.transformPoint(v0, v1);
       if (v1.x < -v1.w) {

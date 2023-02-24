@@ -1,4 +1,4 @@
-import type { StructuredBuffer, PBStructTypeInfo } from "@sophon/device";
+import type { StructuredBuffer, PBStructTypeInfo } from '@sophon/device';
 
 export class BufferPool {
   private static _uniformBufferFreeList: StructuredBuffer[] = [];

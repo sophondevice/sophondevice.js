@@ -1,14 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {Rectangle, IRectangle} from './geom/Rectangle';
-import {MaxRectsBin} from './maxrects-bin';
-import {OversizedElementBin} from './oversized-element-bin';
-import {Bin, IBin} from './abstract-bin';
+import { Rectangle, IRectangle } from './geom/Rectangle';
+import { MaxRectsBin } from './maxrects-bin';
+import { OversizedElementBin } from './oversized-element-bin';
+import { Bin, IBin } from './abstract-bin';
 
 export const EDGE_MAX_VALUE = 4096;
 export const EDGE_MIN_VALUE = 128;
 export enum PACKING_LOGIC {
   MAX_AREA = 0,
-  MAX_EDGE = 1,
+  MAX_EDGE = 1
 }
 
 /**
@@ -61,8 +61,8 @@ export class MaxRectsPacker<T extends IRectangle = Rectangle> {
       allowRotation: false,
       tag: false,
       border: 0,
-      logic: PACKING_LOGIC.MAX_EDGE,
-    },
+      logic: PACKING_LOGIC.MAX_EDGE
+    }
   ) {
     this.bins = [];
   }
@@ -89,9 +89,7 @@ export class MaxRectsPacker<T extends IRectangle = Rectangle> {
       if (rect.width > this.width || rect.height > this.height) {
         this.bins.push(new OversizedElementBin<T>(rect));
       } else {
-        const added = this.bins
-          .slice(this._currentBinIndex)
-          .find((bin) => bin.add(rect) !== undefined);
+        const added = this.bins.slice(this._currentBinIndex).find((bin) => bin.add(rect) !== undefined);
         if (!added) {
           const bin = new MaxRectsBin<T>(this.width, this.height, this.padding, this.options);
           const tag = rect.data && rect.data.tag ? rect.data.tag : rect.tag ? rect.tag : undefined;
@@ -108,9 +106,7 @@ export class MaxRectsPacker<T extends IRectangle = Rectangle> {
       if (rect.width > this.width || rect.height > this.height) {
         this.bins.push(new OversizedElementBin<T>(rect as T));
       } else {
-        const added = this.bins
-          .slice(this._currentBinIndex)
-          .find((bin) => bin.add(rect as T) !== undefined);
+        const added = this.bins.slice(this._currentBinIndex).find((bin) => bin.add(rect as T) !== undefined);
         if (!added) {
           const bin = new MaxRectsBin<T>(this.width, this.height, this.padding, this.options);
           if (this.options.tag && rect.data.tag) bin.tag = rect.data.tag;
@@ -223,15 +219,15 @@ export class MaxRectsPacker<T extends IRectangle = Rectangle> {
         maxHeight: bin.maxHeight,
         freeRects: [],
         rects: [],
-        options: bin.options,
+        options: bin.options
       };
-      if (bin.tag) saveBin = {...saveBin, tag: bin.tag};
+      if (bin.tag) saveBin = { ...saveBin, tag: bin.tag };
       bin.freeRects.forEach((r) => {
         saveBin.freeRects.push({
           x: r.x,
           y: r.y,
           width: r.width,
-          height: r.height,
+          height: r.height
         });
       });
       saveBins.push(saveBin);

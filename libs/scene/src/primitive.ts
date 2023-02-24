@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Geometry, Device } from '@sophon/device';
-import type {BoundingVolume} from './bounding_volume';
+import type { BoundingVolume } from './bounding_volume';
 
 export class Primitive extends Geometry {
   /** @internal */

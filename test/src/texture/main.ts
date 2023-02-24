@@ -7,7 +7,7 @@ import { TestTexture2D, TestTexture2DArray, TestTexture3D, TestTextureCube, Test
 
 (async function () {
   const viewer = new Viewer(document.getElementById('canvas') as HTMLCanvasElement);
-  await viewer.initDevice(common.getQueryString('dev') as DeviceType || 'webgl', { msaa: true });
+  await viewer.initDevice((common.getQueryString('dev') as DeviceType) || 'webgl', { msaa: true });
   const guiRenderer = new GUIRenderer(viewer.device);
   const gui = new GUI(guiRenderer);
   await gui.deserializeFromXML(document.querySelector('#main-ui').innerHTML);
@@ -26,11 +26,13 @@ import { TestTexture2D, TestTexture2DArray, TestTexture3D, TestTextureCube, Test
 
   const case2d = new TestTexture2D(viewer.device, assetManager);
   await case2d.init();
-  const case3d = viewer.device.getDeviceType() === 'webgl' ? null : new TestTexture3D(viewer.device, assetManager);
+  const case3d =
+    viewer.device.getDeviceType() === 'webgl' ? null : new TestTexture3D(viewer.device, assetManager);
   await case3d?.init();
   const caseCube = new TestTextureCube(viewer.device, assetManager);
   await caseCube.init();
-  const case2dArray = viewer.device.getDeviceType() === 'webgl' ? null : new TestTexture2DArray(viewer.device, assetManager);
+  const case2dArray =
+    viewer.device.getDeviceType() === 'webgl' ? null : new TestTexture2DArray(viewer.device, assetManager);
   await case2dArray?.init();
   const caseVideo = new TestTextureVideo(viewer.device, assetManager, './assets/images/sample-video.mp4');
   await caseVideo.init();
@@ -75,7 +77,5 @@ import { TestTexture2D, TestTexture2DArray, TestTexture3D, TestTextureCube, Test
   });
 
   common.createTextureViewPanel(viewer.device, gui.document.body, 300);
-  viewer.device.runLoop(device => gui.render());
-
-}());
-
+  viewer.device.runLoop((device) => gui.render());
+})();

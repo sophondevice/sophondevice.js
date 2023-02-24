@@ -1,5 +1,5 @@
-import { CubeFace } from "@sophon/base";
-import { 
+import { CubeFace } from '@sophon/base';
+import {
   PrimitiveType,
   RenderStateSet,
   FaceMode,
@@ -17,13 +17,13 @@ import {
   PBInsideFunctionScope,
   PBShaderExp
 } from '@sophon/device';
-import { Primitive } from "../primitive";
-import { BoxShape } from "../shape";
+import { Primitive } from '../primitive';
+import { BoxShape } from '../shape';
 
 // TODO: multi-pass support for filter
 
 export type BlitType = '2d' | '2d-array' | 'cube';
-export type BlitProgramInfo = { program: GPUProgram, bindGroup: BindGroup };
+export type BlitProgramInfo = { program: GPUProgram; bindGroup: BindGroup };
 
 export abstract class Blitter {
   /** @internal */
@@ -40,26 +40,43 @@ export abstract class Blitter {
   invalidateHash(): void {
     this._hash = null;
   }
-  readTexel(scope: PBInsideFunctionScope, type: BlitType, srcTex: PBShaderExp, srcUV: PBShaderExp, srcLayer: PBShaderExp): PBShaderExp {
+  readTexel(
+    scope: PBInsideFunctionScope,
+    type: BlitType,
+    srcTex: PBShaderExp,
+    srcUV: PBShaderExp,
+    srcLayer: PBShaderExp
+  ): PBShaderExp {
     const pb = scope.$builder;
     switch (type) {
       case '2d':
       case 'cube':
-        return pb.device?.getShaderCaps().supportShaderTextureLod ? pb.textureSampleLevel(srcTex, srcUV, 0) : pb.textureSample(srcTex, srcUV);
+        return pb.device?.getShaderCaps().supportShaderTextureLod
+          ? pb.textureSampleLevel(srcTex, srcUV, 0)
+          : pb.textureSample(srcTex, srcUV);
       case '2d-array':
         return pb.textureArraySampleLevel(srcTex, srcUV, srcLayer, 0);
       default:
         return null;
     }
   }
-  writeTexel(scope: PBInsideFunctionScope, type: BlitType, srcUV: PBShaderExp, texel: PBShaderExp): PBShaderExp {
+  writeTexel(
+    scope: PBInsideFunctionScope,
+    type: BlitType,
+    srcUV: PBShaderExp,
+    texel: PBShaderExp
+  ): PBShaderExp {
     return texel;
   }
-  setup(scope: PBGlobalScope, type: BlitType) {
-  }
-  setUniforms(bindGroup: BindGroup) {
-  }
-  abstract filter(scope: PBInsideFunctionScope, type: BlitType, srcTex: PBShaderExp, srcUV: PBShaderExp, srcLayer: PBShaderExp): PBShaderExp;
+  setup(scope: PBGlobalScope, type: BlitType) {}
+  setUniforms(bindGroup: BindGroup) {}
+  abstract filter(
+    scope: PBInsideFunctionScope,
+    type: BlitType,
+    srcTex: PBShaderExp,
+    srcUV: PBShaderExp,
+    srcLayer: PBShaderExp
+  ): PBShaderExp;
   /** @internal */
   protected abstract calcHash(): string;
   /** @internal */
@@ -80,7 +97,12 @@ export abstract class Blitter {
     getBlitPrimitive2D(device).draw();
   }
   /** @internal */
-  protected blit2DArray(source: Texture2DArray, dest: FrameBuffer, layer: number, sampler?: TextureSampler): void {
+  protected blit2DArray(
+    source: Texture2DArray,
+    dest: FrameBuffer,
+    layer: number,
+    sampler?: TextureSampler
+  ): void {
     const device = source.device;
     const programInfo = getBlitProgram(device, '2d-array', this);
     programInfo.bindGroup.setTexture('srcTex', source, sampler);
@@ -98,7 +120,12 @@ export abstract class Blitter {
     getBlitPrimitive2D(device).draw();
   }
   /** @internal */
-  protected blitCubeMap(source: TextureCube, dest: FrameBuffer, face: CubeFace, sampler?: TextureSampler): void {
+  protected blitCubeMap(
+    source: TextureCube,
+    dest: FrameBuffer,
+    face: CubeFace,
+    sampler?: TextureSampler
+  ): void {
     const device = source.device;
     const programInfo = getBlitProgram(device, 'cube', this);
     programInfo.bindGroup.setTexture('srcTex', source, sampler);
@@ -122,15 +149,22 @@ export abstract class Blitter {
   blit(source: Texture2DArray, dest: Texture2D | FrameBuffer, layer: number, sampler?: TextureSampler): void;
   blit(source: TextureCube, dest: TextureCube, sampler?: TextureSampler): void;
   blit(source: TextureCube, dest: Texture2D | FrameBuffer, layer: number, sampler?: TextureSampler): void;
-  blit(source: BaseTexture, dest: BaseTexture | FrameBuffer, layer?: number | TextureSampler, sampler?: TextureSampler): void {
+  blit(
+    source: BaseTexture,
+    dest: BaseTexture | FrameBuffer,
+    layer?: number | TextureSampler,
+    sampler?: TextureSampler
+  ): void {
     const device = source.device;
     const saveFramebuffer = device.getFramebuffer();
     const saveViewport = device.getViewport();
     const saveScissor = device.getScissor();
     const saveRenderStates = device.getRenderStates();
-    const framebuffer = dest.isFramebuffer() ? dest : device.createFrameBuffer({
-      colorAttachments: [{ texture: dest }]
-    });
+    const framebuffer = dest.isFramebuffer()
+      ? dest
+      : device.createFrameBuffer({
+          colorAttachments: [{ texture: dest }]
+        });
     const destTexture = dest.isFramebuffer() ? dest.getColorAttachments()?.[0] : dest;
     if (source.isTexture2D()) {
       if (!destTexture?.isTexture2D() && !destTexture?.isTexture2DArray()) {
@@ -148,7 +182,9 @@ export abstract class Blitter {
         this.blit2DArray(source, framebuffer, (layer as number) || 0, sampler);
       } else {
         if (destTexture.depth !== source.depth) {
-          throw new Error('Blitter.blit() failed: can not blit between texture 2d arrays with different array size');
+          throw new Error(
+            'Blitter.blit() failed: can not blit between texture 2d arrays with different array size'
+          );
         } else {
           for (let i = 0; i < source.depth; i++) {
             framebuffer.setTextureLayer(0, i);
@@ -182,7 +218,7 @@ export abstract class Blitter {
 }
 
 const blitProgramCache: {
-  [hash: string]: BlitProgramInfo,
+  [hash: string]: BlitProgramInfo;
 } = {};
 
 let blitPrimitive2D: Primitive = null;
@@ -192,7 +228,11 @@ let blitRenderStates: RenderStateSet = null;
 function getBlitPrimitive2D(device: Device): Primitive {
   if (!blitPrimitive2D) {
     blitPrimitive2D = new Primitive(device);
-    const vb = device.createStructuredBuffer(makeVertexBufferType(4, 'position_f32x2'), { usage: 'vertex', managed: true }, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]));
+    const vb = device.createStructuredBuffer(
+      makeVertexBufferType(4, 'position_f32x2'),
+      { usage: 'vertex', managed: true },
+      new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1])
+    );
     blitPrimitive2D.setVertexBuffer(vb);
     blitPrimitive2D.indexCount = 4;
     blitPrimitive2D.indexStart = 0;
@@ -244,7 +284,10 @@ function createBlitProgram(device: Device, type: BlitType, filter: Blitter): Bli
       filter.setup(this, type);
       this.$mainFunc(function () {
         this.$builtins.position = pb.vec4(this.$inputs.pos, 0, 1);
-        this.$outputs.uv = type === 'cube' ? pb.mul(pb.vec2(1, -1), this.$inputs.pos.xy) : pb.add(pb.mul(this.$inputs.pos.xy, 0.5), pb.vec2(0.5));
+        this.$outputs.uv =
+          type === 'cube'
+            ? pb.mul(pb.vec2(1, -1), this.$inputs.pos.xy)
+            : pb.add(pb.mul(this.$inputs.pos.xy, 0.5), pb.vec2(0.5));
         if (device.getDeviceType() === 'webgpu') {
           this.$builtins.position.y = pb.neg(this.$builtins.position.y);
         }
@@ -274,28 +317,40 @@ function createBlitProgram(device: Device, type: BlitType, filter: Blitter): Bli
           this.uv = pb.vec3();
           this.$if(pb.equal(this.cubeFace, 0), function () {
             this.uv = pb.vec3(1, this.$inputs.uv.y, pb.neg(this.$inputs.uv.x));
-          }).$elseif(pb.equal(this.cubeFace, 1), function () {
-            this.uv = pb.vec3(-1, this.$inputs.uv.y, this.$inputs.uv.x);
-          }).$elseif(pb.equal(this.cubeFace, 2), function () {
-            this.uv = pb.vec3(this.$inputs.uv.x, 1, pb.neg(this.$inputs.uv.y));
-          }).$elseif(pb.equal(this.cubeFace, 3), function () {
-            this.uv = pb.vec3(this.$inputs.uv.x, -1, this.$inputs.uv.y);
-          }).$elseif(pb.equal(this.cubeFace, 4), function () {
-            this.uv = pb.vec3(this.$inputs.uv.x, this.$inputs.uv.y, 1);
-          }).$else(function () {
-            this.uv = pb.vec3(pb.neg(this.$inputs.uv.x), this.$inputs.uv.y, -1);
-          });
+          })
+            .$elseif(pb.equal(this.cubeFace, 1), function () {
+              this.uv = pb.vec3(-1, this.$inputs.uv.y, this.$inputs.uv.x);
+            })
+            .$elseif(pb.equal(this.cubeFace, 2), function () {
+              this.uv = pb.vec3(this.$inputs.uv.x, 1, pb.neg(this.$inputs.uv.y));
+            })
+            .$elseif(pb.equal(this.cubeFace, 3), function () {
+              this.uv = pb.vec3(this.$inputs.uv.x, -1, this.$inputs.uv.y);
+            })
+            .$elseif(pb.equal(this.cubeFace, 4), function () {
+              this.uv = pb.vec3(this.$inputs.uv.x, this.$inputs.uv.y, 1);
+            })
+            .$else(function () {
+              this.uv = pb.vec3(pb.neg(this.$inputs.uv.x), this.$inputs.uv.y, -1);
+            });
         } else {
           this.uv = this.$inputs.uv;
         }
-        this.$l.outTexel = filter.filter(this, type, this.srcTex, this.uv, type === '2d' ? null : this.srcLayer);
+        this.$l.outTexel = filter.filter(
+          this,
+          type,
+          this.srcTex,
+          this.uv,
+          type === '2d' ? null : this.srcLayer
+        );
         this.$outputs.outColor = filter.writeTexel(this, type, this.$inputs.uv, this.outTexel);
       });
     }
   });
-  return program ? {
-    program,
-    bindGroup: device.createBindGroup(program.bindGroupLayouts[0]),
-  } : null;
+  return program
+    ? {
+        program,
+        bindGroup: device.createBindGroup(program.bindGroupLayouts[0])
+      }
+    : null;
 }
-

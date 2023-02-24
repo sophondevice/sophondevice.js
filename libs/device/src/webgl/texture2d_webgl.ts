@@ -1,7 +1,13 @@
 import { TextureTarget, TextureFormat, linearTextureFormatToSRGB } from '../base_types';
 import { textureTargetMap } from './constants_webgl';
 import { WebGLBaseTexture } from './basetexture_webgl';
-import { GPUResourceUsageFlags, TextureImageElement, TextureMipmapData, Texture2D, GPUDataBuffer } from '../gpuobject';
+import {
+  GPUResourceUsageFlags,
+  TextureImageElement,
+  TextureMipmapData,
+  Texture2D,
+  GPUDataBuffer
+} from '../gpuobject';
 import type { TypedArray } from '@sophon/base';
 import type { WebGLDevice } from './device_webgl';
 import type { WebGLTextureCap } from './capabilities_webgl';
@@ -16,13 +22,7 @@ export class WebGLTexture2D extends WebGLBaseTexture implements Texture2D<WebGLT
   init(): void {
     this.loadEmpty(this._format, this._width, this._height, this._mipLevelCount);
   }
-  update(
-    data: TypedArray,
-    xOffset: number,
-    yOffset: number,
-    width: number,
-    height: number,
-  ): void {
+  update(data: TypedArray, xOffset: number, yOffset: number, width: number, height: number): void {
     if (this._device.isContextLost()) {
       return;
     }
@@ -41,7 +41,7 @@ export class WebGLTexture2D extends WebGLBaseTexture implements Texture2D<WebGLT
       height,
       params.glFormat,
       params.glType[0],
-      data,
+      data
     );
     if (this._mipLevelCount > 1) {
       this.generateMipmaps();
@@ -54,7 +54,7 @@ export class WebGLTexture2D extends WebGLBaseTexture implements Texture2D<WebGLT
     x: number,
     y: number,
     width: number,
-    height: number,
+    height: number
   ): void {
     if (this._device.isContextLost()) {
       return;
@@ -73,7 +73,7 @@ export class WebGLTexture2D extends WebGLBaseTexture implements Texture2D<WebGLT
         yOffset,
         params.glFormat,
         params.glType[0],
-        data,
+        data
       );
     } else {
       const cvs = document.createElement('canvas');
@@ -88,7 +88,7 @@ export class WebGLTexture2D extends WebGLBaseTexture implements Texture2D<WebGLT
         yOffset,
         params.glFormat,
         params.glType[0],
-        cvs,
+        cvs
       );
       cvs.width = 0;
       cvs.height = 0;
@@ -106,7 +106,7 @@ export class WebGLTexture2D extends WebGLBaseTexture implements Texture2D<WebGLT
       const savedScissor = this._device.getScissor() as [number, number, number, number];
       const savedFB = this._device.getFramebuffer();
       this._device.setFramebuffer(fb);
-      await this._device.readPixels(x, y, w, h, buffer)
+      await this._device.readPixels(x, y, w, h, buffer);
       fb.dispose();
       this._device.setFramebuffer(savedFB);
       this._device.setViewport(...savedViewport);
@@ -134,7 +134,10 @@ export class WebGLTexture2D extends WebGLBaseTexture implements Texture2D<WebGLT
     if (this._flags & GPUResourceUsageFlags.TF_WRITABLE) {
       console.error(new Error('webgl device does not support storage texture'));
     } else {
-      const format = (this._flags & GPUResourceUsageFlags.TF_LINEAR_COLOR_SPACE) ? TextureFormat.RGBA8UNORM : TextureFormat.RGBA8UNORM_SRGB;
+      const format =
+        this._flags & GPUResourceUsageFlags.TF_LINEAR_COLOR_SPACE
+          ? TextureFormat.RGBA8UNORM
+          : TextureFormat.RGBA8UNORM_SRGB;
       this.loadImage(element, format);
     }
   }
@@ -143,7 +146,10 @@ export class WebGLTexture2D extends WebGLBaseTexture implements Texture2D<WebGLT
     if (this._flags & GPUResourceUsageFlags.TF_WRITABLE) {
       console.error(new Error('webgl device does not support storage texture'));
     } else {
-      format = (this._flags & GPUResourceUsageFlags.TF_LINEAR_COLOR_SPACE) ? format : linearTextureFormatToSRGB(format);
+      format =
+        this._flags & GPUResourceUsageFlags.TF_LINEAR_COLOR_SPACE
+          ? format
+          : linearTextureFormatToSRGB(format);
       this.loadEmpty(format, width, height, 0);
     }
   }
@@ -216,7 +222,9 @@ export class WebGLTexture2D extends WebGLBaseTexture implements Texture2D<WebGLT
     const height = levels.height;
     const mipLevelCount = levels.mipLevels;
     if (levels.isCompressed) {
-      if (sRGB ? !this._device.getTextureCaps().supportS3TCSRGB : !this._device.getTextureCaps().supportS3TC) {
+      if (
+        sRGB ? !this._device.getTextureCaps().supportS3TCSRGB : !this._device.getTextureCaps().supportS3TC
+      ) {
         console.warn('No s3tc compression format support');
         return;
       }
@@ -237,7 +245,7 @@ export class WebGLTexture2D extends WebGLBaseTexture implements Texture2D<WebGLT
             levels.mipDatas[0][i].width,
             levels.mipDatas[0][i].height,
             params.glInternalFormat,
-            levels.mipDatas[0][i].data,
+            levels.mipDatas[0][i].data
           );
         } else {
           if (swizzle) {
@@ -257,7 +265,7 @@ export class WebGLTexture2D extends WebGLBaseTexture implements Texture2D<WebGLT
             levels.mipDatas[0][i].height,
             params.glFormat,
             params.glType[0],
-            levels.mipDatas[0][i].data,
+            levels.mipDatas[0][i].data
           );
         }
         const err = (this.device as WebGLDevice).getError();
@@ -277,15 +285,7 @@ export class WebGLTexture2D extends WebGLBaseTexture implements Texture2D<WebGLT
       const target = textureTargetMap[this._target];
       this._device.context.bindTexture(target, this._object);
       this._device.context.pixelStorei(this._device.context.UNPACK_ALIGNMENT, 4);
-      this._device.context.texSubImage2D(
-        target,
-        0,
-        0,
-        0,
-        params.glFormat,
-        params.glType[0],
-        element,
-      );
+      this._device.context.texSubImage2D(target, 0, 0, 0, params.glFormat, params.glType[0], element);
       const err = (this.device as WebGLDevice).getError();
       if (err) {
         console.error(err);

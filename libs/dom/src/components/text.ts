@@ -107,8 +107,7 @@ export class RText extends RNode {
   measureTextLocation(px: number, py: number): { line: number; pos: number } {
     const lines = this._splitContent();
     const font = this._getCachedFont();
-    const lineHeight =
-      (this.lineHeight >= 0 ? this.lineHeight : -this.lineHeight * font.maxHeight) | 0;
+    const lineHeight = (this.lineHeight >= 0 ? this.lineHeight : -this.lineHeight * font.maxHeight) | 0;
     const charMargin = this.charMargin;
     const l = Math.floor((py - this.style.getPaddingTop()) / lineHeight);
     if (l < 0 || l >= lines.length) {
@@ -133,8 +132,7 @@ export class RText extends RNode {
   _measureContentSize(rc: UIRect): UIRect {
     const lines = this._splitContent();
     const font = this._getCachedFont();
-    const lineHeight =
-      (this.lineHeight >= 0 ? this.lineHeight : -this.lineHeight * font.maxHeight) | 0;
+    const lineHeight = (this.lineHeight >= 0 ? this.lineHeight : -this.lineHeight * font.maxHeight) | 0;
     const charMargin = this.charMargin;
     const autoWrap = this.autoWrap;
     if (rc.width === 0 && rc.height === 0) {
@@ -150,10 +148,7 @@ export class RText extends RNode {
         } else {
           while (start < line.length) {
             start += autoWrap
-              ? Math.max(
-                1,
-                this._uiscene._clipStringToWidth(line, rc.width, charMargin, start, font),
-              )
+              ? Math.max(1, this._uiscene._clipStringToWidth(line, rc.width, charMargin, start, font))
               : line.length;
             rc.height += lineHeight;
           }
@@ -174,7 +169,8 @@ export class RText extends RNode {
   _normalize(): RNode {
     console.assert(
       !this.previousSibling || !this.previousSibling._isText(),
-      'Failed to execute _normalize: text node must be the first');
+      'Failed to execute _normalize: text node must be the first'
+    );
     this._textContent = this._actualContent;
     const textSiblings: RNode[] = [];
     let next = this.nextSibling;
@@ -212,7 +208,7 @@ export class RText extends RNode {
     return this;
   }
   /** @internal */
-  _init(): void { }
+  _init(): void {}
   /** @internal */
   _reparent(p: RNode, at?: RNode): RNode {
     if (this._parent !== p) {
@@ -241,8 +237,7 @@ export class RText extends RNode {
     if (clipper) {
       const lines = this._splitContent();
       const font = this._getCachedFont();
-      const lineHeight =
-        (this.lineHeight >= 0 ? this.lineHeight : -this.lineHeight * font.maxHeight) | 0;
+      const lineHeight = (this.lineHeight >= 0 ? this.lineHeight : -this.lineHeight * font.maxHeight) | 0;
       const autoWrap = this.autoWrap;
       const charMargin = this.charMargin;
       const fontColor = this._getCachedFontColor();
@@ -258,15 +253,15 @@ export class RText extends RNode {
             let x = this.style.getPaddingLeft();
             const n = autoWrap
               ? Math.max(
-                1,
-                this._uiscene._clipStringToWidth(
-                  line,
-                  this._layout.clientRect.width,
-                  charMargin,
-                  start,
-                  font,
-                ),
-              )
+                  1,
+                  this._uiscene._clipStringToWidth(
+                    line,
+                    this._layout.clientRect.width,
+                    charMargin,
+                    start,
+                    font
+                  )
+                )
               : line.length;
             for (let i = start; i < start + n; i++) {
               const glyph = this._uiscene._getGlyphInfo(line[i], font, fontColor);
@@ -277,19 +272,10 @@ export class RText extends RNode {
                 uvMax.x = glyph.uMax;
                 uvMax.y = glyph.vMax;
                 this._batchList.addPrimitive(
-                  new RRectPrimitive(
-                    x,
-                    y,
-                    glyph.width,
-                    glyph.height,
-                    uvMin.x,
-                    uvMin.y,
-                    uvMax.x,
-                    uvMax.y,
-                  ),
+                  new RRectPrimitive(x, y, glyph.width, glyph.height, uvMin.x, uvMin.y, uvMax.x, uvMax.y),
                   clipper,
                   tex,
-                  fontColor,
+                  fontColor
                 );
                 x += glyph.width + charMargin;
               }
@@ -319,10 +305,7 @@ export class RText extends RNode {
   /** @internal */
   private _findFirstTextNode(): RText {
     let el: RNode = this;
-    while (
-      el.previousSibling?._isText() &&
-      el.previousSibling?._getPseudo() === RNode.PSEUDO_NONE
-    ) {
+    while (el.previousSibling?._isText() && el.previousSibling?._getPseudo() === RNode.PSEUDO_NONE) {
       el = el.previousSibling;
     }
     return el as RText;
@@ -331,7 +314,8 @@ export class RText extends RNode {
   private _styleChange() {
     console.assert(
       !this.previousSibling || !this.previousSibling._isText(),
-      'Failed to execute _updateStyle: text node must be the first');
+      'Failed to execute _updateStyle: text node must be the first'
+    );
     this.style.display = 'flex';
     let content = this.textContent;
     for (

@@ -1,5 +1,13 @@
 import { Vector3, isPowerOf2, nextPowerOf2, HttpRequest } from '@sophon/base';
-import { TextureFilter, TextureWrapping, TextureFormat, Device, BaseTexture, Texture2D, GPUObject } from '@sophon/device'
+import {
+  TextureFilter,
+  TextureWrapping,
+  TextureFormat,
+  Device,
+  BaseTexture,
+  Texture2D,
+  GPUObject
+} from '@sophon/device';
 import { AssetHierarchyNode, AssetSkeleton, AssetSubMeshData, SharedModel } from './model';
 import { GLTFLoader } from './loaders/gltf/gltf_loader';
 import { WebImageLoader } from './loaders/image/webimage_loader';
@@ -20,14 +28,14 @@ import type { AbstractTextureLoader, AbstractModelLoader } from './loaders/loade
 export class AssetManager {
   /** @internal */
   static _builtinTextures: {
-    [name: string]: Promise<BaseTexture>
+    [name: string]: Promise<BaseTexture>;
   } = {};
   /** @internal */
   static _builtinTextureLoaders: {
-    [name: string]: (device: Device, texture?: BaseTexture) => Promise<BaseTexture>
+    [name: string]: (device: Device, texture?: BaseTexture) => Promise<BaseTexture>;
   } = {
-      [BUILTIN_ASSET_TEXTURE_SHEEN_LUT]: getSheenLutLoader(64)
-    };
+    [BUILTIN_ASSET_TEXTURE_SHEEN_LUT]: getSheenLutLoader(64)
+  };
   /** @internal */
   private _device: Device;
   /** @internal */
@@ -38,31 +46,31 @@ export class AssetManager {
   private _modelLoaders: AbstractModelLoader[];
   /** @internal */
   private _textures: {
-    [url: string]: Promise<BaseTexture>
+    [url: string]: Promise<BaseTexture>;
   };
   /** @internal */
   private _textures_nomipmap: {
-    [url: string]: Promise<BaseTexture>
+    [url: string]: Promise<BaseTexture>;
   };
   /** @internal */
   private _textures_srgb: {
-    [url: string]: Promise<BaseTexture>,
+    [url: string]: Promise<BaseTexture>;
   };
   /** @internal */
   private _textures_srgb_nomipmap: {
-    [url: string]: Promise<BaseTexture>,
+    [url: string]: Promise<BaseTexture>;
   };
   /** @internal */
   private _models: {
-    [url: string]: Promise<SharedModel>
+    [url: string]: Promise<SharedModel>;
   };
   /** @internal */
   private _binaryDatas: {
-    [url: string]: Promise<ArrayBuffer>
+    [url: string]: Promise<ArrayBuffer>;
   };
   /** @internal */
   private _textDatas: {
-    [url: string]: Promise<string>
+    [url: string]: Promise<string>;
   };
   /** @internal */
   private static _tempElement: HTMLAnchorElement = null;
@@ -120,8 +128,19 @@ export class AssetManager {
     }
     return P;
   }
-  async fetchTexture<T extends BaseTexture>(url: string, mimeType?: string, srgb?: boolean, noMipmap?: boolean): Promise<T> {
-    const textures = srgb ? noMipmap ? this._textures_srgb_nomipmap : this._textures_srgb : noMipmap ? this._textures_nomipmap : this._textures;
+  async fetchTexture<T extends BaseTexture>(
+    url: string,
+    mimeType?: string,
+    srgb?: boolean,
+    noMipmap?: boolean
+  ): Promise<T> {
+    const textures = srgb
+      ? noMipmap
+        ? this._textures_srgb_nomipmap
+        : this._textures_srgb
+      : noMipmap
+      ? this._textures_nomipmap
+      : this._textures;
     let P = textures[url];
     if (!P) {
       P = this.loadTexture(url, mimeType, srgb, noMipmap);
@@ -147,7 +166,13 @@ export class AssetManager {
   async loadBinaryData(url: string): Promise<ArrayBuffer> {
     return this._httpRequest.requestArrayBuffer(url);
   }
-  async loadTexture(url: string, mimeType?: string, srgb?: boolean, noMipmap?: boolean, texture?: BaseTexture): Promise<BaseTexture> {
+  async loadTexture(
+    url: string,
+    mimeType?: string,
+    srgb?: boolean,
+    noMipmap?: boolean,
+    texture?: BaseTexture
+  ): Promise<BaseTexture> {
     const data = await this._httpRequest.requestArrayBuffer(url);
     let ext = '';
     let filename = '';
@@ -155,7 +180,10 @@ export class AssetManager {
     if (dataUriMatchResult) {
       mimeType = mimeType || dataUriMatchResult[1];
     } else {
-      filename = new URL(url, new URL(location.href).origin).pathname.split('/').filter(val => !!val).slice(-1)[0];
+      filename = new URL(url, new URL(location.href).origin).pathname
+        .split('/')
+        .filter((val) => !!val)
+        .slice(-1)[0];
       const p = filename ? filename.lastIndexOf('.') : -1;
       ext = p >= 0 ? filename.substring(p).toLowerCase() : null;
       if (!mimeType) {
@@ -185,13 +213,24 @@ export class AssetManager {
     }
     throw new Error(`Can not find loader for asset ${url}`);
   }
-  async doLoadTexture(loader: AbstractTextureLoader, url: string, mimeType: string, data: ArrayBuffer, srgb: boolean, noMipmap: boolean, texture?: BaseTexture): Promise<BaseTexture> {
+  async doLoadTexture(
+    loader: AbstractTextureLoader,
+    url: string,
+    mimeType: string,
+    data: ArrayBuffer,
+    srgb: boolean,
+    noMipmap: boolean,
+    texture?: BaseTexture
+  ): Promise<BaseTexture> {
     if (this.device.getDeviceType() !== 'webgl') {
       return await loader.load(this, url, mimeType, data, srgb, noMipmap, texture);
     } else {
       let tex = await loader.load(this, url, mimeType, data, srgb, noMipmap);
       if (texture) {
-        const magFilter = tex.width !== texture.width || tex.height !== texture.height ? TextureFilter.Linear : TextureFilter.Nearest;
+        const magFilter =
+          tex.width !== texture.width || tex.height !== texture.height
+            ? TextureFilter.Linear
+            : TextureFilter.Nearest;
         const minFilter = magFilter;
         const mipFilter = TextureFilter.None;
         const sampler = this.device.createSampler({
@@ -204,10 +243,15 @@ export class AssetManager {
         const blitter = new GammaBlitter(1);
         blitter.blit(tex as any, texture as any, sampler);
         tex = texture;
-      } else if (!noMipmap && (tex.isTexture2D() || tex.isTextureCube()) && (srgb || !isPowerOf2(tex.width) || !isPowerOf2(tex.height))) {
+      } else if (
+        !noMipmap &&
+        (tex.isTexture2D() || tex.isTextureCube()) &&
+        (srgb || !isPowerOf2(tex.width) || !isPowerOf2(tex.height))
+      ) {
         const newWidth = !noMipmap && !isPowerOf2(tex.width) ? nextPowerOf2(tex.width) : tex.width;
         const newHeight = !noMipmap && !isPowerOf2(tex.height) ? nextPowerOf2(tex.height) : tex.height;
-        const magFilter = newWidth !== tex.width || newHeight !== tex.height ? TextureFilter.Linear : TextureFilter.Nearest;
+        const magFilter =
+          newWidth !== tex.width || newHeight !== tex.height ? TextureFilter.Linear : TextureFilter.Nearest;
         const minFilter = magFilter;
         const mipFilter = TextureFilter.None;
         const sampler = this.device.createSampler({
@@ -219,7 +263,9 @@ export class AssetManager {
         });
         const blitter = new GammaBlitter(1);
         const newTexture = tex.isTexture2D()
-          ? this.device.createTexture2D(TextureFormat.RGBA8UNORM, newWidth, newHeight, { colorSpace: 'linear' })
+          ? this.device.createTexture2D(TextureFormat.RGBA8UNORM, newWidth, newHeight, {
+              colorSpace: 'linear'
+            })
           : this.device.createCubeTexture(TextureFormat.RGBA8UNORM, newWidth, { colorSpace: 'linear' });
 
         blitter.blit(tex as any, newTexture as any, sampler);
@@ -231,7 +277,10 @@ export class AssetManager {
   }
   async loadModel(url: string, mimeType?: string, name?: string): Promise<SharedModel> {
     const data = await this.httpRequest.requestBlob(url);
-    const filename = new URL(url, new URL(location.href).origin).pathname.split('/').filter(val => !!val).slice(-1)[0];
+    const filename = new URL(url, new URL(location.href).origin).pathname
+      .split('/')
+      .filter((val) => !!val)
+      .slice(-1)[0];
     const p = filename ? filename.lastIndexOf('.') : -1;
     const ext = p >= 0 ? filename.substring(p) : null;
     for (const loader of this._modelLoaders) {
@@ -258,9 +307,9 @@ export class AssetManager {
       AssetManager._builtinTextures[name] = P;
     }
     const tex = await P;
-    tex.restoreHandler = async tex => {
+    tex.restoreHandler = async (tex) => {
       await loader(this.device, tex as Texture2D);
-    }
+    };
     return tex as T;
   }
   private createSceneNode(scene: Scene, model: SharedModel, sceneIndex?: number): Model {
@@ -269,11 +318,15 @@ export class AssetManager {
     for (let i = 0; i < model.scenes.length; i++) {
       if (typeof sceneIndex === 'number' && sceneIndex >= 0 && i !== sceneIndex) {
         continue;
-      } else if ((sceneIndex === undefined || sceneIndex === null) && model.activeScene >= 0 && i !== model.activeScene) {
+      } else if (
+        (sceneIndex === undefined || sceneIndex === null) &&
+        model.activeScene >= 0 &&
+        i !== model.activeScene
+      ) {
         continue;
       }
       const assetScene = model.scenes[i];
-      const skeletonMeshMap: Map<AssetSkeleton, { mesh: Mesh[], bounding: AssetSubMeshData[] }> = new Map();
+      const skeletonMeshMap: Map<AssetSkeleton, { mesh: Mesh[]; bounding: AssetSubMeshData[] }> = new Map();
       const nodeMap: Map<AssetHierarchyNode, SceneNode> = new Map();
       for (let k = 0; k < assetScene.rootNodes.length; k++) {
         this.setAssetNodeToSceneNode(scene, node, model, assetScene.rootNodes[k], skeletonMeshMap, nodeMap);
@@ -287,9 +340,17 @@ export class AssetManager {
           for (const sk of animationData.skeletons) {
             const nodes = skeletonMeshMap.get(sk);
             if (nodes) {
-              const skeleton = new Skeleton(sk.joints.map(val => nodeMap.get(val)), sk.inverseBindMatrices, sk.bindPoseMatrices);
+              const skeleton = new Skeleton(
+                sk.joints.map((val) => nodeMap.get(val)),
+                sk.inverseBindMatrices,
+                sk.bindPoseMatrices
+              );
               skeleton.updateJointMatrices(scene.device);
-              animation.addSkeleton(skeleton, nodes.mesh, nodes.bounding.map(val => this.getBoundingInfo(skeleton, val)));
+              animation.addSkeleton(
+                skeleton,
+                nodes.mesh,
+                nodes.bounding.map((val) => this.getBoundingInfo(skeleton, val))
+              );
             }
           }
         }
@@ -322,10 +383,18 @@ export class AssetManager {
     const numVertices = Math.floor(v.length / 3);
     for (let i = 0; i < numVertices; i++) {
       vert.set(v[i * 3], v[i * 3 + 1], v[i * 3 + 2]);
-      skeleton.jointMatrices[meshData.rawBlendIndices[i * 4 + 0]].transformPointAffine(vert, tmpV0).scaleBy(meshData.rawJointWeights[i * 4 + 0]);
-      skeleton.jointMatrices[meshData.rawBlendIndices[i * 4 + 1]].transformPointAffine(vert, tmpV1).scaleBy(meshData.rawJointWeights[i * 4 + 1]);
-      skeleton.jointMatrices[meshData.rawBlendIndices[i * 4 + 2]].transformPointAffine(vert, tmpV2).scaleBy(meshData.rawJointWeights[i * 4 + 2]);
-      skeleton.jointMatrices[meshData.rawBlendIndices[i * 4 + 3]].transformPointAffine(vert, tmpV3).scaleBy(meshData.rawJointWeights[i * 4 + 3]);
+      skeleton.jointMatrices[meshData.rawBlendIndices[i * 4 + 0]]
+        .transformPointAffine(vert, tmpV0)
+        .scaleBy(meshData.rawJointWeights[i * 4 + 0]);
+      skeleton.jointMatrices[meshData.rawBlendIndices[i * 4 + 1]]
+        .transformPointAffine(vert, tmpV1)
+        .scaleBy(meshData.rawJointWeights[i * 4 + 1]);
+      skeleton.jointMatrices[meshData.rawBlendIndices[i * 4 + 2]]
+        .transformPointAffine(vert, tmpV2)
+        .scaleBy(meshData.rawJointWeights[i * 4 + 2]);
+      skeleton.jointMatrices[meshData.rawBlendIndices[i * 4 + 3]]
+        .transformPointAffine(vert, tmpV3)
+        .scaleBy(meshData.rawJointWeights[i * 4 + 3]);
       tmpV0.addBy(tmpV1).addBy(tmpV2).addBy(tmpV3);
       if (tmpV0.x < minx) {
         minx = tmpV0.x;
@@ -353,17 +422,39 @@ export class AssetManager {
       }
     }
     const info: SkinnedBoundingBox = {
-      boundingVertexBlendIndices: new Float32Array(Array.from({ length: 6 * 4 }).map((val, index) => meshData.rawBlendIndices[indices[index >> 2] * 4 + index % 4])),
-      boundingVertexJointWeights: new Float32Array(Array.from({ length: 6 * 4 }).map((val, index) => meshData.rawJointWeights[indices[index >> 2] * 4 + index % 4])),
-      boundingVertices: Array.from({ length: 6 }).map((val, index) => new Vector3(meshData.rawPositions[indices[index] * 3], meshData.rawPositions[indices[index] * 3 + 1], meshData.rawPositions[indices[index] * 3 + 2])),
-      boundingBox: new BoundingBox,
+      boundingVertexBlendIndices: new Float32Array(
+        Array.from({ length: 6 * 4 }).map(
+          (val, index) => meshData.rawBlendIndices[indices[index >> 2] * 4 + (index % 4)]
+        )
+      ),
+      boundingVertexJointWeights: new Float32Array(
+        Array.from({ length: 6 * 4 }).map(
+          (val, index) => meshData.rawJointWeights[indices[index >> 2] * 4 + (index % 4)]
+        )
+      ),
+      boundingVertices: Array.from({ length: 6 }).map(
+        (val, index) =>
+          new Vector3(
+            meshData.rawPositions[indices[index] * 3],
+            meshData.rawPositions[indices[index] * 3 + 1],
+            meshData.rawPositions[indices[index] * 3 + 2]
+          )
+      ),
+      boundingBox: new BoundingBox()
     };
     return info;
   }
-  private setAssetNodeToSceneNode(scene: Scene, parent: SceneNode, model: SharedModel, assetNode: AssetHierarchyNode, skeletonMeshMap: Map<AssetSkeleton, { mesh: Mesh[], bounding: AssetSubMeshData[] }>, nodeMap: Map<AssetHierarchyNode, SceneNode>) {
+  private setAssetNodeToSceneNode(
+    scene: Scene,
+    parent: SceneNode,
+    model: SharedModel,
+    assetNode: AssetHierarchyNode,
+    skeletonMeshMap: Map<AssetSkeleton, { mesh: Mesh[]; bounding: AssetSubMeshData[] }>,
+    nodeMap: Map<AssetHierarchyNode, SceneNode>
+  ) {
     const node: SceneNode = new SceneNode(scene);
     nodeMap.set(assetNode, node);
-    node.name = `${assetNode.name}`
+    node.name = `${assetNode.name}`;
     node.position = assetNode.position;
     node.rotation = assetNode.rotation;
     node.scaling = assetNode.scaling;

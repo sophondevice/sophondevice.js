@@ -53,7 +53,7 @@ function getDimensionName(dimension: number) {
 enum DX10ResourceDimension {
   DDS_DIMENSION_TEXTURE1D = 2,
   DDS_DIMENSION_TEXTURE2D = 3,
-  DDS_DIMENSION_TEXTURE3D = 4,
+  DDS_DIMENSION_TEXTURE3D = 4
 }
 
 function getDXGIFormatName(fmt: number) {
@@ -91,7 +91,7 @@ enum DXGIFormat {
   DXGI_FORMAT_BGRA8 = 87,
   DXGI_FORMAT_BGRX8 = 88,
   DXGI_FORMAT_BGRA8_SRGB = 91,
-  DXGI_FORMAT_BGRX8_SRGB = 93,
+  DXGI_FORMAT_BGRX8_SRGB = 93
 }
 
 enum D3DFormat {
@@ -120,7 +120,7 @@ enum D3DFormat {
   D3DFMT_RGBA16F = 113,
   D3DFMT_R32F = 114,
   D3DFMT_RG32F = 115,
-  D3DFMT_RGBA32F = 116,
+  D3DFMT_RGBA32F = 116
 }
 
 function FourCCToInt32(value: string) {
@@ -133,12 +133,7 @@ function FourCCToInt32(value: string) {
 }
 
 function Int32ToFourCC(value: number) {
-  return String.fromCharCode(
-    value & 0xff,
-    (value >> 8) & 0xff,
-    (value >> 16) & 0xff,
-    (value >> 24) & 0xff,
-  );
+  return String.fromCharCode(value & 0xff, (value >> 8) & 0xff, (value >> 16) & 0xff, (value >> 24) & 0xff);
 }
 
 function getPixelFormatDesc(header: DDSHeader) {
@@ -366,7 +361,7 @@ interface DDSMetaData extends TextureMipmapData {
 
 const enum DDSConvert {
   RGB_SWIZZLE = 1 << 0,
-  ALPHA_ONE = 11 << 1,
+  ALPHA_ONE = 11 << 1
 }
 
 const legacyDDSMap: {
@@ -379,24 +374,24 @@ const legacyDDSMap: {
     convertFlags: 0,
     pf: {
       dwFlags: DDPF_FOURCC,
-      dwFourCC: FourCCToInt32('DXT1'),
-    },
+      dwFourCC: FourCCToInt32('DXT1')
+    }
   },
   {
     format: TextureFormat.DXT3,
     convertFlags: 0,
     pf: {
       dwFlags: DDPF_FOURCC,
-      dwFourCC: FourCCToInt32('DXT3'),
-    },
+      dwFourCC: FourCCToInt32('DXT3')
+    }
   },
   {
     format: TextureFormat.DXT5,
     convertFlags: 0,
     pf: {
       dwFlags: DDPF_FOURCC,
-      dwFourCC: FourCCToInt32('DXT5'),
-    },
+      dwFourCC: FourCCToInt32('DXT5')
+    }
   },
   {
     format: TextureFormat.BGRA8UNORM,
@@ -407,8 +402,8 @@ const legacyDDSMap: {
       dwRBitMask: 0x00ff0000,
       dwGBitMask: 0x0000ff00,
       dwBBitMask: 0x000000ff,
-      dwABitMask: 0xff000000,
-    },
+      dwABitMask: 0xff000000
+    }
   },
   {
     format: TextureFormat.BGRA8UNORM,
@@ -418,8 +413,8 @@ const legacyDDSMap: {
       dwRGBBitCount: 32,
       dwRBitMask: 0x00ff0000,
       dwGBitMask: 0x0000ff00,
-      dwBBitMask: 0x000000ff,
-    },
+      dwBBitMask: 0x000000ff
+    }
   },
   {
     format: TextureFormat.RGBA8UNORM,
@@ -430,8 +425,8 @@ const legacyDDSMap: {
       dwRBitMask: 0x000000ff,
       dwGBitMask: 0x0000ff00,
       dwBBitMask: 0x00ff0000,
-      dwABitMask: 0xff000000,
-    },
+      dwABitMask: 0xff000000
+    }
   },
   {
     format: TextureFormat.RGBA8UNORM,
@@ -441,105 +436,105 @@ const legacyDDSMap: {
       dwRGBBitCount: 32,
       dwRBitMask: 0x000000ff,
       dwGBitMask: 0x0000ff00,
-      dwBBitMask: 0x00ff0000,
-    },
+      dwBBitMask: 0x00ff0000
+    }
   },
   {
     format: TextureFormat.R16F,
     convertFlags: 0,
     pf: {
       dwFlags: DDPF_FOURCC,
-      dwFourCC: 111,
-    },
+      dwFourCC: 111
+    }
   },
   {
     format: TextureFormat.R16F,
     convertFlags: 0,
     pf: {
       dwFlags: DDPF_FOURCC,
-      dwFourCC: DXGIFormat.DXGI_FORMAT_R16F,
-    },
+      dwFourCC: DXGIFormat.DXGI_FORMAT_R16F
+    }
   },
   {
     format: TextureFormat.RG16F,
     convertFlags: 0,
     pf: {
       dwFlags: DDPF_FOURCC,
-      dwFourCC: 112,
-    },
+      dwFourCC: 112
+    }
   },
   {
     format: TextureFormat.RG16F,
     convertFlags: 0,
     pf: {
       dwFlags: DDPF_FOURCC,
-      dwFourCC: DXGIFormat.DXGI_FORMAT_RG16F,
-    },
+      dwFourCC: DXGIFormat.DXGI_FORMAT_RG16F
+    }
   },
   {
     format: TextureFormat.RGBA16F,
     convertFlags: 0,
     pf: {
       dwFlags: DDPF_FOURCC,
-      dwFourCC: 113,
-    },
+      dwFourCC: 113
+    }
   },
   {
     format: TextureFormat.RGBA16F,
     convertFlags: 0,
     pf: {
       dwFlags: DDPF_FOURCC,
-      dwFourCC: DXGIFormat.DXGI_FORMAT_RGBA16F,
-    },
+      dwFourCC: DXGIFormat.DXGI_FORMAT_RGBA16F
+    }
   },
   {
     format: TextureFormat.R32F,
     convertFlags: 0,
     pf: {
       dwFlags: DDPF_FOURCC,
-      dwFourCC: 114,
-    },
+      dwFourCC: 114
+    }
   },
   {
     format: TextureFormat.R32F,
     convertFlags: 0,
     pf: {
       dwFlags: DDPF_FOURCC,
-      dwFourCC: DXGIFormat.DXGI_FORMAT_R32F,
-    },
+      dwFourCC: DXGIFormat.DXGI_FORMAT_R32F
+    }
   },
   {
     format: TextureFormat.RG32F,
     convertFlags: 0,
     pf: {
       dwFlags: DDPF_FOURCC,
-      dwFourCC: 115,
-    },
+      dwFourCC: 115
+    }
   },
   {
     format: TextureFormat.RG32F,
     convertFlags: 0,
     pf: {
       dwFlags: DDPF_FOURCC,
-      dwFourCC: DXGIFormat.DXGI_FORMAT_RG32F,
-    },
+      dwFourCC: DXGIFormat.DXGI_FORMAT_RG32F
+    }
   },
   {
     format: TextureFormat.RGBA32F,
     convertFlags: 0,
     pf: {
       dwFlags: DDPF_FOURCC,
-      dwFourCC: 116,
-    },
+      dwFourCC: 116
+    }
   },
   {
     format: TextureFormat.RGBA32F,
     convertFlags: 0,
     pf: {
       dwFlags: DDPF_FOURCC,
-      dwFourCC: DXGIFormat.DXGI_FORMAT_RGBA32F,
-    },
-  },
+      dwFourCC: DXGIFormat.DXGI_FORMAT_RGBA32F
+    }
+  }
 ];
 
 function getTextureFormat(pf: DDSPixelFormat) {
@@ -613,7 +608,7 @@ function getMipmapData(
   width: number,
   height: number,
   format: TextureFormat,
-  dataOffset: number,
+  dataOffset: number
 ): TypedArray {
   switch (format) {
     case TextureFormat.R16F:
@@ -632,18 +627,10 @@ function getMipmapData(
     case TextureFormat.RGBA32F:
       return new Float32Array(dds, dataOffset, width * height * 4);
     case TextureFormat.DXT1:
-      return new Uint8Array(
-        dds,
-        dataOffset,
-        (((Math.max(4, width) / 4) * Math.max(4, height)) / 4) * 8,
-      );
+      return new Uint8Array(dds, dataOffset, (((Math.max(4, width) / 4) * Math.max(4, height)) / 4) * 8);
     case TextureFormat.DXT3:
     case TextureFormat.DXT5:
-      return new Uint8Array(
-        dds,
-        dataOffset,
-        (((Math.max(4, width) / 4) * Math.max(4, height)) / 4) * 16,
-      );
+      return new Uint8Array(dds, dataOffset, (((Math.max(4, width) / 4) * Math.max(4, height)) / 4) * 16);
     default:
       return null;
   }
@@ -664,7 +651,7 @@ export function getDDSMipLevelsInfo(dds: ArrayBuffer): DDSMetaData {
     let height = ddsLevelsInfo.height;
     for (let mip = 0; mip < ddsLevelsInfo.mipLevels; mip++) {
       const mipData = getMipmapData(dds, width, height, ddsLevelsInfo.format, dataOffset);
-      mipDatas.push({data: mipData, width: width, height: height});
+      mipDatas.push({ data: mipData, width: width, height: height });
       dataOffset += mipData.byteLength;
       width = Math.max(1, width >> 1);
       height = Math.max(1, height >> 1);
@@ -673,4 +660,3 @@ export function getDDSMipLevelsInfo(dds: ArrayBuffer): DDSMetaData {
   }
   return ddsLevelsInfo;
 }
-

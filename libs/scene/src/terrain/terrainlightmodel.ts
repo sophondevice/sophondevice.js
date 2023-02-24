@@ -1,5 +1,5 @@
-import { Vector2 } from "@sophon/base";
-import { 
+import { Vector2 } from '@sophon/base';
+import {
   ShaderType,
   PBInsideFunctionScope,
   PBGlobalScope,
@@ -10,10 +10,10 @@ import {
   TextureFilter,
   TextureSampler,
   BaseTexture
-} from "@sophon/device";
-import { LambertLightModel } from "../materiallib";
-import { MATERIAL_FUNC_NORMAL } from "../values";
-import type { DrawContext } from "../drawable";
+} from '@sophon/device';
+import { LambertLightModel } from '../materiallib';
+import { MATERIAL_FUNC_NORMAL } from '../values';
+import type { DrawContext } from '../drawable';
 
 export class TerrainLightModel extends LambertLightModel {
   protected static readonly funcNameCalcTerrainAlbedo = 'lib_terrainLM_albedo';
@@ -51,7 +51,7 @@ export class TerrainLightModel extends LambertLightModel {
   set terrainBaseMap(tex: Texture2D) {
     tex = tex || null;
     if (this._terrainBaseMap !== tex) {
-      this.optionChanged(!this._terrainBaseMap || !tex)
+      this.optionChanged(!this._terrainBaseMap || !tex);
       this._terrainBaseMap = tex;
     }
   }
@@ -61,7 +61,7 @@ export class TerrainLightModel extends LambertLightModel {
   set terrainNormalMap(tex: Texture2D) {
     tex = tex || null;
     if (this._terrainNormalMap !== tex) {
-      this.optionChanged(!this._terrainNormalMap || !tex)
+      this.optionChanged(!this._terrainNormalMap || !tex);
       this._terrainNormalMap = tex;
     }
   }
@@ -71,12 +71,17 @@ export class TerrainLightModel extends LambertLightModel {
   set detailMaskMap(tex: Texture2D) {
     tex = tex || null;
     if (this._detailMaskMap !== tex) {
-      this.optionChanged(!this._detailMaskMap || !tex)
+      this.optionChanged(!this._detailMaskMap || !tex);
       this._detailMaskMap = tex;
       this._detailMaskMapSampler = tex.device.createSampler({
         magFilter: tex.isFilterable() ? TextureFilter.Linear : TextureFilter.Nearest,
         minFilter: tex.isFilterable() ? TextureFilter.Linear : TextureFilter.Nearest,
-        mipFilter: tex.mipLevelCount === 1 ? TextureFilter.None : tex.isFilterable() ? TextureFilter.Linear : TextureFilter.Nearest,
+        mipFilter:
+          tex.mipLevelCount === 1
+            ? TextureFilter.None
+            : tex.isFilterable()
+            ? TextureFilter.Linear
+            : TextureFilter.Nearest
       });
     }
   }
@@ -96,7 +101,11 @@ export class TerrainLightModel extends LambertLightModel {
     return !!this._terrainNormalMap;
   }
   calculateHash(): string {
-    return `${this._detailColorMaps.map(tex => this._calcTextureHash(tex)).join('')}_${this._calcTextureHash(this._terrainBaseMap)}_${this._calcTextureHash(this._terrainNormalMap)}`;
+    return `${this._detailColorMaps
+      .map((tex) => this._calcTextureHash(tex))
+      .join('')}_${this._calcTextureHash(this._terrainBaseMap)}_${this._calcTextureHash(
+      this._terrainNormalMap
+    )}`;
   }
   addDetailMap(color: Texture2D, scale: Vector2) {
     if (!color) {
@@ -105,13 +114,20 @@ export class TerrainLightModel extends LambertLightModel {
     }
     scale = scale || Vector2.one();
     this._detailColorMaps.push(color);
-    this._detailColorMapSamplers.push(color.device.createSampler({
-      addressU: TextureWrapping.Repeat,
-      addressV: TextureWrapping.Repeat,
-      magFilter: color.isFilterable() ? TextureFilter.Linear : TextureFilter.Nearest,
-      minFilter: color.isFilterable() ? TextureFilter.Linear : TextureFilter.Nearest,
-      mipFilter: color.mipLevelCount === 1 ? TextureFilter.None : color.isFilterable() ? TextureFilter.Linear : TextureFilter.Nearest,
-    }));
+    this._detailColorMapSamplers.push(
+      color.device.createSampler({
+        addressU: TextureWrapping.Repeat,
+        addressV: TextureWrapping.Repeat,
+        magFilter: color.isFilterable() ? TextureFilter.Linear : TextureFilter.Nearest,
+        minFilter: color.isFilterable() ? TextureFilter.Linear : TextureFilter.Nearest,
+        mipFilter:
+          color.mipLevelCount === 1
+            ? TextureFilter.None
+            : color.isFilterable()
+            ? TextureFilter.Linear
+            : TextureFilter.Nearest
+      })
+    );
     this._detailScales.push(scale);
     this.optionChanged(true);
   }
@@ -127,7 +143,11 @@ export class TerrainLightModel extends LambertLightModel {
       if (this.numDetailMaps > 0) {
         bindGroup.setTexture('terrainlm_maskMap', this._detailMaskMap, this._detailMaskMapSampler);
         for (let i = 0; i < this.numDetailMaps; i++) {
-          bindGroup.setTexture(`terrainlm_detailMap${i}`, this._detailColorMaps[i], this._detailColorMapSamplers[i]);
+          bindGroup.setTexture(
+            `terrainlm_detailMap${i}`,
+            this._detailColorMaps[i],
+            this._detailColorMapSamplers[i]
+          );
           bindGroup.setValue(`terrainlm_detailScale${i}`, this._detailScales[i]);
         }
       }
@@ -143,8 +163,14 @@ export class TerrainLightModel extends LambertLightModel {
         scope.terrainlm_normalMap = pb.tex2D().uniform(2).tag(TerrainLightModel.uniformTerrainNormalMap);
       }
       for (let i = 0; i < this.numDetailMaps; i++) {
-        scope[`terrainlm_detailMap${i}`] = pb.tex2D().uniform(2).tag(`${TerrainLightModel.uniformDetailMap}${i}`);
-        scope[`terrainlm_detailScale${i}`] = pb.vec2().uniform(2).tag(`${TerrainLightModel.uniformDetailScales}${i}`);
+        scope[`terrainlm_detailMap${i}`] = pb
+          .tex2D()
+          .uniform(2)
+          .tag(`${TerrainLightModel.uniformDetailMap}${i}`);
+        scope[`terrainlm_detailScale${i}`] = pb
+          .vec2()
+          .uniform(2)
+          .tag(`${TerrainLightModel.uniformDetailScales}${i}`);
       }
       if (this.numDetailMaps > 0 && !scope.$query(TerrainLightModel.uniformMaskMap)) {
         scope.terrainlm_maskMap = pb.tex2D().uniform(2).tag(TerrainLightModel.uniformMaskMap);
@@ -164,7 +190,16 @@ export class TerrainLightModel extends LambertLightModel {
             this.$l.uv = uv;
             this.$l.mask = pb.textureSample(maskMap, this.uv);
             for (let i = 0; i < that.numDetailMaps; i++) {
-              this.color = pb.add(this.color, pb.mul(pb.textureSample(this.$query(`${TerrainLightModel.uniformDetailMap}${i}`), pb.mul(this.uv, this.$query(`${TerrainLightModel.uniformDetailScales}${i}`))).xyz, this.mask[i]));
+              this.color = pb.add(
+                this.color,
+                pb.mul(
+                  pb.textureSample(
+                    this.$query(`${TerrainLightModel.uniformDetailMap}${i}`),
+                    pb.mul(this.uv, this.$query(`${TerrainLightModel.uniformDetailScales}${i}`))
+                  ).xyz,
+                  this.mask[i]
+                )
+              );
             }
             this.$return(pb.vec4(this.color, 1));
           } else {

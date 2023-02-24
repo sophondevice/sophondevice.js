@@ -1,6 +1,6 @@
-import {RElement} from './element';
-import type {GUI} from './gui';
-import type {IStyleSheet} from './style';
+import { RElement } from './element';
+import type { GUI } from './gui';
+import type { IStyleSheet } from './style';
 
 export class RFlowElement extends RElement {
   constructor(uiscene: GUI) {

@@ -1,5 +1,12 @@
 import { PrimitiveType } from './base_types';
-import { VertexInputLayout, StructuredBuffer, IndexBuffer, VertexStepMode, VertexSemantic, getVertexAttribByName } from './gpuobject';
+import {
+  VertexInputLayout,
+  StructuredBuffer,
+  IndexBuffer,
+  VertexStepMode,
+  VertexSemantic,
+  getVertexAttribByName
+} from './gpuobject';
 import { VertexData } from './vertexdata';
 import type { TypedArray } from '@sophon/base';
 import type { PBStructTypeInfo } from './builder';
@@ -62,18 +69,19 @@ export class Geometry {
     data: TypedArray,
     stepMode?: VertexStepMode
   ): StructuredBuffer {
-    const buffer = this._device.createStructuredBuffer(structureType, {
-      usage: 'vertex',
-      managed: true
-    }, data);
+    const buffer = this._device.createStructuredBuffer(
+      structureType,
+      {
+        usage: 'vertex',
+        managed: true
+      },
+      data
+    );
     const ret = this._vertexData.setVertexBuffer(buffer, stepMode);
     this._vaoDirty = !!ret;
     return ret;
   }
-  setVertexBuffer(
-    buffer: StructuredBuffer,
-    stepMode?: VertexStepMode
-  ) {
+  setVertexBuffer(buffer: StructuredBuffer, stepMode?: VertexStepMode) {
     const ret = this._vertexData.setVertexBuffer(buffer, stepMode);
     this._vaoDirty = !!ret;
     return ret;

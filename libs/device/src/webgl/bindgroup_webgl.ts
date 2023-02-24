@@ -7,7 +7,14 @@ import { WebGLGPUObject } from './gpuobject_webgl';
 import { TypedArray } from '@sophon/base';
 import type { PBStructTypeInfo } from '../builder';
 import type { WebGLDevice } from './device_webgl';
-import type { BindGroupLayout, BaseTexture, StructuredBuffer, TextureSampler, BindGroup, BindGroupLayoutEntry } from '../gpuobject';
+import type {
+  BindGroupLayout,
+  BaseTexture,
+  StructuredBuffer,
+  TextureSampler,
+  BindGroup,
+  BindGroupLayoutEntry
+} from '../gpuobject';
 
 export class WebGLBindGroup extends WebGLGPUObject<unknown> implements BindGroup {
   private _layout: BindGroupLayout;
@@ -80,7 +87,7 @@ export class WebGLBindGroup extends WebGLGPUObject<unknown> implements BindGroup
   getTexture(name: string): BaseTexture {
     const entry = this._findTextureLayout(name);
     if (entry) {
-      return this._resources[name]?.[0] as BaseTexture || null;
+      return (this._resources[name]?.[0] as BaseTexture) || null;
     } else {
       throw new Error(`getTexture() failed:${name} is not a texture`);
     }
@@ -90,9 +97,11 @@ export class WebGLBindGroup extends WebGLGPUObject<unknown> implements BindGroup
     if (entry) {
       this._resources[name] = [
         texture as unknown as WebGLBaseTexture,
-        (sampler || texture.getDefaultSampler(!!entry.texture?.autoBindSamplerComparison)) as WebGLTextureSampler];
+        (sampler ||
+          texture.getDefaultSampler(!!entry.texture?.autoBindSamplerComparison)) as WebGLTextureSampler
+      ];
     } else {
-      console.log(`setTexture() failed: no texture uniform named '${name}'`)
+      console.log(`setTexture() failed: no texture uniform named '${name}'`);
     }
   }
   setSampler(name: string, value: TextureSampler) {
@@ -140,7 +149,9 @@ export class WebGLBindGroup extends WebGLGPUObject<unknown> implements BindGroup
       if (entry.buffer && entry.name === name) {
         let buffer = this._resources[entry.name] as WebGLStructuredBuffer;
         if (!buffer && !nocreate) {
-          buffer = this._device.createStructuredBuffer(entry.type as PBStructTypeInfo, { usage: 'uniform' }) as WebGLStructuredBuffer;
+          buffer = this._device.createStructuredBuffer(entry.type as PBStructTypeInfo, {
+            usage: 'uniform'
+          }) as WebGLStructuredBuffer;
           this._resources[entry.name] = buffer;
         }
         return buffer;

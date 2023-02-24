@@ -1,18 +1,18 @@
 import { TextureFormat, PrimitiveType, TextureWrapping, TextureFilter, CompareFunc } from '../base_types';
 import { StencilOp, FaceWinding, FaceMode, BlendEquation, BlendFunc } from '../render_states';
 
-export const textureWrappingMap: {[k: number]: GPUAddressMode} = {
+export const textureWrappingMap: { [k: number]: GPUAddressMode } = {
   [TextureWrapping.Repeat]: 'repeat',
   [TextureWrapping.MirroredRepeat]: 'mirror-repeat',
-  [TextureWrapping.ClampToEdge]: 'clamp-to-edge',
+  [TextureWrapping.ClampToEdge]: 'clamp-to-edge'
 };
 
-export const textureFilterMap: {[k: number]: GPUFilterMode} = {
+export const textureFilterMap: { [k: number]: GPUFilterMode } = {
   [TextureFilter.Nearest]: 'nearest',
   [TextureFilter.Linear]: 'linear'
 };
 
-export const compareFuncMap: {[k: number]: GPUCompareFunction} = {
+export const compareFuncMap: { [k: number]: GPUCompareFunction } = {
   [CompareFunc.Always]: 'always',
   [CompareFunc.LessEqual]: 'less-equal',
   [CompareFunc.GreaterEqual]: 'greater-equal',
@@ -20,10 +20,10 @@ export const compareFuncMap: {[k: number]: GPUCompareFunction} = {
   [CompareFunc.Greater]: 'greater',
   [CompareFunc.Equal]: 'equal',
   [CompareFunc.NotEqual]: 'not-equal',
-  [CompareFunc.Never]: 'never',
+  [CompareFunc.Never]: 'never'
 };
 
-export const stencilOpMap: {[k: number]: GPUStencilOperation} = {
+export const stencilOpMap: { [k: number]: GPUStencilOperation } = {
   [StencilOp.KEEP]: 'keep',
   [StencilOp.REPLACE]: 'replace',
   [StencilOp.ZERO]: 'zero',
@@ -31,37 +31,37 @@ export const stencilOpMap: {[k: number]: GPUStencilOperation} = {
   [StencilOp.INCR]: 'increment-clamp',
   [StencilOp.DECR]: 'decrement-clamp',
   [StencilOp.INCR_WRAP]: 'increment-wrap',
-  [StencilOp.DECR_WRAP]: 'decrement-wrap',
+  [StencilOp.DECR_WRAP]: 'decrement-wrap'
 };
 
-export const primitiveTypeMap: {[k: number]: GPUPrimitiveTopology} = {
+export const primitiveTypeMap: { [k: number]: GPUPrimitiveTopology } = {
   [PrimitiveType.TriangleList]: 'triangle-list',
   [PrimitiveType.TriangleStrip]: 'triangle-strip',
   [PrimitiveType.LineList]: 'line-list',
   [PrimitiveType.LineStrip]: 'line-strip',
-  [PrimitiveType.PointList]: 'point-list',
+  [PrimitiveType.PointList]: 'point-list'
 };
 
-export const faceWindingMap: {[k: number]: GPUFrontFace} = {
+export const faceWindingMap: { [k: number]: GPUFrontFace } = {
   [FaceWinding.CCW]: 'ccw',
-  [FaceWinding.CW]: 'cw',
+  [FaceWinding.CW]: 'cw'
 };
 
-export const faceModeMap: {[k: number]: GPUCullMode} = {
+export const faceModeMap: { [k: number]: GPUCullMode } = {
   [FaceMode.BACK]: 'back',
   [FaceMode.FRONT]: 'front',
-  [FaceMode.NONE]: 'none',
+  [FaceMode.NONE]: 'none'
 };
 
-export const blendEquationMap: {[k: number]: GPUBlendOperation} = {
+export const blendEquationMap: { [k: number]: GPUBlendOperation } = {
   [BlendEquation.ADD]: 'add',
   [BlendEquation.SUBTRACT]: 'subtract',
   [BlendEquation.REVERSE_SUBTRACT]: 'reverse-subtract',
   [BlendEquation.MIN]: 'min',
-  [BlendEquation.MAX]: 'max',
+  [BlendEquation.MAX]: 'max'
 };
 
-export const blendFuncMap: {[k: number]: GPUBlendFactor} = {
+export const blendFuncMap: { [k: number]: GPUBlendFactor } = {
   [BlendFunc.CONSTANT_COLOR]: 'constant',
   [BlendFunc.CONSTANT_ALPHA]: 'constant',
   [BlendFunc.DST_COLOR]: 'dst',
@@ -76,10 +76,10 @@ export const blendFuncMap: {[k: number]: GPUBlendFactor} = {
   [BlendFunc.INV_SRC_ALPHA]: 'one-minus-src-alpha',
   [BlendFunc.SRC_ALPHA_SATURATE]: 'src-alpha-saturated',
   [BlendFunc.ONE]: 'one',
-  [BlendFunc.ZERO]: 'zero',
+  [BlendFunc.ZERO]: 'zero'
 };
 
-export const vertexFormatToHash : {[fmt: string]: string} = {
+export const vertexFormatToHash: { [fmt: string]: string } = {
   float32: '0',
   float32x2: '1',
   float32x3: '2',
@@ -110,7 +110,7 @@ export const vertexFormatToHash : {[fmt: string]: string} = {
   snorm8x4: 'r'
 };
 
-export const textureFormatMap: {[fmt: number]: GPUTextureFormat} = {
+export const textureFormatMap: { [fmt: number]: GPUTextureFormat } = {
   [TextureFormat.RGBA8UNORM]: 'rgba8unorm',
   [TextureFormat.RGBA8SNORM]: 'rgba8snorm',
   [TextureFormat.BGRA8UNORM]: 'bgra8unorm',
@@ -154,11 +154,11 @@ export const textureFormatMap: {[fmt: number]: GPUTextureFormat} = {
   [TextureFormat.D24]: 'depth24plus',
   [TextureFormat.D32F]: 'depth32float',
   [TextureFormat.D32FS8]: 'depth32float-stencil8',
-  [TextureFormat.D24S8]: 'depth24plus-stencil8',
+  [TextureFormat.D24S8]: 'depth24plus-stencil8'
 };
 
-function zip<K = string>(keys: string[], values: K[]): {[k: string]: K} {
-  const ret: {[k: string]: K} = {};
+function zip<K = string>(keys: string[], values: K[]): { [k: string]: K } {
+  const ret: { [k: string]: K } = {};
   const len = keys.length;
   for (let i = 0; i < len; i++) {
     ret[keys[i]] = values[i];
@@ -166,7 +166,12 @@ function zip<K = string>(keys: string[], values: K[]): {[k: string]: K} {
   return ret;
 }
 
-export const textureFormatInvMap = zip<TextureFormat>(Object.values(textureFormatMap), Object.keys(textureFormatMap).map(val => Number(val)));
+export const textureFormatInvMap = zip<TextureFormat>(
+  Object.values(textureFormatMap),
+  Object.keys(textureFormatMap).map((val) => Number(val))
+);
 
-export const hashToVertexFormat: {[hash: string]: string} = zip(Object.values(vertexFormatToHash), Object.keys(vertexFormatToHash));
-
+export const hashToVertexFormat: { [hash: string]: string } = zip(
+  Object.values(vertexFormatToHash),
+  Object.keys(vertexFormatToHash)
+);

@@ -22,7 +22,16 @@ import {
   TextureCreationOptions,
   BufferCreationOptions
 } from '../gpuobject';
-import { GPUProgramConstructParams, Device, DeviceType, TextureCaps, MiscCaps, FramebufferCaps, ShaderCaps, DeviceOptions } from '../device';
+import {
+  GPUProgramConstructParams,
+  Device,
+  DeviceType,
+  TextureCaps,
+  MiscCaps,
+  FramebufferCaps,
+  ShaderCaps,
+  DeviceOptions
+} from '../device';
 import { RenderStateSet } from '../render_states';
 import { WebGPUTextureSampler } from './sampler_webgpu';
 import { WebGPUProgram } from './gpuprogram_webgpu';
@@ -32,7 +41,12 @@ import { WebGPUTexture2DArray } from './texture2darray_webgpu';
 import { WebGPUTexture3D } from './texture3d_webgpu';
 import { WebGPUTextureCube } from './texturecube_webgpu';
 import { WebGPUTextureVideo } from './texturevideo_webgpu';
-import { WebGPUTextureCap, WebGPUFramebufferCap, WebGPUMiscCap, WebGPUShaderCap } from './capabilities_webgpu';
+import {
+  WebGPUTextureCap,
+  WebGPUFramebufferCap,
+  WebGPUMiscCap,
+  WebGPUShaderCap
+} from './capabilities_webgpu';
 import { WebGPUVertexInputLayout } from './vertexinputlayout_webgpu';
 import { PipelineCache } from './pipeline_cache';
 import { WebGPURenderStateSet } from './renderstates_webgpu';
@@ -223,7 +237,7 @@ export class WebGPUDevice extends Device {
       'timestamp-query',
       'indirect-first-instance',
       'shader-f16'
-    ].filter(val => this._adapter.features.has(val)) as GPUFeatureName[];
+    ].filter((val) => this._adapter.features.has(val)) as GPUFeatureName[];
     this._device = await this._adapter.requestDevice({
       requiredFeatures: featureNames
     });
@@ -234,7 +248,7 @@ export class WebGPUDevice extends Device {
     for (const feature of this._device.features) {
       console.log(` - ${feature}`);
     }
-    this._context = this._canvas.getContext('webgpu') as unknown as GPUCanvasContext || null;
+    this._context = (this._canvas.getContext('webgpu') as unknown as GPUCanvasContext) || null;
     if (!this._context) {
       this._canRender = false;
       throw new Error('WebGPU: getContext() failed');
@@ -253,7 +267,7 @@ export class WebGPUDevice extends Device {
     this._commandQueue = new CommandQueueImmediate(this);
     this._canRender = true;
 
-    this.addDefaultEventListener('resize', evt => {
+    this.addDefaultEventListener('resize', (evt) => {
       const width = Math.max(1, Math.round(this._canvas.clientWidth * this._dpr));
       const height = Math.max(1, Math.round(this._canvas.clientHeight * this._dpr));
       if (width !== this._canvas.width || height !== this._canvas.height) {
@@ -277,8 +291,13 @@ export class WebGPUDevice extends Device {
   createSampler(options: SamplerOptions): TextureSampler {
     return this.fetchSampler(options);
   }
-  createTexture2D(format: TextureFormat, width: number, height: number, options?: TextureCreationOptions): Texture2D {
-    const tex = options?.texture as WebGPUTexture2D ?? new WebGPUTexture2D(this);
+  createTexture2D(
+    format: TextureFormat,
+    width: number,
+    height: number,
+    options?: TextureCreationOptions
+  ): Texture2D {
+    const tex = (options?.texture as WebGPUTexture2D) ?? new WebGPUTexture2D(this);
     if (!tex.isTexture2D()) {
       console.error('createTexture2D() failed: options.texture must be 2d texture');
       return null;
@@ -287,7 +306,7 @@ export class WebGPUDevice extends Device {
     return tex;
   }
   createTexture2DFromMipmapData(data: TextureMipmapData, options?: TextureCreationOptions): Texture2D {
-    const tex = options?.texture as WebGPUTexture2D ?? new WebGPUTexture2D(this);
+    const tex = (options?.texture as WebGPUTexture2D) ?? new WebGPUTexture2D(this);
     if (!tex.isTexture2D()) {
       console.error('createTexture2DFromMipmapData() failed: options.texture must be 2d texture');
       return null;
@@ -296,7 +315,7 @@ export class WebGPUDevice extends Device {
     return tex;
   }
   createTexture2DFromImage(element: TextureImageElement, options?: TextureCreationOptions): Texture2D {
-    const tex = options?.texture as WebGPUTexture2D ?? new WebGPUTexture2D(this);
+    const tex = (options?.texture as WebGPUTexture2D) ?? new WebGPUTexture2D(this);
     if (!tex.isTexture2D()) {
       console.error('createTexture2DFromImage() failed: options.texture must be 2d texture');
       return null;
@@ -304,8 +323,14 @@ export class WebGPUDevice extends Device {
     tex.loadFromElement(element, this.parseTextureOptions(options));
     return tex;
   }
-  createTexture2DArray(format: TextureFormat, width: number, height: number, depth: number, options?: TextureCreationOptions): Texture2DArray {
-    const tex = options?.texture as WebGPUTexture2DArray ?? new WebGPUTexture2DArray(this);
+  createTexture2DArray(
+    format: TextureFormat,
+    width: number,
+    height: number,
+    depth: number,
+    options?: TextureCreationOptions
+  ): Texture2DArray {
+    const tex = (options?.texture as WebGPUTexture2DArray) ?? new WebGPUTexture2DArray(this);
     if (!tex.isTexture2DArray()) {
       console.error('createTexture2DArray() failed: options.texture must be 2d array texture');
       return null;
@@ -313,8 +338,14 @@ export class WebGPUDevice extends Device {
     tex.createEmpty(format, width, height, depth, this.parseTextureOptions(options));
     return tex;
   }
-  createTexture3D(format: TextureFormat, width: number, height: number, depth: number, options?: TextureCreationOptions): Texture3D {
-    const tex = options?.texture as WebGPUTexture3D ?? new WebGPUTexture3D(this);
+  createTexture3D(
+    format: TextureFormat,
+    width: number,
+    height: number,
+    depth: number,
+    options?: TextureCreationOptions
+  ): Texture3D {
+    const tex = (options?.texture as WebGPUTexture3D) ?? new WebGPUTexture3D(this);
     if (!tex.isTexture3D()) {
       console.error('createTexture3D() failed: options.texture must be 3d texture');
       return null;
@@ -323,7 +354,7 @@ export class WebGPUDevice extends Device {
     return tex;
   }
   createCubeTexture(format: TextureFormat, size: number, options?: TextureCreationOptions): TextureCube {
-    const tex = options?.texture as WebGPUTextureCube ?? new WebGPUTextureCube(this);
+    const tex = (options?.texture as WebGPUTextureCube) ?? new WebGPUTextureCube(this);
     if (!tex.isTextureCube()) {
       console.error('createCubeTexture() failed: options.texture must be cube texture');
       return null;
@@ -332,7 +363,7 @@ export class WebGPUDevice extends Device {
     return tex;
   }
   createCubeTextureFromMipmapData(data: TextureMipmapData, options?: TextureCreationOptions): TextureCube {
-    const tex = options?.texture as WebGPUTextureCube ?? new WebGPUTextureCube(this);
+    const tex = (options?.texture as WebGPUTextureCube) ?? new WebGPUTextureCube(this);
     if (!tex.isTextureCube()) {
       console.error('createCubeTextureFromMipmapData() failed: options.texture must be cube texture');
       return null;
@@ -349,16 +380,17 @@ export class WebGPUDevice extends Device {
   createBindGroup(layout: BindGroupLayout): BindGroup {
     return new WebGPUBindGroup(this, layout);
   }
-  createBuffer(
-    sizeInBytes: number,
-    options: BufferCreationOptions,
-  ): GPUDataBuffer {
+  createBuffer(sizeInBytes: number, options: BufferCreationOptions): GPUDataBuffer {
     return new WebGPUBuffer(this, this.parseBufferOptions(options), sizeInBytes);
   }
   createIndexBuffer(data: Uint16Array | Uint32Array, options?: BufferCreationOptions): IndexBuffer<unknown> {
     return new WebGPUIndexBuffer(this, data, this.parseBufferOptions(options, 'index'));
   }
-  createStructuredBuffer(structureType: PBStructTypeInfo, options: BufferCreationOptions, data?: TypedArray): StructuredBuffer {
+  createStructuredBuffer(
+    structureType: PBStructTypeInfo,
+    options: BufferCreationOptions,
+    data?: TypedArray
+  ): StructuredBuffer {
     return new WebGPUStructuredBuffer(this, structureType, this.parseBufferOptions(options), data);
   }
   createVAO(data: VertexData): VertexInputLayout {
@@ -446,7 +478,12 @@ export class WebGPUDevice extends Device {
     return this._renderStatesOverridden;
   }
   /** @internal */
-  getFramebufferInfo(): { colorFormats: GPUTextureFormat[], depthFormat: GPUTextureFormat, sampleCount: number, hash: string } {
+  getFramebufferInfo(): {
+    colorFormats: GPUTextureFormat[];
+    depthFormat: GPUTextureFormat;
+    sampleCount: number;
+    hash: string;
+  } {
     return this._commandQueue.getFramebufferInfo();
   }
   /** @internal */
@@ -534,7 +571,9 @@ export class WebGPUDevice extends Device {
   }
   async readPixels(x: number, y: number, w: number, h: number, buffer: TypedArray): Promise<void> {
     const fb = this.getFramebuffer();
-    const colorAttachment = fb ? fb.getColorAttachments()[0]?.object as GPUTexture : this.context.getCurrentTexture();
+    const colorAttachment = fb
+      ? (fb.getColorAttachments()[0]?.object as GPUTexture)
+      : this.context.getCurrentTexture();
     const texFormat = fb ? fb.getColorAttachments()[0]?.format : textureFormatInvMap[this._backBufferFormat];
     if (colorAttachment && texFormat) {
       const pixelSize = getTextureFormatBlockSize(texFormat);
@@ -552,15 +591,32 @@ export class WebGPUDevice extends Device {
   }
   readPixelsToBuffer(x: number, y: number, w: number, h: number, buffer: GPUDataBuffer): void {
     const fb = this.getFramebuffer();
-    const colorAttachment = fb ? fb.getColorAttachments()[0]?.object as GPUTexture : this.context.getCurrentTexture();
+    const colorAttachment = fb
+      ? (fb.getColorAttachments()[0]?.object as GPUTexture)
+      : this.context.getCurrentTexture();
     const texFormat = fb ? fb.getColorAttachments()[0]?.format : textureFormatInvMap[this._backBufferFormat];
     const texWidth = fb ? fb.getColorAttachments()[0]?.width : this.getDrawingBufferWidth();
     const texHeight = fb ? fb.getColorAttachments()[0]?.height : this.getDrawingBufferHeight();
     if (colorAttachment && texFormat) {
       this.flush();
-      WebGPUBaseTexture.copyTexturePixelsToBuffer(this._device, colorAttachment, texWidth, texHeight, texFormat, x, y, w, h, 0, 0, buffer);
+      WebGPUBaseTexture.copyTexturePixelsToBuffer(
+        this._device,
+        colorAttachment,
+        texWidth,
+        texHeight,
+        texFormat,
+        x,
+        y,
+        w,
+        h,
+        0,
+        0,
+        buffer
+      );
     } else {
-      console.error('readPixelsToBuffer() failed: no color attachment0 or unrecoganized color attachment format');
+      console.error(
+        'readPixelsToBuffer() failed: no color attachment0 or unrecoganized color attachment format'
+      );
     }
   }
   looseContext(): void {
@@ -584,25 +640,59 @@ export class WebGPUDevice extends Device {
   }
   /** @internal */
   protected _draw(primitiveType: PrimitiveType, first: number, count: number): void {
-    this._commandQueue.draw(this._currentProgram, this._currentVertexData, this._currentStateSet, this._currentBindGroups, this._currentBindGroupOffsets, primitiveType, first, count, 1);
+    this._commandQueue.draw(
+      this._currentProgram,
+      this._currentVertexData,
+      this._currentStateSet,
+      this._currentBindGroups,
+      this._currentBindGroupOffsets,
+      primitiveType,
+      first,
+      count,
+      1
+    );
   }
   /** @internal */
-  protected _drawInstanced(primitiveType: PrimitiveType, first: number, count: number, numInstances: number): void {
-    this._commandQueue.draw(this._currentProgram, this._currentVertexData, this._currentStateSet, this._currentBindGroups, this._currentBindGroupOffsets, primitiveType, first, count, numInstances);
+  protected _drawInstanced(
+    primitiveType: PrimitiveType,
+    first: number,
+    count: number,
+    numInstances: number
+  ): void {
+    this._commandQueue.draw(
+      this._currentProgram,
+      this._currentVertexData,
+      this._currentStateSet,
+      this._currentBindGroups,
+      this._currentBindGroupOffsets,
+      primitiveType,
+      first,
+      count,
+      numInstances
+    );
   }
   /** @internal */
   protected _compute(workgroupCountX, workgroupCountY, workgroupCountZ): void {
-    this._commandQueue.compute(this._currentProgram, this._currentBindGroups, this._currentBindGroupOffsets, workgroupCountX, workgroupCountY, workgroupCountZ);
+    this._commandQueue.compute(
+      this._currentProgram,
+      this._currentBindGroups,
+      this._currentBindGroupOffsets,
+      workgroupCountX,
+      workgroupCountY,
+      workgroupCountZ
+    );
   }
   private configure() {
-    this._backBufferFormat = (navigator.gpu as any).getPreferredCanvasFormat ? (navigator.gpu as any).getPreferredCanvasFormat() : this._context.getPreferredFormat(this._adapter);
+    this._backBufferFormat = (navigator.gpu as any).getPreferredCanvasFormat
+      ? (navigator.gpu as any).getPreferredCanvasFormat()
+      : this._context.getPreferredFormat(this._adapter);
     this._depthFormat = 'depth24plus-stencil8';
     this._context.configure({
       device: this._device,
       format: this._backBufferFormat,
       usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC,
       alphaMode: 'opaque',
-      colorSpace: 'srgb',
+      colorSpace: 'srgb'
     });
     this.createDefaultRenderAttachments();
   }
@@ -620,7 +710,7 @@ export class WebGPUDevice extends Device {
         size: {
           width,
           height,
-          depthOrArrayLayers: 1,
+          depthOrArrayLayers: 1
         },
         format: this._backBufferFormat,
         dimension: '2d',
@@ -634,7 +724,7 @@ export class WebGPUDevice extends Device {
       size: {
         width,
         height,
-        depthOrArrayLayers: 1,
+        depthOrArrayLayers: 1
       },
       format: this._depthFormat,
       dimension: '2d',
@@ -645,13 +735,15 @@ export class WebGPUDevice extends Device {
     this._defaultDepthTextureView = this._defaultDepthTexture.createView();
     this._defaultRenderPassDesc = {
       label: `mainRenderPass:${this._sampleCount}`,
-      colorAttachments: [{
-        view: this._sampleCount > 1 ? this._defaultMSAAColorTextureView : null,
-        resolveTarget: undefined,
-        loadOp: 'clear',
-        clearValue: [0, 0, 0, 0],
-        storeOp: 'store',
-      }],
+      colorAttachments: [
+        {
+          view: this._sampleCount > 1 ? this._defaultMSAAColorTextureView : null,
+          resolveTarget: undefined,
+          loadOp: 'clear',
+          clearValue: [0, 0, 0, 0],
+          storeOp: 'store'
+        }
+      ],
       depthStencilAttachment: {
         view: this._defaultDepthTextureView,
         depthLoadOp: 'clear',
@@ -659,9 +751,9 @@ export class WebGPUDevice extends Device {
         depthStoreOp: 'store',
         stencilLoadOp: 'clear',
         stencilClearValue: 0,
-        stencilStoreOp: 'store',
+        stencilStoreOp: 'store'
       }
-    }
+    };
   }
   private async tryCompile(code: string) {
     const sm = this._device.createShaderModule({

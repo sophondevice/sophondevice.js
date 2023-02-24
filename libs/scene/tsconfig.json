@@ -4,11 +4,7 @@
     "moduleResolution": "node",
     "target": "ESNext",
     "module": "ESNext",
-    "lib": [
-      "es2020",
-      "DOM",
-      "DOM.Iterable"
-    ],
+    "lib": ["es2020", "DOM", "DOM.Iterable"],
     "strict": true,
     "noImplicitAny": false,
     "removeComments": true,
@@ -27,18 +23,8 @@
     "rootDir": "./src",
     "declaration": true,
     "importHelpers": false,
-    "typeRoots": [
-      "./node_modules/@types",
-      "./node_modules/@webgpu/types"
-    ],
+    "typeRoots": ["./node_modules/@types", "./node_modules/@webgpu/types"]
   },
-  "include": [
-    "./src"
-  ],
-  "exclude": [
-    "node_modules",
-    "**/*.spec.ts",
-    "**/*.d.ts",
-    "tests"
-  ]
+  "include": ["./src"],
+  "exclude": ["node_modules", "**/*.spec.ts", "**/*.d.ts", "tests"]
 }

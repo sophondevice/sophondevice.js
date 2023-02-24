@@ -1,5 +1,16 @@
 import { Vector3, Matrix4x4 } from '@sophon/base';
-import { Device, GPUProgram, BaseTexture, TextureFormat, Texture2D, TextureCube, TextureVideo, BindGroup, RenderStateSet, ProgramBuilder } from '@sophon/device';
+import {
+  Device,
+  GPUProgram,
+  BaseTexture,
+  TextureFormat,
+  Texture2D,
+  TextureCube,
+  TextureVideo,
+  BindGroup,
+  RenderStateSet,
+  ProgramBuilder
+} from '@sophon/device';
 import { AssetManager, BoxShape } from '@sophon/scene';
 import { projectCubemapCPU } from './sh';
 
@@ -24,7 +35,7 @@ export abstract class TextureTestCase {
     this.program = this.createProgram();
     this.texture = await this.createTexture();
     this.bindgroup = this.createBindGroup();
-    this.box = new BoxShape(this.device, { size: 2, pivotX: 0.5, pivotY: 0.5, pivotZ: 0.5 })
+    this.box = new BoxShape(this.device, { size: 2, pivotX: 0.5, pivotY: 0.5, pivotZ: 0.5 });
     this.renderStates = this.device.createRenderStateSet();
     this.renderStates.useDepthState().enableTest(true);
   }
@@ -33,10 +44,10 @@ export abstract class TextureTestCase {
     this.device.setProgram(this.program);
     this.device.setRenderStates(this.renderStates);
     this.device.setBindGroup(0, this.bindgroup);
-    this.box.draw()
+    this.box.draw();
   }
   protected abstract createProgram(): GPUProgram;
-  protected abstract createTexture(): Promise<BaseTexture|TextureVideo>;
+  protected abstract createTexture(): Promise<BaseTexture | TextureVideo>;
   protected abstract createBindGroup(): BindGroup;
   protected abstract updateBindGroup(t: number, width: number, height: number);
 }
@@ -45,7 +56,11 @@ export class TestTexture2D extends TextureTestCase {
   private viewMatrix: Matrix4x4;
   constructor(device: Device, assetManager: AssetManager) {
     super(device, assetManager);
-    this.viewMatrix = Matrix4x4.lookAt(new Vector3(3, 3, 3), Vector3.zero(), Vector3.axisPY()).inplaceInverseAffine();
+    this.viewMatrix = Matrix4x4.lookAt(
+      new Vector3(3, 3, 3),
+      Vector3.zero(),
+      Vector3.axisPY()
+    ).inplaceInverseAffine();
   }
   protected createProgram(): GPUProgram {
     const pb = new ProgramBuilder(this.device);
@@ -72,7 +87,7 @@ export class TestTexture2D extends TextureTestCase {
     });
   }
   protected async createTexture(): Promise<BaseTexture> {
-    return await this.assetManager.fetchTexture(`./assets/images/Di-3d.png`, null, true) as Texture2D;
+    return (await this.assetManager.fetchTexture(`./assets/images/Di-3d.png`, null, true)) as Texture2D;
   }
   protected createBindGroup(): BindGroup {
     const bindGroup = this.device.createBindGroup(this.program.bindGroupLayouts[0]);
@@ -81,7 +96,9 @@ export class TestTexture2D extends TextureTestCase {
   }
   protected updateBindGroup(t: number, w: number, h: number) {
     const vpMatrix = Matrix4x4.multiply(Matrix4x4.perspective(Math.PI / 3, w / h, 1, 10), this.viewMatrix);
-    const matrix = this.animate ? Matrix4x4.multiply(vpMatrix, Matrix4x4.rotationY((t * 0.001) % (2 * Math.PI))) : vpMatrix;
+    const matrix = this.animate
+      ? Matrix4x4.multiply(vpMatrix, Matrix4x4.rotationY((t * 0.001) % (2 * Math.PI)))
+      : vpMatrix;
     this.bindgroup.setValue('mvpMatrix', matrix);
   }
 }
@@ -91,7 +108,11 @@ export class TestTextureVideo extends TextureTestCase {
   private el: HTMLVideoElement;
   constructor(device: Device, assetManager: AssetManager, video: string) {
     super(device, assetManager);
-    this.viewMatrix = Matrix4x4.lookAt(new Vector3(3, 3, 3), Vector3.zero(), Vector3.axisPY()).inplaceInverseAffine();
+    this.viewMatrix = Matrix4x4.lookAt(
+      new Vector3(3, 3, 3),
+      Vector3.zero(),
+      Vector3.axisPY()
+    ).inplaceInverseAffine();
     this.el = document.createElement('video');
     this.el.src = video;
     this.el.loop = true;
@@ -122,7 +143,7 @@ export class TestTextureVideo extends TextureTestCase {
       }
     });
   }
-  protected async createTexture(): Promise<BaseTexture|TextureVideo> {
+  protected async createTexture(): Promise<BaseTexture | TextureVideo> {
     return this.device.createTextureVideo(this.el);
   }
   protected createBindGroup(): BindGroup {
@@ -132,7 +153,9 @@ export class TestTextureVideo extends TextureTestCase {
   }
   protected updateBindGroup(t: number, w: number, h: number) {
     const vpMatrix = Matrix4x4.multiply(Matrix4x4.perspective(Math.PI / 3, w / h, 1, 10), this.viewMatrix);
-    const matrix = this.animate ? Matrix4x4.multiply(vpMatrix, Matrix4x4.rotationY((t * 0.001) % (2 * Math.PI))) : vpMatrix;
+    const matrix = this.animate
+      ? Matrix4x4.multiply(vpMatrix, Matrix4x4.rotationY((t * 0.001) % (2 * Math.PI)))
+      : vpMatrix;
     this.bindgroup.setValue('mvpMatrix', matrix);
   }
 }
@@ -141,7 +164,11 @@ export class TestTexture2DArray extends TextureTestCase {
   private viewMatrix: Matrix4x4;
   constructor(device: Device, assetManager: AssetManager) {
     super(device, assetManager);
-    this.viewMatrix = Matrix4x4.lookAt(new Vector3(3, 3, 3), Vector3.zero(), Vector3.axisPY()).inplaceInverseAffine();
+    this.viewMatrix = Matrix4x4.lookAt(
+      new Vector3(3, 3, 3),
+      Vector3.zero(),
+      Vector3.axisPY()
+    ).inplaceInverseAffine();
   }
   protected createProgram(): GPUProgram {
     const pb = new ProgramBuilder(this.device);
@@ -160,8 +187,15 @@ export class TestTexture2DArray extends TextureTestCase {
         this.tex = pb.tex2DArray().uniform(0);
         this.$outputs.color = pb.vec4();
         this.$mainFunc(function () {
-          this.$outputs.color = pb.textureArraySample(this.tex, this.$inputs.texcoord.xy, pb.int(pb.mul(this.$inputs.texcoord.z, 4)));
-          this.$outputs.color = pb.vec4(pb.pow(this.$outputs.color.xyz, pb.vec3(1 / 2.2)), this.$outputs.color.w);
+          this.$outputs.color = pb.textureArraySample(
+            this.tex,
+            this.$inputs.texcoord.xy,
+            pb.int(pb.mul(this.$inputs.texcoord.z, 4))
+          );
+          this.$outputs.color = pb.vec4(
+            pb.pow(this.$outputs.color.xyz, pb.vec3(1 / 2.2)),
+            this.$outputs.color.w
+          );
         });
       }
     });
@@ -175,25 +209,73 @@ export class TestTexture2DArray extends TextureTestCase {
     const black = [0, 0, 0, 255];
     const white = [255, 255, 255, 255];
     const pixels = new Uint8Array([
-      ...red, ...green, ...blue, ...yellow,
-      ...purple, ...black, ...white, ...red,
-      ...green, ...blue, ...yellow, ...purple,
-      ...black, ...white, ...red, ...green,
+      ...red,
+      ...green,
+      ...blue,
+      ...yellow,
+      ...purple,
+      ...black,
+      ...white,
+      ...red,
+      ...green,
+      ...blue,
+      ...yellow,
+      ...purple,
+      ...black,
+      ...white,
+      ...red,
+      ...green,
 
-      ...green, ...blue, ...yellow, ...purple,
-      ...black, ...white, ...red, ...green,
-      ...blue, ...yellow, ...purple, ...black,
-      ...white, ...red, ...green, ...blue,
+      ...green,
+      ...blue,
+      ...yellow,
+      ...purple,
+      ...black,
+      ...white,
+      ...red,
+      ...green,
+      ...blue,
+      ...yellow,
+      ...purple,
+      ...black,
+      ...white,
+      ...red,
+      ...green,
+      ...blue,
 
-      ...blue, ...yellow, ...purple, ...black,
-      ...white, ...red, ...green, ...blue,
-      ...yellow, ...purple, ...black, ...white,
-      ...red, ...green, ...blue, ...yellow,
+      ...blue,
+      ...yellow,
+      ...purple,
+      ...black,
+      ...white,
+      ...red,
+      ...green,
+      ...blue,
+      ...yellow,
+      ...purple,
+      ...black,
+      ...white,
+      ...red,
+      ...green,
+      ...blue,
+      ...yellow,
 
-      ...yellow, ...purple, ...black, ...white,
-      ...red, ...green, ...blue, ...yellow,
-      ...purple, ...black, ...white, ...red,
-      ...green, ...blue, ...yellow, ...purple
+      ...yellow,
+      ...purple,
+      ...black,
+      ...white,
+      ...red,
+      ...green,
+      ...blue,
+      ...yellow,
+      ...purple,
+      ...black,
+      ...white,
+      ...red,
+      ...green,
+      ...blue,
+      ...yellow,
+      ...purple
     ]);
     const tex = this.device.createTexture2DArray(TextureFormat.RGBA8UNORM, 4, 4, 4, {
       colorSpace: 'linear'
@@ -208,17 +290,22 @@ export class TestTexture2DArray extends TextureTestCase {
   }
   protected updateBindGroup(t: number, w: number, h: number) {
     const vpMatrix = Matrix4x4.multiply(Matrix4x4.perspective(Math.PI / 3, w / h, 1, 10), this.viewMatrix);
-    const matrix = this.animate ? Matrix4x4.multiply(vpMatrix, Matrix4x4.rotationY((t * 0.001) % (2 * Math.PI))) : vpMatrix;
+    const matrix = this.animate
+      ? Matrix4x4.multiply(vpMatrix, Matrix4x4.rotationY((t * 0.001) % (2 * Math.PI)))
+      : vpMatrix;
     this.bindgroup.setValue('mvpMatrix', matrix);
   }
 }
-
 
 export class TestTexture3D extends TextureTestCase {
   private viewMatrix: Matrix4x4;
   constructor(device: Device, assetManager: AssetManager) {
     super(device, assetManager);
-    this.viewMatrix = Matrix4x4.lookAt(new Vector3(3, 3, 3), Vector3.zero(), Vector3.axisPY()).inplaceInverseAffine();
+    this.viewMatrix = Matrix4x4.lookAt(
+      new Vector3(3, 3, 3),
+      Vector3.zero(),
+      Vector3.axisPY()
+    ).inplaceInverseAffine();
   }
   protected createProgram(): GPUProgram {
     const pb = new ProgramBuilder(this.device);
@@ -238,7 +325,10 @@ export class TestTexture3D extends TextureTestCase {
         this.$outputs.color = pb.vec4();
         this.$mainFunc(function () {
           this.$outputs.color = pb.textureSample(this.tex, this.$inputs.texcoord);
-          this.$outputs.color = pb.vec4(pb.pow(this.$outputs.color.xyz, pb.vec3(1 / 2.2)), this.$outputs.color.w);
+          this.$outputs.color = pb.vec4(
+            pb.pow(this.$outputs.color.xyz, pb.vec3(1 / 2.2)),
+            this.$outputs.color.w
+          );
         });
       }
     });
@@ -252,25 +342,73 @@ export class TestTexture3D extends TextureTestCase {
     const black = [0, 0, 0, 255];
     const white = [255, 255, 255, 255];
     const pixels = new Uint8Array([
-      ...red, ...green, ...blue, ...yellow,
-      ...purple, ...black, ...white, ...red,
-      ...green, ...blue, ...yellow, ...purple,
-      ...black, ...white, ...red, ...green,
+      ...red,
+      ...green,
+      ...blue,
+      ...yellow,
+      ...purple,
+      ...black,
+      ...white,
+      ...red,
+      ...green,
+      ...blue,
+      ...yellow,
+      ...purple,
+      ...black,
+      ...white,
+      ...red,
+      ...green,
 
-      ...green, ...blue, ...yellow, ...purple,
-      ...black, ...white, ...red, ...green,
-      ...blue, ...yellow, ...purple, ...black,
-      ...white, ...red, ...green, ...blue,
+      ...green,
+      ...blue,
+      ...yellow,
+      ...purple,
+      ...black,
+      ...white,
+      ...red,
+      ...green,
+      ...blue,
+      ...yellow,
+      ...purple,
+      ...black,
+      ...white,
+      ...red,
+      ...green,
+      ...blue,
 
-      ...blue, ...yellow, ...purple, ...black,
-      ...white, ...red, ...green, ...blue,
-      ...yellow, ...purple, ...black, ...white,
-      ...red, ...green, ...blue, ...yellow,
+      ...blue,
+      ...yellow,
+      ...purple,
+      ...black,
+      ...white,
+      ...red,
+      ...green,
+      ...blue,
+      ...yellow,
+      ...purple,
+      ...black,
+      ...white,
+      ...red,
+      ...green,
+      ...blue,
+      ...yellow,
 
-      ...yellow, ...purple, ...black, ...white,
-      ...red, ...green, ...blue, ...yellow,
-      ...purple, ...black, ...white, ...red,
-      ...green, ...blue, ...yellow, ...purple
+      ...yellow,
+      ...purple,
+      ...black,
+      ...white,
+      ...red,
+      ...green,
+      ...blue,
+      ...yellow,
+      ...purple,
+      ...black,
+      ...white,
+      ...red,
+      ...green,
+      ...blue,
+      ...yellow,
+      ...purple
     ]);
     const tex = this.device.createTexture3D(TextureFormat.RGBA8UNORM, 4, 4, 4, {
       colorSpace: 'linear',
@@ -286,7 +424,9 @@ export class TestTexture3D extends TextureTestCase {
   }
   protected updateBindGroup(t: number, w: number, h: number) {
     const vpMatrix = Matrix4x4.multiply(Matrix4x4.perspective(Math.PI / 3, w / h, 1, 10), this.viewMatrix);
-    const matrix = this.animate ? Matrix4x4.multiply(vpMatrix, Matrix4x4.rotationY((t * 0.001) % (2 * Math.PI))) : vpMatrix;
+    const matrix = this.animate
+      ? Matrix4x4.multiply(vpMatrix, Matrix4x4.rotationY((t * 0.001) % (2 * Math.PI)))
+      : vpMatrix;
     this.bindgroup.setValue('mvpMatrix', matrix);
   }
 }
@@ -295,7 +435,11 @@ export class TestTextureCube extends TextureTestCase {
   private viewMatrix: Matrix4x4;
   constructor(device: Device, assetManager: AssetManager) {
     super(device, assetManager);
-    this.viewMatrix = Matrix4x4.lookAt(new Vector3(3, 3, 3), Vector3.zero(), Vector3.axisPY()).inplaceInverseAffine();
+    this.viewMatrix = Matrix4x4.lookAt(
+      new Vector3(3, 3, 3),
+      Vector3.zero(),
+      Vector3.axisPY()
+    ).inplaceInverseAffine();
   }
   protected createProgram(): GPUProgram {
     const pb = new ProgramBuilder(this.device);
@@ -315,13 +459,16 @@ export class TestTextureCube extends TextureTestCase {
         this.$outputs.color = pb.vec4();
         this.$mainFunc(function () {
           this.$outputs.color = pb.textureSample(this.tex, pb.normalize(this.$inputs.texcoord));
-          this.$outputs.color = pb.vec4(pb.pow(this.$outputs.color.xyz, pb.vec3(1 / 2.2)), this.$outputs.color.w);
+          this.$outputs.color = pb.vec4(
+            pb.pow(this.$outputs.color.xyz, pb.vec3(1 / 2.2)),
+            this.$outputs.color.w
+          );
         });
       }
     });
   }
   protected async createTexture(): Promise<BaseTexture> {
-    return await this.assetManager.fetchTexture('./assets/images/sky2.dds', null, true) as TextureCube;
+    return (await this.assetManager.fetchTexture('./assets/images/sky2.dds', null, true)) as TextureCube;
   }
   protected createBindGroup(): BindGroup {
     const bindGroup = this.device.createBindGroup(this.program.bindGroupLayouts[0]);
@@ -330,7 +477,9 @@ export class TestTextureCube extends TextureTestCase {
   }
   protected updateBindGroup(t: number, w: number, h: number) {
     const vpMatrix = Matrix4x4.multiply(Matrix4x4.perspective(Math.PI / 3, w / h, 1, 10), this.viewMatrix);
-    const matrix = this.animate ? Matrix4x4.multiply(vpMatrix, Matrix4x4.rotationY((t * 0.001) % (2 * Math.PI))) : vpMatrix;
+    const matrix = this.animate
+      ? Matrix4x4.multiply(vpMatrix, Matrix4x4.rotationY((t * 0.001) % (2 * Math.PI)))
+      : vpMatrix;
     this.bindgroup.setValue('mvpMatrix', matrix);
   }
 }
@@ -340,7 +489,11 @@ export class TestTextureCubeSH extends TextureTestCase {
   private shCoeff: Vector3[];
   constructor(device: Device, assetManager: AssetManager) {
     super(device, assetManager);
-    this.viewMatrix = Matrix4x4.lookAt(new Vector3(3, 3, 3), Vector3.zero(), Vector3.axisPY()).inplaceInverseAffine();
+    this.viewMatrix = Matrix4x4.lookAt(
+      new Vector3(3, 3, 3),
+      Vector3.zero(),
+      Vector3.axisPY()
+    ).inplaceInverseAffine();
     this.shCoeff = Array.from({ length: 9 }).map(() => Vector3.zero());
   }
   protected createProgram(): GPUProgram {
@@ -357,7 +510,19 @@ export class TestTextureCubeSH extends TextureTestCase {
         });
       },
       fragment() {
-        const structSH = pb.defineStruct('SH', 'std140', pb.vec3('c0'), pb.vec3('c1'), pb.vec3('c2'), pb.vec3('c3'), pb.vec3('c4'), pb.vec3('c5'), pb.vec3('c6'), pb.vec3('c7'), pb.vec3('c8'));
+        const structSH = pb.defineStruct(
+          'SH',
+          'std140',
+          pb.vec3('c0'),
+          pb.vec3('c1'),
+          pb.vec3('c2'),
+          pb.vec3('c3'),
+          pb.vec3('c4'),
+          pb.vec3('c5'),
+          pb.vec3('c6'),
+          pb.vec3('c7'),
+          pb.vec3('c8')
+        );
         this.sh = structSH().uniform(0);
         this.$outputs.color = pb.vec4();
         this.$function('Y0', [pb.vec3('v')], function () {
@@ -399,13 +564,16 @@ export class TestTextureCubeSH extends TextureTestCase {
           this.c = pb.add(this.c, pb.mul(this.sh.c7, this.Y7(this.v)));
           this.c = pb.add(this.c, pb.mul(this.sh.c8, this.Y8(this.v)));
           this.$outputs.color = pb.vec4(this.c, 1);
-          this.$outputs.color = pb.vec4(pb.pow(this.$outputs.color.xyz, pb.vec3(1 / 2.2)), this.$outputs.color.w);
+          this.$outputs.color = pb.vec4(
+            pb.pow(this.$outputs.color.xyz, pb.vec3(1 / 2.2)),
+            this.$outputs.color.w
+          );
         });
       }
     });
   }
   protected async createTexture(): Promise<BaseTexture> {
-    const tex = await this.assetManager.fetchTexture('./assets/images/sky2.dds') as TextureCube;
+    const tex = (await this.assetManager.fetchTexture('./assets/images/sky2.dds')) as TextureCube;
     this.shCoeff = await projectCubemapCPU(tex);
     console.log(this.shCoeff);
     return tex;
@@ -421,13 +589,15 @@ export class TestTextureCubeSH extends TextureTestCase {
       c5: this.shCoeff[5],
       c6: this.shCoeff[6],
       c7: this.shCoeff[7],
-      c8: this.shCoeff[8],
+      c8: this.shCoeff[8]
     });
     return bindGroup;
   }
   protected updateBindGroup(t: number, w: number, h: number) {
     const vpMatrix = Matrix4x4.multiply(Matrix4x4.perspective(Math.PI / 3, w / h, 1, 10), this.viewMatrix);
-    const matrix = this.animate ? Matrix4x4.multiply(vpMatrix, Matrix4x4.rotationY((t * 0.001) % (2 * Math.PI))) : vpMatrix;
+    const matrix = this.animate
+      ? Matrix4x4.multiply(vpMatrix, Matrix4x4.rotationY((t * 0.001) % (2 * Math.PI)))
+      : vpMatrix;
     this.bindgroup.setValue('mvpMatrix', matrix);
   }
 }

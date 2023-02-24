@@ -1,5 +1,19 @@
 import { Vector4, TypedArray } from '@sophon/base';
-import { TextureFormat, WebGLContext, PrimitiveType, hasAlphaChannel, hasRedChannel, hasGreenChannel, hasBlueChannel, isIntegerTextureFormat, isSignedTextureFormat, isFloatTextureFormat, getTextureFormatBlockSize, isCompressedTextureFormat, isDepthTextureFormat } from '../base_types';
+import {
+  TextureFormat,
+  WebGLContext,
+  PrimitiveType,
+  hasAlphaChannel,
+  hasRedChannel,
+  hasGreenChannel,
+  hasBlueChannel,
+  isIntegerTextureFormat,
+  isSignedTextureFormat,
+  isFloatTextureFormat,
+  getTextureFormatBlockSize,
+  isCompressedTextureFormat,
+  isDepthTextureFormat
+} from '../base_types';
 import { isWebGL2, WebGLError } from './utils';
 import { WebGLEnum } from './webgl_enum';
 import { WebGLTexture2D } from './texture2d_webgl';
@@ -33,13 +47,26 @@ import {
   TextureImageElement,
   Texture2DArray,
   TextureCreationOptions,
-  BufferCreationOptions,
+  BufferCreationOptions
 } from '../gpuobject';
 import { WebGLTextureCap, WebGLFramebufferCap, WebGLMiscCap, WebGLShaderCap } from './capabilities_webgl';
 import { WebGLBindGroup } from './bindgroup_webgl';
 import { WebGLGPUProgram } from './gpuprogram_webgl';
 import { primitiveTypeMap, typeMap } from './constants_webgl';
-import { GPUProgramConstructParams, Device, DeviceType, DeviceTypeWebGL, TextureCaps, MiscCaps, FramebufferCaps, ShaderCaps, RenderProgramConstructParams, DeviceOptions, DeviceLostEvent, DeviceRestoreEvent } from '../device';
+import {
+  GPUProgramConstructParams,
+  Device,
+  DeviceType,
+  DeviceTypeWebGL,
+  TextureCaps,
+  MiscCaps,
+  FramebufferCaps,
+  ShaderCaps,
+  RenderProgramConstructParams,
+  DeviceOptions,
+  DeviceLostEvent,
+  DeviceRestoreEvent
+} from '../device';
 import { RenderStateSet } from '../render_states';
 import { SamplerCache } from './sampler_cache';
 import { WebGLStructuredBuffer } from './structuredbuffer_webgl';
@@ -68,7 +95,13 @@ export interface VertexArrayObjectEXT {
 
 export interface InstancedArraysEXT {
   drawArraysInstanced: (mode: GLenum, first: GLint, count: GLsizei, primcount: GLsizei) => void;
-  drawElementsInstanced: (mode: GLenum, count: GLsizei, type: GLenum, offset: GLintptr, primcount: GLsizei) => void;
+  drawElementsInstanced: (
+    mode: GLenum,
+    count: GLsizei,
+    type: GLenum,
+    offset: GLintptr,
+    primcount: GLsizei
+  ) => void;
   vertexAttribDivisor: (index: GLuint, divisor: GLuint) => void;
 }
 
@@ -108,15 +141,12 @@ export class WebGLDevice extends Device {
     this._canvas.style.outline = 'none';
     this._isRendering = false;
     let context: WebGLContext = null;
-    context = this._canvas.getContext(
-      type,
-      {
-        antialias: !!options?.msaa,
-        depth: true,
-        stencil: true,
-        premultipliedAlpha: false
-      },
-    ) as WebGLContext;
+    context = this._canvas.getContext(type, {
+      antialias: !!options?.msaa,
+      depth: true,
+      stencil: true,
+      premultipliedAlpha: false
+    }) as WebGLContext;
     if (!context) {
       this._deviceType = null;
       throw new Error('Invalid argument or no webgl support');
@@ -139,15 +169,23 @@ export class WebGLDevice extends Device {
     this._samplerCache = new SamplerCache(this);
     this._renderStatesOverridden = null;
     this._loseContextExtension = this._context.getExtension('WEBGL_lose_context');
-    this._canvas.addEventListener('webglcontextlost', evt => {
-      this._contextLost = true;
-      evt.preventDefault();
-      this.handleContextLost();
-    }, false);
-    this._canvas.addEventListener('webglcontextrestored', evt => {
-      this._contextLost = false;
-      this.handleContextRestored();
-    }, false);
+    this._canvas.addEventListener(
+      'webglcontextlost',
+      (evt) => {
+        this._contextLost = true;
+        evt.preventDefault();
+        this.handleContextLost();
+      },
+      false
+    );
+    this._canvas.addEventListener(
+      'webglcontextrestored',
+      (evt) => {
+        this._contextLost = false;
+        this.handleContextRestored();
+      },
+      false
+    );
   }
   get context() {
     return this._context;
@@ -214,7 +252,7 @@ export class WebGLDevice extends Device {
   }
   async initContext() {
     this.initContextState();
-    this.addDefaultEventListener('resize', evt => {
+    this.addDefaultEventListener('resize', (evt) => {
       const width = Math.max(1, Math.round(this._canvas.clientWidth * this._dpr));
       const height = Math.max(1, Math.round(this._canvas.clientHeight * this._dpr));
       if (width !== this._canvas.width || height !== this._canvas.height) {
@@ -263,8 +301,13 @@ export class WebGLDevice extends Device {
   createSampler(options: SamplerOptions): TextureSampler {
     return this._samplerCache.fetchSampler(options);
   }
-  createTexture2D(format: TextureFormat, width: number, height: number, options?: TextureCreationOptions): Texture2D {
-    const tex = options?.texture as WebGLTexture2D ?? new WebGLTexture2D(this);
+  createTexture2D(
+    format: TextureFormat,
+    width: number,
+    height: number,
+    options?: TextureCreationOptions
+  ): Texture2D {
+    const tex = (options?.texture as WebGLTexture2D) ?? new WebGLTexture2D(this);
     if (!tex.isTexture2D()) {
       console.error('createTexture2D() failed: options.texture must be 2d texture');
       return null;
@@ -273,7 +316,7 @@ export class WebGLDevice extends Device {
     return tex;
   }
   createTexture2DFromMipmapData(data: TextureMipmapData, options?: TextureCreationOptions): Texture2D {
-    const tex = options?.texture as WebGLTexture2D ?? new WebGLTexture2D(this);
+    const tex = (options?.texture as WebGLTexture2D) ?? new WebGLTexture2D(this);
     if (!tex.isTexture2D()) {
       console.error('createTexture2DFromMipmapData() failed: options.texture must be 2d texture');
       return null;
@@ -282,7 +325,7 @@ export class WebGLDevice extends Device {
     return tex;
   }
   createTexture2DFromImage(element: TextureImageElement, options?: TextureCreationOptions): Texture2D {
-    const tex = options?.texture as WebGLTexture2D ?? new WebGLTexture2D(this);
+    const tex = (options?.texture as WebGLTexture2D) ?? new WebGLTexture2D(this);
     if (!tex.isTexture2D()) {
       console.error('createTexture2DFromImage() failed: options.texture must be 2d texture');
       return null;
@@ -290,8 +333,14 @@ export class WebGLDevice extends Device {
     tex.loadFromElement(element, this.parseTextureOptions(options));
     return tex;
   }
-  createTexture2DArray(format: TextureFormat, width: number, height: number, depth: number, options?: TextureCreationOptions): Texture2DArray {
-    const tex = options?.texture as WebGLTexture2DArray ?? new WebGLTexture2DArray(this);
+  createTexture2DArray(
+    format: TextureFormat,
+    width: number,
+    height: number,
+    depth: number,
+    options?: TextureCreationOptions
+  ): Texture2DArray {
+    const tex = (options?.texture as WebGLTexture2DArray) ?? new WebGLTexture2DArray(this);
     if (!tex.isTexture2DArray()) {
       console.error('createTexture2DArray() failed: options.texture must be 2d array texture');
       return null;
@@ -299,12 +348,18 @@ export class WebGLDevice extends Device {
     tex.createEmpty(format, width, height, depth, this.parseTextureOptions(options));
     return tex;
   }
-  createTexture3D(format: TextureFormat, width: number, height: number, depth: number, options?: TextureCreationOptions): Texture3D {
+  createTexture3D(
+    format: TextureFormat,
+    width: number,
+    height: number,
+    depth: number,
+    options?: TextureCreationOptions
+  ): Texture3D {
     if (!this.isWebGL2) {
       console.error('device does not support 3d texture');
       return null;
     }
-    const tex = options?.texture as WebGLTexture3D ?? new WebGLTexture3D(this);
+    const tex = (options?.texture as WebGLTexture3D) ?? new WebGLTexture3D(this);
     if (!tex.isTexture3D()) {
       console.error('createTexture3D() failed: options.texture must be 3d texture');
       return null;
@@ -313,7 +368,7 @@ export class WebGLDevice extends Device {
     return tex;
   }
   createCubeTexture(format: TextureFormat, size: number, options?: TextureCreationOptions): TextureCube {
-    const tex = options?.texture as WebGLTextureCube ?? new WebGLTextureCube(this);
+    const tex = (options?.texture as WebGLTextureCube) ?? new WebGLTextureCube(this);
     if (!tex.isTextureCube()) {
       console.error('createCubeTexture() failed: options.texture must be cube texture');
       return null;
@@ -322,7 +377,7 @@ export class WebGLDevice extends Device {
     return tex;
   }
   createCubeTextureFromMipmapData(data: TextureMipmapData, options?: TextureCreationOptions): TextureCube {
-    const tex = options?.texture as WebGLTextureCube ?? new WebGLTextureCube(this);
+    const tex = (options?.texture as WebGLTextureCube) ?? new WebGLTextureCube(this);
     if (!tex.isTextureCube()) {
       console.error('createCubeTextureFromMipmapData() failed: options.texture must be cube texture');
       return null;
@@ -338,7 +393,13 @@ export class WebGLDevice extends Device {
       throw new Error('device does not support compute shader');
     }
     const renderProgramParams = params.params as RenderProgramConstructParams;
-    return new WebGLGPUProgram(this, renderProgramParams.vs, renderProgramParams.fs, renderProgramParams.bindGroupLayouts, renderProgramParams.vertexAttributes);
+    return new WebGLGPUProgram(
+      this,
+      renderProgramParams.vs,
+      renderProgramParams.fs,
+      renderProgramParams.bindGroupLayouts,
+      renderProgramParams.vertexAttributes
+    );
   }
   createBindGroup(layout: BindGroupLayout): BindGroup {
     return new WebGLBindGroup(this, layout);
@@ -349,7 +410,11 @@ export class WebGLDevice extends Device {
   createIndexBuffer(data: Uint16Array | Uint32Array, options?: BufferCreationOptions): IndexBuffer {
     return new WebGLIndexBuffer(this, data, this.parseBufferOptions(options, 'index'));
   }
-  createStructuredBuffer(structureType: PBStructTypeInfo, options?: BufferCreationOptions, data?: TypedArray): StructuredBuffer {
+  createStructuredBuffer(
+    structureType: PBStructTypeInfo,
+    options?: BufferCreationOptions,
+    data?: TypedArray
+  ): StructuredBuffer {
     return new WebGLStructuredBuffer(this, structureType, this.parseBufferOptions(options), data);
   }
   createVAO(vertexData: VertexData): VertexInputLayout {
@@ -374,14 +439,26 @@ export class WebGLDevice extends Device {
       this._context.viewport(0, 0, this.drawingBufferWidth, this.drawingBufferHeight);
     } else if (Array.isArray(x)) {
       this._currentViewport = [...x];
-      this._context.viewport(this.screenToDevice(x[0]), this.screenToDevice(x[1]), this.screenToDevice(x[2]), this.screenToDevice(x[3]));
+      this._context.viewport(
+        this.screenToDevice(x[0]),
+        this.screenToDevice(x[1]),
+        this.screenToDevice(x[2]),
+        this.screenToDevice(x[3])
+      );
     } else {
       this._currentViewport = [x, y, w, h];
-      this._context.viewport(this.screenToDevice(x), this.screenToDevice(y), this.screenToDevice(w), this.screenToDevice(h));
+      this._context.viewport(
+        this.screenToDevice(x),
+        this.screenToDevice(y),
+        this.screenToDevice(w),
+        this.screenToDevice(h)
+      );
     }
   }
   getViewport(): number[] {
-    return this._currentViewport ? [...this._currentViewport] : [0, 0, this.deviceToScreen(this.drawingBufferWidth), this.deviceToScreen(this.drawingBufferHeight)];
+    return this._currentViewport
+      ? [...this._currentViewport]
+      : [0, 0, this.deviceToScreen(this.drawingBufferWidth), this.deviceToScreen(this.drawingBufferHeight)];
   }
   setScissor(scissor?: number[]);
   setScissor(x: number, y: number, w: number, h: number): void;
@@ -391,14 +468,26 @@ export class WebGLDevice extends Device {
       this._context.scissor(0, 0, this.drawingBufferWidth, this.drawingBufferHeight);
     } else if (Array.isArray(x)) {
       this._currentScissorRect = [...x];
-      this._context.scissor(this.screenToDevice(x[0]), this.screenToDevice(x[1]), this.screenToDevice(x[2]), this.screenToDevice(x[3]));
+      this._context.scissor(
+        this.screenToDevice(x[0]),
+        this.screenToDevice(x[1]),
+        this.screenToDevice(x[2]),
+        this.screenToDevice(x[3])
+      );
     } else {
       this._currentScissorRect = [x, y, w, h];
-      this._context.scissor(this.screenToDevice(x), this.screenToDevice(y), this.screenToDevice(w), this.screenToDevice(h));
+      this._context.scissor(
+        this.screenToDevice(x),
+        this.screenToDevice(y),
+        this.screenToDevice(w),
+        this.screenToDevice(h)
+      );
     }
   }
   getScissor(): number[] {
-    return this._currentScissorRect ? [...this._currentScissorRect] : [0, 0, this.deviceToScreen(this.drawingBufferWidth), this.deviceToScreen(this.drawingBufferHeight)];
+    return this._currentScissorRect
+      ? [...this._currentScissorRect]
+      : [0, 0, this.deviceToScreen(this.drawingBufferWidth), this.deviceToScreen(this.drawingBufferHeight)];
   }
   setProgram(program: GPUProgram) {
     this._currentProgram = program as WebGLGPUProgram;
@@ -438,7 +527,7 @@ export class WebGLDevice extends Device {
   }
   reverseVertexWindingOrder(reverse: boolean): void {
     this._reverseWindingOrder = !!reverse;
-    this._context.frontFace(reverse ? this._context.CW : this._context.CCW)
+    this._context.frontFace(reverse ? this._context.CW : this._context.CCW);
   }
   isWindingOrderReversed(): boolean {
     return !!this._reverseWindingOrder;
@@ -479,7 +568,10 @@ export class WebGLDevice extends Device {
     } else if (size === 4) {
       glType = float ? WebGLEnum.FLOAT : signed ? WebGLEnum.INT : WebGLEnum.UNSIGNED_INT;
     }
-    if ((glFormat !== WebGLEnum.RGBA || (glType !== WebGLEnum.UNSIGNED_BYTE && glType !== WebGLEnum.FLOAT)) && !isWebGL2(this.context)) {
+    if (
+      (glFormat !== WebGLEnum.RGBA || (glType !== WebGLEnum.UNSIGNED_BYTE && glType !== WebGLEnum.FLOAT)) &&
+      !isWebGL2(this.context)
+    ) {
       throw new Error(`readPixels() failed: invalid format: ${format}`);
     }
     const byteSize = w * h * pixelSize;
@@ -499,7 +591,15 @@ export class WebGLDevice extends Device {
       await stagingBuffer.getBufferSubData(data);
       stagingBuffer.dispose();
     } else {
-      this.context.readPixels(x, y, w, h, glFormat, glType, new Uint8Array(buffer.buffer, buffer.byteOffset, buffer.byteLength));
+      this.context.readPixels(
+        x,
+        y,
+        w,
+        h,
+        glFormat,
+        glType,
+        new Uint8Array(buffer.buffer, buffer.byteOffset, buffer.byteLength)
+      );
     }
   }
   readPixelsToBuffer(x: number, y: number, w: number, h: number, buffer: GPUDataBuffer): void {
@@ -569,8 +669,7 @@ export class WebGLDevice extends Device {
     return !this._contextLost;
   }
   /** @internal */
-  protected onEndFrame(): void {
-  }
+  protected onEndFrame(): void {}
   /** @internal */
   protected _draw(primitiveType: PrimitiveType, first: number, count: number): void {
     if (this._currentVertexData) {
@@ -606,7 +705,12 @@ export class WebGLDevice extends Device {
     }
   }
   /** @internal */
-  protected _drawInstanced(primitiveType: PrimitiveType, first: number, count: number, numInstances: number): void {
+  protected _drawInstanced(
+    primitiveType: PrimitiveType,
+    first: number,
+    count: number,
+    numInstances: number
+  ): void {
     if (this.instancedArraysExt && this._currentVertexData) {
       this._currentVertexData.bind();
       if (this._currentProgram) {
@@ -629,14 +733,14 @@ export class WebGLDevice extends Device {
           count,
           typeMap[indexBuffer.indexType.primitiveType],
           first * (indexBuffer.indexType === typeU16 ? 2 : 4),
-          numInstances,
+          numInstances
         );
       } else {
         this.instancedArraysExt.drawArraysInstanced(
           primitiveTypeMap[primitiveType],
           first,
           count,
-          numInstances,
+          numInstances
         );
       }
     }
@@ -652,16 +756,16 @@ export class WebGLDevice extends Device {
       return {
         vertexAttribDivisor: gl.vertexAttribDivisor.bind(gl),
         drawArraysInstanced: gl.drawArraysInstanced.bind(gl),
-        drawElementsInstanced: gl.drawElementsInstanced.bind(gl),
+        drawElementsInstanced: gl.drawElementsInstanced.bind(gl)
       };
     } else {
       const extInstancedArray: ANGLE_instanced_arrays = gl.getExtension('ANGLE_instanced_arrays');
       return extInstancedArray
         ? {
-          vertexAttribDivisor: extInstancedArray.vertexAttribDivisorANGLE.bind(extInstancedArray),
-          drawArraysInstanced: extInstancedArray.drawArraysInstancedANGLE.bind(extInstancedArray),
-          drawElementsInstanced: extInstancedArray.drawElementsInstancedANGLE.bind(extInstancedArray),
-        }
+            vertexAttribDivisor: extInstancedArray.vertexAttribDivisorANGLE.bind(extInstancedArray),
+            drawArraysInstanced: extInstancedArray.drawArraysInstancedANGLE.bind(extInstancedArray),
+            drawElementsInstanced: extInstancedArray.drawElementsInstancedANGLE.bind(extInstancedArray)
+          }
         : null;
     }
   }
@@ -670,14 +774,14 @@ export class WebGLDevice extends Device {
     const gl = this._context;
     if (isWebGL2(gl)) {
       return {
-        drawBuffers: gl.drawBuffers.bind(gl),
-      }
+        drawBuffers: gl.drawBuffers.bind(gl)
+      };
     } else {
       const extDrawBuffers: WEBGL_draw_buffers = gl.getExtension('WEBGL_draw_buffers');
       return extDrawBuffers
         ? {
-          drawBuffers: extDrawBuffers.drawBuffersWEBGL.bind(extDrawBuffers),
-        }
+            drawBuffers: extDrawBuffers.drawBuffersWEBGL.bind(extDrawBuffers)
+          }
         : null;
     }
   }
@@ -689,17 +793,17 @@ export class WebGLDevice extends Device {
         createVertexArray: gl.createVertexArray.bind(gl),
         bindVertexArray: gl.bindVertexArray.bind(gl),
         deleteVertexArray: gl.deleteVertexArray.bind(gl),
-        isVertexArray: gl.isVertexArray.bind(gl),
+        isVertexArray: gl.isVertexArray.bind(gl)
       };
     } else {
       const extVAO: OES_vertex_array_object = gl.getExtension('OES_vertex_array_object');
       return extVAO
         ? {
-          createVertexArray: extVAO.createVertexArrayOES.bind(extVAO),
-          bindVertexArray: extVAO.bindVertexArrayOES.bind(extVAO),
-          deleteVertexArray: extVAO.deleteVertexArrayOES.bind(extVAO),
-          isVertexArray: extVAO.isVertexArrayOES.bind(extVAO),
-        }
+            createVertexArray: extVAO.createVertexArrayOES.bind(extVAO),
+            bindVertexArray: extVAO.bindVertexArrayOES.bind(extVAO),
+            deleteVertexArray: extVAO.deleteVertexArrayOES.bind(extVAO),
+            isVertexArray: extVAO.isVertexArrayOES.bind(extVAO)
+          }
         : null;
     }
   }
@@ -727,7 +831,7 @@ export class WebGLDevice extends Device {
       this._isRendering = false;
       this.reloadAll().then(() => {
         this.dispatchEvent(new DeviceRestoreEvent());
-        this.runLoop(this._runLoopFunc)
+        this.runLoop(this._runLoopFunc);
       });
     }
   }

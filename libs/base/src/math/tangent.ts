@@ -3,13 +3,13 @@ export function calculateTangentVectors(
   normals: number[],
   texcoords: number[],
   indices: number[],
-  withHandedness: boolean,
+  withHandedness: boolean
 ): number[] {
   const numTangentCompnents = withHandedness ? 4 : 3;
   const tangents = Array.from({
-    length: (vertices.length / 3) * numTangentCompnents,
+    length: (vertices.length / 3) * numTangentCompnents
   }).map(() => 0);
-  const bitangents = Array.from({length: vertices.length}).map(() => 0);
+  const bitangents = Array.from({ length: vertices.length }).map(() => 0);
   for (let i = 0; i < indices.length; i += 3) {
     const i0 = indices[i + 0];
     const i1 = indices[i + 1];

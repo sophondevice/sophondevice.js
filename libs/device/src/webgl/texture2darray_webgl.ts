@@ -19,7 +19,15 @@ export class WebGLTexture2DArray extends WebGLBaseTexture implements Texture2DAr
   init(): void {
     this.loadEmpty(this._format, this._width, this._height, this._depth, this._mipLevelCount);
   }
-  update(data: TypedArray, xOffset: number, yOffset: number, zOffset: number, width: number, height: number, depth: number): void {
+  update(
+    data: TypedArray,
+    xOffset: number,
+    yOffset: number,
+    zOffset: number,
+    width: number,
+    height: number,
+    depth: number
+  ): void {
     if (this._device.isContextLost()) {
       return;
     }
@@ -41,7 +49,7 @@ export class WebGLTexture2DArray extends WebGLBaseTexture implements Texture2DAr
       depth,
       params.glFormat,
       params.glType[0],
-      data,
+      data
     );
     if (this._mipLevelCount > 1) {
       this.generateMipmaps();
@@ -55,7 +63,7 @@ export class WebGLTexture2DArray extends WebGLBaseTexture implements Texture2DAr
     x: number,
     y: number,
     width: number,
-    height: number,
+    height: number
   ): void {
     if (this._device.isContextLost()) {
       return;
@@ -79,7 +87,7 @@ export class WebGLTexture2DArray extends WebGLBaseTexture implements Texture2DAr
         1,
         params.glFormat,
         params.glType[0],
-        data,
+        data
       );
     } else {
       const cvs = document.createElement('canvas');
@@ -98,7 +106,7 @@ export class WebGLTexture2DArray extends WebGLBaseTexture implements Texture2DAr
         1,
         params.glFormat,
         params.glType[0],
-        cvs,
+        cvs
       );
       cvs.width = 0;
       cvs.height = 0;
@@ -107,12 +115,21 @@ export class WebGLTexture2DArray extends WebGLBaseTexture implements Texture2DAr
       this.generateMipmaps();
     }
   }
-  createEmpty(format: TextureFormat, width: number, height: number, depth: number, creationFlags?: number): void {
+  createEmpty(
+    format: TextureFormat,
+    width: number,
+    height: number,
+    depth: number,
+    creationFlags?: number
+  ): void {
     this._flags = Number(creationFlags) || 0;
     if (this._flags & GPUResourceUsageFlags.TF_WRITABLE) {
       console.error(new Error('webgl device does not support storage texture'));
     } else {
-      format = (this._flags & GPUResourceUsageFlags.TF_LINEAR_COLOR_SPACE) ? format : linearTextureFormatToSRGB(format);
+      format =
+        this._flags & GPUResourceUsageFlags.TF_LINEAR_COLOR_SPACE
+          ? format
+          : linearTextureFormatToSRGB(format);
       this.loadEmpty(format, width, height, depth, 0);
     }
   }
@@ -124,7 +141,7 @@ export class WebGLTexture2DArray extends WebGLBaseTexture implements Texture2DAr
     }
   }
   readPixels(layer: number, x: number, y: number, w: number, h: number, buffer: TypedArray): Promise<void> {
-    return new Promise<void>(resolve => {
+    return new Promise<void>((resolve) => {
       const fb = this._device.createFrameBuffer({
         colorAttachments: [{ texture: this, layer }]
       });
@@ -155,7 +172,13 @@ export class WebGLTexture2DArray extends WebGLBaseTexture implements Texture2DAr
     this._device.setScissor(...savedScissor);
     fb.dispose();
   }
-  private loadEmpty(format: TextureFormat, width: number, height: number, depth: number, numMipLevels: number): void {
+  private loadEmpty(
+    format: TextureFormat,
+    width: number,
+    height: number,
+    depth: number,
+    numMipLevels: number
+  ): void {
     this.allocInternal(format, width, height, depth, numMipLevels);
     if (this._mipLevelCount > 1 && !this._device.isContextLost()) {
       this.generateMipmaps();

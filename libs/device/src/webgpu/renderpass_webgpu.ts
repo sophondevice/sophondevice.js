@@ -1,17 +1,17 @@
-import { Vector4 } from "@sophon/base";
-import { hasStencilChannel, PrimitiveType } from "../base_types";
-import { WebGPUProgram } from "./gpuprogram_webgpu";
-import { WebGPURenderStateSet } from "./renderstates_webgpu";
-import { WebGPUBindGroup } from "./bindgroup_webgpu";
-import { typeU16 } from "../builder";
-import { WebGPUMipmapGenerator, WebGPUClearQuad } from "./utils_webgpu";
-import type { WebGPUBaseTexture } from "./basetexture_webgpu";
-import type { WebGPUBuffer } from "./buffer_webgpu";
-import type { WebGPUDevice } from "./device";
-import type { WebGPUFrameBuffer } from "./framebuffer_webgpu";
-import type { WebGPUVertexInputLayout } from "./vertexinputlayout_webgpu";
-import type { WebGPUIndexBuffer } from "./indexbuffer_webgpu";
-import type { FrameBufferInfo } from "./pipeline_cache";
+import { Vector4 } from '@sophon/base';
+import { hasStencilChannel, PrimitiveType } from '../base_types';
+import { WebGPUProgram } from './gpuprogram_webgpu';
+import { WebGPURenderStateSet } from './renderstates_webgpu';
+import { WebGPUBindGroup } from './bindgroup_webgpu';
+import { typeU16 } from '../builder';
+import { WebGPUMipmapGenerator, WebGPUClearQuad } from './utils_webgpu';
+import type { WebGPUBaseTexture } from './basetexture_webgpu';
+import type { WebGPUBuffer } from './buffer_webgpu';
+import type { WebGPUDevice } from './device';
+import type { WebGPUFrameBuffer } from './framebuffer_webgpu';
+import type { WebGPUVertexInputLayout } from './vertexinputlayout_webgpu';
+import type { WebGPUIndexBuffer } from './indexbuffer_webgpu';
+import type { FrameBufferInfo } from './pipeline_cache';
 
 const VALIDATION_NEED_NEW_PASS = 1 << 0;
 const VALIDATION_NEED_GENERATE_MIPMAP = 1 << 1;
@@ -68,7 +68,14 @@ export class WebGPURenderPass {
     if (x === undefined || x === null) {
       this._currentViewport = null;
       if (this._renderPassEncoder) {
-        this._renderPassEncoder.setViewport(0, 0, this._device.drawingBufferWidth, this._device.drawingBufferHeight, 0, 1);
+        this._renderPassEncoder.setViewport(
+          0,
+          0,
+          this._device.drawingBufferWidth,
+          this._device.drawingBufferHeight,
+          0,
+          1
+        );
       }
     } else {
       const vx = this._device.screenToDevice(x);
@@ -76,7 +83,9 @@ export class WebGPURenderPass {
       const vw = this._device.screenToDevice(w);
       const vh = this._device.screenToDevice(h);
       if (vx < 0 || vy < 0 || vw > this._device.drawingBufferWidth || vh > this._device.drawingBufferHeight) {
-        console.log(`** VIEWPORT ERROR **: (${vx}, ${vy}, ${vw}, ${vh}) => (0, 0, ${this._device.drawingBufferWidth}, ${this._device.drawingBufferHeight})`);
+        console.log(
+          `** VIEWPORT ERROR **: (${vx}, ${vy}, ${vw}, ${vh}) => (0, 0, ${this._device.drawingBufferWidth}, ${this._device.drawingBufferHeight})`
+        );
       }
       this._currentViewport = [x, y, w, h];
       if (this._renderPassEncoder) {
@@ -87,7 +96,12 @@ export class WebGPURenderPass {
   getViewport(): number[] {
     return this._currentViewport
       ? [...this._currentViewport]
-      : [0, 0, this._device.deviceToScreen(this._device.drawingBufferWidth), this._device.deviceToScreen(this._device.drawingBufferHeight)];
+      : [
+          0,
+          0,
+          this._device.deviceToScreen(this._device.drawingBufferWidth),
+          this._device.deviceToScreen(this._device.drawingBufferHeight)
+        ];
   }
   setScissor();
   setScissor(x: number, y: number, w: number, h: number): void;
@@ -95,7 +109,12 @@ export class WebGPURenderPass {
     if (x === undefined || x === null) {
       this._currentScissor = null;
       if (this._renderPassEncoder) {
-        this._renderPassEncoder.setScissorRect(0, 0, this._device.drawingBufferWidth, this._device.drawingBufferHeight);
+        this._renderPassEncoder.setScissorRect(
+          0,
+          0,
+          this._device.drawingBufferWidth,
+          this._device.drawingBufferHeight
+        );
       }
     } else {
       this._currentScissor = [x, y, w, h];
@@ -111,11 +130,26 @@ export class WebGPURenderPass {
   getScissor(): number[] {
     return this._currentScissor
       ? [...this._currentScissor]
-      : [0, 0, this._device.deviceToScreen(this._device.drawingBufferWidth), this._device.deviceToScreen(this._device.drawingBufferHeight)];
+      : [
+          0,
+          0,
+          this._device.deviceToScreen(this._device.drawingBufferWidth),
+          this._device.deviceToScreen(this._device.drawingBufferHeight)
+        ];
   }
-  draw(program: WebGPUProgram, vertexData: WebGPUVertexInputLayout, stateSet: WebGPURenderStateSet, bindGroups: WebGPUBindGroup[], bindGroupOffsets: Iterable<number>[], primitiveType: PrimitiveType, first: number, count: number, numInstances: number): void {
+  draw(
+    program: WebGPUProgram,
+    vertexData: WebGPUVertexInputLayout,
+    stateSet: WebGPURenderStateSet,
+    bindGroups: WebGPUBindGroup[],
+    bindGroupOffsets: Iterable<number>[],
+    primitiveType: PrimitiveType,
+    first: number,
+    count: number,
+    numInstances: number
+  ): void {
     const validation = this.validateDraw(program, vertexData, bindGroups);
-    if ((validation & VALIDATION_NEED_NEW_PASS) || (validation & VALIDATION_NEED_GENERATE_MIPMAP)) {
+    if (validation & VALIDATION_NEED_NEW_PASS || validation & VALIDATION_NEED_GENERATE_MIPMAP) {
       this.end();
     }
     if (validation & VALIDATION_NEED_GENERATE_MIPMAP) {
@@ -125,7 +159,18 @@ export class WebGPURenderPass {
       if (!this.active) {
         this.begin();
       }
-      this.drawInternal(this._renderPassEncoder, program, vertexData, stateSet, bindGroups, bindGroupOffsets, primitiveType, first, count, numInstances);
+      this.drawInternal(
+        this._renderPassEncoder,
+        program,
+        vertexData,
+        stateSet,
+        bindGroups,
+        bindGroupOffsets,
+        primitiveType,
+        first,
+        count,
+        numInstances
+      );
     }
   }
   clear(color: Vector4, depth: number, stencil: number): void {
@@ -160,7 +205,7 @@ export class WebGPURenderPass {
         depthFormat: this._device.backbufferDepthFormat,
         sampleCount: this._device.sampleCount,
         hash: `${this._device.backbufferFormat}:${this._device.backbufferDepthFormat}:${this._device.sampleCount}`
-      }
+      };
       const mainPassDesc = this._device.defaultRenderPassDesc;
       const colorAttachmentDesc = this._device.defaultRenderPassDesc.colorAttachments[0];
       if (this._frameBufferInfo.sampleCount > 1) {
@@ -183,16 +228,21 @@ export class WebGPURenderPass {
       if (depthAttachmentTexture) {
         depthAttachmentTexture._markAsCurrentFB(true);
         const attachment = this._frameBuffer.options.depthAttachment;
-        const layer = depthAttachmentTexture.isTexture2DArray() || depthAttachmentTexture.isTexture3D() ? attachment.layer : 0;
+        const layer =
+          depthAttachmentTexture.isTexture2DArray() || depthAttachmentTexture.isTexture3D()
+            ? attachment.layer
+            : 0;
         depthTextureView = depthAttachmentTexture.getView(attachment.level ?? 0, layer ?? 0, 1);
       }
       this._frameBufferInfo = {
-        colorFormats: colorAttachmentTextures.map(val => val.gpuFormat),
+        colorFormats: colorAttachmentTextures.map((val) => val.gpuFormat),
         depthFormat: depthAttachmentTexture?.gpuFormat,
         sampleCount: 1,
-        hash: null,
+        hash: null
       };
-      this._frameBufferInfo.hash = `${this._frameBufferInfo.colorFormats.join('-')}:${this._frameBufferInfo.depthFormat}:${this._frameBufferInfo.sampleCount}`;
+      this._frameBufferInfo.hash = `${this._frameBufferInfo.colorFormats.join('-')}:${
+        this._frameBufferInfo.depthFormat
+      }:${this._frameBufferInfo.sampleCount}`;
       this._fbBindFlag = this._frameBuffer.bindFlag;
       const passDesc: GPURenderPassDescriptor = {
         label: `customRenderPass:${this._frameBufferInfo.hash}`,
@@ -200,26 +250,37 @@ export class WebGPURenderPass {
           const tex = attachment.texture as WebGPUBaseTexture;
           if (tex) {
             tex._markAsCurrentFB(true);
-            const layer = (tex.isTexture2DArray() || tex.isTexture3D()) ? attachment.layer : tex.isTextureCube() ? attachment.face : 0;
+            const layer =
+              tex.isTexture2DArray() || tex.isTexture3D()
+                ? attachment.layer
+                : tex.isTextureCube()
+                ? attachment.face
+                : 0;
             return {
               view: tex.getView(attachment.level ?? 0, layer ?? 0, 1),
               loadOp: color ? 'clear' : 'load',
               clearValue: color?.getArray(),
-              storeOp: 'store',
-            } as GPURenderPassColorAttachment
+              storeOp: 'store'
+            } as GPURenderPassColorAttachment;
           } else {
             return null;
           }
         }),
-        depthStencilAttachment: depthAttachmentTexture ? {
-          view: depthTextureView,
-          depthLoadOp: typeof depth === 'number' ? 'clear' : 'load',
-          depthClearValue: depth,
-          depthStoreOp: 'store',
-          stencilLoadOp: hasStencilChannel(depthAttachmentTexture.format) ? typeof stencil === 'number' ? 'clear' : 'load' : undefined,
-          stencilClearValue: stencil,
-          stencilStoreOp: hasStencilChannel(depthAttachmentTexture.format) ? 'store' : undefined,
-        } : undefined
+        depthStencilAttachment: depthAttachmentTexture
+          ? {
+              view: depthTextureView,
+              depthLoadOp: typeof depth === 'number' ? 'clear' : 'load',
+              depthClearValue: depth,
+              depthStoreOp: 'store',
+              stencilLoadOp: hasStencilChannel(depthAttachmentTexture.format)
+                ? typeof stencil === 'number'
+                  ? 'clear'
+                  : 'load'
+                : undefined,
+              stencilClearValue: stencil,
+              stencilStoreOp: hasStencilChannel(depthAttachmentTexture.format) ? 'store' : undefined
+            }
+          : undefined
       };
       this._renderPassEncoder = this._renderCommandEncoder.beginRenderPass(passDesc);
     }
@@ -250,9 +311,26 @@ export class WebGPURenderPass {
       }
     }
   }
-  private drawInternal(renderPassEncoder: GPURenderPassEncoder, program: WebGPUProgram, vertexData: WebGPUVertexInputLayout, stateSet: WebGPURenderStateSet, bindGroups: WebGPUBindGroup[], bindGroupOffsets: Iterable<number>[], primitiveType: PrimitiveType, first: number, count: number, numInstances: number): void {
+  private drawInternal(
+    renderPassEncoder: GPURenderPassEncoder,
+    program: WebGPUProgram,
+    vertexData: WebGPUVertexInputLayout,
+    stateSet: WebGPURenderStateSet,
+    bindGroups: WebGPUBindGroup[],
+    bindGroupOffsets: Iterable<number>[],
+    primitiveType: PrimitiveType,
+    first: number,
+    count: number,
+    numInstances: number
+  ): void {
     if (this.setBindGroupsForRender(renderPassEncoder, program, vertexData, bindGroups, bindGroupOffsets)) {
-      const pipeline = this._device.pipelineCache.fetchRenderPipeline(program, vertexData, stateSet, primitiveType, this._frameBufferInfo);
+      const pipeline = this._device.pipelineCache.fetchRenderPipeline(
+        program,
+        vertexData,
+        stateSet,
+        primitiveType,
+        this._frameBufferInfo
+      );
       if (pipeline) {
         renderPassEncoder.setPipeline(pipeline);
         const stencilState = stateSet?.stencilState;
@@ -266,7 +344,10 @@ export class WebGPURenderPass {
           });
           const indexBuffer = vertexData.getIndexBuffer() as WebGPUIndexBuffer;
           if (indexBuffer) {
-            renderPassEncoder.setIndexBuffer(indexBuffer.object, indexBuffer.indexType === typeU16 ? 'uint16' : 'uint32');
+            renderPassEncoder.setIndexBuffer(
+              indexBuffer.object,
+              indexBuffer.indexType === typeU16 ? 'uint16' : 'uint32'
+            );
             renderPassEncoder.drawIndexed(count, numInstances, first);
           } else {
             renderPassEncoder.draw(count, numInstances, first);
@@ -277,7 +358,11 @@ export class WebGPURenderPass {
       }
     }
   }
-  private validateDraw(program: WebGPUProgram, vertexData: WebGPUVertexInputLayout, bindGroups: WebGPUBindGroup[]): number {
+  private validateDraw(
+    program: WebGPUProgram,
+    vertexData: WebGPUVertexInputLayout,
+    bindGroups: WebGPUBindGroup[]
+  ): number {
     let validation = 0;
     if (bindGroups) {
       for (const bindGroup of bindGroups) {
@@ -327,7 +412,13 @@ export class WebGPURenderPass {
     }
     return validation;
   }
-  private setBindGroupsForRender(renderPassEncoder: GPURenderPassEncoder, program: WebGPUProgram, vertexData: WebGPUVertexInputLayout, bindGroups: WebGPUBindGroup[], bindGroupOffsets: Iterable<number>[]): boolean {
+  private setBindGroupsForRender(
+    renderPassEncoder: GPURenderPassEncoder,
+    program: WebGPUProgram,
+    vertexData: WebGPUVertexInputLayout,
+    bindGroups: WebGPUBindGroup[],
+    bindGroupOffsets: Iterable<number>[]
+  ): boolean {
     if (bindGroups) {
       for (let i = 0; i < bindGroups.length; i++) {
         if (bindGroups[i]) {
@@ -347,11 +438,14 @@ export class WebGPURenderPass {
       this._renderPassEncoder.end();
       this._renderPassEncoder = null;
     }
-    this._bufferUploads.forEach(buffer => buffer.beginSyncChanges(this._uploadCommandEncoder));
-    this._textureUploads.forEach(tex => tex.beginSyncChanges(this._uploadCommandEncoder));
-    this._device.device.queue.submit([this._uploadCommandEncoder.finish(), this._renderCommandEncoder.finish()]);
-    this._bufferUploads.forEach(buffer => buffer.endSyncChanges());
-    this._textureUploads.forEach(tex => tex.endSyncChanges());
+    this._bufferUploads.forEach((buffer) => buffer.beginSyncChanges(this._uploadCommandEncoder));
+    this._textureUploads.forEach((tex) => tex.beginSyncChanges(this._uploadCommandEncoder));
+    this._device.device.queue.submit([
+      this._uploadCommandEncoder.finish(),
+      this._renderCommandEncoder.finish()
+    ]);
+    this._bufferUploads.forEach((buffer) => buffer.endSyncChanges());
+    this._textureUploads.forEach((tex) => tex.endSyncChanges());
     this._bufferUploads.clear();
     this._textureUploads.clear();
     this._uploadCommandEncoder = null;

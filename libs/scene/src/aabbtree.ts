@@ -28,37 +28,37 @@ export class AABBTree {
     if (other) {
       this._primitivesInfo = other._primitivesInfo
         ? {
-          vertices: other._primitivesInfo.vertices?.map((value) => new Vector3(value)),
-          indices: other._primitivesInfo.indices?.map((value) => value),
-          primitiveType: other._primitivesInfo.primitiveType,
-        }
+            vertices: other._primitivesInfo.vertices?.map((value) => new Vector3(value)),
+            indices: other._primitivesInfo.indices?.map((value) => value),
+            primitiveType: other._primitivesInfo.primitiveType
+          }
         : null;
       this._nodes = other._nodes
         ? other._nodes.map((value) => {
-          return {
-            box: new AABB(value.box),
-            triangles: value.triangles?.map((val) => val),
-            axis: value.axis,
-            left: value.left,
-            right: value.right,
-          };
-        })
+            return {
+              box: new AABB(value.box),
+              triangles: value.triangles?.map((val) => val),
+              axis: value.axis,
+              left: value.left,
+              right: value.right
+            };
+          })
         : null;
     }
   }
   buildFromPrimitives(
     vertices: number[] | TypedArray,
     indices: number[] | TypedArray,
-    primitiveType: PrimitiveType,
+    primitiveType: PrimitiveType
   ) {
     this._primitivesInfo = {
       vertices: [],
       indices: null,
-      primitiveType: primitiveType,
+      primitiveType: primitiveType
     };
     for (let i = 0; i < vertices.length; i += 3) {
       this._primitivesInfo.vertices.push(
-        new Vector3(vertices[i] as number, vertices[i + 1] as number, vertices[i + 2] as number),
+        new Vector3(vertices[i] as number, vertices[i + 1] as number, vertices[i + 2] as number)
       );
     }
     if (indices) {
@@ -90,9 +90,7 @@ export class AABBTree {
     const numTris = this._verifyNode(0);
     const n = this._getNumTriangles();
     if (numTris !== n) {
-      throw new Error(
-        `AABB tree verification failed: triangle count mismatch, got ${numTris}, expect ${n}`,
-      );
+      throw new Error(`AABB tree verification failed: triangle count mismatch, got ${numTris}, expect ${n}`);
     }
   }
   /** @internal */
@@ -135,7 +133,7 @@ export class AABBTree {
     nodeIndex: number,
     triangles: number[],
     triangleMin: [number, number, number][],
-    triangleMax: [number, number, number][],
+    triangleMax: [number, number, number][]
   ) {
     const node = this._nodes[nodeIndex];
     if (triangles.length === 1) {
@@ -145,7 +143,7 @@ export class AABBTree {
         node.box.extents,
         triangles,
         triangleMin,
-        triangleMax,
+        triangleMax
       ));
       const sizeMax = node.box.extents.getArray()[splitAxis];
       const sizeCenter = node.box.center.getArray()[splitAxis];
@@ -178,7 +176,7 @@ export class AABBTree {
           triangles: [],
           axis: -1,
           left: -1,
-          right: -1,
+          right: -1
         });
         node.left = this._nodes.length - 1;
         this._buildNode(this._nodes.length - 1, leftTriangles, triangleMin, triangleMax);
@@ -189,7 +187,7 @@ export class AABBTree {
           triangles: [],
           axis: -1,
           left: -1,
-          right: -1,
+          right: -1
         });
         node.right = this._nodes.length - 1;
         this._buildNode(this._nodes.length - 1, rightTriangles, triangleMin, triangleMax);
@@ -201,7 +199,7 @@ export class AABBTree {
     extents: Vector3,
     triangles: number[],
     triangleMin: [number, number, number][],
-    triangleMax: [number, number, number][],
+    triangleMax: [number, number, number][]
   ): number {
     const dx = extents.x,
       dy = extents.y,
@@ -375,7 +373,7 @@ export class AABBTree {
       triangles: [],
       axis: -1,
       left: -1,
-      right: -1,
+      right: -1
     };
     rootNode.box.beginExtend();
     for (let i = 0; i < numTriangles; i++) {
@@ -387,14 +385,14 @@ export class AABBTree {
       const min: [number, number, number] = [
         Math.min(Math.min(v0.x, v1.x), v2.x),
         Math.min(Math.min(v0.y, v1.y), v2.y),
-        Math.min(Math.min(v0.z, v1.z), v2.z),
+        Math.min(Math.min(v0.z, v1.z), v2.z)
       ];
       rootNode.box.extend3(min[0], min[1], min[2]);
       triangleMin.push(min);
       const max: [number, number, number] = [
         Math.max(Math.max(v0.x, v1.x), v2.x),
         Math.max(Math.max(v0.y, v1.y), v2.y),
-        Math.max(Math.max(v0.z, v1.z), v2.z),
+        Math.max(Math.max(v0.z, v1.z), v2.z)
       ];
       rootNode.box.extend3(max[0], max[1], max[2]);
       triangleMax.push(max);

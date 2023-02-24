@@ -68,7 +68,10 @@ export class Mesh extends GraphNode implements BatchDrawable {
       if (this._primitive) {
         this._primitive.addBoundingboxChangeCallback(this._bboxChangeCallback);
       }
-      this._instanceHash = (this._primitive && this._material) ? `${this.constructor.name}:${this._scene.id}:${this._primitive.id}:${this._material.id}` : null;
+      this._instanceHash =
+        this._primitive && this._material
+          ? `${this.constructor.name}:${this._scene.id}:${this._primitive.id}:${this._material.id}`
+          : null;
       this.invalidateBoundingVolume();
     }
   }
@@ -78,7 +81,10 @@ export class Mesh extends GraphNode implements BatchDrawable {
   set material(m: Material) {
     if (this._material !== m) {
       this._material = m;
-      this._instanceHash = (this._primitive && this._material) ? `${this.constructor.name}:${this._scene.id}:${this._primitive.id}:${this._material.id}` : null;
+      this._instanceHash =
+        this._primitive && this._material
+          ? `${this.constructor.name}:${this._scene.id}:${this._primitive.id}:${this._material.id}`
+          : null;
     }
   }
   get drawBoundingBox(): boolean {
@@ -197,10 +203,7 @@ export class Mesh extends GraphNode implements BatchDrawable {
 }
 
 export class BoxMesh extends Mesh {
-  constructor(
-    scene: Scene,
-    options?: IBoxCreationOptions & { material?: Material },
-  ) {
+  constructor(scene: Scene, options?: IBoxCreationOptions & { material?: Material }) {
     super(scene);
     this.primitive = new BoxShape(scene.device, options);
     this.material = options.material;
@@ -220,7 +223,7 @@ export class PlaneMesh extends Mesh {
       sizeX?: number;
       sizeY?: number;
       material?: Material;
-    },
+    }
   ) {
     super(scene);
     this.primitive = new PlaneShape(scene.device, options);
@@ -241,7 +244,7 @@ export class SphereMesh extends Mesh {
       verticalDetail?: number;
       horizonalDetail?: number;
       material?: Material;
-    },
+    }
   ) {
     super(scene);
     this.primitive = new SphereShape(scene.device, options);

@@ -1,7 +1,7 @@
-import { Matrix4x4, Vector3, nextPowerOf2 } from "@sophon/base";
-import { Texture2D, TextureFormat, Device } from "@sophon/device";
-import { SkinnedBoundingBox } from "./animation";
-import type { SceneNode } from "./scene_node";
+import { Matrix4x4, Vector3, nextPowerOf2 } from '@sophon/base';
+import { Texture2D, TextureFormat, Device } from '@sophon/device';
+import { SkinnedBoundingBox } from './animation';
+import type { SceneNode } from './scene_node';
 
 const tmpV0 = new Vector3();
 const tmpV1 = new Vector3();
@@ -35,24 +35,48 @@ export class Skeleton {
     }
     for (let i = 0; i < this._joints.length; i++) {
       const mat = this._jointMatrices[i];
-      Matrix4x4.multiply(jointTransforms ? jointTransforms[i] : this._joints[i].worldMatrix, this._inverseBindMatrices[i], mat);
+      Matrix4x4.multiply(
+        jointTransforms ? jointTransforms[i] : this._joints[i].worldMatrix,
+        this._inverseBindMatrices[i],
+        mat
+      );
     }
   }
   computeBindPose(device: Device) {
     this.updateJointMatrices(device, this._bindPoseMatrices);
-    this._jointTexture.update(this._jointMatrixArray, 0, 0, this._jointTexture.width, this._jointTexture.height);
+    this._jointTexture.update(
+      this._jointMatrixArray,
+      0,
+      0,
+      this._jointTexture.width,
+      this._jointTexture.height
+    );
   }
   computeJoints(device: Device) {
     this.updateJointMatrices(device);
-    this._jointTexture.update(this._jointMatrixArray, 0, 0, this._jointTexture.width, this._jointTexture.height);
+    this._jointTexture.update(
+      this._jointMatrixArray,
+      0,
+      0,
+      this._jointTexture.width,
+      this._jointTexture.height
+    );
   }
   computeBoundingBox(info: SkinnedBoundingBox, invWorldMatrix: Matrix4x4) {
     info.boundingBox.beginExtend();
     for (let i = 0; i < info.boundingVertices.length; i++) {
-      this._jointMatrices[info.boundingVertexBlendIndices[i * 4 + 0]].transformPointAffine(info.boundingVertices[i], tmpV0).scaleBy(info.boundingVertexJointWeights[i * 4 + 0]);
-      this._jointMatrices[info.boundingVertexBlendIndices[i * 4 + 1]].transformPointAffine(info.boundingVertices[i], tmpV1).scaleBy(info.boundingVertexJointWeights[i * 4 + 1]);
-      this._jointMatrices[info.boundingVertexBlendIndices[i * 4 + 2]].transformPointAffine(info.boundingVertices[i], tmpV2).scaleBy(info.boundingVertexJointWeights[i * 4 + 2]);
-      this._jointMatrices[info.boundingVertexBlendIndices[i * 4 + 3]].transformPointAffine(info.boundingVertices[i], tmpV3).scaleBy(info.boundingVertexJointWeights[i * 4 + 3]);
+      this._jointMatrices[info.boundingVertexBlendIndices[i * 4 + 0]]
+        .transformPointAffine(info.boundingVertices[i], tmpV0)
+        .scaleBy(info.boundingVertexJointWeights[i * 4 + 0]);
+      this._jointMatrices[info.boundingVertexBlendIndices[i * 4 + 1]]
+        .transformPointAffine(info.boundingVertices[i], tmpV1)
+        .scaleBy(info.boundingVertexJointWeights[i * 4 + 1]);
+      this._jointMatrices[info.boundingVertexBlendIndices[i * 4 + 2]]
+        .transformPointAffine(info.boundingVertices[i], tmpV2)
+        .scaleBy(info.boundingVertexJointWeights[i * 4 + 2]);
+      this._jointMatrices[info.boundingVertexBlendIndices[i * 4 + 3]]
+        .transformPointAffine(info.boundingVertices[i], tmpV3)
+        .scaleBy(info.boundingVertexJointWeights[i * 4 + 3]);
       tmpV0.addBy(tmpV1).addBy(tmpV2).addBy(tmpV3);
       invWorldMatrix.transformPointAffine(tmpV0, tmpV0);
       info.boundingBox.extend(tmpV0);
@@ -66,6 +90,8 @@ export class Skeleton {
       noMipmap: true
     });
     this._jointMatrixArray = new Float32Array(textureWidth * textureWidth * 4);
-    this._jointMatrices = this._joints.map((val, index) => new Matrix4x4(this._jointMatrixArray.subarray(index * 16, index * 16 + 16)));
+    this._jointMatrices = this._joints.map(
+      (val, index) => new Matrix4x4(this._jointMatrixArray.subarray(index * 16, index * 16 + 16))
+    );
   }
 }

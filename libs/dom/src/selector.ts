@@ -14,7 +14,7 @@ const enum Combine {
   DESCEND,
   CHILD,
   SIBLING,
-  ADJACENT,
+  ADJACENT
 }
 
 const enum Op {
@@ -22,7 +22,7 @@ const enum Op {
   EQUAL,
   CONTAINS,
   START,
-  END,
+  END
 }
 
 const enum Filter {
@@ -33,7 +33,7 @@ const enum Filter {
   COMBINE,
   ATTRIBUTE,
   PSEUDO_CLASS,
-  PSEUDO_ELEMENT,
+  PSEUDO_ELEMENT
 }
 
 interface FilterInfo {
@@ -68,7 +68,7 @@ export class Rule {
     roots: RNode[],
     up: boolean,
     allowInternal: boolean,
-    pseudoElementCallback?: IPseudoElementCallback,
+    pseudoElementCallback?: IPseudoElementCallback
   ) {
     const allElements: Set<RNode> = new Set();
     roots.forEach((root) => {
@@ -100,11 +100,7 @@ export class Rule {
     }
   }
   /** @internal */
-  private _traverseElement(
-    element: RNode,
-    allowInternal: boolean,
-    cb: (element: RNode) => void,
-  ): void {
+  private _traverseElement(element: RNode, allowInternal: boolean, cb: (element: RNode) => void): void {
     if (allowInternal || !element._isInternal()) {
       if (allowInternal || element.nodeType === RNode.ELEMENT_NODE) {
         cb(element as RElement);
@@ -116,72 +112,69 @@ export class Rule {
   /** @internal */
   private _check(filter: FilterInfo, element: RNode): boolean {
     switch (filter.type) {
-    case Filter.TAGNAME:
-      return (
-        element.nodeType === RNode.ELEMENT_NODE && (element as RElement).tagName === filter.name
-      );
-    case Filter.CLASS:
-      return (
-        element.nodeType === RNode.ELEMENT_NODE &&
-          (element as RElement).classList.contains(filter.name)
-      );
-    case Filter.ID:
-      return element.nodeType === RNode.ELEMENT_NODE && (element as RElement).id === filter.name;
-    case Filter.ATTRIBUTE: {
-      if (element.nodeType === RNode.ELEMENT_NODE) {
-        const val = (element as RElement).getAttribute(filter.attribKey);
-        switch (filter.attribOp) {
-        case Op.ANY:
-          return val !== undefined;
-        case Op.CONTAINS:
-          return typeof val === 'string' && val.indexOf(filter.attribValue) >= 0;
-        case Op.EQUAL:
-          return val === filter.attribValue;
-        case Op.START:
-          return typeof val === 'string' && val.indexOf(filter.attribValue) === 0;
-        case Op.END:
-          return (
-            typeof val === 'string' &&
+      case Filter.TAGNAME:
+        return element.nodeType === RNode.ELEMENT_NODE && (element as RElement).tagName === filter.name;
+      case Filter.CLASS:
+        return (
+          element.nodeType === RNode.ELEMENT_NODE && (element as RElement).classList.contains(filter.name)
+        );
+      case Filter.ID:
+        return element.nodeType === RNode.ELEMENT_NODE && (element as RElement).id === filter.name;
+      case Filter.ATTRIBUTE: {
+        if (element.nodeType === RNode.ELEMENT_NODE) {
+          const val = (element as RElement).getAttribute(filter.attribKey);
+          switch (filter.attribOp) {
+            case Op.ANY:
+              return val !== undefined;
+            case Op.CONTAINS:
+              return typeof val === 'string' && val.indexOf(filter.attribValue) >= 0;
+            case Op.EQUAL:
+              return val === filter.attribValue;
+            case Op.START:
+              return typeof val === 'string' && val.indexOf(filter.attribValue) === 0;
+            case Op.END:
+              return (
+                typeof val === 'string' &&
                 val.length >= filter.attribValue.length &&
                 val.substr(-filter.attribValue.length) === filter.attribValue
-          );
-        default:
+              );
+            default:
+              return false;
+          }
+        } else {
           return false;
         }
-      } else {
-        return false;
       }
-    }
-    case Filter.PSEUDO_CLASS: {
-      switch (filter.name) {
-      case 'hover':
-        return element._isHover();
-      case 'active':
-        return element._isActive();
-      case 'disabled':
-        return false;
-      case 'empty':
-        return element.childNodes.length === 0;
-      case 'enabled':
+      case Filter.PSEUDO_CLASS: {
+        switch (filter.name) {
+          case 'hover':
+            return element._isHover();
+          case 'active':
+            return element._isActive();
+          case 'disabled':
+            return false;
+          case 'empty':
+            return element.childNodes.length === 0;
+          case 'enabled':
+            return true;
+          case 'first-child':
+            return !element.previousSibling;
+          case 'last-child':
+            return !element.nextSibling;
+          case 'only-child':
+            return !element.previousSibling && !element.nextSibling;
+          case 'focus':
+            return element.gui.getFocus() === element;
+          case 'focus-within':
+            return !!element.gui.getFocus()?._isSucceedingOf(element);
+          default:
+            return false;
+        }
+      }
+      case Filter.NONE:
         return true;
-      case 'first-child':
-        return !element.previousSibling;
-      case 'last-child':
-        return !element.nextSibling;
-      case 'only-child':
-        return !element.previousSibling && !element.nextSibling;
-      case 'focus':
-        return element.gui.getFocus() === element;
-      case 'focus-within':
-        return !!element.gui.getFocus()?._isSucceedingOf(element);
       default:
         return false;
-      }
-    }
-    case Filter.NONE:
-      return true;
-    default:
-      return false;
     }
   }
   /** @internal */
@@ -191,88 +184,88 @@ export class Rule {
     targets: Set<RNode>,
     allowInternal: boolean,
     elementSet?: Set<RNode>,
-    pseudoElementCallback?: IPseudoElementCallback,
+    pseudoElementCallback?: IPseudoElementCallback
   ) {
     const prevIt = filter.getPrev();
     const lastFilter = prevIt.valid() ? prevIt.data : null;
     switch (filter.data.type) {
-    case Filter.NONE:
-    case Filter.TAGNAME:
-    case Filter.CLASS:
-    case Filter.ID:
-    case Filter.PSEUDO_CLASS:
-    case Filter.ATTRIBUTE: {
-      if (lastFilter === null || lastFilter.type !== Filter.COMBINE) {
-        if (this._check(filter.data, last)) {
-          targets.add(last);
-        }
-      } else if (lastFilter) {
-        switch (lastFilter.combineType) {
-        case Combine.CHILD: {
-          last._getChildren().forEach((child) => {
-            if (
-              child.nodeType === RNode.ELEMENT_NODE &&
+      case Filter.NONE:
+      case Filter.TAGNAME:
+      case Filter.CLASS:
+      case Filter.ID:
+      case Filter.PSEUDO_CLASS:
+      case Filter.ATTRIBUTE: {
+        if (lastFilter === null || lastFilter.type !== Filter.COMBINE) {
+          if (this._check(filter.data, last)) {
+            targets.add(last);
+          }
+        } else if (lastFilter) {
+          switch (lastFilter.combineType) {
+            case Combine.CHILD: {
+              last._getChildren().forEach((child) => {
+                if (
+                  child.nodeType === RNode.ELEMENT_NODE &&
                   elementSet.has(child) &&
                   this._check(filter.data, child as RElement)
-            ) {
-              targets.add(child as RElement);
-            }
-          });
-          break;
-        }
-        case Combine.DESCEND: {
-          last._getChildren().forEach((child) => {
-            if (child.nodeType === RNode.ELEMENT_NODE) {
-              this._traverseElement(child as RElement, allowInternal, (el) => {
-                if (elementSet.has(el) && this._check(filter.data, el)) {
-                  targets.add(el);
+                ) {
+                  targets.add(child as RElement);
                 }
               });
+              break;
             }
-          });
-          break;
-        }
-        case Combine.SIBLING: {
-          let next = last.nextSibling;
-          while (next) {
-            if (
-              next.nodeType === RNode.ELEMENT_NODE &&
+            case Combine.DESCEND: {
+              last._getChildren().forEach((child) => {
+                if (child.nodeType === RNode.ELEMENT_NODE) {
+                  this._traverseElement(child as RElement, allowInternal, (el) => {
+                    if (elementSet.has(el) && this._check(filter.data, el)) {
+                      targets.add(el);
+                    }
+                  });
+                }
+              });
+              break;
+            }
+            case Combine.SIBLING: {
+              let next = last.nextSibling;
+              while (next) {
+                if (
+                  next.nodeType === RNode.ELEMENT_NODE &&
                   elementSet.has(next) &&
                   this._check(filter.data, next as RElement)
-            ) {
-              targets.add(next as RElement);
+                ) {
+                  targets.add(next as RElement);
+                }
+                next = next.nextSibling;
+              }
+              break;
             }
-            next = next.nextSibling;
-          }
-          break;
-        }
-        case Combine.ADJACENT: {
-          const next = last.nextSibling;
-          if (
-            next &&
+            case Combine.ADJACENT: {
+              const next = last.nextSibling;
+              if (
+                next &&
                 next.nodeType === RNode.ELEMENT_NODE &&
                 elementSet.has(next) &&
                 this._check(filter.data, next as RElement)
-          ) {
-            targets.add(next as RElement);
+              ) {
+                targets.add(next as RElement);
+              }
+              break;
+            }
           }
-          break;
         }
-        }
+        break;
       }
-      break;
-    }
-    case Filter.PSEUDO_ELEMENT: {
-      if (
-        pseudoElementCallback &&
+      case Filter.PSEUDO_ELEMENT: {
+        if (
+          pseudoElementCallback &&
           lastFilter &&
           lastFilter.type !== Filter.COMBINE &&
           !filter.getNext().valid()
-      ) {
-        pseudoElementCallback(last, filter.data.name);
+        ) {
+          pseudoElementCallback(last, filter.data.name);
+        }
+        break;
       }
-      break;
-    }
     }
   }
 }
@@ -368,7 +361,7 @@ export class RSelector {
     if (rWS.exec(s)) {
       return [null, ''];
     }
-    const info = {numIds: 0, numClasses: 0, numTypes: 0} as FilterInfo;
+    const info = { numIds: 0, numClasses: 0, numTypes: 0 } as FilterInfo;
     let combine = rCombine.exec(s);
     if (combine && combine[0] === '') {
       combine = null;
@@ -377,39 +370,14 @@ export class RSelector {
       info.combineType = Combine.NONE;
       s = s.trim();
       switch (s[0]) {
-      case '*': {
-        info.type = Filter.NONE;
-        s = s.substr(1);
-        break;
-      }
-      case '.': {
-        info.numClasses++;
-        info.type = Filter.CLASS;
-        s = s.substr(1);
-        const match = rIdentifier.exec(s);
-        if (!match) {
-          return null;
+        case '*': {
+          info.type = Filter.NONE;
+          s = s.substr(1);
+          break;
         }
-        info.name = match[1];
-        s = s.substr(match[0].length);
-        break;
-      }
-      case '#': {
-        info.numIds++;
-        info.type = Filter.ID;
-        s = s.substr(1);
-        const match = rIdentifier.exec(s);
-        if (!match) {
-          return null;
-        }
-        info.name = match[1];
-        s = s.substr(match[0].length);
-        break;
-      }
-      case ':': {
-        info.numClasses++;
-        if (s[1] !== ':') {
-          info.type = Filter.PSEUDO_CLASS;
+        case '.': {
+          info.numClasses++;
+          info.type = Filter.CLASS;
           s = s.substr(1);
           const match = rIdentifier.exec(s);
           if (!match) {
@@ -417,78 +385,103 @@ export class RSelector {
           }
           info.name = match[1];
           s = s.substr(match[0].length);
-        } else {
-          info.type = Filter.PSEUDO_ELEMENT;
-          s = s.substr(2);
+          break;
+        }
+        case '#': {
+          info.numIds++;
+          info.type = Filter.ID;
+          s = s.substr(1);
           const match = rIdentifier.exec(s);
           if (!match) {
             return null;
           }
           info.name = match[1];
           s = s.substr(match[0].length);
-        }
-        break;
-      }
-      case '[': {
-        info.numClasses++;
-        info.type = Filter.ATTRIBUTE;
-        s = s.substr(1);
-        const matchKey = rIdentifier.exec(s);
-        if (!matchKey) {
-          return null;
-        }
-        info.attribKey = matchKey[1];
-        s = s.substr(matchKey[0].length);
-        const matchOp = rOp.exec(s);
-        if (!matchOp) {
-          return null;
-        }
-        switch (matchOp[1]) {
-        case '=':
-          info.attribOp = Op.EQUAL;
-          break;
-        case '~=':
-        case '*=':
-          info.attribOp = Op.CONTAINS;
-          break;
-        case '|=':
-        case '^=':
-          info.attribOp = Op.START;
-          break;
-        case '$=':
-          info.attribOp = Op.END;
-          break;
-        default:
-          info.attribOp = Op.ANY;
           break;
         }
-        s = s.substr(matchOp[0].length);
-        if (info.attribOp !== Op.ANY) {
-          const matchValue = (s[0] === "'" || s[0] === '"' ? rLiteral : rIdentifier).exec(s);
-          if (!matchValue) {
+        case ':': {
+          info.numClasses++;
+          if (s[1] !== ':') {
+            info.type = Filter.PSEUDO_CLASS;
+            s = s.substr(1);
+            const match = rIdentifier.exec(s);
+            if (!match) {
+              return null;
+            }
+            info.name = match[1];
+            s = s.substr(match[0].length);
+          } else {
+            info.type = Filter.PSEUDO_ELEMENT;
+            s = s.substr(2);
+            const match = rIdentifier.exec(s);
+            if (!match) {
+              return null;
+            }
+            info.name = match[1];
+            s = s.substr(match[0].length);
+          }
+          break;
+        }
+        case '[': {
+          info.numClasses++;
+          info.type = Filter.ATTRIBUTE;
+          s = s.substr(1);
+          const matchKey = rIdentifier.exec(s);
+          if (!matchKey) {
             return null;
           }
-          info.attribValue = matchValue[1] || matchValue[2];
-          s = s.substr(matchValue[0].length);
+          info.attribKey = matchKey[1];
+          s = s.substr(matchKey[0].length);
+          const matchOp = rOp.exec(s);
+          if (!matchOp) {
+            return null;
+          }
+          switch (matchOp[1]) {
+            case '=':
+              info.attribOp = Op.EQUAL;
+              break;
+            case '~=':
+            case '*=':
+              info.attribOp = Op.CONTAINS;
+              break;
+            case '|=':
+            case '^=':
+              info.attribOp = Op.START;
+              break;
+            case '$=':
+              info.attribOp = Op.END;
+              break;
+            default:
+              info.attribOp = Op.ANY;
+              break;
+          }
+          s = s.substr(matchOp[0].length);
+          if (info.attribOp !== Op.ANY) {
+            const matchValue = (s[0] === "'" || s[0] === '"' ? rLiteral : rIdentifier).exec(s);
+            if (!matchValue) {
+              return null;
+            }
+            info.attribValue = matchValue[1] || matchValue[2];
+            s = s.substr(matchValue[0].length);
+          }
+          const matchCloseBracket = rCloseBracket.exec(s);
+          if (!matchCloseBracket) {
+            return null;
+          }
+          s = s.substr(matchCloseBracket[0].length);
+          break;
         }
-        const matchCloseBracket = rCloseBracket.exec(s);
-        if (!matchCloseBracket) {
-          return null;
+        default: {
+          info.numTypes++;
+          info.type = Filter.TAGNAME;
+          const match = rIdentifier.exec(s);
+          if (!match) {
+            return null;
+          }
+          info.name = match[1];
+          s = s.substr(match[0].length);
+          break;
         }
-        s = s.substr(matchCloseBracket[0].length);
-        break;
-      }
-      default: {
-        info.numTypes++;
-        info.type = Filter.TAGNAME;
-        const match = rIdentifier.exec(s);
-        if (!match) {
-          return null;
-        }
-        info.name = match[1];
-        s = s.substr(match[0].length);
-        break;
-      }
       }
     } else {
       s = s.substr(combine[0].length);

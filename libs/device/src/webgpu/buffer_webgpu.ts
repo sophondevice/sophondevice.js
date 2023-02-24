@@ -81,7 +81,10 @@ export class WebGPUBuffer extends WebGPUObject<GPUBuffer> implements GPUDataBuff
         } else {
           const start = Math.min(dstByteOffset, upload.uploadOffset);
           const end = Math.max(dstByteOffset + uploadSize, upload.uploadOffset + upload.uploadSize);
-          if (end - start < uploadSize + upload.uploadSize && this._device.currentPass?.isBufferUploading(this)) {
+          if (
+            end - start < uploadSize + upload.uploadSize &&
+            this._device.currentPass?.isBufferUploading(this)
+          ) {
             // data overlaps and previous data is in use, refresh data by restarting current render pass or compute pass
             this._device.currentPass.end();
             // now, the pending uploads should be cleared
@@ -96,10 +99,16 @@ export class WebGPUBuffer extends WebGPUObject<GPUBuffer> implements GPUDataBuff
         this.pushUpload(newPendings, null, 0, dstByteOffset, uploadSize);
       }
       this._pendingUploads = newPendings;
-      new Uint8Array(this._pendingUploads[0].mappedBuffer.mappedRange, writeOffset, writeSize).set(new Uint8Array(data.buffer, uploadOffset, writeSize));
+      new Uint8Array(this._pendingUploads[0].mappedBuffer.mappedRange, writeOffset, writeSize).set(
+        new Uint8Array(data.buffer, uploadOffset, writeSize)
+      );
     }
   }
-  async getBufferSubData(dstBuffer?: Uint8Array, offsetInBytes?: number, sizeInBytes?: number): Promise<Uint8Array> {
+  async getBufferSubData(
+    dstBuffer?: Uint8Array,
+    offsetInBytes?: number,
+    sizeInBytes?: number
+  ): Promise<Uint8Array> {
     if (!(this._usage & GPUResourceUsageFlags.BF_READ)) {
       throw new Error('getBufferSubData() failed: buffer does not have BF_READ flag set');
     }
@@ -138,7 +147,13 @@ export class WebGPUBuffer extends WebGPUObject<GPUBuffer> implements GPUDataBuff
     if (this._pendingUploads.length > 0) {
       const cmdEncoder = encoder || this._device.device.createCommandEncoder();
       for (const upload of this._pendingUploads) {
-        cmdEncoder.copyBufferToBuffer(upload.mappedBuffer.buffer, upload.mappedBuffer.offset, this._object, upload.uploadOffset, upload.uploadSize);
+        cmdEncoder.copyBufferToBuffer(
+          upload.mappedBuffer.buffer,
+          upload.mappedBuffer.offset,
+          this._object,
+          upload.uploadOffset,
+          upload.uploadSize
+        );
       }
       if (!encoder) {
         this._device.device.queue.submit([cmdEncoder.finish()]);
@@ -192,7 +207,7 @@ export class WebGPUBuffer extends WebGPUObject<GPUBuffer> implements GPUDataBuff
             label: label,
             size: (data.byteLength + 15) & ~15,
             usage: this._gpuUsage,
-            mappedAtCreation: true,
+            mappedAtCreation: true
           });
           const range = this._object.getMappedRange();
           new (data.constructor as TypedArrayConstructor)(range).set(data);
@@ -201,7 +216,7 @@ export class WebGPUBuffer extends WebGPUObject<GPUBuffer> implements GPUDataBuff
           this._object = this._device.gpuCreateBuffer({
             label: label,
             size: (this.byteLength + 15) & ~15,
-            usage: this._gpuUsage,
+            usage: this._gpuUsage
           });
         }
         const memCost = this.byteLength;
@@ -210,10 +225,18 @@ export class WebGPUBuffer extends WebGPUObject<GPUBuffer> implements GPUDataBuff
       }
     }
   }
-  private pushUpload(pending: UploadBuffer[], data: ArrayBuffer, srcByteOffset: number, dstByteOffset: number, byteSize: number) {
+  private pushUpload(
+    pending: UploadBuffer[],
+    data: ArrayBuffer,
+    srcByteOffset: number,
+    dstByteOffset: number,
+    byteSize: number
+  ) {
     const bufferMapped = this._ringBuffer.fetchBufferMapped(byteSize, true);
     if (data) {
-      new Uint8Array(bufferMapped.mappedRange, dstByteOffset, byteSize).set(new Uint8Array(data, srcByteOffset, byteSize));
+      new Uint8Array(bufferMapped.mappedRange, dstByteOffset, byteSize).set(
+        new Uint8Array(data, srcByteOffset, byteSize)
+      );
     }
     pending.push({
       mappedBuffer: {
@@ -221,11 +244,11 @@ export class WebGPUBuffer extends WebGPUObject<GPUBuffer> implements GPUDataBuff
         size: bufferMapped.size,
         offset: dstByteOffset,
         used: bufferMapped.used,
-        mappedRange: bufferMapped.mappedRange,
+        mappedRange: bufferMapped.mappedRange
       },
       uploadSize: byteSize,
       uploadOffset: dstByteOffset,
-      uploadBuffer: this._object,
+      uploadBuffer: this._object
     });
   }
 }

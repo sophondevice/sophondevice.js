@@ -1,6 +1,34 @@
 import { Matrix4x4, Vector3, Vector4, REvent } from '@sophon/base';
-import { Viewer, DeviceType, FrameBuffer, TextureSampler, TextureCube, Texture2D, Device, TextureFormat, PBInsideFunctionScope, PBShaderExp } from '@sophon/device';
-import { Mesh, SphereMesh, AssetManager, DirectionalLight, ForwardRenderScheme, ForwardMultiRenderPass, ForwardRenderPass, OrbitCameraModel, RenderPass, ShaderLib, Scene, Camera, GraphNode, UnlitLightModel, StandardMaterial, PBRMetallicRoughnessMaterial } from '@sophon/scene';
+import {
+  Viewer,
+  DeviceType,
+  FrameBuffer,
+  TextureSampler,
+  TextureCube,
+  Texture2D,
+  Device,
+  TextureFormat,
+  PBInsideFunctionScope,
+  PBShaderExp
+} from '@sophon/device';
+import {
+  Mesh,
+  SphereMesh,
+  AssetManager,
+  DirectionalLight,
+  ForwardRenderScheme,
+  ForwardMultiRenderPass,
+  ForwardRenderPass,
+  OrbitCameraModel,
+  RenderPass,
+  ShaderLib,
+  Scene,
+  Camera,
+  GraphNode,
+  UnlitLightModel,
+  StandardMaterial,
+  PBRMetallicRoughnessMaterial
+} from '@sophon/scene';
 import { GUIRenderer, GUI, RElement, RKeyEvent } from '@sophon/dom';
 import * as common from '../common';
 
@@ -14,7 +42,10 @@ class MyRenderScheme extends ForwardRenderScheme {
   reflectiveSphere: Mesh;
   constructor(device: Device) {
     super(device);
-    this.cubemapRenderPass = device.getDeviceType() === 'webgl' ? new ForwardMultiRenderPass(this, 'cubemap') : new ForwardRenderPass(this, 'cubemap');
+    this.cubemapRenderPass =
+      device.getDeviceType() === 'webgl'
+        ? new ForwardMultiRenderPass(this, 'cubemap')
+        : new ForwardRenderPass(this, 'cubemap');
     this.cubemapRenderCamera = new Map();
     this.colorAttachment = device.createCubeTexture(TextureFormat.RGBA8UNORM, 512, {
       colorSpace: 'linear'
@@ -23,12 +54,14 @@ class MyRenderScheme extends ForwardRenderScheme {
       noMipmap: true
     });
     this.fb = device.createFrameBuffer({
-      colorAttachments: [{
-        texture: this.colorAttachment,
-      }],
+      colorAttachments: [
+        {
+          texture: this.colorAttachment
+        }
+      ],
       depthAttachment: {
-        texture: this.depthAttachment,
-      },
+        texture: this.depthAttachment
+      }
     });
   }
   renderScene(scene: Scene, camera: Camera) {
@@ -69,7 +102,9 @@ class ReflectLightModel extends UnlitLightModel {
   calculateAlbedo(scope: PBInsideFunctionScope): PBShaderExp {
     const pb = scope.$builder;
     const reflectTexture = scope[this.getTextureUniformName('reflection')];
-    const v = pb.normalize(pb.sub(scope.$inputs.worldPosition.xyz, scope.$query(ShaderLib.USAGE_CAMERA_POSITION)));
+    const v = pb.normalize(
+      pb.sub(scope.$inputs.worldPosition.xyz, scope.$query(ShaderLib.USAGE_CAMERA_POSITION))
+    );
     const r = pb.reflect(v, pb.normalize(scope.$inputs.worldNormal));
     return pb.textureSample(reflectTexture, r);
   }
@@ -77,7 +112,7 @@ class ReflectLightModel extends UnlitLightModel {
 
 (async function () {
   const viewer = new Viewer(document.getElementById('canvas') as HTMLCanvasElement);
-  await viewer.initDevice(common.getQueryString('dev') as DeviceType || 'webgl', { msaa: true });
+  await viewer.initDevice((common.getQueryString('dev') as DeviceType) || 'webgl', { msaa: true });
   const guiRenderer = new GUIRenderer(viewer.device);
   const gui = new GUI(guiRenderer);
 
@@ -87,7 +122,14 @@ class ReflectLightModel extends UnlitLightModel {
   const scene = new Scene(viewer.device);
   const scheme = new MyRenderScheme(viewer.device);
   const camera = scene.addCamera().lookAt(new Vector3(0, 8, 30), new Vector3(0, 0, 0), Vector3.axisPY());
-  camera.setProjectionMatrix(Matrix4x4.perspective(Math.PI / 3, viewer.device.getDrawingBufferWidth() / viewer.device.getDrawingBufferHeight(), 1, 160));
+  camera.setProjectionMatrix(
+    Matrix4x4.perspective(
+      Math.PI / 3,
+      viewer.device.getDrawingBufferWidth() / viewer.device.getDrawingBufferHeight(),
+      1,
+      160
+    )
+  );
   camera.mouseInputSource = sceneView;
   camera.keyboardInputSource = sceneView;
   camera.setModel(new OrbitCameraModel({ distance: camera.position.magnitude }));
@@ -108,9 +150,21 @@ class ReflectLightModel extends UnlitLightModel {
   light.lookAt(new Vector3(10, 10, 10), new Vector3(0, 0, 0), Vector3.axisPY());
 
   const stdMat = new PBRMetallicRoughnessMaterial(scene.device);
-  stdMat.lightModel.setAlbedoMap(await assetManager.fetchTexture('./assets/images/rustediron2_basecolor.png', null, true), null, 0);
-  stdMat.lightModel.setNormalMap(await assetManager.fetchTexture('./assets/images/rustediron2_normal.png', null, false), null, 0);
-  stdMat.lightModel.setMetallicMap(await assetManager.fetchTexture('./assets/images/mr.png', null, false), null, 0);
+  stdMat.lightModel.setAlbedoMap(
+    await assetManager.fetchTexture('./assets/images/rustediron2_basecolor.png', null, true),
+    null,
+    0
+  );
+  stdMat.lightModel.setNormalMap(
+    await assetManager.fetchTexture('./assets/images/rustediron2_normal.png', null, false),
+    null,
+    0
+  );
+  stdMat.lightModel.setMetallicMap(
+    await assetManager.fetchTexture('./assets/images/mr.png', null, false),
+    null,
+    0
+  );
   stdMat.lightModel.metallicIndex = 0;
   stdMat.lightModel.roughnessIndex = 1;
 
@@ -128,7 +182,14 @@ class ReflectLightModel extends UnlitLightModel {
 
   sceneView.addEventListener('layout', function (this: RElement) {
     const rect = this.getClientRect();
-    camera.setProjectionMatrix(Matrix4x4.perspective(camera.getFOV(), rect.width / rect.height, camera.getNearPlane(), camera.getFarPlane()));
+    camera.setProjectionMatrix(
+      Matrix4x4.perspective(
+        camera.getFOV(),
+        rect.width / rect.height,
+        camera.getNearPlane(),
+        camera.getFarPlane()
+      )
+    );
   });
 
   sceneView.addEventListener('keyup', function (evt: REvent) {
@@ -157,8 +218,5 @@ class ReflectLightModel extends UnlitLightModel {
     scheme.renderScene(scene, camera);
   });
 
-  viewer.device.runLoop(device => gui.render());
-
-}());
-
-
+  viewer.device.runLoop((device) => gui.render());
+})();

@@ -11,17 +11,35 @@ export function testFrustum() {
     const far = near + rand(1, 1000);
     const matrix = Matrix4x4.ortho(left, right, bottom, top, near, far);
     const frustum = new Frustum(matrix);
-    assert(frustum.planes[BoxSide.LEFT].getNormal().equalsTo(new Vector3(1, 0, 0)), 'ortho left plane test failed')
+    assert(
+      frustum.planes[BoxSide.LEFT].getNormal().equalsTo(new Vector3(1, 0, 0)),
+      'ortho left plane test failed'
+    );
     assert(numberEquals(frustum.planes[BoxSide.LEFT].d, -left), 'ortho left plane test failed');
-    assert(frustum.planes[BoxSide.RIGHT].getNormal().equalsTo(new Vector3(-1, 0, 0)), 'ortho right plane test failed')
+    assert(
+      frustum.planes[BoxSide.RIGHT].getNormal().equalsTo(new Vector3(-1, 0, 0)),
+      'ortho right plane test failed'
+    );
     assert(numberEquals(frustum.planes[BoxSide.RIGHT].d, right), 'ortho right plane test failed');
-    assert(frustum.planes[BoxSide.BOTTOM].getNormal().equalsTo(new Vector3(0, 1, 0)), 'ortho bottom plane test failed')
+    assert(
+      frustum.planes[BoxSide.BOTTOM].getNormal().equalsTo(new Vector3(0, 1, 0)),
+      'ortho bottom plane test failed'
+    );
     assert(numberEquals(frustum.planes[BoxSide.BOTTOM].d, -bottom), 'ortho bottom plane test failed');
-    assert(frustum.planes[BoxSide.TOP].getNormal().equalsTo(new Vector3(0, -1, 0)), 'ortho top plane test failed')
+    assert(
+      frustum.planes[BoxSide.TOP].getNormal().equalsTo(new Vector3(0, -1, 0)),
+      'ortho top plane test failed'
+    );
     assert(numberEquals(frustum.planes[BoxSide.TOP].d, top), 'ortho top plane test failed');
-    assert(frustum.planes[BoxSide.FRONT].getNormal().equalsTo(new Vector3(0, 0, -1)), 'ortho front plane test failed')
+    assert(
+      frustum.planes[BoxSide.FRONT].getNormal().equalsTo(new Vector3(0, 0, -1)),
+      'ortho front plane test failed'
+    );
     assert(numberEquals(frustum.planes[BoxSide.FRONT].d, -near), 'ortho front plane test failed');
-    assert(frustum.planes[BoxSide.BACK].getNormal().equalsTo(new Vector3(0, 0, 1)), 'ortho back plane test failed')
+    assert(
+      frustum.planes[BoxSide.BACK].getNormal().equalsTo(new Vector3(0, 0, 1)),
+      'ortho back plane test failed'
+    );
     assert(numberEquals(frustum.planes[BoxSide.BACK].d, far), 'ortho back plane test failed');
     const axis = new Vector3(rand(-10, 10), rand(-10, 10), rand(-10, 10)).inplaceNormalize();
     const angle = rand(-Math.PI, Math.PI);
@@ -30,7 +48,10 @@ export function testFrustum() {
     const mat = q.toMatrix4x4().translateLeft(t);
     const frustum2 = new Frustum(matrix, Matrix4x4.inverseAffine(mat));
     for (let i = 0; i < 8; i++) {
-      assert(mat.transformPoint(frustum.corners[i]).xyz().equalsTo(frustum2.corners[i]), 'world space frustum test failed');
+      assert(
+        mat.transformPoint(frustum.corners[i]).xyz().equalsTo(frustum2.corners[i]),
+        'world space frustum test failed'
+      );
     }
   })();
   (function testPerspectiveFrustum() {
@@ -57,24 +78,47 @@ export function testFrustum() {
     */
     const nz = new Vector3(0, 0, -1);
     const frustum = new Frustum(matrix);
-    const normalTop = Matrix4x4.rotationX(halfFovY - Math.PI * 0.5).transformVector(nz).xyz();
-    const normalBottom = Matrix4x4.rotationX(Math.PI * 0.5 - halfFovY).transformVector(nz).xyz();
+    const normalTop = Matrix4x4.rotationX(halfFovY - Math.PI * 0.5)
+      .transformVector(nz)
+      .xyz();
+    const normalBottom = Matrix4x4.rotationX(Math.PI * 0.5 - halfFovY)
+      .transformVector(nz)
+      .xyz();
     const halfFovX = Math.atan(Math.tan(halfFovY) * aspect);
-    const normalLeft = Matrix4x4.rotationY(halfFovX - Math.PI * 0.5).transformVector(nz).xyz();
-    const normalRight = Matrix4x4.rotationY(Math.PI * 0.5 - halfFovX).transformVector(nz).xyz();
+    const normalLeft = Matrix4x4.rotationY(halfFovX - Math.PI * 0.5)
+      .transformVector(nz)
+      .xyz();
+    const normalRight = Matrix4x4.rotationY(Math.PI * 0.5 - halfFovX)
+      .transformVector(nz)
+      .xyz();
     const normalNear = nz;
     const normalFar = Vector3.scale(nz, -1);
-    assert(frustum.planes[BoxSide.LEFT].getNormal().equalsTo(normalLeft), 'perspective left plane test failed')
+    assert(
+      frustum.planes[BoxSide.LEFT].getNormal().equalsTo(normalLeft),
+      'perspective left plane test failed'
+    );
     assert(numberEquals(frustum.planes[BoxSide.LEFT].d, 0), 'perspective left plane test failed');
-    assert(frustum.planes[BoxSide.RIGHT].getNormal().equalsTo(normalRight), 'perspective right plane test failed')
+    assert(
+      frustum.planes[BoxSide.RIGHT].getNormal().equalsTo(normalRight),
+      'perspective right plane test failed'
+    );
     assert(numberEquals(frustum.planes[BoxSide.RIGHT].d, 0), 'perspective right plane test failed');
-    assert(frustum.planes[BoxSide.BOTTOM].getNormal().equalsTo(normalBottom), 'perspective bottom plane test failed')
+    assert(
+      frustum.planes[BoxSide.BOTTOM].getNormal().equalsTo(normalBottom),
+      'perspective bottom plane test failed'
+    );
     assert(numberEquals(frustum.planes[BoxSide.BOTTOM].d, 0), 'perspective bottom plane test failed');
-    assert(frustum.planes[BoxSide.TOP].getNormal().equalsTo(normalTop), 'perspective top plane test failed')
+    assert(frustum.planes[BoxSide.TOP].getNormal().equalsTo(normalTop), 'perspective top plane test failed');
     assert(numberEquals(frustum.planes[BoxSide.TOP].d, 0), 'perspective top plane test failed');
-    assert(frustum.planes[BoxSide.FRONT].getNormal().equalsTo(normalNear), 'perspective front plane test failed')
+    assert(
+      frustum.planes[BoxSide.FRONT].getNormal().equalsTo(normalNear),
+      'perspective front plane test failed'
+    );
     assert(numberEquals(frustum.planes[BoxSide.FRONT].d, -near), 'perspective front plane test failed');
-    assert(frustum.planes[BoxSide.BACK].getNormal().equalsTo(normalFar), 'perspective back plane test failed')
+    assert(
+      frustum.planes[BoxSide.BACK].getNormal().equalsTo(normalFar),
+      'perspective back plane test failed'
+    );
     assert(numberEquals(frustum.planes[BoxSide.BACK].d, far), 'perspective back plane test failed');
     const halfW = far * Math.tan(halfFovX);
     const halfH = far * Math.tan(halfFovY);
@@ -83,7 +127,8 @@ export function testFrustum() {
     const z = rand(near + 200, far - 200);
     const aw = Math.atan(x / z);
     const ah = Math.atan(y / z);
-    const inside1 = (z <= -near && z >= -far && aw >= -halfFovX && aw <= halfFovX && ah >= -halfFovY && ah <= halfFovY);
+    const inside1 =
+      z <= -near && z >= -far && aw >= -halfFovX && aw <= halfFovX && ah >= -halfFovY && ah <= halfFovY;
     const inside2 = frustum.containsPoint(new Vector3(x, y, z));
     assert(!!inside1 === !!inside2, 'point classification failed');
   })();

@@ -15,7 +15,12 @@ fs.readdirSync(srcdir).filter((dir) => {
     if (filter.length === 0 || filter.indexOf(name) >= 0) {
       const main = path.join(fullpath, 'main.ts');
       const html = path.join(fullpath, 'index.html');
-      if (fs.existsSync(main) && fs.statSync(main).isFile() && fs.existsSync(html) && fs.statSync(html).isFile()) {
+      if (
+        fs.existsSync(main) &&
+        fs.statSync(main).isFile() &&
+        fs.existsSync(html) &&
+        fs.statSync(html).isFile()
+      ) {
         srcfiles.push([
           main,
           path.join(__dirname, 'dist-tmp', `${dir}.js`),

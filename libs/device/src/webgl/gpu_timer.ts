@@ -1,7 +1,7 @@
-import {isWebGL2} from './utils';
-import {WebGLEnum} from './webgl_enum';
-import type {ITimer} from '../timer';
-import type {WebGLDevice} from './device_webgl';
+import { isWebGL2 } from './utils';
+import { WebGLEnum } from './webgl_enum';
+import type { ITimer } from '../timer';
+import type { WebGLDevice } from './device_webgl';
 
 const GPU_DISJOINT_EXT = 0x8fbb;
 const TIME_ELAPSED_EXT = 0x88bf;
@@ -9,7 +9,7 @@ const TIME_ELAPSED_EXT = 0x88bf;
 const enum QueryState {
   QUERY_STATE_NONE = 0,
   QUERY_STATE_QUERYING = 1,
-  QUERY_STATE_FINISHED = 2,
+  QUERY_STATE_FINISHED = 2
 }
 
 interface ITimerQuery {
@@ -45,7 +45,7 @@ export class GPUTimer implements ITimer {
           isQuery: gl.isQuery.bind(gl),
           getQuery: gl.getQuery.bind(gl),
           getQueryObject: gl.getQueryParameter.bind(gl),
-          queryCounter: ext.queryCounterEXT.bind(ext),
+          queryCounter: ext.queryCounterEXT.bind(ext)
         };
       }
     } else {
@@ -59,7 +59,7 @@ export class GPUTimer implements ITimer {
           isQuery: ext.isQueryEXT.bind(ext),
           getQuery: ext.getQueryEXT.bind(ext),
           getQueryObject: ext.getQueryObjectEXT.bind(ext),
-          queryCounter: ext.queryCounterEXT.bind(ext),
+          queryCounter: ext.queryCounterEXT.bind(ext)
         };
       }
     }

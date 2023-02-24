@@ -29,7 +29,7 @@ export abstract class Shape<T extends IShapeCreationOptions = IShapeCreationOpti
     return {
       needNormal: true,
       needTangent: false,
-      needUV: true,
+      needUV: true
     } as T;
   }
   /** @internal */
@@ -60,14 +60,10 @@ export class PlaneShape extends Shape<IPlaneCreationOptions> {
     uvs: number[],
     indices: number[],
     sizeX: number,
-    sizeY: number,
+    sizeY: number
   ) {
     uvs?.push(0, 1, 0, 0, 1, 0, 1, 1);
-    vertices?.push(
-      0, 0, sizeY,
-      sizeX, 0, sizeY,
-      sizeX, 0, 0,
-      0, 0, 0);
+    vertices?.push(0, 0, sizeY, sizeX, 0, sizeY, sizeX, 0, 0, 0, 0, 0);
     indices?.push(0, 1, 2, 0, 2, 3);
     normals?.push(0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0);
     this.primitiveType = PrimitiveType.TriangleList;
@@ -83,11 +79,20 @@ export class PlaneShape extends Shape<IPlaneCreationOptions> {
     const normals: number[] = needNormal ? [] : null;
     const uvs: number[] = needUV ? [] : null;
     this._createArrays(vertices, normals, uvs, indices, sizeX, sizeY);
-    this.createAndSetVertexBuffer(makeVertexBufferType(vertices.length / 3, 'position_f32x3'), new Float32Array(vertices));
+    this.createAndSetVertexBuffer(
+      makeVertexBufferType(vertices.length / 3, 'position_f32x3'),
+      new Float32Array(vertices)
+    );
     normals &&
-      this.createAndSetVertexBuffer(makeVertexBufferType(normals.length / 3, 'normal_f32x3'), new Float32Array(normals));
+      this.createAndSetVertexBuffer(
+        makeVertexBufferType(normals.length / 3, 'normal_f32x3'),
+        new Float32Array(normals)
+      );
     uvs &&
-      this.createAndSetVertexBuffer(makeVertexBufferType(uvs.length / 2, 'tex0_f32x2'), new Float32Array(uvs));
+      this.createAndSetVertexBuffer(
+        makeVertexBufferType(uvs.length / 2, 'tex0_f32x2'),
+        new Float32Array(uvs)
+      );
     this.createAndSetIndexBuffer(new Uint16Array(indices));
     this.setBoundingVolume(new BoundingBox(new Vector3(0, 0, 0), new Vector3(sizeX, 0, sizeY)));
     this.indexCount = indices.length;
@@ -144,9 +149,64 @@ export class BoxShape extends Shape<IBoxCreationOptions> {
     const leftFaceNormal = needNormal ? [-1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0] : null;
     const bottomFacePos = [minx, miny, maxz, minx, miny, minz, maxx, miny, minz, maxx, miny, maxz];
     const bottomFaceNormal = needNormal ? [0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0] : null;
-    indices && indices.push(0, 1, 2, 0, 2, 3, 4, 5, 6, 4, 6, 7, 8, 9, 10, 8, 10, 11, 12, 13, 14, 12, 14, 15, 16, 17, 18, 16, 18, 19, 20, 21, 22, 20, 22, 23);
-    vertices && vertices.push(...topFacePos, ...frontFacePos, ...rightFacePos, ...backFacePos, ...leftFacePos, ...bottomFacePos);
-    needNormal && normals && normals.push(...topFacenormal, ...frontFaceNormal, ...rightFaceNormal, ...backFaceNormal, ...leftFaceNormal, ...bottomFaceNormal);
+    indices &&
+      indices.push(
+        0,
+        1,
+        2,
+        0,
+        2,
+        3,
+        4,
+        5,
+        6,
+        4,
+        6,
+        7,
+        8,
+        9,
+        10,
+        8,
+        10,
+        11,
+        12,
+        13,
+        14,
+        12,
+        14,
+        15,
+        16,
+        17,
+        18,
+        16,
+        18,
+        19,
+        20,
+        21,
+        22,
+        20,
+        22,
+        23
+      );
+    vertices &&
+      vertices.push(
+        ...topFacePos,
+        ...frontFacePos,
+        ...rightFacePos,
+        ...backFacePos,
+        ...leftFacePos,
+        ...bottomFacePos
+      );
+    needNormal &&
+      normals &&
+      normals.push(
+        ...topFacenormal,
+        ...frontFaceNormal,
+        ...rightFaceNormal,
+        ...backFaceNormal,
+        ...leftFaceNormal,
+        ...bottomFaceNormal
+      );
     needUV && uvs && uvs.push(...uv, ...uv, ...uv, ...uv, ...uv, ...uv);
     this.primitiveType = PrimitiveType.TriangleList;
   }
@@ -171,18 +231,22 @@ export class BoxShape extends Shape<IBoxCreationOptions> {
     const normals: number[] = needNormal ? [] : null;
     const uvs: number[] = needUV ? [] : null;
     this._createArrays(vertices, normals, uvs, indices, minx, miny, minz, maxx, maxy, maxz);
-    this.createAndSetVertexBuffer(makeVertexBufferType(vertices.length / 3, 'position_f32x3'), new Float32Array(vertices));
-    normals &&
-      this.createAndSetVertexBuffer(makeVertexBufferType(normals.length / 3, 'normal_f32x3'), new Float32Array(normals));
-    uvs &&
-      this.createAndSetVertexBuffer(makeVertexBufferType(uvs.length / 2, 'tex0_f32x2'), new Float32Array(uvs));
-    this.createAndSetIndexBuffer(new Uint16Array(indices));
-    this.setBoundingVolume(
-      new BoundingBox(
-        new Vector3(minx, miny, minz),
-        new Vector3(maxx, maxy, maxz),
-      ),
+    this.createAndSetVertexBuffer(
+      makeVertexBufferType(vertices.length / 3, 'position_f32x3'),
+      new Float32Array(vertices)
     );
+    normals &&
+      this.createAndSetVertexBuffer(
+        makeVertexBufferType(normals.length / 3, 'normal_f32x3'),
+        new Float32Array(normals)
+      );
+    uvs &&
+      this.createAndSetVertexBuffer(
+        makeVertexBufferType(uvs.length / 2, 'tex0_f32x2'),
+        new Float32Array(uvs)
+      );
+    this.createAndSetIndexBuffer(new Uint16Array(indices));
+    this.setBoundingVolume(new BoundingBox(new Vector3(minx, miny, minz), new Vector3(maxx, maxy, maxz)));
     this.indexCount = indices.length;
     return true;
   }
@@ -235,14 +299,12 @@ export class BoxFrameShape extends Shape<IBoxCreationOptions> {
     const vertices: number[] = [];
     const indices: number[] = [];
     this._createArrays(vertices, indices, minx, miny, minz, maxx, maxy, maxz);
-    this.createAndSetVertexBuffer(makeVertexBufferType(vertices.length / 3, 'position_f32x3'), new Float32Array(vertices));
-    this.createAndSetIndexBuffer(new Uint16Array(indices));
-    this.setBoundingVolume(
-      new BoundingBox(
-        new Vector3(minx, miny, minz),
-        new Vector3(maxx, maxy, maxz),
-      ),
+    this.createAndSetVertexBuffer(
+      makeVertexBufferType(vertices.length / 3, 'position_f32x3'),
+      new Float32Array(vertices)
     );
+    this.createAndSetIndexBuffer(new Uint16Array(indices));
+    this.setBoundingVolume(new BoundingBox(new Vector3(minx, miny, minz), new Vector3(maxx, maxy, maxz)));
     this.indexCount = indices.length;
     return true;
   }
@@ -304,15 +366,21 @@ export class SphereShape extends Shape<ISphereCreationOptions> {
       indices.push(indices[indices.length - 1]);
       indices.push((i + 1) * (horizonalDetail + 1));
     }
-    this.createAndSetVertexBuffer(makeVertexBufferType(vertices.length / 3, 'position_f32x3'), new Float32Array(vertices));
+    this.createAndSetVertexBuffer(
+      makeVertexBufferType(vertices.length / 3, 'position_f32x3'),
+      new Float32Array(vertices)
+    );
     normals?.length > 0 &&
-      this.createAndSetVertexBuffer(makeVertexBufferType(normals.length / 3, 'normal_f32x3'), new Float32Array(normals));
+      this.createAndSetVertexBuffer(
+        makeVertexBufferType(normals.length / 3, 'normal_f32x3'),
+        new Float32Array(normals)
+      );
     uv?.length > 0 &&
       this.createAndSetVertexBuffer(makeVertexBufferType(uv.length / 2, 'tex0_f32x2'), new Float32Array(uv));
 
     this.createAndSetIndexBuffer(new Uint32Array(indices));
     this.setBoundingVolume(
-      new BoundingBox(new Vector3(-radius, -radius, -radius), new Vector3(radius, radius, radius)),
+      new BoundingBox(new Vector3(-radius, -radius, -radius), new Vector3(radius, radius, radius))
     );
     this.primitiveType = PrimitiveType.TriangleStrip;
     this.indexCount = indices.length;

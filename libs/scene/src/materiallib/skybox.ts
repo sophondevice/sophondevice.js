@@ -1,4 +1,13 @@
-import { FaceMode, Device, TextureCube, BindGroup, GPUProgram, PBGlobalScope, ProgramBuilder, TextureSampler } from '@sophon/device';
+import {
+  FaceMode,
+  Device,
+  TextureCube,
+  BindGroup,
+  GPUProgram,
+  PBGlobalScope,
+  ProgramBuilder,
+  TextureSampler
+} from '@sophon/device';
 import { Material } from '../material';
 import { ShaderLib } from './shaderlib';
 import * as values from '../values';
@@ -54,7 +63,10 @@ export class SkyboxMaterial extends Material {
         this.$outputs.texCoord = pb.vec3();
         this.$mainFunc(function () {
           this.$outputs.texCoord = this.$inputs.pos;
-          this.$l.worldPos = pb.add(pb.reflection.tag(ShaderLib.USAGE_CAMERA_POSITION), lib.objectSpacePositionToWorld(this.$inputs.pos).xyz);
+          this.$l.worldPos = pb.add(
+            pb.reflection.tag(ShaderLib.USAGE_CAMERA_POSITION),
+            lib.objectSpacePositionToWorld(this.$inputs.pos).xyz
+          );
           this.$builtins.position = lib.worldSpacePositionToClip(this.worldPos);
           this.$builtins.position.z = this.$builtins.position.w;
         });
@@ -74,7 +86,7 @@ export class SkyboxMaterial extends Material {
               this.$l.texCoord = pb.normalize(this.$inputs.texCoord);
               this.$l.color = pb.device?.getShaderCaps().supportShaderTextureLod
                 ? pb.textureSampleLevel(this.skyCubeMap, this.texCoord, 0).xyz
-                : pb.textureSample(this.skyCubeMap, this.texCoord).xyz
+                : pb.textureSample(this.skyCubeMap, this.texCoord).xyz;
             } else {
               this.$l.color = pb.vec3(0);
             }
@@ -89,4 +101,3 @@ export class SkyboxMaterial extends Material {
     });
   }
 }
-

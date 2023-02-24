@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {IRectangle} from './geom/Rectangle';
-import type {IOption} from './maxrects-packer';
+import { IRectangle } from './geom/Rectangle';
+import type { IOption } from './maxrects-packer';
 
 export interface IBin {
   width: number;

@@ -1,5 +1,19 @@
 import { Vector4, Vector3, Matrix4x4, AABB } from '@sophon/base';
-import { SceneNode, BoundingBox, GraphNode, Material, Model, AssetManager, Scene, RenderScheme, Camera, DirectionalLight, BUILTIN_ASSET_TEXTURE_SHEEN_LUT, ForwardRenderScheme, OrbitCameraModel } from '@sophon/scene';
+import {
+  SceneNode,
+  BoundingBox,
+  GraphNode,
+  Material,
+  Model,
+  AssetManager,
+  Scene,
+  RenderScheme,
+  Camera,
+  DirectionalLight,
+  BUILTIN_ASSET_TEXTURE_SHEEN_LUT,
+  ForwardRenderScheme,
+  OrbitCameraModel
+} from '@sophon/scene';
 import { GUI, Select, Option } from '@sophon/dom';
 
 export class GLTFViewer {
@@ -30,12 +44,15 @@ export class GLTFViewer {
     this._camera = this._scene.addCamera();
     this._camera.position.set(0, 0, 15);
     this._camera.setModel(new OrbitCameraModel());
-    this._light = new DirectionalLight(this._scene)
-      .setColor(new Vector4(1, 1, 1, 1))
-      .setCastShadow(false);
+    this._light = new DirectionalLight(this._scene).setColor(new Vector4(1, 1, 1, 1)).setCastShadow(false);
     this._light.shadow.shadowMapSize = 1024;
     this._light.lookAt(new Vector3(10, 10, 10), new Vector3(0, 0, 0), Vector3.axisPY());
-    Material.setGCOptions({ drawableCountThreshold: 0, materialCountThreshold: 0, inactiveTimeDuration: 10000, verbose: true });
+    Material.setGCOptions({
+      drawableCountThreshold: 0,
+      materialCountThreshold: 0,
+      inactiveTimeDuration: 10000,
+      verbose: true
+    });
     this._animationSelector.addEventListener('change', () => {
       if (this._animationSelector.value === 'none') {
         this.stopAnimation();
@@ -75,17 +92,17 @@ export class GLTFViewer {
     return this._modelNode?.getAnimationNames() || [];
   }
   handleDrop(data: DataTransfer) {
-    this.resolveDraggedItems(data).then(fileMap => {
+    this.resolveDraggedItems(data).then((fileMap) => {
       if (fileMap) {
         console.log(fileMap);
-        this._assetManager.httpRequest.urlResolver = url => {
+        this._assetManager.httpRequest.urlResolver = (url) => {
           return fileMap.get(url) || url;
-        }
-        const modelFile = Array.from(fileMap.keys()).find(val => /(\.gltf|\.glb)$/i.test(val));
+        };
+        const modelFile = Array.from(fileMap.keys()).find((val) => /(\.gltf|\.glb)$/i.test(val));
         if (modelFile) {
           this._modelNode?.remove();
           this._assetManager.clearCache();
-          this._assetManager.createModelNode(this._scene, modelFile, null).then(node => {
+          this._assetManager.createModelNode(this._scene, modelFile, null).then((node) => {
             this._modelNode = node;
             this._modelNode.pickMode = GraphNode.PICK_ENABLED;
             this.lookAt();
@@ -159,15 +176,26 @@ export class GLTFViewer {
       }
       const dist = size / Math.tan(this._fov * 0.5) + extents.z + this._nearPlane;
 
-      this._camera.lookAt(Vector3.add(center, Vector3.scale(Vector3.axisPZ(), dist)), center, Vector3.axisPY());
-      this._camera.setProjectionMatrix(Matrix4x4.perspective(this._camera.getFOV(), this._aspect, Math.min(1, this._camera.getNearPlane()), Math.max(10, dist + extents.z + 100)));
+      this._camera.lookAt(
+        Vector3.add(center, Vector3.scale(Vector3.axisPZ(), dist)),
+        center,
+        Vector3.axisPY()
+      );
+      this._camera.setProjectionMatrix(
+        Matrix4x4.perspective(
+          this._camera.getFOV(),
+          this._aspect,
+          Math.min(1, this._camera.getNearPlane()),
+          Math.max(10, dist + extents.z + 100)
+        )
+      );
       (this._camera.model as OrbitCameraModel).setOptions({ distance: dist });
     }
   }
   private getBoundingBox(): AABB {
     const bbox = new BoundingBox();
     bbox.beginExtend();
-    this.traverseModel(node => {
+    this.traverseModel((node) => {
       if (node.isGraphNode()) {
         const aabb = node.getWorldBoundingVolume()?.toAABB();
         if (aabb && aabb.isValid()) {
@@ -192,11 +220,17 @@ export class GLTFViewer {
   }
   private async readDirectoryEntry(entry: FileSystemDirectoryEntry): Promise<FileSystemEntry[]> {
     return new Promise((resolve, reject) => {
-      entry.createReader().readEntries(fileEntries => resolve(fileEntries), err => reject(err));
-    })
+      entry.createReader().readEntries(
+        (fileEntries) => resolve(fileEntries),
+        (err) => reject(err)
+      );
+    });
   }
-  private async resolveDirectoryEntries(files: File[], entries: FileSystemEntry[]): Promise<Map<string, { entry: FileSystemEntry, file: File }>> {
-    const map: Map<string, { entry: FileSystemEntry, file: File }> = new Map();
+  private async resolveDirectoryEntries(
+    files: File[],
+    entries: FileSystemEntry[]
+  ): Promise<Map<string, { entry: FileSystemEntry; file: File }>> {
+    const map: Map<string, { entry: FileSystemEntry; file: File }> = new Map();
     let i = 0;
     while (i < entries.length) {
       const entry = entries[i];
@@ -205,7 +239,7 @@ export class GLTFViewer {
         if (i < files.length) {
           files.splice(i, 1);
         }
-        entries.push(...await this.readDirectoryEntry(entry as FileSystemDirectoryEntry));
+        entries.push(...(await this.readDirectoryEntry(entry as FileSystemDirectoryEntry)));
       } else {
         map.set(entry.fullPath, {
           entry,
@@ -216,27 +250,39 @@ export class GLTFViewer {
     }
     return map;
   }
-  private async resolveFileEntries(map: Map<string, { entry: FileSystemEntry, file: File }>): Promise<Map<string, string>> {
+  private async resolveFileEntries(
+    map: Map<string, { entry: FileSystemEntry; file: File }>
+  ): Promise<Map<string, string>> {
     const result: Map<string, string> = new Map();
-    const promises = Array.from(map.entries()).map(entry => new Promise<File>((resolve, reject) => {
-      const key = `/${entry[0].slice(1).split('/').map(val => encodeURIComponent(val)).join('/')}`;
-      if (entry[1].file) {
-        result.set(key, URL.createObjectURL(entry[1].file));
-        resolve(null);
-      } else {
-        (entry[1].entry as FileSystemFileEntry).file(f => {
-          result.set(key, URL.createObjectURL(f));
-          resolve(null);
-        }, err => reject(err));
-      }
-    }));
+    const promises = Array.from(map.entries()).map(
+      (entry) =>
+        new Promise<File>((resolve, reject) => {
+          const key = `/${entry[0]
+            .slice(1)
+            .split('/')
+            .map((val) => encodeURIComponent(val))
+            .join('/')}`;
+          if (entry[1].file) {
+            result.set(key, URL.createObjectURL(entry[1].file));
+            resolve(null);
+          } else {
+            (entry[1].entry as FileSystemFileEntry).file(
+              (f) => {
+                result.set(key, URL.createObjectURL(f));
+                resolve(null);
+              },
+              (err) => reject(err)
+            );
+          }
+        })
+    );
     await Promise.all(promises);
     return result;
   }
   private async resolveDraggedItems(data: DataTransfer): Promise<Map<string, string>> {
     const files = Array.from(data.files);
-    const entries = Array.from(data.items).map(item => item.webkitGetAsEntry());
-    const modelFile = files.find(file => /(\.gltf|\.glb)$/i.test(file.name));
+    const entries = Array.from(data.items).map((item) => item.webkitGetAsEntry());
+    const modelFile = files.find((file) => /(\.gltf|\.glb)$/i.test(file.name));
     if (!modelFile) {
       return null;
     }

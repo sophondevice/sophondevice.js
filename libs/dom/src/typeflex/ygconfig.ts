@@ -1,8 +1,8 @@
-import {YGLogger, YGCloneNodeFunc} from './yoga';
+import { YGLogger, YGCloneNodeFunc } from './yoga';
 
-const kYGDefaultExperimentalFeatures: () => Array<boolean> = function() {
+const kYGDefaultExperimentalFeatures: () => Array<boolean> = function () {
   return [false, false, false];
-}
+};
 
 class YGConfig {
   public experimentalFeatures: Array<boolean>;
@@ -25,4 +25,4 @@ class YGConfig {
   }
 }
 
-export {YGConfig};
+export { YGConfig };

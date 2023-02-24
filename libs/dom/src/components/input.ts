@@ -1,4 +1,4 @@
-import { REvent } from '@sophon/base'
+import { REvent } from '@sophon/base';
 import { RRectPrimitive, RPrimitiveBatchList } from '../primitive';
 import { RText } from './text';
 import { RElement } from '../element';
@@ -8,7 +8,7 @@ import {
   RFocusEvent,
   RTextEvent,
   RKeyEvent,
-  RChangeEvent,
+  RChangeEvent
 } from '../events';
 import type { GUI } from '../gui';
 import type { IStyleSheet } from '../style';
@@ -78,7 +78,7 @@ export class Input extends RElement {
           this._hiddenInput.focus();
           const loc = this._text.measureTextLocation(
             data.offsetX - this.getClientRect().x - this._text.getRect().x,
-            data.offsetY - this.getClientRect().y - this._text.getRect().y,
+            data.offsetY - this.getClientRect().y - this._text.getRect().y
           );
           if (loc) {
             console.assert(loc.line === 0);
@@ -91,7 +91,7 @@ export class Input extends RElement {
           const evt = new MouseEvent('click', {
             bubbles: true,
             cancelable: true,
-            view: window,
+            view: window
           });
           this._hiddenInput.dispatchEvent(evt);
         }
@@ -103,7 +103,7 @@ export class Input extends RElement {
         this._selectionStart = Math.min(this._selectionStart, this.textContent.length);
         this._selectionEnd = Math.max(
           this._selectionStart,
-          Math.min(this._selectionEnd, this.textContent.length),
+          Math.min(this._selectionEnd, this.textContent.length)
         );
         this._setHiddenInputSelection(this._selectionStart, this._selectionEnd);
         this._updateCursorVertices();
@@ -133,7 +133,7 @@ export class Input extends RElement {
         evt.ctrlKey,
         evt.shiftKey,
         evt.altKey,
-        evt.metaKey,
+        evt.metaKey
       );
       that.dispatchEvent(keyEvt);
     });
@@ -146,7 +146,7 @@ export class Input extends RElement {
         evt.ctrlKey,
         evt.shiftKey,
         evt.altKey,
-        evt.metaKey,
+        evt.metaKey
       );
       that.dispatchEvent(keyEvt);
     });
@@ -159,7 +159,7 @@ export class Input extends RElement {
         evt.ctrlKey,
         evt.shiftKey,
         evt.altKey,
-        evt.metaKey,
+        evt.metaKey
       );
       that.dispatchEvent(keyEvt);
     });
@@ -227,7 +227,7 @@ export class Input extends RElement {
     this._oninput();
   }
   /** @internal */
-  _init(): void { }
+  _init(): void {}
   /** @internal */
   _getDefaultStyleSheet(): IStyleSheet {
     const style = super._getDefaultStyleSheet();
@@ -270,8 +270,7 @@ export class Input extends RElement {
     this._hiddenInput.style.top = `${t}px`;
     this._hiddenInput.style.width = `${this.getRect().width}px`;
     this._hiddenInput.style.height = `${this.getRect().height}px`;
-    this._hiddenInput.style.font = `${this._getCachedFont().size}px ${this._getCachedFont().family
-      }`;
+    this._hiddenInput.style.font = `${this._getCachedFont().size}px ${this._getCachedFont().family}`;
   }
   /** @internal */
   protected _buildVertexData() {
@@ -317,19 +316,10 @@ export class Input extends RElement {
       const v = this.toAbsolute({ x: 0, y: 0 });
       this._cursorBatch = new RPrimitiveBatchList(v.x, v.y);
       this._cursorBatch.addPrimitive(
-        new RRectPrimitive(
-          x,
-          this.getClientRect().y - 2,
-          1,
-          this.getClientRect().height,
-          0,
-          0,
-          0,
-          0,
-        ),
+        new RRectPrimitive(x, this.getClientRect().y - 2, 1, this.getClientRect().height, 0, 0, 0, 0),
         clipper,
         null,
-        this._getCachedFontColor(),
+        this._getCachedFontColor()
       );
     }
   }

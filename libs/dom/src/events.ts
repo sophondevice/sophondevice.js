@@ -55,11 +55,24 @@ export class RMouseEvent extends REvent {
     ctrlKey: boolean,
     shiftKey: boolean,
     altKey: boolean,
-    metaKey: boolean,
+    metaKey: boolean
   ) {
     super(type, type !== RMouseEvent.NAME_MOUSEENTER && type !== RMouseEvent.NAME_MOUSELEAVE, true);
     this.relatedTarget = null;
-    this.init(x, y, offsetX, offsetY, button, buttons, wheelDeltaX, wheelDeltaY, ctrlKey, shiftKey, altKey, metaKey);
+    this.init(
+      x,
+      y,
+      offsetX,
+      offsetY,
+      button,
+      buttons,
+      wheelDeltaX,
+      wheelDeltaY,
+      ctrlKey,
+      shiftKey,
+      altKey,
+      metaKey
+    );
   }
   init(
     x: number,
@@ -73,7 +86,7 @@ export class RMouseEvent extends REvent {
     ctrlKey: boolean,
     shiftKey: boolean,
     altKey: boolean,
-    metaKey: boolean,
+    metaKey: boolean
   ) {
     this.x = x;
     this.y = y;
@@ -111,7 +124,7 @@ export class RDragEvent extends RMouseEvent {
     shiftKey: boolean,
     altKey: boolean,
     metaKey: boolean,
-    dataTransfer: DataTransfer,
+    dataTransfer: DataTransfer
   ) {
     super(type, x, y, offsetX, offsetY, button, buttons, 0, 0, ctrlKey, shiftKey, altKey, metaKey);
     this.dataTransfer = dataTransfer;
@@ -140,7 +153,7 @@ export class RKeyEvent extends REvent {
     ctrlKey: boolean,
     shiftKey: boolean,
     altKey: boolean,
-    metaKey: boolean,
+    metaKey: boolean
   ) {
     super(type, true, true);
     this.code = code;

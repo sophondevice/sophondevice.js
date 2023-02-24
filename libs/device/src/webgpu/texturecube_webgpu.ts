@@ -1,7 +1,20 @@
 import { CubeFace, TypedArray } from '@sophon/base';
-import { TextureFormat, TextureTarget, linearTextureFormatToSRGB, getTextureFormatBlockWidth, getTextureFormatBlockHeight, getTextureFormatBlockSize } from '../base_types';
+import {
+  TextureFormat,
+  TextureTarget,
+  linearTextureFormatToSRGB,
+  getTextureFormatBlockWidth,
+  getTextureFormatBlockHeight,
+  getTextureFormatBlockSize
+} from '../base_types';
 import { WebGPUBaseTexture } from './basetexture_webgpu';
-import { GPUResourceUsageFlags, TextureMipmapData, TextureCube, TextureImageElement, GPUDataBuffer } from '../gpuobject';
+import {
+  GPUResourceUsageFlags,
+  TextureMipmapData,
+  TextureCube,
+  TextureImageElement,
+  GPUDataBuffer
+} from '../gpuobject';
 import type { WebGPUDevice } from './device';
 
 export class WebGPUTextureCube extends WebGPUBaseTexture implements TextureCube<GPUTexture> {
@@ -17,7 +30,7 @@ export class WebGPUTextureCube extends WebGPUBaseTexture implements TextureCube<
     yOffset: number,
     width: number,
     height: number,
-    face: CubeFace,
+    face: CubeFace
   ): void {
     if (this._device.isContextLost()) {
       return;
@@ -30,7 +43,16 @@ export class WebGPUTextureCube extends WebGPUBaseTexture implements TextureCube<
       this.generateMipmaps();
     }
   }
-  updateFromElement(data: TextureImageElement, xOffset: number, yOffset: number, face: number, x: number, y: number, width: number, height: number): void {
+  updateFromElement(
+    data: TextureImageElement,
+    xOffset: number,
+    yOffset: number,
+    face: number,
+    x: number,
+    y: number,
+    width: number,
+    height: number
+  ): void {
     if (this._device.isContextLost()) {
       return;
     }
@@ -55,7 +77,10 @@ export class WebGPUTextureCube extends WebGPUBaseTexture implements TextureCube<
     if (this._flags & GPUResourceUsageFlags.TF_WRITABLE) {
       console.error(new Error('storage texture can not be cube texture'));
     } else {
-      format = (this._flags & GPUResourceUsageFlags.TF_LINEAR_COLOR_SPACE) ? format : linearTextureFormatToSRGB(format);
+      format =
+        this._flags & GPUResourceUsageFlags.TF_LINEAR_COLOR_SPACE
+          ? format
+          : linearTextureFormatToSRGB(format);
       this.loadEmpty(format, size, 0);
     }
   }
@@ -65,7 +90,10 @@ export class WebGPUTextureCube extends WebGPUBaseTexture implements TextureCube<
     if (this._flags & GPUResourceUsageFlags.TF_WRITABLE) {
       console.error(new Error('storage texture can not be cube texture'));
     } else {
-      const format = (this._flags & GPUResourceUsageFlags.TF_LINEAR_COLOR_SPACE) ? TextureFormat.RGBA8UNORM : TextureFormat.RGBA8UNORM_SRGB;
+      const format =
+        this._flags & GPUResourceUsageFlags.TF_LINEAR_COLOR_SPACE
+          ? TextureFormat.RGBA8UNORM
+          : TextureFormat.RGBA8UNORM_SRGB;
       this.loadImages(images, format);
     }
   }
@@ -73,17 +101,26 @@ export class WebGPUTextureCube extends WebGPUBaseTexture implements TextureCube<
     return true;
   }
   createView(level?: number, face?: number, mipCount?: number): GPUTextureView {
-    return this._object ? this._device.gpuCreateTextureView(this._object, {
-      format: this._gpuFormat,
-      dimension: '2d',
-      baseMipLevel: level ?? 0,
-      mipLevelCount: mipCount || this._mipLevelCount - (level ?? 0),
-      baseArrayLayer: face ?? 0,
-      arrayLayerCount: 1,
-      aspect: 'all',
-    }) : null;
+    return this._object
+      ? this._device.gpuCreateTextureView(this._object, {
+          format: this._gpuFormat,
+          dimension: '2d',
+          baseMipLevel: level ?? 0,
+          mipLevelCount: mipCount || this._mipLevelCount - (level ?? 0),
+          baseArrayLayer: face ?? 0,
+          arrayLayerCount: 1,
+          aspect: 'all'
+        })
+      : null;
   }
-  async readPixels(face: number, x: number, y: number, w: number, h: number, buffer: TypedArray): Promise<void> {
+  async readPixels(
+    face: number,
+    x: number,
+    y: number,
+    w: number,
+    h: number,
+    buffer: TypedArray
+  ): Promise<void> {
     const blockWidth = getTextureFormatBlockWidth(this.format);
     const blockHeight = getTextureFormatBlockHeight(this.format);
     const blockSize = getTextureFormatBlockSize(this.format);
@@ -91,11 +128,17 @@ export class WebGPUTextureCube extends WebGPUBaseTexture implements TextureCube<
     const blocksPerCol = this.height / blockHeight;
     const imageSize = blocksPerRow * blocksPerCol * blockSize;
     if (buffer.byteLength < imageSize) {
-      throw new Error(`Texture2D.readPixels() failed: destination buffer size is ${buffer.byteLength}, should be at least ${imageSize}`);
+      throw new Error(
+        `Texture2D.readPixels() failed: destination buffer size is ${buffer.byteLength}, should be at least ${imageSize}`
+      );
     }
     const tmpBuffer = this._device.createBuffer(imageSize, { usage: 'read' });
     await this.copyPixelDataToBuffer(x, y, w, h, face, 0, tmpBuffer);
-    await tmpBuffer.getBufferSubData(new Uint8Array(buffer.buffer, buffer.byteOffset, buffer.byteLength), 0, imageSize);
+    await tmpBuffer.getBufferSubData(
+      new Uint8Array(buffer.buffer, buffer.byteOffset, buffer.byteLength),
+      0,
+      imageSize
+    );
     tmpBuffer.dispose();
   }
   readPixelsToBuffer(face: number, x: number, y: number, w: number, h: number, buffer: GPUDataBuffer): void {
@@ -144,7 +187,7 @@ export class WebGPUTextureCube extends WebGPUBaseTexture implements TextureCube<
       for (let face = 0; face < 6; face++) {
         createImageBitmap(images[face], {
           premultiplyAlpha: 'none',
-          colorSpaceConversion: 'none',
+          colorSpaceConversion: 'none'
         }).then((bmData) => {
           this.uploadImageData(bmData, w, h, 0, 0, 0, 0);
         });
@@ -162,7 +205,9 @@ export class WebGPUTextureCube extends WebGPUBaseTexture implements TextureCube<
     const height = levels.height;
     const mipLevelCount = levels.mipLevels;
     if (levels.isCompressed) {
-      if (sRGB ? !this._device.getTextureCaps().supportS3TCSRGB : !this._device.getTextureCaps().supportS3TC) {
+      if (
+        sRGB ? !this._device.getTextureCaps().supportS3TCSRGB : !this._device.getTextureCaps().supportS3TC
+      ) {
         console.warn('No s3tc compression format support');
         return;
       }
@@ -171,7 +216,16 @@ export class WebGPUTextureCube extends WebGPUBaseTexture implements TextureCube<
     if (!this._device.isContextLost()) {
       for (let face = 0; face < 6; face++) {
         for (let i = 0; i < levels.mipDatas[face].length; i++) {
-          this.uploadRaw(levels.mipDatas[face][i].data, levels.mipDatas[face][i].width, levels.mipDatas[face][i].height, 1, 0, 0, face, i);
+          this.uploadRaw(
+            levels.mipDatas[face][i].data,
+            levels.mipDatas[face][i].width,
+            levels.mipDatas[face][i].height,
+            1,
+            0,
+            0,
+            face,
+            i
+          );
         }
       }
     }

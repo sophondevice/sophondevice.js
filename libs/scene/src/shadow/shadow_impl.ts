@@ -1,5 +1,5 @@
-import { PBInsideFunctionScope, PBShaderExp, TextureFormat, TextureSampler } from "@sophon/device";
-import type { ShadowMapper, ShadowMapType, ShadowMode } from "./shadowmapper";
+import { PBInsideFunctionScope, PBShaderExp, TextureFormat, TextureSampler } from '@sophon/device';
+import type { ShadowMapper, ShadowMapType, ShadowMode } from './shadowmapper';
 
 export abstract class ShadowImpl {
   protected _resourceDirty: boolean;
@@ -27,10 +27,20 @@ export abstract class ShadowImpl {
   abstract doUpdateResources(shadowMapper: ShadowMapper);
   abstract getShaderHash(): string;
   abstract computeShadowMapDepth(shadowMapper: ShadowMapper, scope: PBInsideFunctionScope): PBShaderExp;
-  abstract computeShadow(shadowMapper: ShadowMapper, scope: PBInsideFunctionScope, shadowVertex: PBShaderExp, NdotL: PBShaderExp): PBShaderExp;
-  abstract computeShadowCSM(shadowMapper: ShadowMapper, scope: PBInsideFunctionScope, shadowVertex: PBShaderExp, NdotL: PBShaderExp, split: PBShaderExp): PBShaderExp;
+  abstract computeShadow(
+    shadowMapper: ShadowMapper,
+    scope: PBInsideFunctionScope,
+    shadowVertex: PBShaderExp,
+    NdotL: PBShaderExp
+  ): PBShaderExp;
+  abstract computeShadowCSM(
+    shadowMapper: ShadowMapper,
+    scope: PBInsideFunctionScope,
+    shadowVertex: PBShaderExp,
+    NdotL: PBShaderExp,
+    split: PBShaderExp
+  ): PBShaderExp;
   abstract getShadowMapColorFormat(shadowMapper: ShadowMapper): TextureFormat;
   abstract getShadowMapDepthFormat(shadowMapper: ShadowMapper): TextureFormat;
   abstract useNativeShadowMap(shadowMapper: ShadowMapper): boolean;
 }
-

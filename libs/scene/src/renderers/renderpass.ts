@@ -10,14 +10,7 @@ import type { DrawContext } from '../drawable';
 import type { Camera } from '../camera';
 import type { Device, PBGlobalScope, FrameBuffer, BindGroup } from '@sophon/device';
 
-const cubeFaceList = [
-  CubeFace.PX,
-  CubeFace.NX,
-  CubeFace.PY,
-  CubeFace.NY,
-  CubeFace.PZ,
-  CubeFace.NZ,
-];
+const cubeFaceList = [CubeFace.PX, CubeFace.NX, CubeFace.PY, CubeFace.NY, CubeFace.PZ, CubeFace.NZ];
 
 export type GlobalLightStruct = {
   positionAndRange: Vector4;
@@ -159,7 +152,9 @@ export abstract class RenderPass {
     return RENDER_PASS_TYPE_UNKNOWN;
   }
   isAutoFlip(): boolean {
-    return !!(this._renderScheme.device.getFramebuffer() && this._renderScheme.device.getDeviceType() === 'webgpu');
+    return !!(
+      this._renderScheme.device.getFramebuffer() && this._renderScheme.device.getDeviceType() === 'webgpu'
+    );
   }
   enableClear(color: boolean, depthStencil: boolean) {
     this._clearColorEnabled = !!color;
@@ -228,13 +223,11 @@ export abstract class RenderPass {
       const ret = pb.buildRender({
         vertex() {
           that.setGlobalBindings(this, ctx);
-          this.$mainFunc(function () {
-          });
+          this.$mainFunc(function () {});
         },
         fragment() {
           that.setGlobalBindings(this, ctx);
-          this.$mainFunc(function () {
-          });
+          this.$mainFunc(function () {});
         }
       });
       bindGroup = this.device.createBindGroup(ret[2][0]);
@@ -266,14 +259,25 @@ export abstract class RenderPass {
       viewProjectionMatrix: ctx.camera.viewProjectionMatrix,
       viewMatrix: ctx.camera.viewMatrix,
       projectionMatrix: ctx.camera.projectionMatrix,
-      params: new Vector4(ctx.camera.getNearPlane(), ctx.camera.getFarPlane(), flip ? 1 : 0, ctx.camera.linearOutputEnabled ? 0 : 1)
+      params: new Vector4(
+        ctx.camera.getNearPlane(),
+        ctx.camera.getFarPlane(),
+        flip ? 1 : 0,
+        ctx.camera.linearOutputEnabled ? 0 : 1
+      )
     };
     bindGroup.setValue('global', {
       camera: cameraStruct
     });
   }
   /** @internal */
-  protected drawSceneToTexture(scene: Scene, renderCamera: Camera, cullCamera: Camera, target: FrameBuffer, forceCull: boolean) {
+  protected drawSceneToTexture(
+    scene: Scene,
+    renderCamera: Camera,
+    cullCamera: Camera,
+    target: FrameBuffer,
+    forceCull: boolean
+  ) {
     this._renderScheme.device.setFramebuffer(target);
     this.drawScene(scene, renderCamera, cullCamera, forceCull);
     this._renderScheme.device.setFramebuffer(null);

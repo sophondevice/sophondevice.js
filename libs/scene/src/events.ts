@@ -1,5 +1,5 @@
-import type {BaseLight} from './light';
-import type {Camera} from './camera';
+import type { BaseLight } from './light';
+import type { Camera } from './camera';
 
 export class AddLight {
   node: BaseLight;

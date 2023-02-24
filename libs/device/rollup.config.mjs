@@ -15,7 +15,7 @@ const outdir = path.resolve(cwd, '..', '..', 'build', '@sophon', 'base');
 
 function getTargetES6() {
   return {
-    external: id => /@sophon\/base/.test(id),
+    external: (id) => /@sophon\/base/.test(id),
     input: './src/index.ts',
     preserveSymlinks: true,
     output: {
@@ -23,7 +23,7 @@ function getTargetES6() {
       dir: 'dist',
       preserveModules: true,
       format: 'esm',
-      sourcemap: true,
+      sourcemap: true
     },
     plugins: [
       typescript(),
@@ -34,26 +34,32 @@ function getTargetES6() {
         compact: false,
         minified: false,
         presets: [
-          ['@babel/preset-env', {
-            bugfixes: true,
-            loose: true,
-            modules: false,
-            targets: {
-              esmodules: true
+          [
+            '@babel/preset-env',
+            {
+              bugfixes: true,
+              loose: true,
+              modules: false,
+              targets: {
+                esmodules: true
+              }
             }
-          }]
+          ]
         ]
       }),
       // terser()
       copy({
-        targets: [{
-          src: "./package.pub.json",
-          dest: "dist",
-          rename: "package.json"
-        }, {
-          src: "./src",
-          dest: "dist"
-        }]
+        targets: [
+          {
+            src: './package.pub.json',
+            dest: 'dist',
+            rename: 'package.json'
+          },
+          {
+            src: './src',
+            dest: 'dist'
+          }
+        ]
       })
     ]
   };
@@ -64,14 +70,12 @@ function getTargetTypes() {
     input: 'src/index.ts',
     preserveSymlinks: true,
     output: {
-      file: `dist/index.d.ts`,
+      file: `dist/index.d.ts`
     },
-    plugins: [
-      dts()
-    ]
+    plugins: [dts()]
   };
 }
 
 export default (args) => {
-  return [getTargetES6()/*, getTargetTypes()*/];
+  return [getTargetES6() /*, getTargetTypes()*/];
 };

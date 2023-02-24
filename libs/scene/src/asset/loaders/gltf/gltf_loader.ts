@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Vector3, Vector4, Matrix4x4, Quaternion, TypedArray } from '@sophon/base';
 import {
-  TextureFilter, 
+  TextureFilter,
   TextureWrapping,
   PrimitiveType,
   FaceMode,
@@ -23,10 +23,30 @@ import {
   IndexBuffer,
   StructuredBuffer
 } from '@sophon/device';
-import { SharedModel, AssetHierarchyNode, AssetMeshData, AssetSkeleton, AssetScene, AssetAnimationData, AssetSubMeshData, AssetMaterial, AssetUnlitMaterial, AssetPBRMaterialMR, AssetPBRMaterialSG, AssetMaterialCommon, MaterialTextureInfo, AssetPBRMaterialCommon } from '../../model';
+import {
+  SharedModel,
+  AssetHierarchyNode,
+  AssetMeshData,
+  AssetSkeleton,
+  AssetScene,
+  AssetAnimationData,
+  AssetSubMeshData,
+  AssetMaterial,
+  AssetUnlitMaterial,
+  AssetPBRMaterialMR,
+  AssetPBRMaterialSG,
+  AssetMaterialCommon,
+  MaterialTextureInfo,
+  AssetPBRMaterialCommon
+} from '../../model';
 import { BoundingBox } from '../../../bounding_volume';
 import { Primitive } from '../../../primitive';
-import { StandardMaterial, UnlitMaterial, PBRMetallicRoughnessMaterial, PBRSpecularGlossinessMaterial } from '../../../materiallib';
+import {
+  StandardMaterial,
+  UnlitMaterial,
+  PBRMetallicRoughnessMaterial,
+  PBRSpecularGlossinessMaterial
+} from '../../../materiallib';
 import { ComponentType, GLTFAccessor } from './helpers';
 import { Interpolator, InterpolationMode, InterpolationTarget } from '../../../interpolator';
 import { AbstractModelLoader } from '../loader';
@@ -42,7 +62,7 @@ export interface GLTFContent extends GlTf {
   _textureCache: { [name: string]: Texture2D };
   _primitiveCache: { [hash: string]: Primitive };
   _materialCache: { [hash: string]: StandardMaterial };
-  _accessorCache: { [index: number]: { array: TypedArray, typeMask: number, elementCount: number } };
+  _accessorCache: { [index: number]: { array: TypedArray; typeMask: number; elementCount: number } };
   _nodes: AssetHierarchyNode[];
   _meshes: AssetMeshData[];
 }
@@ -59,14 +79,14 @@ export class GLTFLoader extends AbstractModelLoader {
     if (this.isGLB(buffer)) {
       return this.loadBinary(assetManager, url, buffer);
     }
-    const gltf = await new Response(data).json() as GLTFContent;
+    const gltf = (await new Response(data).json()) as GLTFContent;
     gltf._manager = assetManager;
     gltf._loadedBuffers = null;
     return this.loadJson(url, gltf);
   }
   async loadBinary(assetManager: AssetManager, url: string, buffer: ArrayBuffer): Promise<SharedModel> {
-    const jsonChunkType = 0x4E4F534A;
-    const binaryChunkType = 0x004E4942;
+    const jsonChunkType = 0x4e4f534a;
+    const binaryChunkType = 0x004e4942;
     let gltf: GLTFContent = null;
     const buffers: ArrayBuffer[] = [];
     const chunkInfos = this.getGLBChunkInfos(buffer);
@@ -157,10 +177,12 @@ export class GLTFLoader extends AbstractModelLoader {
   /** @internal */
   private _normalizeURI(baseURI: string, uri: string) {
     const s = uri.toLowerCase();
-    if (s.startsWith('http://')
-      || s.startsWith('https://')
-      || s.startsWith('blob:')
-      || s.startsWith('data:')) {
+    if (
+      s.startsWith('http://') ||
+      s.startsWith('https://') ||
+      s.startsWith('blob:') ||
+      s.startsWith('data:')
+    ) {
       // absolute path
       return encodeURI(uri);
     }
@@ -169,7 +191,10 @@ export class GLTFLoader extends AbstractModelLoader {
     if (uri[0] === '/') {
       uri = uri.slice(1);
     }
-    uri = uri.split('/').map(val => encodeURIComponent(val)).join('/');
+    uri = uri
+      .split('/')
+      .map((val) => encodeURIComponent(val))
+      .join('/');
     return baseURI + uri;
   }
   /** @internal */
@@ -198,10 +223,16 @@ export class GLTFLoader extends AbstractModelLoader {
         if (!accessor || accessor.type !== 'MAT4' || accessor.componentType !== ComponentType.FLOAT) {
           throw new Error('Invalid GLTF inverse bind matricies accessor');
         }
-        const matrices = typeof skinInfo.inverseBindMatrices === 'number' ? accessor.getDeinterlacedView(gltf) as Float32Array : null;
+        const matrices =
+          typeof skinInfo.inverseBindMatrices === 'number'
+            ? (accessor.getDeinterlacedView(gltf) as Float32Array)
+            : null;
         skinInfo.joints.forEach((joint, index) => {
           const m = index * 16;
-          skeleton.addJoint(gltf._nodes[joint], matrices ? new Matrix4x4(matrices.subarray(m, m + 16)) : Matrix4x4.identity());
+          skeleton.addJoint(
+            gltf._nodes[joint],
+            matrices ? new Matrix4x4(matrices.subarray(m, m + 16)) : Matrix4x4.identity()
+          );
         });
         model.addSkeleton(skeleton);
       }
@@ -217,18 +248,24 @@ export class GLTFLoader extends AbstractModelLoader {
     }
   }
   /** @internal */
-  private collectNodes(gltf: GLTFContent): Map<AssetHierarchyNode, {
-    translate: Vector3,
-    scale: Vector3,
-    rotation: Quaternion,
-    worldTransform: Matrix4x4
-  }> {
-    const collect: Map<AssetHierarchyNode, {
-      translate: Vector3,
-      scale: Vector3,
-      rotation: Quaternion,
-      worldTransform: Matrix4x4
-    }> = new Map();
+  private collectNodes(gltf: GLTFContent): Map<
+    AssetHierarchyNode,
+    {
+      translate: Vector3;
+      scale: Vector3;
+      rotation: Quaternion;
+      worldTransform: Matrix4x4;
+    }
+  > {
+    const collect: Map<
+      AssetHierarchyNode,
+      {
+        translate: Vector3;
+        scale: Vector3;
+        rotation: Quaternion;
+        worldTransform: Matrix4x4;
+      }
+    > = new Map();
     for (const node of gltf._nodes) {
       collect.set(node, {
         translate: node.position || Vector3.zero(),
@@ -240,15 +277,23 @@ export class GLTFLoader extends AbstractModelLoader {
     return collect;
   }
   /** @internal */
-  private updateNodeTransform(nodeTransforms: Map<AssetHierarchyNode, {
-    translate: Vector3,
-    scale: Vector3,
-    rotation: Quaternion,
-    worldTransform: Matrix4x4
-  }>, node: AssetHierarchyNode) {
+  private updateNodeTransform(
+    nodeTransforms: Map<
+      AssetHierarchyNode,
+      {
+        translate: Vector3;
+        scale: Vector3;
+        rotation: Quaternion;
+        worldTransform: Matrix4x4;
+      }
+    >,
+    node: AssetHierarchyNode
+  ) {
     const transform = nodeTransforms.get(node);
     if (!transform.worldTransform) {
-      transform.worldTransform = Matrix4x4.scaling(transform.scale).rotateLeft(transform.rotation).translateLeft(transform.translate);
+      transform.worldTransform = Matrix4x4.scaling(transform.scale)
+        .rotateLeft(transform.rotation)
+        .translateLeft(transform.translate);
       if (node.parent) {
         this.updateNodeTransform(nodeTransforms, node.parent);
         transform.worldTransform.multiplyLeft(nodeTransforms.get(node.parent).worldTransform);
@@ -256,18 +301,24 @@ export class GLTFLoader extends AbstractModelLoader {
     }
   }
   /** @internal */
-  private getAnimationInfo(gltf: GLTFContent, index: number): {
+  private getAnimationInfo(
+    gltf: GLTFContent,
+    index: number
+  ): {
     name: string;
-    channels: AnimationChannel[],
-    samplers: AnimationSampler[],
-    interpolators: Interpolator[],
-    maxTime: number,
-    nodes: Map<AssetHierarchyNode, {
-      translate: Vector3,
-      scale: Vector3,
-      rotation: Quaternion,
-      worldTransform: Matrix4x4
-    }>
+    channels: AnimationChannel[];
+    samplers: AnimationSampler[];
+    interpolators: Interpolator[];
+    maxTime: number;
+    nodes: Map<
+      AssetHierarchyNode,
+      {
+        translate: Vector3;
+        scale: Vector3;
+        rotation: Quaternion;
+        worldTransform: Matrix4x4;
+      }
+    >;
   } {
     const animationInfo = gltf.animations[index];
     const name = animationInfo.name || null;
@@ -281,18 +332,20 @@ export class GLTFLoader extends AbstractModelLoader {
       const sampler = samplers[channel.sampler];
       const input = gltf._accessors[sampler.input].getNormalizedDeinterlacedView(gltf);
       const output = gltf._accessors[sampler.output].getNormalizedDeinterlacedView(gltf);
-      const mode = sampler.interpolation === 'STEP'
-        ? InterpolationMode.STEP
-        : sampler.interpolation === 'CUBICSPLINE'
+      const mode =
+        sampler.interpolation === 'STEP'
+          ? InterpolationMode.STEP
+          : sampler.interpolation === 'CUBICSPLINE'
           ? InterpolationMode.CUBICSPLINE
           : InterpolationMode.LINEAR;
-      const target = channel.target.path === 'rotation'
-        ? InterpolationTarget.ROTATION
-        : channel.target.path === 'translation'
+      const target =
+        channel.target.path === 'rotation'
+          ? InterpolationTarget.ROTATION
+          : channel.target.path === 'translation'
           ? InterpolationTarget.TRANSLATION
           : channel.target.path === 'scale'
-            ? InterpolationTarget.SCALING
-            : InterpolationTarget.WEIGHTS;
+          ? InterpolationTarget.SCALING
+          : InterpolationTarget.WEIGHTS;
       // TODO: morph target animation
       interpolators.push(new Interpolator(mode, target, input, output, 0));
       const max = input[input.length - 1];
@@ -305,7 +358,12 @@ export class GLTFLoader extends AbstractModelLoader {
   /** @internal */
   private _loadAnimation(gltf: GLTFContent, index: number, model: SharedModel): AssetAnimationData {
     const animationInfo = this.getAnimationInfo(gltf, index);
-    const animationData: AssetAnimationData = { name: animationInfo.name, tracks: [], skeletons: [], nodes: [] };
+    const animationData: AssetAnimationData = {
+      name: animationInfo.name,
+      tracks: [],
+      skeletons: [],
+      nodes: []
+    };
     for (let i = 0; i < animationInfo.channels.length; i++) {
       const targetNode = gltf._nodes[animationInfo.channels[i].target.node];
       animationData.tracks.push({
@@ -322,7 +380,12 @@ export class GLTFLoader extends AbstractModelLoader {
     return animationData;
   }
   /** @internal */
-  private _loadNode(gltf: GLTFContent, nodeIndex: number, parent: AssetHierarchyNode, model: SharedModel): AssetHierarchyNode {
+  private _loadNode(
+    gltf: GLTFContent,
+    nodeIndex: number,
+    parent: AssetHierarchyNode,
+    model: SharedModel
+  ): AssetHierarchyNode {
     let node: AssetHierarchyNode = gltf._nodes[nodeIndex];
     if (node) {
       if (parent) {
@@ -390,9 +453,12 @@ export class GLTFLoader extends AbstractModelLoader {
             material: null,
             rawPositions: null,
             rawBlendIndices: null,
-            rawJointWeights: null,
+            rawJointWeights: null
           };
-          const hash = `(${Object.getOwnPropertyNames(p.attributes).sort().map(k => `${k}:${p.attributes[k]}`).join(',')})-(${p.indices})-(${p.mode})`;
+          const hash = `(${Object.getOwnPropertyNames(p.attributes)
+            .sort()
+            .map((k) => `${k}:${p.attributes[k]}`)
+            .join(',')})-(${p.indices})-(${p.mode})`;
           let primitive: Primitive = p.targets ? null : gltf._primitiveCache[hash];
           if (!primitive) {
             primitive = new Primitive(gltf._manager.device);
@@ -414,11 +480,19 @@ export class GLTFLoader extends AbstractModelLoader {
           const hasVertexNormal = !!primitive.getVertexBuffer('normal');
           const hasVertexColor = !!primitive.getVertexBuffer('diffuse');
           const hasVertexTangent = !!primitive.getVertexBuffer('tangent');
-          const materialHash = `${p.material}.${Number(hasVertexNormal)}.${Number(hasVertexColor)}.${Number(hasVertexTangent)}`;
+          const materialHash = `${p.material}.${Number(hasVertexNormal)}.${Number(hasVertexColor)}.${Number(
+            hasVertexTangent
+          )}`;
           let material = gltf._materialCache[materialHash];
           if (!material) {
             const materialInfo = p.material !== undefined ? gltf.materials[p.material] : null;
-            material = await this._loadMaterial(gltf, materialInfo, hasVertexColor, hasVertexNormal, hasVertexTangent);
+            material = await this._loadMaterial(
+              gltf,
+              materialInfo,
+              hasVertexColor,
+              hasVertexNormal,
+              hasVertexTangent
+            );
             gltf._materialCache[materialHash] = material;
           }
           subMeshData.primitive = primitive;
@@ -429,13 +503,21 @@ export class GLTFLoader extends AbstractModelLoader {
     }
     return mesh;
   }
-  private async _createMaterial(assetManager: AssetManager, assetMaterial: AssetMaterial): Promise<StandardMaterial> {
+  private async _createMaterial(
+    assetManager: AssetManager,
+    assetMaterial: AssetMaterial
+  ): Promise<StandardMaterial> {
     if (assetMaterial.type === 'unlit') {
       const unlitAssetMaterial = assetMaterial as AssetUnlitMaterial;
       const unlitMaterial = new UnlitMaterial(assetManager.device);
       unlitMaterial.lightModel.albedo = unlitAssetMaterial.diffuse ?? Vector4.one();
       if (unlitAssetMaterial.diffuseMap) {
-        unlitMaterial.lightModel.setAlbedoMap(unlitAssetMaterial.diffuseMap.texture, unlitAssetMaterial.diffuseMap.sampler, unlitAssetMaterial.diffuseMap.texCoord, unlitAssetMaterial.diffuseMap.transform);
+        unlitMaterial.lightModel.setAlbedoMap(
+          unlitAssetMaterial.diffuseMap.texture,
+          unlitAssetMaterial.diffuseMap.sampler,
+          unlitAssetMaterial.diffuseMap.texCoord,
+          unlitAssetMaterial.diffuseMap.transform
+        );
       }
       unlitMaterial.vertexColor = unlitAssetMaterial.common.vertexColor;
       if (assetMaterial.common.alphaMode === 'blend') {
@@ -454,26 +536,56 @@ export class GLTFLoader extends AbstractModelLoader {
       const pbrMaterial = new PBRSpecularGlossinessMaterial(assetManager.device);
       pbrMaterial.lightModel.ior = assetPBRMaterial.ior;
       pbrMaterial.lightModel.albedo = assetPBRMaterial.diffuse;
-      pbrMaterial.lightModel.specularFactor = new Vector4(assetPBRMaterial.specular.x, assetPBRMaterial.specular.y, assetPBRMaterial.specular.z, 1);
+      pbrMaterial.lightModel.specularFactor = new Vector4(
+        assetPBRMaterial.specular.x,
+        assetPBRMaterial.specular.y,
+        assetPBRMaterial.specular.z,
+        1
+      );
       pbrMaterial.lightModel.glossinessFactor = assetPBRMaterial.glossness;
       if (assetPBRMaterial.diffuseMap) {
-        pbrMaterial.lightModel.setAlbedoMap(assetPBRMaterial.diffuseMap.texture, assetPBRMaterial.diffuseMap.sampler, assetPBRMaterial.diffuseMap.texCoord, assetPBRMaterial.diffuseMap.transform);
+        pbrMaterial.lightModel.setAlbedoMap(
+          assetPBRMaterial.diffuseMap.texture,
+          assetPBRMaterial.diffuseMap.sampler,
+          assetPBRMaterial.diffuseMap.texCoord,
+          assetPBRMaterial.diffuseMap.transform
+        );
       }
       if (assetPBRMaterial.common.normalMap) {
-        pbrMaterial.lightModel.setNormalMap(assetPBRMaterial.common.normalMap.texture, assetPBRMaterial.common.normalMap.sampler, assetPBRMaterial.common.normalMap.texCoord, assetPBRMaterial.common.normalMap.transform);
+        pbrMaterial.lightModel.setNormalMap(
+          assetPBRMaterial.common.normalMap.texture,
+          assetPBRMaterial.common.normalMap.sampler,
+          assetPBRMaterial.common.normalMap.texCoord,
+          assetPBRMaterial.common.normalMap.transform
+        );
       }
       pbrMaterial.lightModel.normalScale = assetPBRMaterial.common.bumpScale;
       if (assetPBRMaterial.common.emissiveMap) {
-        pbrMaterial.lightModel.setEmissiveMap(assetPBRMaterial.common.emissiveMap.texture, assetPBRMaterial.common.emissiveMap.sampler, assetPBRMaterial.common.emissiveMap.texCoord, assetPBRMaterial.common.emissiveMap.transform);
+        pbrMaterial.lightModel.setEmissiveMap(
+          assetPBRMaterial.common.emissiveMap.texture,
+          assetPBRMaterial.common.emissiveMap.sampler,
+          assetPBRMaterial.common.emissiveMap.texCoord,
+          assetPBRMaterial.common.emissiveMap.transform
+        );
       }
       pbrMaterial.lightModel.emissiveColor = assetPBRMaterial.common.emissiveColor;
       pbrMaterial.lightModel.emissiveStrength = assetPBRMaterial.common.emissiveStrength;
       if (assetPBRMaterial.common.occlusionMap) {
-        pbrMaterial.lightModel.setOcclusionMap(assetPBRMaterial.common.occlusionMap.texture, assetPBRMaterial.common.occlusionMap.sampler, assetPBRMaterial.common.occlusionMap.texCoord, assetPBRMaterial.common.occlusionMap.transform);
+        pbrMaterial.lightModel.setOcclusionMap(
+          assetPBRMaterial.common.occlusionMap.texture,
+          assetPBRMaterial.common.occlusionMap.sampler,
+          assetPBRMaterial.common.occlusionMap.texCoord,
+          assetPBRMaterial.common.occlusionMap.transform
+        );
       }
       pbrMaterial.lightModel.occlusionStrength = assetPBRMaterial.common.occlusionStrength;
       if (assetPBRMaterial.specularGlossnessMap) {
-        pbrMaterial.lightModel.setSpecularMap(assetPBRMaterial.specularGlossnessMap.texture, assetPBRMaterial.specularGlossnessMap.sampler, assetPBRMaterial.specularGlossnessMap.texCoord, assetPBRMaterial.specularGlossnessMap.transform);
+        pbrMaterial.lightModel.setSpecularMap(
+          assetPBRMaterial.specularGlossnessMap.texture,
+          assetPBRMaterial.specularGlossnessMap.sampler,
+          assetPBRMaterial.specularGlossnessMap.texCoord,
+          assetPBRMaterial.specularGlossnessMap.transform
+        );
       }
       pbrMaterial.vertexTangent = assetPBRMaterial.common.useTangent;
       pbrMaterial.vertexColor = assetPBRMaterial.common.vertexColor;
@@ -496,44 +608,91 @@ export class GLTFLoader extends AbstractModelLoader {
       pbrMaterial.lightModel.metallic = assetPBRMaterial.metallic;
       pbrMaterial.lightModel.roughness = assetPBRMaterial.roughness;
       if (assetPBRMaterial.diffuseMap) {
-        pbrMaterial.lightModel.setAlbedoMap(assetPBRMaterial.diffuseMap.texture, assetPBRMaterial.diffuseMap.sampler, assetPBRMaterial.diffuseMap.texCoord, assetPBRMaterial.diffuseMap.transform);
+        pbrMaterial.lightModel.setAlbedoMap(
+          assetPBRMaterial.diffuseMap.texture,
+          assetPBRMaterial.diffuseMap.sampler,
+          assetPBRMaterial.diffuseMap.texCoord,
+          assetPBRMaterial.diffuseMap.transform
+        );
       }
       if (assetPBRMaterial.common.normalMap) {
-        pbrMaterial.lightModel.setNormalMap(assetPBRMaterial.common.normalMap.texture, assetPBRMaterial.common.normalMap.sampler, assetPBRMaterial.common.normalMap.texCoord, assetPBRMaterial.common.normalMap.transform);
+        pbrMaterial.lightModel.setNormalMap(
+          assetPBRMaterial.common.normalMap.texture,
+          assetPBRMaterial.common.normalMap.sampler,
+          assetPBRMaterial.common.normalMap.texCoord,
+          assetPBRMaterial.common.normalMap.transform
+        );
       }
       pbrMaterial.lightModel.normalScale = assetPBRMaterial.common.bumpScale;
       if (assetPBRMaterial.common.emissiveMap) {
-        pbrMaterial.lightModel.setEmissiveMap(assetPBRMaterial.common.emissiveMap.texture, assetPBRMaterial.common.emissiveMap.sampler, assetPBRMaterial.common.emissiveMap.texCoord, assetPBRMaterial.common.emissiveMap.transform);
+        pbrMaterial.lightModel.setEmissiveMap(
+          assetPBRMaterial.common.emissiveMap.texture,
+          assetPBRMaterial.common.emissiveMap.sampler,
+          assetPBRMaterial.common.emissiveMap.texCoord,
+          assetPBRMaterial.common.emissiveMap.transform
+        );
       }
       pbrMaterial.lightModel.emissiveColor = assetPBRMaterial.common.emissiveColor;
       pbrMaterial.lightModel.emissiveStrength = assetPBRMaterial.common.emissiveStrength;
       if (assetPBRMaterial.common.occlusionMap) {
-        pbrMaterial.lightModel.setOcclusionMap(assetPBRMaterial.common.occlusionMap.texture, assetPBRMaterial.common.occlusionMap.sampler, assetPBRMaterial.common.occlusionMap.texCoord, assetPBRMaterial.common.occlusionMap.transform);
+        pbrMaterial.lightModel.setOcclusionMap(
+          assetPBRMaterial.common.occlusionMap.texture,
+          assetPBRMaterial.common.occlusionMap.sampler,
+          assetPBRMaterial.common.occlusionMap.texCoord,
+          assetPBRMaterial.common.occlusionMap.transform
+        );
       }
       pbrMaterial.lightModel.occlusionStrength = assetPBRMaterial.common.occlusionStrength;
       if (assetPBRMaterial.metallicMap) {
-        pbrMaterial.lightModel.setMetallicMap(assetPBRMaterial.metallicMap.texture, assetPBRMaterial.metallicMap.sampler, assetPBRMaterial.metallicMap.texCoord, assetPBRMaterial.metallicMap.transform);
+        pbrMaterial.lightModel.setMetallicMap(
+          assetPBRMaterial.metallicMap.texture,
+          assetPBRMaterial.metallicMap.sampler,
+          assetPBRMaterial.metallicMap.texCoord,
+          assetPBRMaterial.metallicMap.transform
+        );
       }
       pbrMaterial.lightModel.metallicIndex = assetPBRMaterial.metallicIndex;
       pbrMaterial.lightModel.roughnessIndex = assetPBRMaterial.roughnessIndex;
       pbrMaterial.lightModel.specularFactor = assetPBRMaterial.specularFactor;
       if (assetPBRMaterial.specularMap) {
-        pbrMaterial.lightModel.setSpecularMap(assetPBRMaterial.specularMap.texture, assetPBRMaterial.specularMap.sampler, assetPBRMaterial.specularMap.texCoord, assetPBRMaterial.specularMap.transform);
+        pbrMaterial.lightModel.setSpecularMap(
+          assetPBRMaterial.specularMap.texture,
+          assetPBRMaterial.specularMap.sampler,
+          assetPBRMaterial.specularMap.texCoord,
+          assetPBRMaterial.specularMap.transform
+        );
       }
       if (assetPBRMaterial.specularColorMap) {
-        pbrMaterial.lightModel.setSpecularColorMap(assetPBRMaterial.specularColorMap.texture, assetPBRMaterial.specularColorMap.sampler, assetPBRMaterial.specularColorMap.texCoord, assetPBRMaterial.specularColorMap.transform);
+        pbrMaterial.lightModel.setSpecularColorMap(
+          assetPBRMaterial.specularColorMap.texture,
+          assetPBRMaterial.specularColorMap.sampler,
+          assetPBRMaterial.specularColorMap.texCoord,
+          assetPBRMaterial.specularColorMap.transform
+        );
       }
       if (assetPBRMaterial.sheen) {
         const sheen = assetPBRMaterial.sheen;
         pbrMaterial.lightModel.useSheen = true;
         pbrMaterial.lightModel.sheenColorFactor = sheen.sheenColorFactor;
         pbrMaterial.lightModel.sheenRoughnessFactor = sheen.sheenRoughnessFactor;
-        pbrMaterial.lightModel.setSheenLut(await assetManager.fetchBuiltinTexture(BUILTIN_ASSET_TEXTURE_SHEEN_LUT));
+        pbrMaterial.lightModel.setSheenLut(
+          await assetManager.fetchBuiltinTexture(BUILTIN_ASSET_TEXTURE_SHEEN_LUT)
+        );
         if (sheen.sheenColorMap) {
-          pbrMaterial.lightModel.setSheenColorMap(sheen.sheenColorMap.texture, sheen.sheenColorMap.sampler, sheen.sheenColorMap.texCoord, sheen.sheenColorMap.transform);
+          pbrMaterial.lightModel.setSheenColorMap(
+            sheen.sheenColorMap.texture,
+            sheen.sheenColorMap.sampler,
+            sheen.sheenColorMap.texCoord,
+            sheen.sheenColorMap.transform
+          );
         }
         if (sheen.sheenRoughnessMap) {
-          pbrMaterial.lightModel.setSheenRoughnessMap(sheen.sheenRoughnessMap.texture, sheen.sheenRoughnessMap.sampler, sheen.sheenRoughnessMap.texCoord, sheen.sheenRoughnessMap.transform)
+          pbrMaterial.lightModel.setSheenRoughnessMap(
+            sheen.sheenRoughnessMap.texture,
+            sheen.sheenRoughnessMap.sampler,
+            sheen.sheenRoughnessMap.texCoord,
+            sheen.sheenRoughnessMap.transform
+          );
         }
       }
       if (assetPBRMaterial.clearcoat) {
@@ -542,13 +701,28 @@ export class GLTFLoader extends AbstractModelLoader {
         pbrMaterial.lightModel.clearcoatIntensity = cc.clearCoatFactor;
         pbrMaterial.lightModel.clearcoatRoughnessFactor = cc.clearCoatRoughnessFactor;
         if (cc.clearCoatIntensityMap) {
-          pbrMaterial.lightModel.setClearcoatIntensityMap(cc.clearCoatIntensityMap.texture, cc.clearCoatIntensityMap.sampler, cc.clearCoatIntensityMap.texCoord, cc.clearCoatIntensityMap.transform);
+          pbrMaterial.lightModel.setClearcoatIntensityMap(
+            cc.clearCoatIntensityMap.texture,
+            cc.clearCoatIntensityMap.sampler,
+            cc.clearCoatIntensityMap.texCoord,
+            cc.clearCoatIntensityMap.transform
+          );
         }
         if (cc.clearCoatRoughnessMap) {
-          pbrMaterial.lightModel.setClearcoatRoughnessMap(cc.clearCoatRoughnessMap.texture, cc.clearCoatRoughnessMap.sampler, cc.clearCoatRoughnessMap.texCoord, cc.clearCoatRoughnessMap.transform);
+          pbrMaterial.lightModel.setClearcoatRoughnessMap(
+            cc.clearCoatRoughnessMap.texture,
+            cc.clearCoatRoughnessMap.sampler,
+            cc.clearCoatRoughnessMap.texCoord,
+            cc.clearCoatRoughnessMap.transform
+          );
         }
         if (cc.clearCoatNormalMap) {
-          pbrMaterial.lightModel.setClearcoatNormalMap(cc.clearCoatNormalMap.texture, cc.clearCoatNormalMap.sampler, cc.clearCoatNormalMap.texCoord, cc.clearCoatNormalMap.transform);
+          pbrMaterial.lightModel.setClearcoatNormalMap(
+            cc.clearCoatNormalMap.texture,
+            cc.clearCoatNormalMap.sampler,
+            cc.clearCoatNormalMap.texCoord,
+            cc.clearCoatNormalMap.transform
+          );
         }
       }
       pbrMaterial.vertexTangent = assetPBRMaterial.common.useTangent;
@@ -567,7 +741,13 @@ export class GLTFLoader extends AbstractModelLoader {
     }
   }
   /** @internal */
-  private async _loadMaterial(gltf: GLTFContent, materialInfo: Material, vertexColor: boolean, vertexNormal: boolean, useTangent: boolean): Promise<StandardMaterial> {
+  private async _loadMaterial(
+    gltf: GLTFContent,
+    materialInfo: Material,
+    vertexColor: boolean,
+    vertexNormal: boolean,
+    useTangent: boolean
+  ): Promise<StandardMaterial> {
     let assetMaterial: AssetMaterial = null;
     let pbrMetallicRoughness: AssetPBRMaterialMR = null;
     let pbrSpecularGlossness: AssetPBRMaterialSG = null;
@@ -578,7 +758,7 @@ export class GLTFLoader extends AbstractModelLoader {
       bumpScale: 1,
       emissiveColor: Vector3.zero(),
       emissiveStrength: 1,
-      occlusionStrength: 1,
+      occlusionStrength: 1
     };
     switch (materialInfo?.alphaMode) {
       case 'BLEND': {
@@ -595,25 +775,40 @@ export class GLTFLoader extends AbstractModelLoader {
       pbrCommon.doubleSided = true;
     }
     if (materialInfo?.pbrMetallicRoughness || materialInfo?.extensions?.KHR_materials_pbrSpecularGlossiness) {
-      pbrCommon.normalMap = materialInfo.normalTexture ? await this._loadTexture(gltf, materialInfo.normalTexture, false) : null;
+      pbrCommon.normalMap = materialInfo.normalTexture
+        ? await this._loadTexture(gltf, materialInfo.normalTexture, false)
+        : null;
       pbrCommon.bumpScale = materialInfo.normalTexture?.scale ?? 1;
-      pbrCommon.occlusionMap = materialInfo.occlusionTexture ? await this._loadTexture(gltf, materialInfo.occlusionTexture, false) : null;
+      pbrCommon.occlusionMap = materialInfo.occlusionTexture
+        ? await this._loadTexture(gltf, materialInfo.occlusionTexture, false)
+        : null;
       pbrCommon.occlusionStrength = materialInfo.occlusionTexture?.strength ?? 1;
-      pbrCommon.emissiveMap = materialInfo.emissiveTexture ? await this._loadTexture(gltf, materialInfo.emissiveTexture, false) : null;
-      pbrCommon.emissiveStrength = materialInfo?.extensions?.KHR_materials_emissive_strength?.emissiveStrength ?? 1;
-      pbrCommon.emissiveColor = materialInfo.emissiveFactor ? new Vector3(materialInfo.emissiveFactor) : Vector3.zero();
+      pbrCommon.emissiveMap = materialInfo.emissiveTexture
+        ? await this._loadTexture(gltf, materialInfo.emissiveTexture, false)
+        : null;
+      pbrCommon.emissiveStrength =
+        materialInfo?.extensions?.KHR_materials_emissive_strength?.emissiveStrength ?? 1;
+      pbrCommon.emissiveColor = materialInfo.emissiveFactor
+        ? new Vector3(materialInfo.emissiveFactor)
+        : Vector3.zero();
     }
     if (materialInfo?.pbrMetallicRoughness) {
       pbrMetallicRoughness = {
         type: 'pbrMetallicRoughness',
         ior: 1.5,
-        common: pbrCommon,
+        common: pbrCommon
       };
-      pbrMetallicRoughness.diffuse = new Vector4(materialInfo.pbrMetallicRoughness.baseColorFactor ?? [1, 1, 1, 1]);
+      pbrMetallicRoughness.diffuse = new Vector4(
+        materialInfo.pbrMetallicRoughness.baseColorFactor ?? [1, 1, 1, 1]
+      );
       pbrMetallicRoughness.metallic = materialInfo.pbrMetallicRoughness.metallicFactor ?? 1;
       pbrMetallicRoughness.roughness = materialInfo.pbrMetallicRoughness.roughnessFactor ?? 1;
-      pbrMetallicRoughness.diffuseMap = materialInfo.pbrMetallicRoughness.baseColorTexture ? await this._loadTexture(gltf, materialInfo.pbrMetallicRoughness.baseColorTexture, true) : null;
-      pbrMetallicRoughness.metallicMap = materialInfo.pbrMetallicRoughness.metallicRoughnessTexture ? await this._loadTexture(gltf, materialInfo.pbrMetallicRoughness.metallicRoughnessTexture, false) : null;
+      pbrMetallicRoughness.diffuseMap = materialInfo.pbrMetallicRoughness.baseColorTexture
+        ? await this._loadTexture(gltf, materialInfo.pbrMetallicRoughness.baseColorTexture, true)
+        : null;
+      pbrMetallicRoughness.metallicMap = materialInfo.pbrMetallicRoughness.metallicRoughnessTexture
+        ? await this._loadTexture(gltf, materialInfo.pbrMetallicRoughness.metallicRoughnessTexture, false)
+        : null;
       pbrMetallicRoughness.metallicIndex = 2;
       pbrMetallicRoughness.roughnessIndex = 1;
     }
@@ -622,13 +817,17 @@ export class GLTFLoader extends AbstractModelLoader {
       pbrSpecularGlossness = {
         type: 'pbrSpecularGlossiness',
         ior: 1.5,
-        common: pbrCommon,
+        common: pbrCommon
       };
       pbrSpecularGlossness.diffuse = new Vector4(sg.diffuseFactor ?? [1, 1, 1, 1]);
       pbrSpecularGlossness.specular = new Vector3(sg.specularFactor ?? [1, 1, 1]);
       pbrSpecularGlossness.glossness = sg.glossnessFactor ?? 1;
-      pbrSpecularGlossness.diffuseMap = sg.diffuseTexture ? await this._loadTexture(gltf, sg.diffuseTexture, true) : null;
-      pbrSpecularGlossness.specularGlossnessMap = sg.specularGlossinessTexture ? await this._loadTexture(gltf, sg.specularGlossinessTexture, true) : null;
+      pbrSpecularGlossness.diffuseMap = sg.diffuseTexture
+        ? await this._loadTexture(gltf, sg.diffuseTexture, true)
+        : null;
+      pbrSpecularGlossness.specularGlossnessMap = sg.specularGlossinessTexture
+        ? await this._loadTexture(gltf, sg.specularGlossinessTexture, true)
+        : null;
     }
     assetMaterial = pbrSpecularGlossness || pbrMetallicRoughness;
     if (!assetMaterial || materialInfo?.extensions?.KHR_materials_unlit) {
@@ -637,7 +836,7 @@ export class GLTFLoader extends AbstractModelLoader {
           type: 'unlit',
           common: pbrCommon,
           diffuse: pbrMetallicRoughness?.diffuse ?? Vector4.one(),
-          diffuseMap: pbrMetallicRoughness?.diffuseMap ?? null,
+          diffuseMap: pbrMetallicRoughness?.diffuseMap ?? null
         } as AssetUnlitMaterial;
       } else {
         assetMaterial = {
@@ -649,7 +848,7 @@ export class GLTFLoader extends AbstractModelLoader {
           diffuseMap: null,
           metallicMap: null,
           metallicIndex: 2,
-          roughnessIndex: 1,
+          roughnessIndex: 1
         } as AssetPBRMaterialMR;
       }
     }
@@ -659,17 +858,33 @@ export class GLTFLoader extends AbstractModelLoader {
     if (assetMaterial.type === 'pbrMetallicRoughness') {
       pbrMetallicRoughness = assetMaterial;
       // KHR_materials_specular extension
-      pbrMetallicRoughness.specularFactor = new Vector4(new Vector3(materialInfo?.extensions?.KHR_materials_specular?.specularColorFactor ?? [1, 1, 1]), materialInfo?.extensions?.KHR_materials_specular?.specularFactor ?? 1);
-      pbrMetallicRoughness.specularMap = materialInfo?.extensions?.KHR_materials_specular?.specularTexture ? await this._loadTexture(gltf, materialInfo.extensions.KHR_materials_specular.specularTexture, false) : null;
-      pbrMetallicRoughness.specularColorMap = materialInfo?.extensions?.KHR_materials_specular?.specularColorTexture ? await this._loadTexture(gltf, materialInfo.extensions.KHR_materials_specular.specularColorTexture, true) : null;
+      pbrMetallicRoughness.specularFactor = new Vector4(
+        new Vector3(materialInfo?.extensions?.KHR_materials_specular?.specularColorFactor ?? [1, 1, 1]),
+        materialInfo?.extensions?.KHR_materials_specular?.specularFactor ?? 1
+      );
+      pbrMetallicRoughness.specularMap = materialInfo?.extensions?.KHR_materials_specular?.specularTexture
+        ? await this._loadTexture(gltf, materialInfo.extensions.KHR_materials_specular.specularTexture, false)
+        : null;
+      pbrMetallicRoughness.specularColorMap = materialInfo?.extensions?.KHR_materials_specular
+        ?.specularColorTexture
+        ? await this._loadTexture(
+            gltf,
+            materialInfo.extensions.KHR_materials_specular.specularColorTexture,
+            true
+          )
+        : null;
       // KHR_materials_sheen
       const sheen = materialInfo?.extensions?.KHR_materials_sheen;
       if (sheen) {
         pbrMetallicRoughness.sheen = {
           sheenColorFactor: new Vector3(sheen.sheenColorFactor ?? [0, 0, 0]),
-          sheenColorMap: sheen.sheenColorTexture ? await this._loadTexture(gltf, sheen.sheenColorTexture, true) : null,
+          sheenColorMap: sheen.sheenColorTexture
+            ? await this._loadTexture(gltf, sheen.sheenColorTexture, true)
+            : null,
           sheenRoughnessFactor: sheen.sheenRoughnessFactor ?? 0,
-          sheenRoughnessMap: sheen.sheenRoughnessTexture ? await this._loadTexture(gltf, sheen.sheenRoughnessTexture, true) : null,
+          sheenRoughnessMap: sheen.sheenRoughnessTexture
+            ? await this._loadTexture(gltf, sheen.sheenRoughnessTexture, true)
+            : null
         };
       }
       // KHR_materials_clearcoat
@@ -677,17 +892,27 @@ export class GLTFLoader extends AbstractModelLoader {
       if (cc) {
         pbrMetallicRoughness.clearcoat = {
           clearCoatFactor: cc.clearcoatFactor ?? 0,
-          clearCoatIntensityMap: cc.clearcoatTexture ? await this._loadTexture(gltf, cc.clearcoatTexture, false) : null,
+          clearCoatIntensityMap: cc.clearcoatTexture
+            ? await this._loadTexture(gltf, cc.clearcoatTexture, false)
+            : null,
           clearCoatRoughnessFactor: cc.clearcoatRoughnessFactor ?? 0,
-          clearCoatRoughnessMap: cc.clearcoatRoughnessTexture ? await this._loadTexture(gltf, cc.clearcoatRoughnessTexture, false) : null,
-          clearCoatNormalMap: cc.clearcoatNormalTexture ? await this._loadTexture(gltf, cc.clearcoatNormalTexture, false) : null
+          clearCoatRoughnessMap: cc.clearcoatRoughnessTexture
+            ? await this._loadTexture(gltf, cc.clearcoatRoughnessTexture, false)
+            : null,
+          clearCoatNormalMap: cc.clearcoatNormalTexture
+            ? await this._loadTexture(gltf, cc.clearcoatNormalTexture, false)
+            : null
         };
       }
     }
     return await this._createMaterial(gltf._manager, assetMaterial);
   }
   /** @internal */
-  private async _loadTexture(gltf: GLTFContent, info: Partial<TextureInfo>, sRGB: boolean): Promise<MaterialTextureInfo> {
+  private async _loadTexture(
+    gltf: GLTFContent,
+    info: Partial<TextureInfo>,
+    sRGB: boolean
+  ): Promise<MaterialTextureInfo> {
     const mt: MaterialTextureInfo = {
       texture: null,
       sampler: null,
@@ -701,15 +926,18 @@ export class GLTFLoader extends AbstractModelLoader {
         if (uvTransform.texCoord !== undefined) {
           mt.texCoord = uvTransform.texCoord;
         }
-        const rotation = uvTransform.rotation !== undefined
-          ? Matrix4x4.rotationZ(-uvTransform.rotation)
-          : Matrix4x4.identity();
-        const scale = uvTransform.scale !== undefined
-          ? new Vector3(uvTransform.scale[0], uvTransform.scale[1], 1)
-          : Vector3.one();
-        const translation = uvTransform.offset !== undefined
-          ? new Vector3(uvTransform.offset[0], uvTransform.offset[1], 0)
-          : Vector3.zero();
+        const rotation =
+          uvTransform.rotation !== undefined
+            ? Matrix4x4.rotationZ(-uvTransform.rotation)
+            : Matrix4x4.identity();
+        const scale =
+          uvTransform.scale !== undefined
+            ? new Vector3(uvTransform.scale[0], uvTransform.scale[1], 1)
+            : Vector3.one();
+        const translation =
+          uvTransform.offset !== undefined
+            ? new Vector3(uvTransform.offset[0], uvTransform.offset[1], 0)
+            : Vector3.zero();
         mt.transform = Matrix4x4.scaling(scale).multiplyLeft(rotation).translateLeft(translation);
       }
       let wrapS: TextureWrapping = TextureWrapping.Repeat;
@@ -792,11 +1020,7 @@ export class GLTFLoader extends AbstractModelLoader {
             if (bufferView) {
               const arrayBuffer = gltf._loadedBuffers && gltf._loadedBuffers[bufferView.buffer];
               if (arrayBuffer) {
-                const view = new Uint8Array(
-                  arrayBuffer,
-                  bufferView.byteOffset || 0,
-                  bufferView.byteLength,
-                );
+                const view = new Uint8Array(arrayBuffer, bufferView.byteOffset || 0, bufferView.byteLength);
                 const mimeType = image.mimeType;
                 const blob = new Blob([view], { type: mimeType });
                 const sourceURI = URL.createObjectURL(blob);
@@ -816,7 +1040,7 @@ export class GLTFLoader extends AbstractModelLoader {
           addressV: wrapT,
           magFilter: magFilter,
           minFilter: minFilter,
-          mipFilter: mipFilter,
+          mipFilter: mipFilter
         });
       }
     }
@@ -846,7 +1070,12 @@ export class GLTFLoader extends AbstractModelLoader {
     }
   }
   /** @internal */
-  private _loadIndexBuffer(gltf: GLTFContent, accessorIndex: number, primitive: Primitive, meshData: AssetSubMeshData) {
+  private _loadIndexBuffer(
+    gltf: GLTFContent,
+    accessorIndex: number,
+    primitive: Primitive,
+    meshData: AssetSubMeshData
+  ) {
     this._setBuffer(gltf, accessorIndex, primitive, null, meshData);
   }
   /** @internal */
@@ -907,7 +1136,13 @@ export class GLTFLoader extends AbstractModelLoader {
     this._setBuffer(gltf, accessorIndex, primitive, semantic, subMeshData);
   }
   /** @internal */
-  private _setBuffer(gltf: GLTFContent, accessorIndex: number, primitive: Primitive, semantic: VertexSemantic, subMeshData: AssetSubMeshData) {
+  private _setBuffer(
+    gltf: GLTFContent,
+    accessorIndex: number,
+    primitive: Primitive,
+    semantic: VertexSemantic,
+    subMeshData: AssetSubMeshData
+  ) {
     const accessor = gltf._accessors[accessorIndex];
     const normalized = !!accessor.normalized;
     const hash = `${accessorIndex}:${!!semantic}:${Number(normalized)}`;
@@ -966,11 +1201,20 @@ export class GLTFLoader extends AbstractModelLoader {
       if (!semantic) {
         buffer = gltf._manager.device.createIndexBuffer(data as Uint16Array | Uint32Array, { managed: true });
       } else {
-        const bufferType = new PBStructTypeInfo(null, 'packed', [{
-          name: semantic,
-          type: new PBArrayTypeInfo(PBPrimitiveTypeInfo.getCachedTypeInfo(makePrimitiveType(typeMask, 1, componentCount, 0)), data.length / componentCount),
-        }]);
-        buffer = gltf._manager.device.createStructuredBuffer(bufferType, { usage: 'vertex', managed: true }, data);
+        const bufferType = new PBStructTypeInfo(null, 'packed', [
+          {
+            name: semantic,
+            type: new PBArrayTypeInfo(
+              PBPrimitiveTypeInfo.getCachedTypeInfo(makePrimitiveType(typeMask, 1, componentCount, 0)),
+              data.length / componentCount
+            )
+          }
+        ]);
+        buffer = gltf._manager.device.createStructuredBuffer(
+          bufferType,
+          { usage: 'vertex', managed: true },
+          data
+        );
       }
       gltf._bufferCache[hash] = buffer;
     }
@@ -991,14 +1235,17 @@ export class GLTFLoader extends AbstractModelLoader {
           if (min && max) {
             primitive.setBoundingVolume(new BoundingBox(new Vector3(min), new Vector3(max)));
           } else {
-            const numComponents = getVertexBufferAttribTypeBySemantic((buffer as StructuredBuffer).structure, semantic).cols;
+            const numComponents = getVertexBufferAttribTypeBySemantic(
+              (buffer as StructuredBuffer).structure,
+              semantic
+            ).cols;
             const bbox = new BoundingBox();
             bbox.beginExtend();
             for (let i = 0; i < data.length; i++) {
               const v = new Vector3(
                 data[i * numComponents],
                 data[i * numComponents + 1],
-                data[i * numComponents + 2],
+                data[i * numComponents + 2]
               );
               bbox.extend(v);
             }
@@ -1019,14 +1266,17 @@ export class GLTFLoader extends AbstractModelLoader {
   private isGLB(data: ArrayBuffer): boolean {
     if (data.byteLength > 12) {
       const p = new Uint32Array(data, 0, 3);
-      if (p[0] === 0x46546C67 && p[1] === 2 && p[2] === data.byteLength) {
+      if (p[0] === 0x46546c67 && p[1] === 2 && p[2] === data.byteLength) {
         return true;
       }
     }
     return false;
   }
   /** @internal */
-  private getGLBChunkInfo(data: ArrayBuffer, offset: number): { start: number, length: number, type: number } {
+  private getGLBChunkInfo(
+    data: ArrayBuffer,
+    offset: number
+  ): { start: number; length: number; type: number } {
     const header = new Uint32Array(data, offset, 2);
     const start = offset + 8;
     const length = header[0];
@@ -1034,8 +1284,8 @@ export class GLTFLoader extends AbstractModelLoader {
     return { start, length, type };
   }
   /** @internal */
-  private getGLBChunkInfos(data: ArrayBuffer): { start: number, length: number, type: number }[] {
-    const infos: { start: number, length: number, type: number }[] = [];
+  private getGLBChunkInfos(data: ArrayBuffer): { start: number; length: number; type: number }[] {
+    const infos: { start: number; length: number; type: number }[] = [];
     let offset = 12;
     while (offset < data.byteLength) {
       const info = this.getGLBChunkInfo(data, offset);

@@ -1,5 +1,5 @@
 import { Matrix4x4 } from '@sophon/base';
-import { BlendFunc, Device, BindGroup, GPUProgram, PBGlobalScope, ProgramBuilder  } from '@sophon/device';
+import { BlendFunc, Device, BindGroup, GPUProgram, PBGlobalScope, ProgramBuilder } from '@sophon/device';
 import { Material } from '../material';
 import { ShaderLib } from './shaderlib';
 import { forwardComputeLighting } from '../renderers/forward.shaderlib';
@@ -70,8 +70,11 @@ export class StandardMaterial<T extends LightModel = LightModel> extends Materia
     if (this._alphaBlend !== !!val) {
       this._alphaBlend = !!val;
       const blending = this._alphaBlend || this._opacity < 1;
-      if (blending && (!this._renderStateSet.blendingState?.enabled)) {
-        this._renderStateSet.useBlendingState().enable(true).setBlendFunc(BlendFunc.ONE, BlendFunc.INV_SRC_ALPHA);
+      if (blending && !this._renderStateSet.blendingState?.enabled) {
+        this._renderStateSet
+          .useBlendingState()
+          .enable(true)
+          .setBlendFunc(BlendFunc.ONE, BlendFunc.INV_SRC_ALPHA);
       } else if (this._renderStateSet.blendingState?.enabled && !blending) {
         this._renderStateSet.defaultBlendingState();
       }
@@ -96,8 +99,11 @@ export class StandardMaterial<T extends LightModel = LightModel> extends Materia
       this.optionChanged(this._opacity === 1 || val === 1);
       this._opacity = val;
       const blending = this._alphaBlend || this._opacity < 1;
-      if (blending && (!this._renderStateSet.blendingState?.enabled)) {
-        this._renderStateSet.useBlendingState().enable(true).setBlendFunc(BlendFunc.ONE, BlendFunc.INV_SRC_ALPHA);
+      if (blending && !this._renderStateSet.blendingState?.enabled) {
+        this._renderStateSet
+          .useBlendingState()
+          .enable(true)
+          .setBlendFunc(BlendFunc.ONE, BlendFunc.INV_SRC_ALPHA);
       } else if (this._renderStateSet.blendingState?.enabled && !blending) {
         this._renderStateSet.defaultBlendingState();
       }
@@ -127,7 +133,9 @@ export class StandardMaterial<T extends LightModel = LightModel> extends Materia
       if (this._texCoordTransforms.size === 0) {
         this._texCoordTransforms = null;
       }
-      this._texCoordTransformHash = this._texCoordTransforms ? [...this._texCoordTransforms.keys()].sort().join('') : '';
+      this._texCoordTransformHash = this._texCoordTransforms
+        ? [...this._texCoordTransforms.keys()].sort().join('')
+        : '';
       this.optionChanged(true);
     }
   }
@@ -155,24 +163,30 @@ export class StandardMaterial<T extends LightModel = LightModel> extends Materia
     if (this._alphaBlend || this._opacity < 1) {
       bindGroup.setValue('opacity', this._opacity);
     }
-    this._texCoordTransforms?.forEach(((val, key) => {
+    this._texCoordTransforms?.forEach((val, key) => {
       bindGroup.setValue(`texCoordMatrix${key}`, val);
-    }));
+    });
   }
   protected _createHash(): string {
-    return `|${Number(!!this._vertexColor)}`
-      + `|${Number(!!this._useTangent)}`
-      + `|${Number(!!this._hasNormal)}`
-      + `|${Number(this._opacity < 1 || this._alphaBlend)}`
-      + `|${Number(this._alphaCutoff > 0)}`
-      + `|${this._lightModel?.getHash() || ''}`
-      + `|${this._texCoordTransformHash}`;
+    return (
+      `|${Number(!!this._vertexColor)}` +
+      `|${Number(!!this._useTangent)}` +
+      `|${Number(!!this._hasNormal)}` +
+      `|${Number(this._opacity < 1 || this._alphaBlend)}` +
+      `|${Number(this._alphaCutoff > 0)}` +
+      `|${this._lightModel?.getHash() || ''}` +
+      `|${this._texCoordTransformHash}`
+    );
   }
   protected _createProgram(pb: ProgramBuilder, ctx: DrawContext, func: number): GPUProgram {
     const that = this;
     const lib = new ShaderLib(pb);
-    const useNormal = that._hasNormal && (func !== values.MATERIAL_FUNC_DEPTH_ONLY && (that._lightModel?.isNormalUsed()));
-    if (ctx.materialFunc === values.MATERIAL_FUNC_DEPTH_SHADOW && (ctx.renderPass as ShadowMapPass).light.shadow.depthClampEnabled) {
+    const useNormal =
+      that._hasNormal && func !== values.MATERIAL_FUNC_DEPTH_ONLY && that._lightModel?.isNormalUsed();
+    if (
+      ctx.materialFunc === values.MATERIAL_FUNC_DEPTH_SHADOW &&
+      (ctx.renderPass as ShadowMapPass).light.shadow.depthClampEnabled
+    ) {
       pb.emulateDepthClamp = true;
     } else {
       pb.emulateDepthClamp = false;
@@ -219,12 +233,22 @@ export class StandardMaterial<T extends LightModel = LightModel> extends Materia
               }
             }
           }
-          this.$outputs.worldPosition = lib.objectSpacePositionToWorld(this.$l.pos).tag(ShaderLib.USAGE_WORLD_POSITION);
+          this.$outputs.worldPosition = lib
+            .objectSpacePositionToWorld(this.$l.pos)
+            .tag(ShaderLib.USAGE_WORLD_POSITION);
           if (useNormal) {
-            this.$outputs.worldNormal = pb.normalize(lib.objectSpaceVectorToWorld(this.$l.norm)).tag(ShaderLib.USAGE_WORLD_NORMAL);
+            this.$outputs.worldNormal = pb
+              .normalize(lib.objectSpaceVectorToWorld(this.$l.norm))
+              .tag(ShaderLib.USAGE_WORLD_NORMAL);
             if (that._useTangent) {
-              this.$outputs.worldTangent = pb.normalize(lib.objectSpaceVectorToWorld(this.$l.tangent.xyz)).tag(ShaderLib.USAGE_WORLD_TANGENT);
-              this.$outputs.worldBinormal = pb.normalize(pb.mul(pb.cross(this.$outputs.worldNormal, this.$outputs.worldTangent), this.$l.tangent.w)).tag(ShaderLib.USAGE_WORLD_BINORMAL);
+              this.$outputs.worldTangent = pb
+                .normalize(lib.objectSpaceVectorToWorld(this.$l.tangent.xyz))
+                .tag(ShaderLib.USAGE_WORLD_TANGENT);
+              this.$outputs.worldBinormal = pb
+                .normalize(
+                  pb.mul(pb.cross(this.$outputs.worldNormal, this.$outputs.worldTangent), this.$l.tangent.w)
+                )
+                .tag(ShaderLib.USAGE_WORLD_BINORMAL);
             }
           }
           this.$builtins.position = lib.ftransform(this.$l.pos);
@@ -251,7 +275,9 @@ export class StandardMaterial<T extends LightModel = LightModel> extends Materia
           }
           this.$outputs.outColor = pb.vec4();
           this.$mainFunc(function () {
-            this.$l.litColor = that._lightModel ? forwardComputeLighting(this, that._lightModel, ctx) : pb.vec4(1);
+            this.$l.litColor = that._lightModel
+              ? forwardComputeLighting(this, that._lightModel, ctx)
+              : pb.vec4(1);
             if (!blend && that._alphaCutoff === 0) {
               this.litColor.a = 1;
             } else if (blend) {
@@ -276,7 +302,9 @@ export class StandardMaterial<T extends LightModel = LightModel> extends Materia
         } else if (func === values.MATERIAL_FUNC_DEPTH_SHADOW) {
           this.$outputs.outColor = pb.vec4();
           this.$mainFunc(function () {
-            this.$outputs.outColor = (ctx.renderPass as ShadowMapPass).light.shadow.computeShadowMapDepth(this);
+            this.$outputs.outColor = (ctx.renderPass as ShadowMapPass).light.shadow.computeShadowMapDepth(
+              this
+            );
           });
         } else {
           throw new Error(`unknown material function: ${func}`);
@@ -285,4 +313,3 @@ export class StandardMaterial<T extends LightModel = LightModel> extends Materia
     });
   }
 }
-

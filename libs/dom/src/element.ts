@@ -2,7 +2,7 @@ import { REvent } from '@sophon/base';
 import { RNode } from './node';
 import { RAttributeChangeEvent } from './events';
 import { RNodeList, RStaticNodeList } from './nodelist';
-import type {GUI} from './gui';
+import type { GUI } from './gui';
 
 export interface RClassList {
   [n: number]: string;
@@ -31,7 +31,7 @@ export class RClassList {
         } else {
           return target[name];
         }
-      },
+      }
     });
     RClassList._elementMap.set(proxy, el);
     return proxy;
@@ -147,7 +147,7 @@ export class RElement extends RNode {
   /** @internal */
   protected _tagname: string;
   /** @internal */
-  protected _attributes: {[name: string]: string};
+  protected _attributes: { [name: string]: string };
   /** @internal */
   protected _classList: RClassList;
   /** @internal */
@@ -195,7 +195,7 @@ export class RElement extends RNode {
   get attributes(): RAttr[] {
     const result: RAttr[] = [];
     for (const name in this._attributes) {
-      result.push({name: name, value: this._attributes[name]});
+      result.push({ name: name, value: this._attributes[name] });
     }
     return result;
   }
@@ -214,9 +214,7 @@ export class RElement extends RNode {
   getAttribute(k: string): string {
     if (k) {
       k = k.toLowerCase();
-      return k === 'class'
-        ? this._classList.value
-        : (this._attributes && this._attributes[k]) || null;
+      return k === 'class' ? this._classList.value : (this._attributes && this._attributes[k]) || null;
     }
     return null;
   }

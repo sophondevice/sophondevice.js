@@ -27,9 +27,8 @@ export class BoundingBox extends AABB {
   }
   outsideFrustum(frustum: Frustum | Matrix4x4): boolean {
     return (
-      (frustum instanceof Frustum
-        ? this.getClipStateWithFrustum(frustum)
-        : this.getClipState(frustum)) === ClipState.NOT_CLIPPED
+      (frustum instanceof Frustum ? this.getClipStateWithFrustum(frustum) : this.getClipState(frustum)) ===
+      ClipState.NOT_CLIPPED
     );
   }
   toAABB(): AABB {
@@ -57,9 +56,8 @@ export class BoundingBoxTree extends AABBTree {
     const aabb = this.getTopLevelAABB();
     if (aabb) {
       return (
-        (frustum instanceof Frustum
-          ? aabb.getClipStateWithFrustum(frustum)
-          : aabb.getClipState(frustum)) === ClipState.NOT_CLIPPED
+        (frustum instanceof Frustum ? aabb.getClipStateWithFrustum(frustum) : aabb.getClipState(frustum)) ===
+        ClipState.NOT_CLIPPED
       );
     } else {
       return false;

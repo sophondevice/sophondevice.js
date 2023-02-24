@@ -23,7 +23,7 @@ export class Model extends GraphNode {
   }
   addAnimation(name?: string): AnimationClip {
     if (!name) {
-      for (; ;) {
+      for (;;) {
         name = `animation${this._animationIndex++}`;
         if (!this._animationIndex[name]) {
           break;
@@ -81,5 +81,4 @@ export class Model extends GraphNode {
       this.scene.removeEventListener('tick', this._updateCallback);
     }
   }
-
 }

@@ -20,7 +20,10 @@ export class ForwardMultiRenderPass extends RenderPass {
     this._overriddenState = renderScheme.device.createRenderStateSet();
     this._overriddenState.useBlendingState().enable(true).setBlendFunc(BlendFunc.ONE, BlendFunc.ONE);
     this._overriddenStateTrans = renderScheme.device.createRenderStateSet();
-    this._overriddenStateTrans.useBlendingState().enable(true).setBlendFunc(BlendFunc.ONE, BlendFunc.INV_SRC_ALPHA);
+    this._overriddenStateTrans
+      .useBlendingState()
+      .enable(true)
+      .setBlendFunc(BlendFunc.ONE, BlendFunc.INV_SRC_ALPHA);
     this._overriddenStateTrans.useDepthState().enableTest(true).enableWrite(false);
     this._currentLight = null;
   }
@@ -33,7 +36,9 @@ export class ForwardMultiRenderPass extends RenderPass {
   /** @internal */
   protected _getGlobalBindGroupHash(ctx: DrawContext) {
     const shadowMapHash = ctx.shadowMapper ? ctx.shadowMapper.shaderHash : '';
-    return `${this._currentLight?.lightType || LIGHT_TYPE_NONE}:${ctx.environment?.constructor.name || ''}:${shadowMapHash}`;
+    return `${this._currentLight?.lightType || LIGHT_TYPE_NONE}:${
+      ctx.environment?.constructor.name || ''
+    }:${shadowMapHash}`;
   }
   /** @internal */
   protected setLightUniforms(bindGroup: BindGroup, ctx: DrawContext, light: PunctualLight) {
@@ -50,7 +55,7 @@ export class ForwardMultiRenderPass extends RenderPass {
           shadowCameraParams: light.shadow.shadowCameraParams,
           depthBiasScales: light.shadow.depthBiasScales,
           lightType: light.lightType,
-          envLightStrength: light.scene.envLightStrength,
+          envLightStrength: light.scene.envLightStrength
         }
       });
       if (ctx.shadowMapper) {
@@ -69,7 +74,7 @@ export class ForwardMultiRenderPass extends RenderPass {
       pb.mat4('viewProjectionMatrix'),
       pb.mat4('viewMatrix'),
       pb.mat4('projectionMatrix'),
-      pb.vec4('params'),
+      pb.vec4('params')
     );
     const structLight = pb.defineStruct(
       null,
@@ -84,24 +89,21 @@ export class ForwardMultiRenderPass extends RenderPass {
       pb.vec4[16]('shadowMatrix'),
       pb.int('shadowCascades'),
       pb.int('lightType'),
-      pb.float('envLightStrength'),
+      pb.float('envLightStrength')
     );
-    const structGlobal = pb.defineStruct(
-      null,
-      'std140',
-      structCamera('camera'),
-      structLight('light'),
-    );
-    pb.globalScope.global = structGlobal().uniform(0).tag({
-      camera: {
-        position: ShaderLib.USAGE_CAMERA_POSITION,
-        viewProjectionMatrix: ShaderLib.USAGE_VIEW_PROJ_MATRIX,
-        params: ShaderLib.USAGE_CAMERA_PARAMS,
-      },
-      light: {
-        envLightStrength: ShaderLib.USAGE_ENV_LIGHT_STRENGTH,
-      }
-    });
+    const structGlobal = pb.defineStruct(null, 'std140', structCamera('camera'), structLight('light'));
+    pb.globalScope.global = structGlobal()
+      .uniform(0)
+      .tag({
+        camera: {
+          position: ShaderLib.USAGE_CAMERA_POSITION,
+          viewProjectionMatrix: ShaderLib.USAGE_VIEW_PROJ_MATRIX,
+          params: ShaderLib.USAGE_CAMERA_PARAMS
+        },
+        light: {
+          envLightStrength: ShaderLib.USAGE_ENV_LIGHT_STRENGTH
+        }
+      });
     if (ctx.shadowMapper) {
       const shadowTex = ctx.shadowMapper.shadowMap.isTexture2D() ? pb.tex2D() : pb.texCube();
       if (!this.device.getTextureCaps().getTextureFormatInfo(ctx.shadowMapper.shadowMap.format).filterable) {
@@ -118,7 +120,7 @@ export class ForwardMultiRenderPass extends RenderPass {
       target: null,
       materialFunc: MATERIAL_FUNC_NORMAL,
       renderPass: this,
-      renderPassHash: null,
+      renderPassHash: null
     };
     const device = this._renderScheme.device;
     const env = camera.scene.environment;
@@ -126,7 +128,9 @@ export class ForwardMultiRenderPass extends RenderPass {
     renderQueue.sortItems();
 
     lightList = lightList?.length > 0 ? lightList : [null];
-    for (const order of Object.keys(renderQueue.items).map(val => Number(val)).sort((a, b) => a - b)) {
+    for (const order of Object.keys(renderQueue.items)
+      .map((val) => Number(val))
+      .sort((a, b) => a - b)) {
       const items = renderQueue.items[order];
       const lists = [items.opaqueList, items.transList];
       const overriddenBlendingStates = [this._overriddenState, this._overriddenStateTrans];
@@ -169,7 +173,11 @@ export class ForwardMultiRenderPass extends RenderPass {
             }
             device.setBindGroup(0, bindGroup);
             if (ctx.shadowMapper) {
-              bindGroup.setTexture('shadowMap', ctx.shadowMapper.shadowMap, ctx.shadowMapper.shadowMapSampler);
+              bindGroup.setTexture(
+                'shadowMap',
+                ctx.shadowMapper.shadowMap,
+                ctx.shadowMapper.shadowMapSampler
+              );
             }
             this.setCameraUniforms(bindGroup, ctx, this._verticalFlip !== flip);
             this.setLightUniforms(bindGroup, ctx, light);

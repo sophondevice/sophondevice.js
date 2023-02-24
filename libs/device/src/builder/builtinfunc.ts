@@ -1,31 +1,50 @@
 import * as typeinfo from './types';
 import { ASTExpression, ASTUnaryFunc, ASTBinaryFunc } from './ast';
 import { PBShaderExp } from './base';
-import { PBDeviceNotSupport, PBOverloadingMatchError, PBParamLengthError, PBParamTypeError, PBParamValueError } from './errors';
+import {
+  PBDeviceNotSupport,
+  PBOverloadingMatchError,
+  PBParamLengthError,
+  PBParamTypeError,
+  PBParamValueError
+} from './errors';
 import type { ExpValueType, ProgramBuilder } from './programbuilder';
 
 const genTypeList = [
   [typeinfo.typeF32, typeinfo.typeF32Vec2, typeinfo.typeF32Vec3, typeinfo.typeF32Vec4],
   [typeinfo.typeI32, typeinfo.typeI32Vec2, typeinfo.typeI32Vec3, typeinfo.typeI32Vec4],
   [typeinfo.typeU32, typeinfo.typeU32Vec2, typeinfo.typeU32Vec3, typeinfo.typeU32Vec4],
-  [typeinfo.typeBool, typeinfo.typeBVec2, typeinfo.typeBVec3, typeinfo.typeBVec4],
+  [typeinfo.typeBool, typeinfo.typeBVec2, typeinfo.typeBVec3, typeinfo.typeBVec4]
 ];
 
 const genMatrixTypeList = [
-  typeinfo.typeMat2, typeinfo.typeMat2x3, typeinfo.typeMat2x4,
-  typeinfo.typeMat3x2, typeinfo.typeMat3, typeinfo.typeMat3x4,
-  typeinfo.typeMat4x2, typeinfo.typeMat4x3, typeinfo.typeMat4
+  typeinfo.typeMat2,
+  typeinfo.typeMat2x3,
+  typeinfo.typeMat2x4,
+  typeinfo.typeMat3x2,
+  typeinfo.typeMat3,
+  typeinfo.typeMat3x4,
+  typeinfo.typeMat4x2,
+  typeinfo.typeMat4x3,
+  typeinfo.typeMat4
 ];
 
 type WrapFunction = (pb: ProgramBuilder, name: string, ...args: ExpValueType[]) => PBShaderExp;
 
 function matchFunctionOverloadings(pb: ProgramBuilder, name: string, ...args: ExpValueType[]) {
-  const bit = pb.getDeviceType() === 'webgl' ? MASK_WEBGL1 : (pb.getDeviceType() === 'webgl2' ? MASK_WEBGL2 : MASK_WEBGPU);
-  const overloadings = builtinFunctionsAll?.[name].overloads.filter(val => !!(val[1] & bit)).map(val => val[0]);
+  const bit =
+    pb.getDeviceType() === 'webgl'
+      ? MASK_WEBGL1
+      : pb.getDeviceType() === 'webgl2'
+      ? MASK_WEBGL2
+      : MASK_WEBGPU;
+  const overloadings = builtinFunctionsAll?.[name].overloads
+    .filter((val) => !!(val[1] & bit))
+    .map((val) => val[0]);
   if (!overloadings || overloadings.length === 0) {
     throw new PBDeviceNotSupport(`builtin shader function '${name}'`);
   }
-  const argsNonArray = args.map(val => pb.normalizeExpValue(val));
+  const argsNonArray = args.map((val) => pb.normalizeExpValue(val));
   const matchResult = pb._matchFunctionOverloading(overloadings, argsNonArray);
   if (!matchResult) {
     throw new PBOverloadingMatchError(name);
@@ -39,12 +58,16 @@ function callBuiltin(pb: ProgramBuilder, name: string, ...args: ExpValueType[]):
   return callBuiltinChecked(pb, matchFunctionOverloadings(pb, name, ...args));
 }
 
-function genMatrixType(name: string, shaderTypeMask: number, r: typeinfo.PBTypeInfo, args: (typeinfo.PBPrimitiveTypeInfo)[])
-  : [typeinfo.PBFunctionTypeInfo, number][] {
+function genMatrixType(
+  name: string,
+  shaderTypeMask: number,
+  r: typeinfo.PBTypeInfo,
+  args: typeinfo.PBPrimitiveTypeInfo[]
+): [typeinfo.PBFunctionTypeInfo, number][] {
   const result: [typeinfo.PBFunctionTypeInfo, number][] = [];
   for (let i = 0; i < genMatrixTypeList.length; i++) {
     const returnType = r || genMatrixTypeList[i];
-    const argTypes = args.map(arg => {
+    const argTypes = args.map((arg) => {
       return { type: arg || genMatrixTypeList[i] };
     });
     result.push([new typeinfo.PBFunctionTypeInfo(name, returnType, argTypes), shaderTypeMask]);
@@ -52,16 +75,30 @@ function genMatrixType(name: string, shaderTypeMask: number, r: typeinfo.PBTypeI
   return result;
 }
 
-function genType(name: string, shaderTypeMask, r: typeinfo.PBTypeInfo | number, args: (typeinfo.PBTypeInfo | number)[], vecOnly?: boolean)
-  : [typeinfo.PBFunctionTypeInfo, number][] {
-  if (args.findIndex(val => (typeof val === 'number')) < 0) {
-    return [[new typeinfo.PBFunctionTypeInfo(name, r as typeinfo.PBPrimitiveTypeInfo, args.map(arg => ({ type: arg as typeinfo.PBTypeInfo }))), shaderTypeMask]];
+function genType(
+  name: string,
+  shaderTypeMask,
+  r: typeinfo.PBTypeInfo | number,
+  args: (typeinfo.PBTypeInfo | number)[],
+  vecOnly?: boolean
+): [typeinfo.PBFunctionTypeInfo, number][] {
+  if (args.findIndex((val) => typeof val === 'number') < 0) {
+    return [
+      [
+        new typeinfo.PBFunctionTypeInfo(
+          name,
+          r as typeinfo.PBPrimitiveTypeInfo,
+          args.map((arg) => ({ type: arg as typeinfo.PBTypeInfo }))
+        ),
+        shaderTypeMask
+      ]
+    ];
   } else {
     const result: [typeinfo.PBFunctionTypeInfo, number][] = [];
     let i = vecOnly ? 1 : 0;
     for (; i < 4; i++) {
       const returnType = typeof r === 'number' ? genTypeList[r][i] : r;
-      const argTypes = args.map(arg => {
+      const argTypes = args.map((arg) => {
         if (typeof arg === 'number') {
           return { type: genTypeList[arg][i] };
         } else {
@@ -80,12 +117,7 @@ function unaryFunc(a: ASTExpression, op: string, type: typeinfo.PBTypeInfo): PBS
   return exp;
 }
 
-function binaryFunc(
-  a: ASTExpression,
-  b: ASTExpression,
-  op: string,
-  type: typeinfo.PBTypeInfo
-): PBShaderExp {
+function binaryFunc(a: ASTExpression, b: ASTExpression, op: string, type: typeinfo.PBTypeInfo): PBShaderExp {
   const exp = new PBShaderExp('', type);
   exp.$ast = new ASTBinaryFunc(a, b, op, type);
   return exp;
@@ -97,7 +129,9 @@ const MASK_WEBGPU = 1 << 2;
 const MASK_WEBGL = MASK_WEBGL1 | MASK_WEBGL2;
 const MASK_ALL = MASK_WEBGL | MASK_WEBGPU;
 
-const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionTypeInfo, number][], normalizeFunc?: WrapFunction } } = {
+const builtinFunctionsAll: {
+  [name: string]: { overloads?: [typeinfo.PBFunctionTypeInfo, number][]; normalizeFunc?: WrapFunction };
+} = {
   add_2: {
     overloads: [
       ...genType('', MASK_ALL, 0, [0, 0]),
@@ -125,7 +159,7 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
       ...genType('', MASK_ALL, typeinfo.typeU32Vec4, [typeinfo.typeU32, typeinfo.typeU32Vec4]),
       ...genType('', MASK_ALL, typeinfo.typeU32Vec4, [typeinfo.typeU32Vec4, typeinfo.typeU32]),
 
-      ...genMatrixType('', MASK_ALL, null, [null, null]),
+      ...genMatrixType('', MASK_ALL, null, [null, null])
     ],
     normalizeFunc(pb, name, ...args) {
       const matchResult = matchFunctionOverloadings(pb, name, ...args);
@@ -172,7 +206,7 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
       ...genType('', MASK_ALL, typeinfo.typeU32Vec4, [typeinfo.typeU32, typeinfo.typeU32Vec4]),
       ...genType('', MASK_ALL, typeinfo.typeU32Vec4, [typeinfo.typeU32Vec4, typeinfo.typeU32]),
 
-      ...genMatrixType('', MASK_ALL, null, [null, null]),
+      ...genMatrixType('', MASK_ALL, null, [null, null])
     ],
     normalizeFunc(pb, name, ...args) {
       const matchResult = matchFunctionOverloadings(pb, name, ...args);
@@ -204,7 +238,7 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
       ...genType('', MASK_ALL, typeinfo.typeU32Vec3, [typeinfo.typeU32, typeinfo.typeU32Vec3]),
       ...genType('', MASK_ALL, typeinfo.typeU32Vec3, [typeinfo.typeU32Vec3, typeinfo.typeU32]),
       ...genType('', MASK_ALL, typeinfo.typeU32Vec4, [typeinfo.typeU32, typeinfo.typeU32Vec4]),
-      ...genType('', MASK_ALL, typeinfo.typeU32Vec4, [typeinfo.typeU32Vec4, typeinfo.typeU32]),
+      ...genType('', MASK_ALL, typeinfo.typeU32Vec4, [typeinfo.typeU32Vec4, typeinfo.typeU32])
     ],
     normalizeFunc(pb, name, ...args) {
       const matchResult = matchFunctionOverloadings(pb, name, ...args);
@@ -293,7 +327,7 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
       ...genType('', MASK_ALL, typeinfo.typeMat3x4, [typeinfo.typeMat4, typeinfo.typeMat3x4]),
       ...genType('', MASK_ALL, typeinfo.typeMat4, [typeinfo.typeMat4, typeinfo.typeMat4]),
       ...genType('', MASK_ALL, typeinfo.typeF32Vec4, [typeinfo.typeMat4, typeinfo.typeF32Vec4]),
-      ...genType('', MASK_ALL, typeinfo.typeF32Vec4, [typeinfo.typeF32Vec4, typeinfo.typeMat4]),
+      ...genType('', MASK_ALL, typeinfo.typeF32Vec4, [typeinfo.typeF32Vec4, typeinfo.typeMat4])
     ],
     normalizeFunc(pb, name, ...args) {
       const matchResult = matchFunctionOverloadings(pb, name, ...args);
@@ -318,12 +352,15 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
       ...genType('mod', MASK_ALL, 0, [0, 0]),
       ...genType('mod', MASK_ALL, 1, [1, 1]),
       ...genType('mod', MASK_ALL, 2, [2, 2]),
-      ...genType('mod', MASK_ALL, 3, [3, 3]),
+      ...genType('mod', MASK_ALL, 3, [3, 3])
     ],
     normalizeFunc(pb, name, ...args) {
       const matchResult = matchFunctionOverloadings(pb, name, ...args);
       const argType = matchResult[1][0].getType();
-      const isIntegerType = argType.isPrimitiveType() && (argType.scalarType === typeinfo.PBPrimitiveType.I32 || argType.scalarType === typeinfo.PBPrimitiveType.U32);
+      const isIntegerType =
+        argType.isPrimitiveType() &&
+        (argType.scalarType === typeinfo.PBPrimitiveType.I32 ||
+          argType.scalarType === typeinfo.PBPrimitiveType.U32);
       if (pb.getDeviceType() === 'webgl' && isIntegerType) {
         throw new PBDeviceNotSupport('integer modulus');
       }
@@ -343,10 +380,7 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
   acos: { overloads: genType('acos', MASK_ALL, 0, [0]) },
   atan: { overloads: genType('atan', MASK_ALL, 0, [0]) },
   atan2: {
-    overloads: [
-      ...genType('atan', MASK_WEBGL, 0, [0, 0]),
-      ...genType('atan2', MASK_WEBGPU, 0, [0, 0]),
-    ]
+    overloads: [...genType('atan', MASK_WEBGL, 0, [0, 0]), ...genType('atan2', MASK_WEBGPU, 0, [0, 0])]
   },
   sinh: { overloads: genType('sinh', MASK_WEBGL2 | MASK_WEBGPU, 0, [0]) },
   cosh: { overloads: genType('cosh', MASK_WEBGL2 | MASK_WEBGPU, 0, [0]) },
@@ -361,10 +395,7 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
   log2: { overloads: genType('log2', MASK_ALL, 0, [0]) },
   sqrt: { overloads: genType('sqrt', MASK_ALL, 0, [0]) },
   inverseSqrt: {
-    overloads: [
-      ...genType('inversesqrt', MASK_WEBGL, 0, [0]),
-      ...genType('inverseSqrt', MASK_WEBGPU, 0, [0])
-    ]
+    overloads: [...genType('inversesqrt', MASK_WEBGL, 0, [0]), ...genType('inverseSqrt', MASK_WEBGPU, 0, [0])]
   },
   abs: {
     overloads: [
@@ -374,10 +405,7 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
     ]
   },
   sign: {
-    overloads: [
-      ...genType('sign', MASK_ALL, 0, [0]),
-      ...genType('sign', MASK_WEBGL2, 1, [1])
-    ]
+    overloads: [...genType('sign', MASK_ALL, 0, [0]), ...genType('sign', MASK_WEBGL2, 1, [1])]
   },
   floor: { overloads: genType('floor', MASK_ALL, 0, [0]) },
   ceil: { overloads: genType('ceil', MASK_ALL, 0, [0]) },
@@ -390,27 +418,27 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
     overloads: [
       ...genType('min', MASK_ALL, 0, [0, 0]),
       ...genType('min', MASK_WEBGL2 | MASK_WEBGPU, 1, [1, 1]),
-      ...genType('min', MASK_WEBGL2 | MASK_WEBGPU, 2, [2, 2]),
+      ...genType('min', MASK_WEBGL2 | MASK_WEBGPU, 2, [2, 2])
     ]
   },
   max: {
     overloads: [
       ...genType('max', MASK_ALL, 0, [0, 0]),
       ...genType('max', MASK_WEBGL2 | MASK_WEBGPU, 1, [1, 1]),
-      ...genType('max', MASK_WEBGL2 | MASK_WEBGPU, 2, [2, 2]),
+      ...genType('max', MASK_WEBGL2 | MASK_WEBGPU, 2, [2, 2])
     ]
   },
   clamp: {
     overloads: [
       ...genType('clamp', MASK_ALL, 0, [0, 0, 0]),
       ...genType('clamp', MASK_WEBGL2 | MASK_WEBGPU, 1, [1, 1, 1]),
-      ...genType('clamp', MASK_WEBGL2 | MASK_WEBGPU, 2, [2, 2, 2]),
+      ...genType('clamp', MASK_WEBGL2 | MASK_WEBGPU, 2, [2, 2, 2])
     ]
   },
   mix: {
     overloads: [
       ...genType('mix', MASK_ALL, 0, [0, 0, 0]),
-      ...genType('mix', MASK_ALL, 0, [0, 0, typeinfo.typeF32]),
+      ...genType('mix', MASK_ALL, 0, [0, 0, typeinfo.typeF32])
     ]
   },
   step: { overloads: genType('step', MASK_ALL, 0, [0, 0]) },
@@ -423,15 +451,17 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
     overloads: [
       ...genType('dot', MASK_ALL, typeinfo.typeF32, [0, 0], true),
       ...genType('dot', MASK_WEBGPU, typeinfo.typeI32, [1, 1], true),
-      ...genType('dot', MASK_WEBGPU, typeinfo.typeU32, [2, 2], true),
+      ...genType('dot', MASK_WEBGPU, typeinfo.typeU32, [2, 2], true)
     ]
   },
-  cross: { overloads: genType('cross', MASK_ALL, typeinfo.typeF32Vec3, [typeinfo.typeF32Vec3, typeinfo.typeF32Vec3]) },
+  cross: {
+    overloads: genType('cross', MASK_ALL, typeinfo.typeF32Vec3, [typeinfo.typeF32Vec3, typeinfo.typeF32Vec3])
+  },
   normalize: { overloads: genType('normalize', MASK_ALL, 0, [0], true) },
   faceForward: {
     overloads: [
       ...genType('faceforward', MASK_WEBGL, 0, [0, 0, 0], true),
-      ...genType('faceForward', MASK_WEBGPU, 0, [0, 0, 0], true),
+      ...genType('faceForward', MASK_WEBGPU, 0, [0, 0, 0], true)
     ]
   },
   reflect: { overloads: genType('reflect', MASK_ALL, 0, [0, 0], true) },
@@ -441,20 +471,47 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
       ...genType('frexp', MASK_WEBGPU, typeinfo.typeFrexpResult, [typeinfo.typeF32]),
       ...genType('frexp', MASK_WEBGPU, typeinfo.typeFrexpResultVec2, [typeinfo.typeF32Vec2]),
       ...genType('frexp', MASK_WEBGPU, typeinfo.typeFrexpResultVec3, [typeinfo.typeF32Vec3]),
-      ...genType('frexp', MASK_WEBGPU, typeinfo.typeFrexpResultVec4, [typeinfo.typeF32Vec4]),
+      ...genType('frexp', MASK_WEBGPU, typeinfo.typeFrexpResultVec4, [typeinfo.typeF32Vec4])
     ]
   },
   outerProduct: {
     overloads: [
-      ...genType('outerProduct', MASK_WEBGL2, typeinfo.typeMat2, [typeinfo.typeF32Vec2, typeinfo.typeF32Vec2]),
-      ...genType('outerProduct', MASK_WEBGL2, typeinfo.typeMat3, [typeinfo.typeF32Vec3, typeinfo.typeF32Vec3]),
-      ...genType('outerProduct', MASK_WEBGL2, typeinfo.typeMat4, [typeinfo.typeF32Vec4, typeinfo.typeF32Vec4]),
-      ...genType('outerProduct', MASK_WEBGL2, typeinfo.typeMat2x3, [typeinfo.typeF32Vec3, typeinfo.typeF32Vec2]),
-      ...genType('outerProduct', MASK_WEBGL2, typeinfo.typeMat3x2, [typeinfo.typeF32Vec2, typeinfo.typeF32Vec3]),
-      ...genType('outerProduct', MASK_WEBGL2, typeinfo.typeMat2x4, [typeinfo.typeF32Vec4, typeinfo.typeF32Vec2]),
-      ...genType('outerProduct', MASK_WEBGL2, typeinfo.typeMat4x2, [typeinfo.typeF32Vec2, typeinfo.typeF32Vec4]),
-      ...genType('outerProduct', MASK_WEBGL2, typeinfo.typeMat3x4, [typeinfo.typeF32Vec4, typeinfo.typeF32Vec3]),
-      ...genType('outerProduct', MASK_WEBGL2, typeinfo.typeMat4x3, [typeinfo.typeF32Vec3, typeinfo.typeF32Vec4]),
+      ...genType('outerProduct', MASK_WEBGL2, typeinfo.typeMat2, [
+        typeinfo.typeF32Vec2,
+        typeinfo.typeF32Vec2
+      ]),
+      ...genType('outerProduct', MASK_WEBGL2, typeinfo.typeMat3, [
+        typeinfo.typeF32Vec3,
+        typeinfo.typeF32Vec3
+      ]),
+      ...genType('outerProduct', MASK_WEBGL2, typeinfo.typeMat4, [
+        typeinfo.typeF32Vec4,
+        typeinfo.typeF32Vec4
+      ]),
+      ...genType('outerProduct', MASK_WEBGL2, typeinfo.typeMat2x3, [
+        typeinfo.typeF32Vec3,
+        typeinfo.typeF32Vec2
+      ]),
+      ...genType('outerProduct', MASK_WEBGL2, typeinfo.typeMat3x2, [
+        typeinfo.typeF32Vec2,
+        typeinfo.typeF32Vec3
+      ]),
+      ...genType('outerProduct', MASK_WEBGL2, typeinfo.typeMat2x4, [
+        typeinfo.typeF32Vec4,
+        typeinfo.typeF32Vec2
+      ]),
+      ...genType('outerProduct', MASK_WEBGL2, typeinfo.typeMat4x2, [
+        typeinfo.typeF32Vec2,
+        typeinfo.typeF32Vec4
+      ]),
+      ...genType('outerProduct', MASK_WEBGL2, typeinfo.typeMat3x4, [
+        typeinfo.typeF32Vec4,
+        typeinfo.typeF32Vec3
+      ]),
+      ...genType('outerProduct', MASK_WEBGL2, typeinfo.typeMat4x3, [
+        typeinfo.typeF32Vec3,
+        typeinfo.typeF32Vec4
+      ])
     ]
   },
   transpose: {
@@ -467,28 +524,28 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
       ...genType('transpose', MASK_WEBGL2 | MASK_WEBGPU, typeinfo.typeMat2x4, [typeinfo.typeMat4x2]),
       ...genType('transpose', MASK_WEBGL2 | MASK_WEBGPU, typeinfo.typeMat4x2, [typeinfo.typeMat2x4]),
       ...genType('transpose', MASK_WEBGL2 | MASK_WEBGPU, typeinfo.typeMat3x4, [typeinfo.typeMat4x3]),
-      ...genType('transpose', MASK_WEBGL2 | MASK_WEBGPU, typeinfo.typeMat4x3, [typeinfo.typeMat3x4]),
+      ...genType('transpose', MASK_WEBGL2 | MASK_WEBGPU, typeinfo.typeMat4x3, [typeinfo.typeMat3x4])
     ]
   },
   determinant: {
     overloads: [
       ...genType('determinant', MASK_WEBGL2 | MASK_WEBGPU, typeinfo.typeF32, [typeinfo.typeMat2]),
       ...genType('determinant', MASK_WEBGL2 | MASK_WEBGPU, typeinfo.typeF32, [typeinfo.typeMat3]),
-      ...genType('determinant', MASK_WEBGL2 | MASK_WEBGPU, typeinfo.typeF32, [typeinfo.typeMat4]),
+      ...genType('determinant', MASK_WEBGL2 | MASK_WEBGPU, typeinfo.typeF32, [typeinfo.typeMat4])
     ]
   },
   inverse: {
     overloads: [
       ...genType('inverse', MASK_WEBGL2, typeinfo.typeMat2, [typeinfo.typeMat2]),
       ...genType('inverse', MASK_WEBGL2, typeinfo.typeMat3, [typeinfo.typeMat3]),
-      ...genType('inverse', MASK_WEBGL2, typeinfo.typeMat4, [typeinfo.typeMat4]),
+      ...genType('inverse', MASK_WEBGL2, typeinfo.typeMat4, [typeinfo.typeMat4])
     ]
   },
   lessThan: {
     overloads: [
       ...genType('lessThan', MASK_ALL, 3, [0, 0]),
       ...genType('lessThan', MASK_ALL, 3, [1, 1]),
-      ...genType('lessThan', MASK_ALL, 3, [2, 2]),
+      ...genType('lessThan', MASK_ALL, 3, [2, 2])
     ],
     normalizeFunc(pb, name, ...args) {
       const matchResult = matchFunctionOverloadings(pb, name, ...args);
@@ -504,7 +561,7 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
     overloads: [
       ...genType('lessThanEqual', MASK_ALL, 3, [0, 0]),
       ...genType('lessThanEqual', MASK_ALL, 3, [1, 1]),
-      ...genType('lessThanEqual', MASK_ALL, 3, [2, 2]),
+      ...genType('lessThanEqual', MASK_ALL, 3, [2, 2])
     ],
     normalizeFunc(pb, name, ...args) {
       const matchResult = matchFunctionOverloadings(pb, name, ...args);
@@ -520,7 +577,7 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
     overloads: [
       ...genType('greaterThan', MASK_ALL, 3, [0, 0]),
       ...genType('greaterThan', MASK_ALL, 3, [1, 1]),
-      ...genType('greaterThan', MASK_ALL, 3, [2, 2]),
+      ...genType('greaterThan', MASK_ALL, 3, [2, 2])
     ],
     normalizeFunc(pb, name, ...args) {
       const matchResult = matchFunctionOverloadings(pb, name, ...args);
@@ -536,7 +593,7 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
     overloads: [
       ...genType('greaterThanEqual', MASK_ALL, 3, [0, 0]),
       ...genType('greaterThanEqual', MASK_ALL, 3, [1, 1]),
-      ...genType('greaterThanEqual', MASK_ALL, 3, [2, 2]),
+      ...genType('greaterThanEqual', MASK_ALL, 3, [2, 2])
     ],
     normalizeFunc(pb, name, ...args) {
       const matchResult = matchFunctionOverloadings(pb, name, ...args);
@@ -553,7 +610,7 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
       ...genType('equal', MASK_ALL, 3, [0, 0]),
       ...genType('equal', MASK_ALL, 3, [1, 1]),
       ...genType('equal', MASK_ALL, 3, [2, 2]),
-      ...genType('equal', MASK_ALL, 3, [3, 3]),
+      ...genType('equal', MASK_ALL, 3, [3, 3])
     ],
     normalizeFunc(pb, name, ...args) {
       const matchResult = matchFunctionOverloadings(pb, name, ...args);
@@ -570,7 +627,7 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
       ...genType('notEqual', MASK_ALL, 3, [0, 0]),
       ...genType('notEqual', MASK_ALL, 3, [1, 1]),
       ...genType('notEqual', MASK_ALL, 3, [2, 2]),
-      ...genType('notEqual', MASK_ALL, 3, [3, 3]),
+      ...genType('notEqual', MASK_ALL, 3, [3, 3])
     ],
     normalizeFunc(pb, name, ...args) {
       const matchResult = matchFunctionOverloadings(pb, name, ...args);
@@ -587,13 +644,13 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
       ...genType('equal', MASK_ALL, typeinfo.typeBool, [0, 0]),
       ...genType('equal', MASK_ALL, typeinfo.typeBool, [1, 1]),
       ...genType('equal', MASK_ALL, typeinfo.typeBool, [2, 2]),
-      ...genType('equal', MASK_ALL, typeinfo.typeBool, [3, 3]),
+      ...genType('equal', MASK_ALL, typeinfo.typeBool, [3, 3])
     ],
     normalizeFunc(pb, name, ...args) {
       const matchResult = matchFunctionOverloadings(pb, name, ...args);
       const argType = matchResult[1][0].getType();
       if (pb.getDeviceType() === 'webgpu' && argType.isPrimitiveType() && !argType.isScalarType()) {
-        return pb.all(pb.compEqual(args[0] as PBShaderExp, args[1] as PBShaderExp))
+        return pb.all(pb.compEqual(args[0] as PBShaderExp, args[1] as PBShaderExp));
       } else {
         return binaryFunc(matchResult[1][0], matchResult[1][1], '==', matchResult[0].returnType);
       }
@@ -604,13 +661,13 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
       ...genType('notEqual', MASK_ALL, typeinfo.typeBool, [0, 0]),
       ...genType('notEqual', MASK_ALL, typeinfo.typeBool, [1, 1]),
       ...genType('notEqual', MASK_ALL, typeinfo.typeBool, [2, 2]),
-      ...genType('notEqual', MASK_ALL, typeinfo.typeBool, [3, 3]),
+      ...genType('notEqual', MASK_ALL, typeinfo.typeBool, [3, 3])
     ],
     normalizeFunc(pb, name, ...args) {
       const matchResult = matchFunctionOverloadings(pb, name, ...args);
       const argType = matchResult[1][0].getType();
       if (pb.getDeviceType() === 'webgpu' && argType.isPrimitiveType() && !argType.isScalarType()) {
-        return pb.any(pb.compNotEqual(args[0] as PBShaderExp, args[1] as PBShaderExp))
+        return pb.any(pb.compNotEqual(args[0] as PBShaderExp, args[1] as PBShaderExp));
       } else {
         return binaryFunc(matchResult[1][0], matchResult[1][1], '!=', matchResult[0].returnType);
       }
@@ -631,10 +688,7 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
     }
   },
   neg: {
-    overloads: [
-      ...genType('neg', MASK_ALL, 0, [0]),
-      ...genType('neg', MASK_ALL, 1, [1]),
-    ],
+    overloads: [...genType('neg', MASK_ALL, 0, [0]), ...genType('neg', MASK_ALL, 1, [1])],
     normalizeFunc(pb, name, ...args) {
       const matchResult = matchFunctionOverloadings(pb, name, ...args);
       return unaryFunc(matchResult[1][0], '-', matchResult[0].returnType);
@@ -669,7 +723,10 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
       }
       let result = args[0];
       for (let i = 1; i < args.length; i++) {
-        result = pb.and_2(result as PBShaderExp | number | boolean, args[i] as PBShaderExp | number | boolean);
+        result = pb.and_2(
+          result as PBShaderExp | number | boolean,
+          args[i] as PBShaderExp | number | boolean
+        );
       }
       return result as PBShaderExp;
     }
@@ -686,10 +743,12 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
       if (pb.getDeviceType() !== 'webgpu') {
         throw new PBDeviceNotSupport('arrayLength builtin function');
       }
-      if (args.length !== 1
-        || !(args[0] instanceof PBShaderExp)
-        || !args[0].$ast.getType().isPointerType()
-        || !((args[0].$ast.getType() as typeinfo.PBPointerTypeInfo).pointerType.isArrayType())) {
+      if (
+        args.length !== 1 ||
+        !(args[0] instanceof PBShaderExp) ||
+        !args[0].$ast.getType().isPointerType() ||
+        !(args[0].$ast.getType() as typeinfo.PBPointerTypeInfo).pointerType.isArrayType()
+      ) {
         throw new PBParamTypeError('arrayLength');
       }
       return pb.$callFunction(name, [args[0].$ast], typeinfo.typeU32);
@@ -707,7 +766,7 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
       ...genType('select', MASK_WEBGPU, 3, [3, 3, 3], true),
       ...genType('mix', MASK_WEBGL2, 0, [0, 0, 3]),
       ...genType('mix', MASK_WEBGL2, 1, [1, 1, 3]),
-      ...genType('mix', MASK_WEBGL2, 2, [2, 2, 3]),
+      ...genType('mix', MASK_WEBGL2, 2, [2, 2, 3])
     ]
   },
   floatBitsToInt: { overloads: genType('floatBitsToInt', MASK_WEBGL2, 1, [0]) },
@@ -715,13 +774,17 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
   intBitsToFloat: { overloads: genType('intBitsToFloat', MASK_WEBGL2, 0, [1]) },
   uintBitsToFloat: { overloads: genType('uintBitsToFloat', MASK_WEBGL2, 0, [2]) },
   pack4x8snorm: { overloads: genType('pack4x8snorm', MASK_WEBGPU, typeinfo.typeU32, [typeinfo.typeF32Vec4]) },
-  unpack4x8snorm: { overloads: genType('unpack4x8snorm', MASK_WEBGPU, typeinfo.typeF32Vec4, [typeinfo.typeU32]) },
+  unpack4x8snorm: {
+    overloads: genType('unpack4x8snorm', MASK_WEBGPU, typeinfo.typeF32Vec4, [typeinfo.typeU32])
+  },
   pack4x8unorm: { overloads: genType('pack4x8unorm', MASK_WEBGPU, typeinfo.typeU32, [typeinfo.typeF32Vec4]) },
-  unpack4x8unorm: { overloads: genType('unpack4x8unorm', MASK_WEBGPU, typeinfo.typeF32Vec4, [typeinfo.typeU32]) },
+  unpack4x8unorm: {
+    overloads: genType('unpack4x8unorm', MASK_WEBGPU, typeinfo.typeF32Vec4, [typeinfo.typeU32])
+  },
   pack2x16snorm: {
     overloads: [
       ...genType('pack2x16snorm', MASK_WEBGPU, typeinfo.typeU32, [typeinfo.typeF32Vec2]),
-      ...genType('packSnorm2x16', MASK_WEBGL2, typeinfo.typeU32, [typeinfo.typeF32Vec2]),
+      ...genType('packSnorm2x16', MASK_WEBGL2, typeinfo.typeU32, [typeinfo.typeF32Vec2])
     ]
   },
   unpack2x16snorm: {
@@ -733,64 +796,46 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
   pack2x16unorm: {
     overloads: [
       ...genType('pack2x16unorm', MASK_WEBGPU, typeinfo.typeU32, [typeinfo.typeF32Vec2]),
-      ...genType('packUnorm2x16', MASK_WEBGL2, typeinfo.typeU32, [typeinfo.typeF32Vec2]),
+      ...genType('packUnorm2x16', MASK_WEBGL2, typeinfo.typeU32, [typeinfo.typeF32Vec2])
     ]
   },
   unpack2x16unorm: {
     overloads: [
       ...genType('unpack2x16unorm', MASK_WEBGPU, typeinfo.typeF32Vec2, [typeinfo.typeU32]),
-      ...genType('unpackUnorm2x16', MASK_WEBGL2, typeinfo.typeF32Vec2, [typeinfo.typeU32]),
+      ...genType('unpackUnorm2x16', MASK_WEBGL2, typeinfo.typeF32Vec2, [typeinfo.typeU32])
     ]
   },
   pack2x16float: {
     overloads: [
       ...genType('pack2x16float', MASK_WEBGPU, typeinfo.typeU32, [typeinfo.typeF32Vec2]),
-      ...genType('packHalf2x16', MASK_WEBGL2, typeinfo.typeU32, [typeinfo.typeF32Vec2]),
+      ...genType('packHalf2x16', MASK_WEBGL2, typeinfo.typeU32, [typeinfo.typeF32Vec2])
     ]
   },
   unpack2x16float: {
     overloads: [
       ...genType('unpack2x16float', MASK_WEBGPU, typeinfo.typeF32Vec2, [typeinfo.typeU32]),
-      ...genType('unpackHalf2x16', MASK_WEBGL2, typeinfo.typeF32Vec2, [typeinfo.typeU32]),
+      ...genType('unpackHalf2x16', MASK_WEBGL2, typeinfo.typeF32Vec2, [typeinfo.typeU32])
     ]
   },
   matrixCompMult: { overloads: genMatrixType('matrixCompMult', MASK_WEBGL, null, [null, null]) },
   dpdx: {
-    overloads: [
-      ...genType('dFdx', MASK_WEBGL, 0, [0]),
-      ...genType('dpdx', MASK_WEBGPU, 0, [0]),
-    ]
+    overloads: [...genType('dFdx', MASK_WEBGL, 0, [0]), ...genType('dpdx', MASK_WEBGPU, 0, [0])]
   },
   dpdy: {
-    overloads: [
-      ...genType('dFdy', MASK_WEBGL, 0, [0]),
-      ...genType('dpdy', MASK_WEBGPU, 0, [0]),
-    ]
+    overloads: [...genType('dFdy', MASK_WEBGL, 0, [0]), ...genType('dpdy', MASK_WEBGPU, 0, [0])]
   },
   fwidth: { overloads: genType('fwidth', MASK_ALL, 0, [0]) },
   dpdxCoarse: {
-    overloads: [
-      ...genType('dpdxCoarse', MASK_WEBGPU, 0, [0]),
-      ...genType('dFdx', MASK_WEBGL, 0, [0]),
-    ]
+    overloads: [...genType('dpdxCoarse', MASK_WEBGPU, 0, [0]), ...genType('dFdx', MASK_WEBGL, 0, [0])]
   },
   dpdxFine: {
-    overloads: [
-      ...genType('dpdxFine', MASK_WEBGPU, 0, [0]),
-      ...genType('dFdx', MASK_WEBGL, 0, [0]),
-    ]
+    overloads: [...genType('dpdxFine', MASK_WEBGPU, 0, [0]), ...genType('dFdx', MASK_WEBGL, 0, [0])]
   },
   dpdyCoarse: {
-    overloads: [
-      ...genType('dpdyCoarse', MASK_WEBGPU, 0, [0]),
-      ...genType('dFdy', MASK_WEBGL, 0, [0]),
-    ]
+    overloads: [...genType('dpdyCoarse', MASK_WEBGPU, 0, [0]), ...genType('dFdy', MASK_WEBGL, 0, [0])]
   },
   dpdyFine: {
-    overloads: [
-      ...genType('dpdyFine', MASK_WEBGPU, 0, [0]),
-      ...genType('dFdy', MASK_WEBGL, 0, [0]),
-    ]
+    overloads: [...genType('dpdyFine', MASK_WEBGPU, 0, [0]), ...genType('dFdy', MASK_WEBGL, 0, [0])]
   },
   // textureDimensions(tex: PBShaderExp, level?: number|PBShaderExp);
   textureDimensions: {
@@ -798,29 +843,88 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
       ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32, [typeinfo.typeTex1D, typeinfo.typeI32]),
       ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32, [typeinfo.typeITex1D, typeinfo.typeI32]),
       ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32, [typeinfo.typeUTex1D, typeinfo.typeI32]),
-      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [typeinfo.typeTex2D, typeinfo.typeI32]),
-      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [typeinfo.typeITex2D, typeinfo.typeI32]),
-      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [typeinfo.typeUTex2D, typeinfo.typeI32]),
-      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [typeinfo.typeTex2DArray, typeinfo.typeI32]),
-      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [typeinfo.typeITex2DArray, typeinfo.typeI32]),
-      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [typeinfo.typeUTex2DArray, typeinfo.typeI32]),
-      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec3, [typeinfo.typeTex3D, typeinfo.typeI32]),
-      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec3, [typeinfo.typeITex3D, typeinfo.typeI32]),
-      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec3, [typeinfo.typeUTex3D, typeinfo.typeI32]),
-      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [typeinfo.typeTexCube, typeinfo.typeI32]),
-      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [typeinfo.typeITexCube, typeinfo.typeI32]),
-      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [typeinfo.typeUTexCube, typeinfo.typeI32]),
-      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [typeinfo.typeTexCubeArray, typeinfo.typeI32]),
-      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [typeinfo.typeITexCubeArray, typeinfo.typeI32]),
-      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [typeinfo.typeUTexCubeArray, typeinfo.typeI32]),
+      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [
+        typeinfo.typeTex2D,
+        typeinfo.typeI32
+      ]),
+      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [
+        typeinfo.typeITex2D,
+        typeinfo.typeI32
+      ]),
+      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [
+        typeinfo.typeUTex2D,
+        typeinfo.typeI32
+      ]),
+      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [
+        typeinfo.typeTex2DArray,
+        typeinfo.typeI32
+      ]),
+      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [
+        typeinfo.typeITex2DArray,
+        typeinfo.typeI32
+      ]),
+      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [
+        typeinfo.typeUTex2DArray,
+        typeinfo.typeI32
+      ]),
+      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec3, [
+        typeinfo.typeTex3D,
+        typeinfo.typeI32
+      ]),
+      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec3, [
+        typeinfo.typeITex3D,
+        typeinfo.typeI32
+      ]),
+      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec3, [
+        typeinfo.typeUTex3D,
+        typeinfo.typeI32
+      ]),
+      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [
+        typeinfo.typeTexCube,
+        typeinfo.typeI32
+      ]),
+      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [
+        typeinfo.typeITexCube,
+        typeinfo.typeI32
+      ]),
+      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [
+        typeinfo.typeUTexCube,
+        typeinfo.typeI32
+      ]),
+      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [
+        typeinfo.typeTexCubeArray,
+        typeinfo.typeI32
+      ]),
+      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [
+        typeinfo.typeITexCubeArray,
+        typeinfo.typeI32
+      ]),
+      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [
+        typeinfo.typeUTexCubeArray,
+        typeinfo.typeI32
+      ]),
       ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [typeinfo.typeTexMultisampled2D]),
       ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [typeinfo.typeITexMultisampled2D]),
       ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [typeinfo.typeUTexMultisampled2D]),
-      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [typeinfo.typeTexDepth2D, typeinfo.typeI32]),
-      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [typeinfo.typeTexDepth2DArray, typeinfo.typeI32]),
-      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [typeinfo.typeTexDepthCube, typeinfo.typeI32]),
-      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [typeinfo.typeTexDepthCubeArray, typeinfo.typeI32]),
-      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [typeinfo.typeTexDepthMultisampled2D]),
+      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [
+        typeinfo.typeTexDepth2D,
+        typeinfo.typeI32
+      ]),
+      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [
+        typeinfo.typeTexDepth2DArray,
+        typeinfo.typeI32
+      ]),
+      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [
+        typeinfo.typeTexDepthCube,
+        typeinfo.typeI32
+      ]),
+      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [
+        typeinfo.typeTexDepthCubeArray,
+        typeinfo.typeI32
+      ]),
+      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [
+        typeinfo.typeTexDepthMultisampled2D
+      ]),
       ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32, [typeinfo.typeTexStorage1D_rgba8unorm]),
       ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32, [typeinfo.typeTexStorage1D_rgba8snorm]),
       ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32, [typeinfo.typeTexStorage1D_rgba8uint]),
@@ -837,72 +941,178 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
       ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32, [typeinfo.typeTexStorage1D_r32uint]),
       ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32, [typeinfo.typeTexStorage1D_r32sint]),
       ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32, [typeinfo.typeTexStorage1D_r32float]),
-      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [typeinfo.typeTexStorage2D_rgba8unorm]),
-      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [typeinfo.typeTexStorage2D_rgba8snorm]),
-      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [typeinfo.typeTexStorage2D_rgba8uint]),
-      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [typeinfo.typeTexStorage2D_rgba8sint]),
-      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [typeinfo.typeTexStorage2D_rgba16uint]),
-      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [typeinfo.typeTexStorage2D_rgba16sint]),
-      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [typeinfo.typeTexStorage2D_rgba16float]),
-      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [typeinfo.typeTexStorage2D_rgba32uint]),
-      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [typeinfo.typeTexStorage2D_rgba32sint]),
-      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [typeinfo.typeTexStorage2D_rgba32float]),
-      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [typeinfo.typeTexStorage2D_rg32uint]),
-      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [typeinfo.typeTexStorage2D_rg32sint]),
-      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [typeinfo.typeTexStorage2D_rg32float]),
+      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [
+        typeinfo.typeTexStorage2D_rgba8unorm
+      ]),
+      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [
+        typeinfo.typeTexStorage2D_rgba8snorm
+      ]),
+      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [
+        typeinfo.typeTexStorage2D_rgba8uint
+      ]),
+      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [
+        typeinfo.typeTexStorage2D_rgba8sint
+      ]),
+      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [
+        typeinfo.typeTexStorage2D_rgba16uint
+      ]),
+      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [
+        typeinfo.typeTexStorage2D_rgba16sint
+      ]),
+      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [
+        typeinfo.typeTexStorage2D_rgba16float
+      ]),
+      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [
+        typeinfo.typeTexStorage2D_rgba32uint
+      ]),
+      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [
+        typeinfo.typeTexStorage2D_rgba32sint
+      ]),
+      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [
+        typeinfo.typeTexStorage2D_rgba32float
+      ]),
+      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [
+        typeinfo.typeTexStorage2D_rg32uint
+      ]),
+      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [
+        typeinfo.typeTexStorage2D_rg32sint
+      ]),
+      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [
+        typeinfo.typeTexStorage2D_rg32float
+      ]),
       ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [typeinfo.typeTexStorage2D_r32uint]),
       ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [typeinfo.typeTexStorage2D_r32sint]),
-      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [typeinfo.typeTexStorage2D_r32float]),
-      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [typeinfo.typeTexStorage2DArray_rgba8unorm]),
-      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [typeinfo.typeTexStorage2DArray_rgba8snorm]),
-      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [typeinfo.typeTexStorage2DArray_rgba8uint]),
-      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [typeinfo.typeTexStorage2DArray_rgba8sint]),
-      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [typeinfo.typeTexStorage2DArray_rgba16uint]),
-      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [typeinfo.typeTexStorage2DArray_rgba16sint]),
-      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [typeinfo.typeTexStorage2DArray_rgba16float]),
-      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [typeinfo.typeTexStorage2DArray_rgba32uint]),
-      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [typeinfo.typeTexStorage2DArray_rgba32sint]),
-      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [typeinfo.typeTexStorage2DArray_rgba32float]),
-      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [typeinfo.typeTexStorage2DArray_rg32uint]),
-      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [typeinfo.typeTexStorage2DArray_rg32sint]),
-      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [typeinfo.typeTexStorage2DArray_rg32float]),
-      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [typeinfo.typeTexStorage2DArray_r32uint]),
-      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [typeinfo.typeTexStorage2DArray_r32sint]),
-      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [typeinfo.typeTexStorage2DArray_r32float]),
-      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec3, [typeinfo.typeTexStorage3D_rgba8unorm]),
-      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec3, [typeinfo.typeTexStorage3D_rgba8snorm]),
-      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec3, [typeinfo.typeTexStorage3D_rgba8uint]),
-      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec3, [typeinfo.typeTexStorage3D_rgba8sint]),
-      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec3, [typeinfo.typeTexStorage3D_rgba16uint]),
-      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec3, [typeinfo.typeTexStorage3D_rgba16sint]),
-      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec3, [typeinfo.typeTexStorage3D_rgba16float]),
-      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec3, [typeinfo.typeTexStorage3D_rgba32uint]),
-      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec3, [typeinfo.typeTexStorage3D_rgba32sint]),
-      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec3, [typeinfo.typeTexStorage3D_rgba32float]),
-      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec3, [typeinfo.typeTexStorage3D_rg32uint]),
-      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec3, [typeinfo.typeTexStorage3D_rg32sint]),
-      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec3, [typeinfo.typeTexStorage3D_rg32float]),
+      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [
+        typeinfo.typeTexStorage2D_r32float
+      ]),
+      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [
+        typeinfo.typeTexStorage2DArray_rgba8unorm
+      ]),
+      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [
+        typeinfo.typeTexStorage2DArray_rgba8snorm
+      ]),
+      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [
+        typeinfo.typeTexStorage2DArray_rgba8uint
+      ]),
+      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [
+        typeinfo.typeTexStorage2DArray_rgba8sint
+      ]),
+      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [
+        typeinfo.typeTexStorage2DArray_rgba16uint
+      ]),
+      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [
+        typeinfo.typeTexStorage2DArray_rgba16sint
+      ]),
+      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [
+        typeinfo.typeTexStorage2DArray_rgba16float
+      ]),
+      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [
+        typeinfo.typeTexStorage2DArray_rgba32uint
+      ]),
+      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [
+        typeinfo.typeTexStorage2DArray_rgba32sint
+      ]),
+      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [
+        typeinfo.typeTexStorage2DArray_rgba32float
+      ]),
+      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [
+        typeinfo.typeTexStorage2DArray_rg32uint
+      ]),
+      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [
+        typeinfo.typeTexStorage2DArray_rg32sint
+      ]),
+      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [
+        typeinfo.typeTexStorage2DArray_rg32float
+      ]),
+      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [
+        typeinfo.typeTexStorage2DArray_r32uint
+      ]),
+      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [
+        typeinfo.typeTexStorage2DArray_r32sint
+      ]),
+      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec2, [
+        typeinfo.typeTexStorage2DArray_r32float
+      ]),
+      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec3, [
+        typeinfo.typeTexStorage3D_rgba8unorm
+      ]),
+      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec3, [
+        typeinfo.typeTexStorage3D_rgba8snorm
+      ]),
+      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec3, [
+        typeinfo.typeTexStorage3D_rgba8uint
+      ]),
+      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec3, [
+        typeinfo.typeTexStorage3D_rgba8sint
+      ]),
+      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec3, [
+        typeinfo.typeTexStorage3D_rgba16uint
+      ]),
+      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec3, [
+        typeinfo.typeTexStorage3D_rgba16sint
+      ]),
+      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec3, [
+        typeinfo.typeTexStorage3D_rgba16float
+      ]),
+      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec3, [
+        typeinfo.typeTexStorage3D_rgba32uint
+      ]),
+      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec3, [
+        typeinfo.typeTexStorage3D_rgba32sint
+      ]),
+      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec3, [
+        typeinfo.typeTexStorage3D_rgba32float
+      ]),
+      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec3, [
+        typeinfo.typeTexStorage3D_rg32uint
+      ]),
+      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec3, [
+        typeinfo.typeTexStorage3D_rg32sint
+      ]),
+      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec3, [
+        typeinfo.typeTexStorage3D_rg32float
+      ]),
       ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec3, [typeinfo.typeTexStorage3D_r32uint]),
       ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec3, [typeinfo.typeTexStorage3D_r32sint]),
-      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec3, [typeinfo.typeTexStorage3D_r32float]),
+      ...genType('textureDimensions', MASK_WEBGPU, typeinfo.typeU32Vec3, [
+        typeinfo.typeTexStorage3D_r32float
+      ]),
       ...genType('textureSize', MASK_WEBGL2, typeinfo.typeI32Vec2, [typeinfo.typeTex1D, typeinfo.typeI32]),
       ...genType('textureSize', MASK_WEBGL2, typeinfo.typeI32Vec2, [typeinfo.typeTex2D, typeinfo.typeI32]),
       ...genType('textureSize', MASK_WEBGL2, typeinfo.typeI32Vec2, [typeinfo.typeITex1D, typeinfo.typeI32]),
       ...genType('textureSize', MASK_WEBGL2, typeinfo.typeI32Vec2, [typeinfo.typeITex2D, typeinfo.typeI32]),
       ...genType('textureSize', MASK_WEBGL2, typeinfo.typeI32Vec2, [typeinfo.typeUTex1D, typeinfo.typeI32]),
       ...genType('textureSize', MASK_WEBGL2, typeinfo.typeI32Vec2, [typeinfo.typeUTex2D, typeinfo.typeI32]),
-      ...genType('textureSize', MASK_WEBGL2, typeinfo.typeI32Vec2, [typeinfo.typeTex2DArray, typeinfo.typeI32]),
-      ...genType('textureSize', MASK_WEBGL2, typeinfo.typeI32Vec2, [typeinfo.typeITex2DArray, typeinfo.typeI32]),
-      ...genType('textureSize', MASK_WEBGL2, typeinfo.typeI32Vec2, [typeinfo.typeUTex2DArray, typeinfo.typeI32]),
+      ...genType('textureSize', MASK_WEBGL2, typeinfo.typeI32Vec2, [
+        typeinfo.typeTex2DArray,
+        typeinfo.typeI32
+      ]),
+      ...genType('textureSize', MASK_WEBGL2, typeinfo.typeI32Vec2, [
+        typeinfo.typeITex2DArray,
+        typeinfo.typeI32
+      ]),
+      ...genType('textureSize', MASK_WEBGL2, typeinfo.typeI32Vec2, [
+        typeinfo.typeUTex2DArray,
+        typeinfo.typeI32
+      ]),
       ...genType('textureSize', MASK_WEBGL2, typeinfo.typeI32Vec2, [typeinfo.typeTexCube, typeinfo.typeI32]),
       ...genType('textureSize', MASK_WEBGL2, typeinfo.typeI32Vec2, [typeinfo.typeITexCube, typeinfo.typeI32]),
       ...genType('textureSize', MASK_WEBGL2, typeinfo.typeI32Vec2, [typeinfo.typeUTexCube, typeinfo.typeI32]),
       ...genType('textureSize', MASK_WEBGL2, typeinfo.typeI32Vec3, [typeinfo.typeTex3D, typeinfo.typeI32]),
       ...genType('textureSize', MASK_WEBGL2, typeinfo.typeI32Vec3, [typeinfo.typeITex3D, typeinfo.typeI32]),
       ...genType('textureSize', MASK_WEBGL2, typeinfo.typeI32Vec3, [typeinfo.typeUTex3D, typeinfo.typeI32]),
-      ...genType('textureSize', MASK_WEBGL2, typeinfo.typeI32Vec2, [typeinfo.typeTexDepth2D, typeinfo.typeI32]),
-      ...genType('textureSize', MASK_WEBGL2, typeinfo.typeI32Vec2, [typeinfo.typeTexDepthCube, typeinfo.typeI32]),
-      ...genType('textureSize', MASK_WEBGL2, typeinfo.typeI32Vec2, [typeinfo.typeTexDepth2DArray, typeinfo.typeI32]),
+      ...genType('textureSize', MASK_WEBGL2, typeinfo.typeI32Vec2, [
+        typeinfo.typeTexDepth2D,
+        typeinfo.typeI32
+      ]),
+      ...genType('textureSize', MASK_WEBGL2, typeinfo.typeI32Vec2, [
+        typeinfo.typeTexDepthCube,
+        typeinfo.typeI32
+      ]),
+      ...genType('textureSize', MASK_WEBGL2, typeinfo.typeI32Vec2, [
+        typeinfo.typeTexDepth2DArray,
+        typeinfo.typeI32
+      ])
     ],
     normalizeFunc(pb, name, ...args) {
       if (args.length < 1 || args.length > 2) {
@@ -925,7 +1135,9 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
       } else if (pb.getDeviceType() === 'webgl2') {
         const tex = args[0];
         const level = args[1] || 0;
-        return texType.is1DTexture() ? callBuiltin(pb, name, tex, level).x : callBuiltin(pb, name, tex, level);
+        return texType.is1DTexture()
+          ? callBuiltin(pb, name, tex, level).x
+          : callBuiltin(pb, name, tex, level);
       }
     }
   },
@@ -933,72 +1145,277 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
   // textureGather(component: number|PBShaderExp, tex: PBShaderExp, sampler: PBShaderExp, coords: PBShaderExp);
   textureGather: {
     overloads: [
-      ...genType('textureGather', MASK_WEBGPU, typeinfo.typeF32Vec4, [typeinfo.typeI32, typeinfo.typeTex2D, typeinfo.typeSampler, typeinfo.typeF32Vec2]),
-      ...genType('textureGather', MASK_WEBGPU, typeinfo.typeI32Vec4, [typeinfo.typeI32, typeinfo.typeITex2D, typeinfo.typeSampler, typeinfo.typeF32Vec2]),
-      ...genType('textureGather', MASK_WEBGPU, typeinfo.typeU32Vec4, [typeinfo.typeI32, typeinfo.typeUTex2D, typeinfo.typeSampler, typeinfo.typeF32Vec2]),
-      ...genType('textureGather', MASK_WEBGPU, typeinfo.typeF32Vec4, [typeinfo.typeI32, typeinfo.typeTexCube, typeinfo.typeSampler, typeinfo.typeF32Vec3]),
-      ...genType('textureGather', MASK_WEBGPU, typeinfo.typeI32Vec4, [typeinfo.typeI32, typeinfo.typeITexCube, typeinfo.typeSampler, typeinfo.typeF32Vec3]),
-      ...genType('textureGather', MASK_WEBGPU, typeinfo.typeU32Vec4, [typeinfo.typeI32, typeinfo.typeUTexCube, typeinfo.typeSampler, typeinfo.typeF32Vec3]),
-      ...genType('textureGather', MASK_WEBGPU, typeinfo.typeF32Vec4, [typeinfo.typeTexDepth2D, typeinfo.typeSampler, typeinfo.typeF32Vec2]),
-      ...genType('textureGather', MASK_WEBGPU, typeinfo.typeF32Vec4, [typeinfo.typeTexDepthCube, typeinfo.typeSampler, typeinfo.typeF32Vec3]),
+      ...genType('textureGather', MASK_WEBGPU, typeinfo.typeF32Vec4, [
+        typeinfo.typeI32,
+        typeinfo.typeTex2D,
+        typeinfo.typeSampler,
+        typeinfo.typeF32Vec2
+      ]),
+      ...genType('textureGather', MASK_WEBGPU, typeinfo.typeI32Vec4, [
+        typeinfo.typeI32,
+        typeinfo.typeITex2D,
+        typeinfo.typeSampler,
+        typeinfo.typeF32Vec2
+      ]),
+      ...genType('textureGather', MASK_WEBGPU, typeinfo.typeU32Vec4, [
+        typeinfo.typeI32,
+        typeinfo.typeUTex2D,
+        typeinfo.typeSampler,
+        typeinfo.typeF32Vec2
+      ]),
+      ...genType('textureGather', MASK_WEBGPU, typeinfo.typeF32Vec4, [
+        typeinfo.typeI32,
+        typeinfo.typeTexCube,
+        typeinfo.typeSampler,
+        typeinfo.typeF32Vec3
+      ]),
+      ...genType('textureGather', MASK_WEBGPU, typeinfo.typeI32Vec4, [
+        typeinfo.typeI32,
+        typeinfo.typeITexCube,
+        typeinfo.typeSampler,
+        typeinfo.typeF32Vec3
+      ]),
+      ...genType('textureGather', MASK_WEBGPU, typeinfo.typeU32Vec4, [
+        typeinfo.typeI32,
+        typeinfo.typeUTexCube,
+        typeinfo.typeSampler,
+        typeinfo.typeF32Vec3
+      ]),
+      ...genType('textureGather', MASK_WEBGPU, typeinfo.typeF32Vec4, [
+        typeinfo.typeTexDepth2D,
+        typeinfo.typeSampler,
+        typeinfo.typeF32Vec2
+      ]),
+      ...genType('textureGather', MASK_WEBGPU, typeinfo.typeF32Vec4, [
+        typeinfo.typeTexDepthCube,
+        typeinfo.typeSampler,
+        typeinfo.typeF32Vec3
+      ])
     ]
   },
   // textureArrayGather(tex: PBShaderExp, sampler: PBShaderExp, coords: PBShaderExp, arrayIndex: number|PBShaderExp);
   // textureArrayGather(component: number|PBShaderExp, tex: PBShaderExp, sampler: PBShaderExp, coords: PBShaderExp, arrayIndex: number|PBShaderExp);
   textureArrayGather: {
     overloads: [
-      ...genType('textureGather', MASK_WEBGPU, typeinfo.typeF32Vec4, [typeinfo.typeI32, typeinfo.typeTex2DArray, typeinfo.typeSampler, typeinfo.typeF32Vec2, typeinfo.typeI32]),
-      ...genType('textureGather', MASK_WEBGPU, typeinfo.typeI32Vec4, [typeinfo.typeI32, typeinfo.typeITex2DArray, typeinfo.typeSampler, typeinfo.typeF32Vec2, typeinfo.typeI32]),
-      ...genType('textureGather', MASK_WEBGPU, typeinfo.typeU32Vec4, [typeinfo.typeI32, typeinfo.typeUTex2DArray, typeinfo.typeSampler, typeinfo.typeF32Vec2, typeinfo.typeI32]),
-      ...genType('textureGather', MASK_WEBGPU, typeinfo.typeF32Vec4, [typeinfo.typeI32, typeinfo.typeTexCubeArray, typeinfo.typeSampler, typeinfo.typeF32Vec3, typeinfo.typeI32]),
-      ...genType('textureGather', MASK_WEBGPU, typeinfo.typeI32Vec4, [typeinfo.typeI32, typeinfo.typeITexCubeArray, typeinfo.typeSampler, typeinfo.typeF32Vec3, typeinfo.typeI32]),
-      ...genType('textureGather', MASK_WEBGPU, typeinfo.typeU32Vec4, [typeinfo.typeI32, typeinfo.typeUTexCubeArray, typeinfo.typeSampler, typeinfo.typeF32Vec3, typeinfo.typeI32]),
-      ...genType('textureGather', MASK_WEBGPU, typeinfo.typeF32Vec4, [typeinfo.typeTexDepth2DArray, typeinfo.typeSampler, typeinfo.typeF32Vec2, typeinfo.typeI32]),
-      ...genType('textureGather', MASK_WEBGPU, typeinfo.typeF32Vec4, [typeinfo.typeTexDepthCubeArray, typeinfo.typeSampler, typeinfo.typeF32Vec3, typeinfo.typeI32]),
+      ...genType('textureGather', MASK_WEBGPU, typeinfo.typeF32Vec4, [
+        typeinfo.typeI32,
+        typeinfo.typeTex2DArray,
+        typeinfo.typeSampler,
+        typeinfo.typeF32Vec2,
+        typeinfo.typeI32
+      ]),
+      ...genType('textureGather', MASK_WEBGPU, typeinfo.typeI32Vec4, [
+        typeinfo.typeI32,
+        typeinfo.typeITex2DArray,
+        typeinfo.typeSampler,
+        typeinfo.typeF32Vec2,
+        typeinfo.typeI32
+      ]),
+      ...genType('textureGather', MASK_WEBGPU, typeinfo.typeU32Vec4, [
+        typeinfo.typeI32,
+        typeinfo.typeUTex2DArray,
+        typeinfo.typeSampler,
+        typeinfo.typeF32Vec2,
+        typeinfo.typeI32
+      ]),
+      ...genType('textureGather', MASK_WEBGPU, typeinfo.typeF32Vec4, [
+        typeinfo.typeI32,
+        typeinfo.typeTexCubeArray,
+        typeinfo.typeSampler,
+        typeinfo.typeF32Vec3,
+        typeinfo.typeI32
+      ]),
+      ...genType('textureGather', MASK_WEBGPU, typeinfo.typeI32Vec4, [
+        typeinfo.typeI32,
+        typeinfo.typeITexCubeArray,
+        typeinfo.typeSampler,
+        typeinfo.typeF32Vec3,
+        typeinfo.typeI32
+      ]),
+      ...genType('textureGather', MASK_WEBGPU, typeinfo.typeU32Vec4, [
+        typeinfo.typeI32,
+        typeinfo.typeUTexCubeArray,
+        typeinfo.typeSampler,
+        typeinfo.typeF32Vec3,
+        typeinfo.typeI32
+      ]),
+      ...genType('textureGather', MASK_WEBGPU, typeinfo.typeF32Vec4, [
+        typeinfo.typeTexDepth2DArray,
+        typeinfo.typeSampler,
+        typeinfo.typeF32Vec2,
+        typeinfo.typeI32
+      ]),
+      ...genType('textureGather', MASK_WEBGPU, typeinfo.typeF32Vec4, [
+        typeinfo.typeTexDepthCubeArray,
+        typeinfo.typeSampler,
+        typeinfo.typeF32Vec3,
+        typeinfo.typeI32
+      ])
     ]
   },
   // textureGatherCompare(tex: PBShaderExp, samplerCompare: PBShaderExp, coords: PBShaderExp, depthRef: number|PBShaderExp);
   textureGatherCompare: {
     overloads: [
-      ...genType('textureGatherCompare', MASK_WEBGPU, typeinfo.typeF32Vec4, [typeinfo.typeTexDepth2D, typeinfo.typeSamplerComparison, typeinfo.typeF32Vec2, typeinfo.typeF32]),
-      ...genType('textureGatherCompare', MASK_WEBGPU, typeinfo.typeF32Vec4, [typeinfo.typeTexDepthCube, typeinfo.typeSamplerComparison, typeinfo.typeF32Vec3, typeinfo.typeF32]),
+      ...genType('textureGatherCompare', MASK_WEBGPU, typeinfo.typeF32Vec4, [
+        typeinfo.typeTexDepth2D,
+        typeinfo.typeSamplerComparison,
+        typeinfo.typeF32Vec2,
+        typeinfo.typeF32
+      ]),
+      ...genType('textureGatherCompare', MASK_WEBGPU, typeinfo.typeF32Vec4, [
+        typeinfo.typeTexDepthCube,
+        typeinfo.typeSamplerComparison,
+        typeinfo.typeF32Vec3,
+        typeinfo.typeF32
+      ])
     ]
   },
   // textureArrayGatherCompare(tex: PBShaderExp, samplerCompare: PBShaderExp, coords: PBShaderExp, arrayIndex: number|PBShaderExp, depthRef: number|PBShaderExp);
   textureArrayGatherCompare: {
     overloads: [
-      ...genType('textureGatherCompare', MASK_WEBGPU, typeinfo.typeF32Vec4, [typeinfo.typeTexDepth2DArray, typeinfo.typeSamplerComparison, typeinfo.typeF32Vec2, typeinfo.typeI32, typeinfo.typeF32]),
-      ...genType('textureGatherCompare', MASK_WEBGPU, typeinfo.typeF32Vec4, [typeinfo.typeTexDepthCubeArray, typeinfo.typeSamplerComparison, typeinfo.typeF32Vec3, typeinfo.typeI32, typeinfo.typeF32]),
+      ...genType('textureGatherCompare', MASK_WEBGPU, typeinfo.typeF32Vec4, [
+        typeinfo.typeTexDepth2DArray,
+        typeinfo.typeSamplerComparison,
+        typeinfo.typeF32Vec2,
+        typeinfo.typeI32,
+        typeinfo.typeF32
+      ]),
+      ...genType('textureGatherCompare', MASK_WEBGPU, typeinfo.typeF32Vec4, [
+        typeinfo.typeTexDepthCubeArray,
+        typeinfo.typeSamplerComparison,
+        typeinfo.typeF32Vec3,
+        typeinfo.typeI32,
+        typeinfo.typeF32
+      ])
     ]
   },
   // textureLoad(tex: PBShaderExp, coords: number|PBShaderExp, levelOrSampleIndex: number|PBShaderExp);
   textureLoad: {
     overloads: [
-      ...genType('textureLoad', MASK_WEBGPU, typeinfo.typeF32Vec4, [typeinfo.typeTex1D, typeinfo.typeI32, typeinfo.typeI32]),
-      ...genType('textureLoad', MASK_WEBGPU, typeinfo.typeI32Vec4, [typeinfo.typeITex1D, typeinfo.typeI32, typeinfo.typeI32]),
-      ...genType('textureLoad', MASK_WEBGPU, typeinfo.typeU32Vec4, [typeinfo.typeUTex1D, typeinfo.typeI32, typeinfo.typeI32]),
-      ...genType('textureLoad', MASK_WEBGPU, typeinfo.typeF32Vec4, [typeinfo.typeTex2D, typeinfo.typeI32Vec2, typeinfo.typeI32]),
-      ...genType('textureLoad', MASK_WEBGPU, typeinfo.typeI32Vec4, [typeinfo.typeITex2D, typeinfo.typeI32Vec2, typeinfo.typeI32]),
-      ...genType('textureLoad', MASK_WEBGPU, typeinfo.typeU32Vec4, [typeinfo.typeUTex2D, typeinfo.typeI32Vec2, typeinfo.typeI32]),
-      ...genType('textureLoad', MASK_WEBGPU, typeinfo.typeF32Vec4, [typeinfo.typeTex3D, typeinfo.typeI32Vec3, typeinfo.typeI32]),
-      ...genType('textureLoad', MASK_WEBGPU, typeinfo.typeI32Vec4, [typeinfo.typeITex3D, typeinfo.typeI32Vec3, typeinfo.typeI32]),
-      ...genType('textureLoad', MASK_WEBGPU, typeinfo.typeU32Vec4, [typeinfo.typeUTex3D, typeinfo.typeI32Vec3, typeinfo.typeI32]),
-      ...genType('textureLoad', MASK_WEBGPU, typeinfo.typeF32Vec4, [typeinfo.typeTexMultisampled2D, typeinfo.typeI32Vec2, typeinfo.typeI32]),
-      ...genType('textureLoad', MASK_WEBGPU, typeinfo.typeI32Vec4, [typeinfo.typeITexMultisampled2D, typeinfo.typeI32Vec2, typeinfo.typeI32]),
-      ...genType('textureLoad', MASK_WEBGPU, typeinfo.typeU32Vec4, [typeinfo.typeUTexMultisampled2D, typeinfo.typeI32Vec2, typeinfo.typeI32]),
-      ...genType('textureLoad', MASK_WEBGPU, typeinfo.typeF32Vec4, [typeinfo.typeTexExternal, typeinfo.typeI32Vec2]),
-      ...genType('textureLoad', MASK_WEBGPU, typeinfo.typeF32, [typeinfo.typeTexDepth2D, typeinfo.typeI32Vec2, typeinfo.typeI32]),
-      ...genType('textureLoad', MASK_WEBGPU, typeinfo.typeF32, [typeinfo.typeTexDepthMultisampled2D, typeinfo.typeI32Vec2, typeinfo.typeI32]),
-      ...genType('texelFetch', MASK_WEBGL2, typeinfo.typeF32Vec4, [typeinfo.typeTex1D, typeinfo.typeI32Vec2, typeinfo.typeI32]),
-      ...genType('texelFetch', MASK_WEBGL2, typeinfo.typeF32Vec4, [typeinfo.typeTex2D, typeinfo.typeI32Vec2, typeinfo.typeI32]),
-      ...genType('texelFetch', MASK_WEBGL2, typeinfo.typeF32Vec4, [typeinfo.typeTex3D, typeinfo.typeI32Vec3, typeinfo.typeI32]),
-      ...genType('texelFetch', MASK_WEBGL2, typeinfo.typeU32Vec4, [typeinfo.typeTexExternal, typeinfo.typeI32Vec2, typeinfo.typeI32]),
-      ...genType('texelFetch', MASK_WEBGL2, typeinfo.typeF32Vec4, [typeinfo.typeITex1D, typeinfo.typeI32Vec2, typeinfo.typeI32]),
-      ...genType('texelFetch', MASK_WEBGL2, typeinfo.typeI32Vec4, [typeinfo.typeITex2D, typeinfo.typeI32Vec2, typeinfo.typeI32]),
-      ...genType('texelFetch', MASK_WEBGL2, typeinfo.typeI32Vec4, [typeinfo.typeITex3D, typeinfo.typeI32Vec3, typeinfo.typeI32]),
-      ...genType('texelFetch', MASK_WEBGL2, typeinfo.typeF32Vec4, [typeinfo.typeUTex1D, typeinfo.typeI32Vec2, typeinfo.typeI32]),
-      ...genType('texelFetch', MASK_WEBGL2, typeinfo.typeU32Vec4, [typeinfo.typeUTex2D, typeinfo.typeI32Vec2, typeinfo.typeI32]),
-      ...genType('texelFetch', MASK_WEBGL2, typeinfo.typeU32Vec4, [typeinfo.typeUTex3D, typeinfo.typeI32Vec3, typeinfo.typeI32]),
+      ...genType('textureLoad', MASK_WEBGPU, typeinfo.typeF32Vec4, [
+        typeinfo.typeTex1D,
+        typeinfo.typeI32,
+        typeinfo.typeI32
+      ]),
+      ...genType('textureLoad', MASK_WEBGPU, typeinfo.typeI32Vec4, [
+        typeinfo.typeITex1D,
+        typeinfo.typeI32,
+        typeinfo.typeI32
+      ]),
+      ...genType('textureLoad', MASK_WEBGPU, typeinfo.typeU32Vec4, [
+        typeinfo.typeUTex1D,
+        typeinfo.typeI32,
+        typeinfo.typeI32
+      ]),
+      ...genType('textureLoad', MASK_WEBGPU, typeinfo.typeF32Vec4, [
+        typeinfo.typeTex2D,
+        typeinfo.typeI32Vec2,
+        typeinfo.typeI32
+      ]),
+      ...genType('textureLoad', MASK_WEBGPU, typeinfo.typeI32Vec4, [
+        typeinfo.typeITex2D,
+        typeinfo.typeI32Vec2,
+        typeinfo.typeI32
+      ]),
+      ...genType('textureLoad', MASK_WEBGPU, typeinfo.typeU32Vec4, [
+        typeinfo.typeUTex2D,
+        typeinfo.typeI32Vec2,
+        typeinfo.typeI32
+      ]),
+      ...genType('textureLoad', MASK_WEBGPU, typeinfo.typeF32Vec4, [
+        typeinfo.typeTex3D,
+        typeinfo.typeI32Vec3,
+        typeinfo.typeI32
+      ]),
+      ...genType('textureLoad', MASK_WEBGPU, typeinfo.typeI32Vec4, [
+        typeinfo.typeITex3D,
+        typeinfo.typeI32Vec3,
+        typeinfo.typeI32
+      ]),
+      ...genType('textureLoad', MASK_WEBGPU, typeinfo.typeU32Vec4, [
+        typeinfo.typeUTex3D,
+        typeinfo.typeI32Vec3,
+        typeinfo.typeI32
+      ]),
+      ...genType('textureLoad', MASK_WEBGPU, typeinfo.typeF32Vec4, [
+        typeinfo.typeTexMultisampled2D,
+        typeinfo.typeI32Vec2,
+        typeinfo.typeI32
+      ]),
+      ...genType('textureLoad', MASK_WEBGPU, typeinfo.typeI32Vec4, [
+        typeinfo.typeITexMultisampled2D,
+        typeinfo.typeI32Vec2,
+        typeinfo.typeI32
+      ]),
+      ...genType('textureLoad', MASK_WEBGPU, typeinfo.typeU32Vec4, [
+        typeinfo.typeUTexMultisampled2D,
+        typeinfo.typeI32Vec2,
+        typeinfo.typeI32
+      ]),
+      ...genType('textureLoad', MASK_WEBGPU, typeinfo.typeF32Vec4, [
+        typeinfo.typeTexExternal,
+        typeinfo.typeI32Vec2
+      ]),
+      ...genType('textureLoad', MASK_WEBGPU, typeinfo.typeF32, [
+        typeinfo.typeTexDepth2D,
+        typeinfo.typeI32Vec2,
+        typeinfo.typeI32
+      ]),
+      ...genType('textureLoad', MASK_WEBGPU, typeinfo.typeF32, [
+        typeinfo.typeTexDepthMultisampled2D,
+        typeinfo.typeI32Vec2,
+        typeinfo.typeI32
+      ]),
+      ...genType('texelFetch', MASK_WEBGL2, typeinfo.typeF32Vec4, [
+        typeinfo.typeTex1D,
+        typeinfo.typeI32Vec2,
+        typeinfo.typeI32
+      ]),
+      ...genType('texelFetch', MASK_WEBGL2, typeinfo.typeF32Vec4, [
+        typeinfo.typeTex2D,
+        typeinfo.typeI32Vec2,
+        typeinfo.typeI32
+      ]),
+      ...genType('texelFetch', MASK_WEBGL2, typeinfo.typeF32Vec4, [
+        typeinfo.typeTex3D,
+        typeinfo.typeI32Vec3,
+        typeinfo.typeI32
+      ]),
+      ...genType('texelFetch', MASK_WEBGL2, typeinfo.typeU32Vec4, [
+        typeinfo.typeTexExternal,
+        typeinfo.typeI32Vec2,
+        typeinfo.typeI32
+      ]),
+      ...genType('texelFetch', MASK_WEBGL2, typeinfo.typeF32Vec4, [
+        typeinfo.typeITex1D,
+        typeinfo.typeI32Vec2,
+        typeinfo.typeI32
+      ]),
+      ...genType('texelFetch', MASK_WEBGL2, typeinfo.typeI32Vec4, [
+        typeinfo.typeITex2D,
+        typeinfo.typeI32Vec2,
+        typeinfo.typeI32
+      ]),
+      ...genType('texelFetch', MASK_WEBGL2, typeinfo.typeI32Vec4, [
+        typeinfo.typeITex3D,
+        typeinfo.typeI32Vec3,
+        typeinfo.typeI32
+      ]),
+      ...genType('texelFetch', MASK_WEBGL2, typeinfo.typeF32Vec4, [
+        typeinfo.typeUTex1D,
+        typeinfo.typeI32Vec2,
+        typeinfo.typeI32
+      ]),
+      ...genType('texelFetch', MASK_WEBGL2, typeinfo.typeU32Vec4, [
+        typeinfo.typeUTex2D,
+        typeinfo.typeI32Vec2,
+        typeinfo.typeI32
+      ]),
+      ...genType('texelFetch', MASK_WEBGL2, typeinfo.typeU32Vec4, [
+        typeinfo.typeUTex3D,
+        typeinfo.typeI32Vec3,
+        typeinfo.typeI32
+      ])
     ],
     normalizeFunc(pb, name, ...args) {
       if (args.length === 0) {
@@ -1022,7 +1439,11 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
             }
           } else if (args[1] instanceof PBShaderExp) {
             const coordType = args[1].$ast.getType();
-            if (!coordType.isPrimitiveType() || !coordType.isScalarType() || coordType.scalarType !== typeinfo.PBPrimitiveType.I32) {
+            if (
+              !coordType.isPrimitiveType() ||
+              !coordType.isScalarType() ||
+              coordType.scalarType !== typeinfo.PBPrimitiveType.I32
+            ) {
               throw new PBParamTypeError('textureLoad', 'coord');
             }
           } else {
@@ -1039,13 +1460,45 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
   // textureArrayLoad(tex: PBShaderExp, coords: number|PBShaderExp, arrayIndex: number|PBShaderExp, level: number|PBShaderExp);
   textureArrayLoad: {
     overloads: [
-      ...genType('textureLoad', MASK_WEBGPU, typeinfo.typeF32Vec4, [typeinfo.typeTex2DArray, typeinfo.typeI32Vec2, typeinfo.typeI32, typeinfo.typeI32]),
-      ...genType('textureLoad', MASK_WEBGPU, typeinfo.typeI32Vec4, [typeinfo.typeITex2DArray, typeinfo.typeI32Vec2, typeinfo.typeI32, typeinfo.typeI32]),
-      ...genType('textureLoad', MASK_WEBGPU, typeinfo.typeU32Vec4, [typeinfo.typeUTex2DArray, typeinfo.typeI32Vec2, typeinfo.typeI32, typeinfo.typeI32]),
-      ...genType('textureLoad', MASK_WEBGPU, typeinfo.typeF32, [typeinfo.typeTexDepth2DArray, typeinfo.typeI32Vec2, typeinfo.typeI32, typeinfo.typeI32]),
-      ...genType('texelFetch', MASK_WEBGL2, typeinfo.typeF32Vec4, [typeinfo.typeTex2DArray, typeinfo.typeI32Vec3, typeinfo.typeI32]),
-      ...genType('texelFetch', MASK_WEBGL2, typeinfo.typeI32Vec4, [typeinfo.typeITex2DArray, typeinfo.typeI32Vec3, typeinfo.typeI32]),
-      ...genType('texelFetch', MASK_WEBGL2, typeinfo.typeU32Vec4, [typeinfo.typeUTex2DArray, typeinfo.typeI32Vec3, typeinfo.typeI32]),
+      ...genType('textureLoad', MASK_WEBGPU, typeinfo.typeF32Vec4, [
+        typeinfo.typeTex2DArray,
+        typeinfo.typeI32Vec2,
+        typeinfo.typeI32,
+        typeinfo.typeI32
+      ]),
+      ...genType('textureLoad', MASK_WEBGPU, typeinfo.typeI32Vec4, [
+        typeinfo.typeITex2DArray,
+        typeinfo.typeI32Vec2,
+        typeinfo.typeI32,
+        typeinfo.typeI32
+      ]),
+      ...genType('textureLoad', MASK_WEBGPU, typeinfo.typeU32Vec4, [
+        typeinfo.typeUTex2DArray,
+        typeinfo.typeI32Vec2,
+        typeinfo.typeI32,
+        typeinfo.typeI32
+      ]),
+      ...genType('textureLoad', MASK_WEBGPU, typeinfo.typeF32, [
+        typeinfo.typeTexDepth2DArray,
+        typeinfo.typeI32Vec2,
+        typeinfo.typeI32,
+        typeinfo.typeI32
+      ]),
+      ...genType('texelFetch', MASK_WEBGL2, typeinfo.typeF32Vec4, [
+        typeinfo.typeTex2DArray,
+        typeinfo.typeI32Vec3,
+        typeinfo.typeI32
+      ]),
+      ...genType('texelFetch', MASK_WEBGL2, typeinfo.typeI32Vec4, [
+        typeinfo.typeITex2DArray,
+        typeinfo.typeI32Vec3,
+        typeinfo.typeI32
+      ]),
+      ...genType('texelFetch', MASK_WEBGL2, typeinfo.typeU32Vec4, [
+        typeinfo.typeUTex2DArray,
+        typeinfo.typeI32Vec3,
+        typeinfo.typeI32
+      ])
     ],
     normalizeFunc(pb, name, ...args) {
       if (pb.getDeviceType() === 'webgl2') {
@@ -1059,81 +1512,352 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
       } else {
         return callBuiltin(pb, name, ...args);
       }
-    },
+    }
   },
   // textureStore(tex: PBShaderExp, coords: number|PBShaderExp, value: PBShaderExp);
   textureStore: {
     overloads: [
-      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [typeinfo.typeTexStorage1D_rgba8unorm, typeinfo.typeU32, typeinfo.typeF32Vec4]),
-      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [typeinfo.typeTexStorage1D_rgba8snorm, typeinfo.typeU32, typeinfo.typeF32Vec4]),
-      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [typeinfo.typeTexStorage1D_rgba8uint, typeinfo.typeU32, typeinfo.typeU32Vec4]),
-      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [typeinfo.typeTexStorage1D_rgba8sint, typeinfo.typeU32, typeinfo.typeI32Vec4]),
-      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [typeinfo.typeTexStorage1D_rgba16uint, typeinfo.typeU32, typeinfo.typeU32Vec4]),
-      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [typeinfo.typeTexStorage1D_rgba16sint, typeinfo.typeU32, typeinfo.typeI32Vec4]),
-      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [typeinfo.typeTexStorage1D_rgba16float, typeinfo.typeU32, typeinfo.typeF32Vec4]),
-      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [typeinfo.typeTexStorage1D_rgba32uint, typeinfo.typeU32, typeinfo.typeU32Vec4]),
-      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [typeinfo.typeTexStorage1D_rgba32sint, typeinfo.typeU32, typeinfo.typeI32Vec4]),
-      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [typeinfo.typeTexStorage1D_rgba32float, typeinfo.typeU32, typeinfo.typeF32Vec4]),
-      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [typeinfo.typeTexStorage1D_rg32uint, typeinfo.typeU32, typeinfo.typeU32Vec4]),
-      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [typeinfo.typeTexStorage1D_rg32sint, typeinfo.typeU32, typeinfo.typeI32Vec4]),
-      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [typeinfo.typeTexStorage1D_rg32float, typeinfo.typeU32, typeinfo.typeF32Vec4]),
-      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [typeinfo.typeTexStorage1D_r32uint, typeinfo.typeU32, typeinfo.typeU32Vec4]),
-      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [typeinfo.typeTexStorage1D_r32sint, typeinfo.typeU32, typeinfo.typeI32Vec4]),
-      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [typeinfo.typeTexStorage1D_r32float, typeinfo.typeU32, typeinfo.typeF32Vec4]),
-      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [typeinfo.typeTexStorage2D_rgba8unorm, typeinfo.typeU32Vec2, typeinfo.typeF32Vec4]),
-      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [typeinfo.typeTexStorage2D_rgba8snorm, typeinfo.typeU32Vec2, typeinfo.typeF32Vec4]),
-      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [typeinfo.typeTexStorage2D_rgba8uint, typeinfo.typeU32Vec2, typeinfo.typeU32Vec4]),
-      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [typeinfo.typeTexStorage2D_rgba8sint, typeinfo.typeU32Vec2, typeinfo.typeI32Vec4]),
-      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [typeinfo.typeTexStorage2D_rgba16uint, typeinfo.typeU32Vec2, typeinfo.typeU32Vec4]),
-      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [typeinfo.typeTexStorage2D_rgba16sint, typeinfo.typeU32Vec2, typeinfo.typeI32Vec4]),
-      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [typeinfo.typeTexStorage2D_rgba16float, typeinfo.typeU32Vec2, typeinfo.typeF32Vec4]),
-      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [typeinfo.typeTexStorage2D_rgba32uint, typeinfo.typeU32Vec2, typeinfo.typeU32Vec4]),
-      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [typeinfo.typeTexStorage2D_rgba32sint, typeinfo.typeU32Vec2, typeinfo.typeI32Vec4]),
-      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [typeinfo.typeTexStorage2D_rgba32float, typeinfo.typeU32Vec2, typeinfo.typeF32Vec4]),
-      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [typeinfo.typeTexStorage2D_rg32uint, typeinfo.typeU32Vec2, typeinfo.typeU32Vec4]),
-      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [typeinfo.typeTexStorage2D_rg32sint, typeinfo.typeU32Vec2, typeinfo.typeI32Vec4]),
-      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [typeinfo.typeTexStorage2D_rg32float, typeinfo.typeU32Vec2, typeinfo.typeF32Vec4]),
-      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [typeinfo.typeTexStorage2D_r32uint, typeinfo.typeU32Vec2, typeinfo.typeU32Vec4]),
-      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [typeinfo.typeTexStorage2D_r32sint, typeinfo.typeU32Vec2, typeinfo.typeI32Vec4]),
-      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [typeinfo.typeTexStorage2D_r32float, typeinfo.typeU32Vec2, typeinfo.typeF32Vec4]),
-      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [typeinfo.typeTexStorage3D_rgba8unorm, typeinfo.typeU32Vec3, typeinfo.typeF32Vec4]),
-      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [typeinfo.typeTexStorage3D_rgba8snorm, typeinfo.typeU32Vec3, typeinfo.typeF32Vec4]),
-      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [typeinfo.typeTexStorage3D_rgba8uint, typeinfo.typeU32Vec3, typeinfo.typeU32Vec4]),
-      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [typeinfo.typeTexStorage3D_rgba8sint, typeinfo.typeU32Vec3, typeinfo.typeI32Vec4]),
-      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [typeinfo.typeTexStorage3D_rgba16uint, typeinfo.typeU32Vec3, typeinfo.typeU32Vec4]),
-      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [typeinfo.typeTexStorage3D_rgba16sint, typeinfo.typeU32Vec3, typeinfo.typeI32Vec4]),
-      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [typeinfo.typeTexStorage3D_rgba16float, typeinfo.typeU32Vec3, typeinfo.typeF32Vec4]),
-      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [typeinfo.typeTexStorage3D_rgba32uint, typeinfo.typeU32Vec3, typeinfo.typeU32Vec4]),
-      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [typeinfo.typeTexStorage3D_rgba32sint, typeinfo.typeU32Vec3, typeinfo.typeI32Vec4]),
-      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [typeinfo.typeTexStorage3D_rgba32float, typeinfo.typeU32Vec3, typeinfo.typeF32Vec4]),
-      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [typeinfo.typeTexStorage3D_rg32uint, typeinfo.typeU32Vec3, typeinfo.typeU32Vec4]),
-      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [typeinfo.typeTexStorage3D_rg32sint, typeinfo.typeU32Vec3, typeinfo.typeI32Vec4]),
-      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [typeinfo.typeTexStorage3D_rg32float, typeinfo.typeU32Vec3, typeinfo.typeF32Vec4]),
-      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [typeinfo.typeTexStorage3D_r32uint, typeinfo.typeU32Vec3, typeinfo.typeU32Vec4]),
-      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [typeinfo.typeTexStorage3D_r32sint, typeinfo.typeU32Vec3, typeinfo.typeI32Vec4]),
-      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [typeinfo.typeTexStorage3D_r32float, typeinfo.typeU32Vec3, typeinfo.typeF32Vec4]),
+      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [
+        typeinfo.typeTexStorage1D_rgba8unorm,
+        typeinfo.typeU32,
+        typeinfo.typeF32Vec4
+      ]),
+      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [
+        typeinfo.typeTexStorage1D_rgba8snorm,
+        typeinfo.typeU32,
+        typeinfo.typeF32Vec4
+      ]),
+      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [
+        typeinfo.typeTexStorage1D_rgba8uint,
+        typeinfo.typeU32,
+        typeinfo.typeU32Vec4
+      ]),
+      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [
+        typeinfo.typeTexStorage1D_rgba8sint,
+        typeinfo.typeU32,
+        typeinfo.typeI32Vec4
+      ]),
+      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [
+        typeinfo.typeTexStorage1D_rgba16uint,
+        typeinfo.typeU32,
+        typeinfo.typeU32Vec4
+      ]),
+      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [
+        typeinfo.typeTexStorage1D_rgba16sint,
+        typeinfo.typeU32,
+        typeinfo.typeI32Vec4
+      ]),
+      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [
+        typeinfo.typeTexStorage1D_rgba16float,
+        typeinfo.typeU32,
+        typeinfo.typeF32Vec4
+      ]),
+      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [
+        typeinfo.typeTexStorage1D_rgba32uint,
+        typeinfo.typeU32,
+        typeinfo.typeU32Vec4
+      ]),
+      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [
+        typeinfo.typeTexStorage1D_rgba32sint,
+        typeinfo.typeU32,
+        typeinfo.typeI32Vec4
+      ]),
+      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [
+        typeinfo.typeTexStorage1D_rgba32float,
+        typeinfo.typeU32,
+        typeinfo.typeF32Vec4
+      ]),
+      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [
+        typeinfo.typeTexStorage1D_rg32uint,
+        typeinfo.typeU32,
+        typeinfo.typeU32Vec4
+      ]),
+      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [
+        typeinfo.typeTexStorage1D_rg32sint,
+        typeinfo.typeU32,
+        typeinfo.typeI32Vec4
+      ]),
+      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [
+        typeinfo.typeTexStorage1D_rg32float,
+        typeinfo.typeU32,
+        typeinfo.typeF32Vec4
+      ]),
+      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [
+        typeinfo.typeTexStorage1D_r32uint,
+        typeinfo.typeU32,
+        typeinfo.typeU32Vec4
+      ]),
+      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [
+        typeinfo.typeTexStorage1D_r32sint,
+        typeinfo.typeU32,
+        typeinfo.typeI32Vec4
+      ]),
+      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [
+        typeinfo.typeTexStorage1D_r32float,
+        typeinfo.typeU32,
+        typeinfo.typeF32Vec4
+      ]),
+      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [
+        typeinfo.typeTexStorage2D_rgba8unorm,
+        typeinfo.typeU32Vec2,
+        typeinfo.typeF32Vec4
+      ]),
+      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [
+        typeinfo.typeTexStorage2D_rgba8snorm,
+        typeinfo.typeU32Vec2,
+        typeinfo.typeF32Vec4
+      ]),
+      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [
+        typeinfo.typeTexStorage2D_rgba8uint,
+        typeinfo.typeU32Vec2,
+        typeinfo.typeU32Vec4
+      ]),
+      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [
+        typeinfo.typeTexStorage2D_rgba8sint,
+        typeinfo.typeU32Vec2,
+        typeinfo.typeI32Vec4
+      ]),
+      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [
+        typeinfo.typeTexStorage2D_rgba16uint,
+        typeinfo.typeU32Vec2,
+        typeinfo.typeU32Vec4
+      ]),
+      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [
+        typeinfo.typeTexStorage2D_rgba16sint,
+        typeinfo.typeU32Vec2,
+        typeinfo.typeI32Vec4
+      ]),
+      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [
+        typeinfo.typeTexStorage2D_rgba16float,
+        typeinfo.typeU32Vec2,
+        typeinfo.typeF32Vec4
+      ]),
+      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [
+        typeinfo.typeTexStorage2D_rgba32uint,
+        typeinfo.typeU32Vec2,
+        typeinfo.typeU32Vec4
+      ]),
+      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [
+        typeinfo.typeTexStorage2D_rgba32sint,
+        typeinfo.typeU32Vec2,
+        typeinfo.typeI32Vec4
+      ]),
+      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [
+        typeinfo.typeTexStorage2D_rgba32float,
+        typeinfo.typeU32Vec2,
+        typeinfo.typeF32Vec4
+      ]),
+      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [
+        typeinfo.typeTexStorage2D_rg32uint,
+        typeinfo.typeU32Vec2,
+        typeinfo.typeU32Vec4
+      ]),
+      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [
+        typeinfo.typeTexStorage2D_rg32sint,
+        typeinfo.typeU32Vec2,
+        typeinfo.typeI32Vec4
+      ]),
+      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [
+        typeinfo.typeTexStorage2D_rg32float,
+        typeinfo.typeU32Vec2,
+        typeinfo.typeF32Vec4
+      ]),
+      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [
+        typeinfo.typeTexStorage2D_r32uint,
+        typeinfo.typeU32Vec2,
+        typeinfo.typeU32Vec4
+      ]),
+      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [
+        typeinfo.typeTexStorage2D_r32sint,
+        typeinfo.typeU32Vec2,
+        typeinfo.typeI32Vec4
+      ]),
+      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [
+        typeinfo.typeTexStorage2D_r32float,
+        typeinfo.typeU32Vec2,
+        typeinfo.typeF32Vec4
+      ]),
+      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [
+        typeinfo.typeTexStorage3D_rgba8unorm,
+        typeinfo.typeU32Vec3,
+        typeinfo.typeF32Vec4
+      ]),
+      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [
+        typeinfo.typeTexStorage3D_rgba8snorm,
+        typeinfo.typeU32Vec3,
+        typeinfo.typeF32Vec4
+      ]),
+      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [
+        typeinfo.typeTexStorage3D_rgba8uint,
+        typeinfo.typeU32Vec3,
+        typeinfo.typeU32Vec4
+      ]),
+      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [
+        typeinfo.typeTexStorage3D_rgba8sint,
+        typeinfo.typeU32Vec3,
+        typeinfo.typeI32Vec4
+      ]),
+      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [
+        typeinfo.typeTexStorage3D_rgba16uint,
+        typeinfo.typeU32Vec3,
+        typeinfo.typeU32Vec4
+      ]),
+      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [
+        typeinfo.typeTexStorage3D_rgba16sint,
+        typeinfo.typeU32Vec3,
+        typeinfo.typeI32Vec4
+      ]),
+      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [
+        typeinfo.typeTexStorage3D_rgba16float,
+        typeinfo.typeU32Vec3,
+        typeinfo.typeF32Vec4
+      ]),
+      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [
+        typeinfo.typeTexStorage3D_rgba32uint,
+        typeinfo.typeU32Vec3,
+        typeinfo.typeU32Vec4
+      ]),
+      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [
+        typeinfo.typeTexStorage3D_rgba32sint,
+        typeinfo.typeU32Vec3,
+        typeinfo.typeI32Vec4
+      ]),
+      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [
+        typeinfo.typeTexStorage3D_rgba32float,
+        typeinfo.typeU32Vec3,
+        typeinfo.typeF32Vec4
+      ]),
+      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [
+        typeinfo.typeTexStorage3D_rg32uint,
+        typeinfo.typeU32Vec3,
+        typeinfo.typeU32Vec4
+      ]),
+      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [
+        typeinfo.typeTexStorage3D_rg32sint,
+        typeinfo.typeU32Vec3,
+        typeinfo.typeI32Vec4
+      ]),
+      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [
+        typeinfo.typeTexStorage3D_rg32float,
+        typeinfo.typeU32Vec3,
+        typeinfo.typeF32Vec4
+      ]),
+      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [
+        typeinfo.typeTexStorage3D_r32uint,
+        typeinfo.typeU32Vec3,
+        typeinfo.typeU32Vec4
+      ]),
+      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [
+        typeinfo.typeTexStorage3D_r32sint,
+        typeinfo.typeU32Vec3,
+        typeinfo.typeI32Vec4
+      ]),
+      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [
+        typeinfo.typeTexStorage3D_r32float,
+        typeinfo.typeU32Vec3,
+        typeinfo.typeF32Vec4
+      ])
     ]
   },
   // textureArrayStore(tex: PBShaderExp, coords: PBShaderExp, arrayIndex: number|PBShaderExp, value: PBShaderExp);
   textureArrayStore: {
     overloads: [
-      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [typeinfo.typeTexStorage2DArray_rgba8unorm, typeinfo.typeI32Vec2, typeinfo.typeI32, typeinfo.typeF32Vec4]),
-      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [typeinfo.typeTexStorage2DArray_rgba8snorm, typeinfo.typeI32Vec2, typeinfo.typeI32, typeinfo.typeF32Vec4]),
-      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [typeinfo.typeTexStorage2DArray_rgba8uint, typeinfo.typeI32Vec2, typeinfo.typeI32, typeinfo.typeU32Vec4]),
-      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [typeinfo.typeTexStorage2DArray_rgba8sint, typeinfo.typeI32Vec2, typeinfo.typeI32, typeinfo.typeI32Vec4]),
-      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [typeinfo.typeTexStorage2DArray_rgba16uint, typeinfo.typeI32Vec2, typeinfo.typeI32, typeinfo.typeU32Vec4]),
-      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [typeinfo.typeTexStorage2DArray_rgba16sint, typeinfo.typeI32Vec2, typeinfo.typeI32, typeinfo.typeI32Vec4]),
-      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [typeinfo.typeTexStorage2DArray_rgba16float, typeinfo.typeI32Vec2, typeinfo.typeI32, typeinfo.typeF32Vec4]),
-      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [typeinfo.typeTexStorage2DArray_rgba32uint, typeinfo.typeI32Vec2, typeinfo.typeI32, typeinfo.typeU32Vec4]),
-      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [typeinfo.typeTexStorage2DArray_rgba32sint, typeinfo.typeI32Vec2, typeinfo.typeI32, typeinfo.typeI32Vec4]),
-      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [typeinfo.typeTexStorage2DArray_rgba32float, typeinfo.typeI32Vec2, typeinfo.typeI32, typeinfo.typeF32Vec4]),
-      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [typeinfo.typeTexStorage2DArray_rg32uint, typeinfo.typeI32Vec2, typeinfo.typeI32, typeinfo.typeU32Vec4]),
-      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [typeinfo.typeTexStorage2DArray_rg32sint, typeinfo.typeI32Vec2, typeinfo.typeI32, typeinfo.typeI32Vec4]),
-      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [typeinfo.typeTexStorage2DArray_rg32float, typeinfo.typeI32Vec2, typeinfo.typeI32, typeinfo.typeF32Vec4]),
-      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [typeinfo.typeTexStorage2DArray_r32uint, typeinfo.typeI32Vec2, typeinfo.typeI32, typeinfo.typeU32Vec4]),
-      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [typeinfo.typeTexStorage2DArray_r32sint, typeinfo.typeI32Vec2, typeinfo.typeI32, typeinfo.typeI32Vec4]),
-      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [typeinfo.typeTexStorage2DArray_r32float, typeinfo.typeI32Vec2, typeinfo.typeI32, typeinfo.typeF32Vec4]),
-
+      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [
+        typeinfo.typeTexStorage2DArray_rgba8unorm,
+        typeinfo.typeI32Vec2,
+        typeinfo.typeI32,
+        typeinfo.typeF32Vec4
+      ]),
+      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [
+        typeinfo.typeTexStorage2DArray_rgba8snorm,
+        typeinfo.typeI32Vec2,
+        typeinfo.typeI32,
+        typeinfo.typeF32Vec4
+      ]),
+      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [
+        typeinfo.typeTexStorage2DArray_rgba8uint,
+        typeinfo.typeI32Vec2,
+        typeinfo.typeI32,
+        typeinfo.typeU32Vec4
+      ]),
+      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [
+        typeinfo.typeTexStorage2DArray_rgba8sint,
+        typeinfo.typeI32Vec2,
+        typeinfo.typeI32,
+        typeinfo.typeI32Vec4
+      ]),
+      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [
+        typeinfo.typeTexStorage2DArray_rgba16uint,
+        typeinfo.typeI32Vec2,
+        typeinfo.typeI32,
+        typeinfo.typeU32Vec4
+      ]),
+      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [
+        typeinfo.typeTexStorage2DArray_rgba16sint,
+        typeinfo.typeI32Vec2,
+        typeinfo.typeI32,
+        typeinfo.typeI32Vec4
+      ]),
+      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [
+        typeinfo.typeTexStorage2DArray_rgba16float,
+        typeinfo.typeI32Vec2,
+        typeinfo.typeI32,
+        typeinfo.typeF32Vec4
+      ]),
+      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [
+        typeinfo.typeTexStorage2DArray_rgba32uint,
+        typeinfo.typeI32Vec2,
+        typeinfo.typeI32,
+        typeinfo.typeU32Vec4
+      ]),
+      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [
+        typeinfo.typeTexStorage2DArray_rgba32sint,
+        typeinfo.typeI32Vec2,
+        typeinfo.typeI32,
+        typeinfo.typeI32Vec4
+      ]),
+      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [
+        typeinfo.typeTexStorage2DArray_rgba32float,
+        typeinfo.typeI32Vec2,
+        typeinfo.typeI32,
+        typeinfo.typeF32Vec4
+      ]),
+      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [
+        typeinfo.typeTexStorage2DArray_rg32uint,
+        typeinfo.typeI32Vec2,
+        typeinfo.typeI32,
+        typeinfo.typeU32Vec4
+      ]),
+      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [
+        typeinfo.typeTexStorage2DArray_rg32sint,
+        typeinfo.typeI32Vec2,
+        typeinfo.typeI32,
+        typeinfo.typeI32Vec4
+      ]),
+      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [
+        typeinfo.typeTexStorage2DArray_rg32float,
+        typeinfo.typeI32Vec2,
+        typeinfo.typeI32,
+        typeinfo.typeF32Vec4
+      ]),
+      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [
+        typeinfo.typeTexStorage2DArray_r32uint,
+        typeinfo.typeI32Vec2,
+        typeinfo.typeI32,
+        typeinfo.typeU32Vec4
+      ]),
+      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [
+        typeinfo.typeTexStorage2DArray_r32sint,
+        typeinfo.typeI32Vec2,
+        typeinfo.typeI32,
+        typeinfo.typeI32Vec4
+      ]),
+      ...genType('textureStore', MASK_WEBGPU, typeinfo.typeVoid, [
+        typeinfo.typeTexStorage2DArray_r32float,
+        typeinfo.typeI32Vec2,
+        typeinfo.typeI32,
+        typeinfo.typeF32Vec4
+      ])
     ]
   },
   // textureNumLayers(tex: PBShaderExp);
@@ -1147,22 +1871,50 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
       ...genType('textureNumLayers', MASK_WEBGPU, typeinfo.typeI32, [typeinfo.typeUTexCubeArray]),
       ...genType('textureNumLayers', MASK_WEBGPU, typeinfo.typeI32, [typeinfo.typeTexDepth2DArray]),
       ...genType('textureNumLayers', MASK_WEBGPU, typeinfo.typeI32, [typeinfo.typeTexDepthCubeArray]),
-      ...genType('textureNumLayers', MASK_WEBGPU, typeinfo.typeI32, [typeinfo.typeTexStorage2DArray_r32float]),
+      ...genType('textureNumLayers', MASK_WEBGPU, typeinfo.typeI32, [
+        typeinfo.typeTexStorage2DArray_r32float
+      ]),
       ...genType('textureNumLayers', MASK_WEBGPU, typeinfo.typeI32, [typeinfo.typeTexStorage2DArray_r32sint]),
       ...genType('textureNumLayers', MASK_WEBGPU, typeinfo.typeI32, [typeinfo.typeTexStorage2DArray_r32uint]),
-      ...genType('textureNumLayers', MASK_WEBGPU, typeinfo.typeI32, [typeinfo.typeTexStorage2DArray_rg32float]),
-      ...genType('textureNumLayers', MASK_WEBGPU, typeinfo.typeI32, [typeinfo.typeTexStorage2DArray_rg32sint]),
-      ...genType('textureNumLayers', MASK_WEBGPU, typeinfo.typeI32, [typeinfo.typeTexStorage2DArray_rg32uint]),
-      ...genType('textureNumLayers', MASK_WEBGPU, typeinfo.typeI32, [typeinfo.typeTexStorage2DArray_rgba16float]),
-      ...genType('textureNumLayers', MASK_WEBGPU, typeinfo.typeI32, [typeinfo.typeTexStorage2DArray_rgba16sint]),
-      ...genType('textureNumLayers', MASK_WEBGPU, typeinfo.typeI32, [typeinfo.typeTexStorage2DArray_rgba16uint]),
-      ...genType('textureNumLayers', MASK_WEBGPU, typeinfo.typeI32, [typeinfo.typeTexStorage2DArray_rgba32float]),
-      ...genType('textureNumLayers', MASK_WEBGPU, typeinfo.typeI32, [typeinfo.typeTexStorage2DArray_rgba32sint]),
-      ...genType('textureNumLayers', MASK_WEBGPU, typeinfo.typeI32, [typeinfo.typeTexStorage2DArray_rgba32uint]),
-      ...genType('textureNumLayers', MASK_WEBGPU, typeinfo.typeI32, [typeinfo.typeTexStorage2DArray_rgba8sint]),
-      ...genType('textureNumLayers', MASK_WEBGPU, typeinfo.typeI32, [typeinfo.typeTexStorage2DArray_rgba8snorm]),
-      ...genType('textureNumLayers', MASK_WEBGPU, typeinfo.typeI32, [typeinfo.typeTexStorage2DArray_rgba8uint]),
-      ...genType('textureNumLayers', MASK_WEBGPU, typeinfo.typeI32, [typeinfo.typeTexStorage2DArray_rgba8unorm]),
+      ...genType('textureNumLayers', MASK_WEBGPU, typeinfo.typeI32, [
+        typeinfo.typeTexStorage2DArray_rg32float
+      ]),
+      ...genType('textureNumLayers', MASK_WEBGPU, typeinfo.typeI32, [
+        typeinfo.typeTexStorage2DArray_rg32sint
+      ]),
+      ...genType('textureNumLayers', MASK_WEBGPU, typeinfo.typeI32, [
+        typeinfo.typeTexStorage2DArray_rg32uint
+      ]),
+      ...genType('textureNumLayers', MASK_WEBGPU, typeinfo.typeI32, [
+        typeinfo.typeTexStorage2DArray_rgba16float
+      ]),
+      ...genType('textureNumLayers', MASK_WEBGPU, typeinfo.typeI32, [
+        typeinfo.typeTexStorage2DArray_rgba16sint
+      ]),
+      ...genType('textureNumLayers', MASK_WEBGPU, typeinfo.typeI32, [
+        typeinfo.typeTexStorage2DArray_rgba16uint
+      ]),
+      ...genType('textureNumLayers', MASK_WEBGPU, typeinfo.typeI32, [
+        typeinfo.typeTexStorage2DArray_rgba32float
+      ]),
+      ...genType('textureNumLayers', MASK_WEBGPU, typeinfo.typeI32, [
+        typeinfo.typeTexStorage2DArray_rgba32sint
+      ]),
+      ...genType('textureNumLayers', MASK_WEBGPU, typeinfo.typeI32, [
+        typeinfo.typeTexStorage2DArray_rgba32uint
+      ]),
+      ...genType('textureNumLayers', MASK_WEBGPU, typeinfo.typeI32, [
+        typeinfo.typeTexStorage2DArray_rgba8sint
+      ]),
+      ...genType('textureNumLayers', MASK_WEBGPU, typeinfo.typeI32, [
+        typeinfo.typeTexStorage2DArray_rgba8snorm
+      ]),
+      ...genType('textureNumLayers', MASK_WEBGPU, typeinfo.typeI32, [
+        typeinfo.typeTexStorage2DArray_rgba8uint
+      ]),
+      ...genType('textureNumLayers', MASK_WEBGPU, typeinfo.typeI32, [
+        typeinfo.typeTexStorage2DArray_rgba8unorm
+      ])
     ]
   },
   // textureNumLevels(tex: PBShaderExp);
@@ -1189,7 +1941,7 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
       ...genType('textureNumLevels', MASK_WEBGPU, typeinfo.typeI32, [typeinfo.typeTexDepth2D]),
       ...genType('textureNumLevels', MASK_WEBGPU, typeinfo.typeI32, [typeinfo.typeTexDepth2DArray]),
       ...genType('textureNumLevels', MASK_WEBGPU, typeinfo.typeI32, [typeinfo.typeTexDepthCube]),
-      ...genType('textureNumLevels', MASK_WEBGPU, typeinfo.typeI32, [typeinfo.typeTexDepthCubeArray]),
+      ...genType('textureNumLevels', MASK_WEBGPU, typeinfo.typeI32, [typeinfo.typeTexDepthCubeArray])
     ]
   },
   // textureNumSamples(tex: PBShaderExp);
@@ -1198,31 +1950,76 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
       ...genType('textureNumSamples', MASK_WEBGPU, typeinfo.typeI32, [typeinfo.typeTexMultisampled2D]),
       ...genType('textureNumSamples', MASK_WEBGPU, typeinfo.typeI32, [typeinfo.typeITexMultisampled2D]),
       ...genType('textureNumSamples', MASK_WEBGPU, typeinfo.typeI32, [typeinfo.typeUTexMultisampled2D]),
-      ...genType('textureNumSamples', MASK_WEBGPU, typeinfo.typeI32, [typeinfo.typeTexDepthMultisampled2D]),
+      ...genType('textureNumSamples', MASK_WEBGPU, typeinfo.typeI32, [typeinfo.typeTexDepthMultisampled2D])
     ]
   },
   // textureSample(tex: texture, coords: number|PBShaderExp);
   textureSample: {
     overloads: [
-      ...genType('textureSample', MASK_WEBGPU, typeinfo.typeF32Vec4, [typeinfo.typeTex1D, typeinfo.typeSampler, typeinfo.typeF32]),
-      ...genType('textureSample', MASK_WEBGPU, typeinfo.typeF32Vec4, [typeinfo.typeTex2D, typeinfo.typeSampler, typeinfo.typeF32Vec2]),
-      ...genType('textureSample', MASK_WEBGPU, typeinfo.typeF32Vec4, [typeinfo.typeTex3D, typeinfo.typeSampler, typeinfo.typeF32Vec3]),
-      ...genType('textureSample', MASK_WEBGPU, typeinfo.typeF32Vec4, [typeinfo.typeTexCube, typeinfo.typeSampler, typeinfo.typeF32Vec3]),
-      ...genType('textureSample', MASK_WEBGPU, typeinfo.typeF32, [typeinfo.typeTexDepth2D, typeinfo.typeSampler, typeinfo.typeF32Vec2]),
-      ...genType('textureSample', MASK_WEBGPU, typeinfo.typeF32, [typeinfo.typeTexDepthCube, typeinfo.typeSampler, typeinfo.typeF32Vec3]),
+      ...genType('textureSample', MASK_WEBGPU, typeinfo.typeF32Vec4, [
+        typeinfo.typeTex1D,
+        typeinfo.typeSampler,
+        typeinfo.typeF32
+      ]),
+      ...genType('textureSample', MASK_WEBGPU, typeinfo.typeF32Vec4, [
+        typeinfo.typeTex2D,
+        typeinfo.typeSampler,
+        typeinfo.typeF32Vec2
+      ]),
+      ...genType('textureSample', MASK_WEBGPU, typeinfo.typeF32Vec4, [
+        typeinfo.typeTex3D,
+        typeinfo.typeSampler,
+        typeinfo.typeF32Vec3
+      ]),
+      ...genType('textureSample', MASK_WEBGPU, typeinfo.typeF32Vec4, [
+        typeinfo.typeTexCube,
+        typeinfo.typeSampler,
+        typeinfo.typeF32Vec3
+      ]),
+      ...genType('textureSample', MASK_WEBGPU, typeinfo.typeF32, [
+        typeinfo.typeTexDepth2D,
+        typeinfo.typeSampler,
+        typeinfo.typeF32Vec2
+      ]),
+      ...genType('textureSample', MASK_WEBGPU, typeinfo.typeF32, [
+        typeinfo.typeTexDepthCube,
+        typeinfo.typeSampler,
+        typeinfo.typeF32Vec3
+      ]),
       ...genType('texture', MASK_WEBGL2, typeinfo.typeF32Vec4, [typeinfo.typeTex1D, typeinfo.typeF32Vec2]),
       ...genType('texture', MASK_WEBGL2, typeinfo.typeF32Vec4, [typeinfo.typeTex2D, typeinfo.typeF32Vec2]),
-      ...genType('texture', MASK_WEBGL2, typeinfo.typeF32Vec4, [typeinfo.typeTexExternal, typeinfo.typeF32Vec2]),
-      ...genType('texture', MASK_WEBGL2, typeinfo.typeF32Vec4, [typeinfo.typeTexDepth2D, typeinfo.typeF32Vec2]),
+      ...genType('texture', MASK_WEBGL2, typeinfo.typeF32Vec4, [
+        typeinfo.typeTexExternal,
+        typeinfo.typeF32Vec2
+      ]),
+      ...genType('texture', MASK_WEBGL2, typeinfo.typeF32Vec4, [
+        typeinfo.typeTexDepth2D,
+        typeinfo.typeF32Vec2
+      ]),
       ...genType('texture', MASK_WEBGL2, typeinfo.typeF32Vec4, [typeinfo.typeTex3D, typeinfo.typeF32Vec3]),
       ...genType('texture', MASK_WEBGL2, typeinfo.typeF32Vec4, [typeinfo.typeTexCube, typeinfo.typeF32Vec3]),
-      ...genType('texture', MASK_WEBGL2, typeinfo.typeF32Vec4, [typeinfo.typeTexDepthCube, typeinfo.typeF32Vec3]),
+      ...genType('texture', MASK_WEBGL2, typeinfo.typeF32Vec4, [
+        typeinfo.typeTexDepthCube,
+        typeinfo.typeF32Vec3
+      ]),
       ...genType('texture2D', MASK_WEBGL1, typeinfo.typeF32Vec4, [typeinfo.typeTex1D, typeinfo.typeF32Vec2]),
       ...genType('texture2D', MASK_WEBGL1, typeinfo.typeF32Vec4, [typeinfo.typeTex2D, typeinfo.typeF32Vec2]),
-      ...genType('texture2D', MASK_WEBGL1, typeinfo.typeF32Vec4, [typeinfo.typeTexExternal, typeinfo.typeF32Vec2]),
-      ...genType('texture2D', MASK_WEBGL1, typeinfo.typeF32Vec4, [typeinfo.typeTexDepth2D, typeinfo.typeF32Vec2]),
-      ...genType('textureCube', MASK_WEBGL1, typeinfo.typeF32Vec4, [typeinfo.typeTexCube, typeinfo.typeF32Vec3]),
-      ...genType('textureCube', MASK_WEBGL1, typeinfo.typeF32Vec4, [typeinfo.typeTexDepthCube, typeinfo.typeF32Vec3]),
+      ...genType('texture2D', MASK_WEBGL1, typeinfo.typeF32Vec4, [
+        typeinfo.typeTexExternal,
+        typeinfo.typeF32Vec2
+      ]),
+      ...genType('texture2D', MASK_WEBGL1, typeinfo.typeF32Vec4, [
+        typeinfo.typeTexDepth2D,
+        typeinfo.typeF32Vec2
+      ]),
+      ...genType('textureCube', MASK_WEBGL1, typeinfo.typeF32Vec4, [
+        typeinfo.typeTexCube,
+        typeinfo.typeF32Vec3
+      ]),
+      ...genType('textureCube', MASK_WEBGL1, typeinfo.typeF32Vec4, [
+        typeinfo.typeTexDepthCube,
+        typeinfo.typeF32Vec3
+      ])
     ],
     normalizeFunc(pb, name, ...args) {
       if (args.length !== 2) {
@@ -1254,7 +2051,11 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
         if (texType.is1DTexture()) {
           if (args[1] instanceof PBShaderExp) {
             const coordType = args[1].$ast.getType();
-            if (!coordType.isPrimitiveType() || !coordType.isScalarType() || coordType.scalarType !== typeinfo.PBPrimitiveType.F32) {
+            if (
+              !coordType.isPrimitiveType() ||
+              !coordType.isScalarType() ||
+              coordType.scalarType !== typeinfo.PBPrimitiveType.F32
+            ) {
               throw new PBParamTypeError('textureSample', 'coord');
             }
           } else if (typeof args[1] !== 'number') {
@@ -1269,11 +2070,34 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
   // textureArraySample(tex: PBShaderExp, coords: PBShaderExp, arrayIndex: number|PBShaderExp)
   textureArraySample: {
     overloads: [
-      ...genType('textureSample', MASK_WEBGPU, typeinfo.typeF32Vec4, [typeinfo.typeTex2DArray, typeinfo.typeSampler, typeinfo.typeF32Vec2, typeinfo.typeI32]),
-      ...genType('textureSample', MASK_WEBGPU, typeinfo.typeF32Vec4, [typeinfo.typeTexCubeArray, typeinfo.typeSampler, typeinfo.typeF32Vec3, typeinfo.typeI32]),
-      ...genType('textureSample', MASK_WEBGPU, typeinfo.typeF32, [typeinfo.typeTexDepth2DArray, typeinfo.typeSampler, typeinfo.typeF32Vec2, typeinfo.typeI32]),
-      ...genType('textureSample', MASK_WEBGPU, typeinfo.typeF32, [typeinfo.typeTexDepthCubeArray, typeinfo.typeSampler, typeinfo.typeF32Vec3, typeinfo.typeI32]),
-      ...genType('texture', MASK_WEBGL2, typeinfo.typeF32Vec4, [typeinfo.typeTex2DArray, typeinfo.typeF32Vec3]),
+      ...genType('textureSample', MASK_WEBGPU, typeinfo.typeF32Vec4, [
+        typeinfo.typeTex2DArray,
+        typeinfo.typeSampler,
+        typeinfo.typeF32Vec2,
+        typeinfo.typeI32
+      ]),
+      ...genType('textureSample', MASK_WEBGPU, typeinfo.typeF32Vec4, [
+        typeinfo.typeTexCubeArray,
+        typeinfo.typeSampler,
+        typeinfo.typeF32Vec3,
+        typeinfo.typeI32
+      ]),
+      ...genType('textureSample', MASK_WEBGPU, typeinfo.typeF32, [
+        typeinfo.typeTexDepth2DArray,
+        typeinfo.typeSampler,
+        typeinfo.typeF32Vec2,
+        typeinfo.typeI32
+      ]),
+      ...genType('textureSample', MASK_WEBGPU, typeinfo.typeF32, [
+        typeinfo.typeTexDepthCubeArray,
+        typeinfo.typeSampler,
+        typeinfo.typeF32Vec3,
+        typeinfo.typeI32
+      ]),
+      ...genType('texture', MASK_WEBGL2, typeinfo.typeF32Vec4, [
+        typeinfo.typeTex2DArray,
+        typeinfo.typeF32Vec3
+      ])
     ],
     normalizeFunc(pb, name, ...args) {
       if (args.length !== 3) {
@@ -1309,14 +2133,49 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
   // textureSampleBias(tex: PBShaderExp, coords: PBShaderExp, bias: number|PBShaderExp)
   textureSampleBias: {
     overloads: [
-      ...genType('textureSampleBias', MASK_WEBGPU, typeinfo.typeF32Vec4, [typeinfo.typeTex2D, typeinfo.typeSampler, typeinfo.typeF32Vec2, typeinfo.typeF32]),
-      ...genType('textureSampleBias', MASK_WEBGPU, typeinfo.typeF32Vec4, [typeinfo.typeTex3D, typeinfo.typeSampler, typeinfo.typeF32Vec3, typeinfo.typeF32]),
-      ...genType('textureSampleBias', MASK_WEBGPU, typeinfo.typeF32Vec4, [typeinfo.typeTexCube, typeinfo.typeSampler, typeinfo.typeF32Vec3, typeinfo.typeF32]),
-      ...genType('texture', MASK_WEBGL2, typeinfo.typeF32Vec4, [typeinfo.typeTex2D, typeinfo.typeF32Vec2, typeinfo.typeF32]),
-      ...genType('texture', MASK_WEBGL2, typeinfo.typeF32Vec4, [typeinfo.typeTex3D, typeinfo.typeF32Vec3, typeinfo.typeF32]),
-      ...genType('texture', MASK_WEBGL2, typeinfo.typeF32Vec4, [typeinfo.typeTexCube, typeinfo.typeF32Vec3, typeinfo.typeF32]),
-      ...genType('texture2D', MASK_WEBGL1, typeinfo.typeF32Vec4, [typeinfo.typeTex2D, typeinfo.typeF32Vec2, typeinfo.typeF32]),
-      ...genType('textureCube', MASK_WEBGL1, typeinfo.typeF32Vec4, [typeinfo.typeTexCube, typeinfo.typeF32Vec3, typeinfo.typeF32]),
+      ...genType('textureSampleBias', MASK_WEBGPU, typeinfo.typeF32Vec4, [
+        typeinfo.typeTex2D,
+        typeinfo.typeSampler,
+        typeinfo.typeF32Vec2,
+        typeinfo.typeF32
+      ]),
+      ...genType('textureSampleBias', MASK_WEBGPU, typeinfo.typeF32Vec4, [
+        typeinfo.typeTex3D,
+        typeinfo.typeSampler,
+        typeinfo.typeF32Vec3,
+        typeinfo.typeF32
+      ]),
+      ...genType('textureSampleBias', MASK_WEBGPU, typeinfo.typeF32Vec4, [
+        typeinfo.typeTexCube,
+        typeinfo.typeSampler,
+        typeinfo.typeF32Vec3,
+        typeinfo.typeF32
+      ]),
+      ...genType('texture', MASK_WEBGL2, typeinfo.typeF32Vec4, [
+        typeinfo.typeTex2D,
+        typeinfo.typeF32Vec2,
+        typeinfo.typeF32
+      ]),
+      ...genType('texture', MASK_WEBGL2, typeinfo.typeF32Vec4, [
+        typeinfo.typeTex3D,
+        typeinfo.typeF32Vec3,
+        typeinfo.typeF32
+      ]),
+      ...genType('texture', MASK_WEBGL2, typeinfo.typeF32Vec4, [
+        typeinfo.typeTexCube,
+        typeinfo.typeF32Vec3,
+        typeinfo.typeF32
+      ]),
+      ...genType('texture2D', MASK_WEBGL1, typeinfo.typeF32Vec4, [
+        typeinfo.typeTex2D,
+        typeinfo.typeF32Vec2,
+        typeinfo.typeF32
+      ]),
+      ...genType('textureCube', MASK_WEBGL1, typeinfo.typeF32Vec4, [
+        typeinfo.typeTexCube,
+        typeinfo.typeF32Vec3,
+        typeinfo.typeF32
+      ])
     ],
     normalizeFunc(pb, name, ...args) {
       if (args.length !== 3) {
@@ -1342,9 +2201,25 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
   // textureArraySampleBias(tex: PBShaderExp, coords: PBShaderExp, arrayIndex: number|PBShaderExp, bias: number|PBShaderExp)
   textureArraySampleBias: {
     overloads: [
-      ...genType('textureSampleBias', MASK_WEBGPU, typeinfo.typeF32Vec4, [typeinfo.typeTex2DArray, typeinfo.typeSampler, typeinfo.typeF32Vec2, typeinfo.typeI32, typeinfo.typeF32]),
-      ...genType('textureSampleBias', MASK_WEBGPU, typeinfo.typeF32Vec4, [typeinfo.typeTexCubeArray, typeinfo.typeSampler, typeinfo.typeF32Vec3, typeinfo.typeI32, typeinfo.typeF32]),
-      ...genType('texture', MASK_WEBGL2, typeinfo.typeF32Vec4, [typeinfo.typeTex2DArray, typeinfo.typeF32Vec3, typeinfo.typeF32]),
+      ...genType('textureSampleBias', MASK_WEBGPU, typeinfo.typeF32Vec4, [
+        typeinfo.typeTex2DArray,
+        typeinfo.typeSampler,
+        typeinfo.typeF32Vec2,
+        typeinfo.typeI32,
+        typeinfo.typeF32
+      ]),
+      ...genType('textureSampleBias', MASK_WEBGPU, typeinfo.typeF32Vec4, [
+        typeinfo.typeTexCubeArray,
+        typeinfo.typeSampler,
+        typeinfo.typeF32Vec3,
+        typeinfo.typeI32,
+        typeinfo.typeF32
+      ]),
+      ...genType('texture', MASK_WEBGL2, typeinfo.typeF32Vec4, [
+        typeinfo.typeTex2DArray,
+        typeinfo.typeF32Vec3,
+        typeinfo.typeF32
+      ])
     ],
     normalizeFunc(pb, name, ...args) {
       if (args.length !== 4) {
@@ -1373,10 +2248,20 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
   // textureSampleCompare(tex: PBShaderExp, coords: PBShaderExp, depthRef: number|PBShaderExp)
   textureSampleCompare: {
     overloads: [
-      ...genType('textureSampleCompare', MASK_WEBGPU, typeinfo.typeF32, [typeinfo.typeTexDepth2D, typeinfo.typeSamplerComparison, typeinfo.typeF32Vec2, typeinfo.typeF32]),
-      ...genType('textureSampleCompare', MASK_WEBGPU, typeinfo.typeF32, [typeinfo.typeTexDepthCube, typeinfo.typeSamplerComparison, typeinfo.typeF32Vec3, typeinfo.typeF32]),
+      ...genType('textureSampleCompare', MASK_WEBGPU, typeinfo.typeF32, [
+        typeinfo.typeTexDepth2D,
+        typeinfo.typeSamplerComparison,
+        typeinfo.typeF32Vec2,
+        typeinfo.typeF32
+      ]),
+      ...genType('textureSampleCompare', MASK_WEBGPU, typeinfo.typeF32, [
+        typeinfo.typeTexDepthCube,
+        typeinfo.typeSamplerComparison,
+        typeinfo.typeF32Vec3,
+        typeinfo.typeF32
+      ]),
       ...genType('texture', MASK_WEBGL2, typeinfo.typeF32, [typeinfo.typeTexDepth2D, typeinfo.typeF32Vec3]),
-      ...genType('texture', MASK_WEBGL2, typeinfo.typeF32, [typeinfo.typeTexDepthCube, typeinfo.typeF32Vec4]),
+      ...genType('texture', MASK_WEBGL2, typeinfo.typeF32, [typeinfo.typeTexDepthCube, typeinfo.typeF32Vec4])
     ],
     normalizeFunc(pb, name, ...args) {
       if (args.length !== 3) {
@@ -1408,9 +2293,24 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
   // textureArraySampleCompare(tex: PBShaderExp, coords: PBShaderExp, arrayIndex: number|PBShaderExp, depthRef: number|PBShaderExp)
   textureArraySampleCompare: {
     overloads: [
-      ...genType('textureSampleCompare', MASK_WEBGPU, typeinfo.typeF32, [typeinfo.typeTexDepth2DArray, typeinfo.typeSamplerComparison, typeinfo.typeF32Vec2, typeinfo.typeI32, typeinfo.typeF32]),
-      ...genType('textureSampleCompare', MASK_WEBGPU, typeinfo.typeF32, [typeinfo.typeTexDepthCubeArray, typeinfo.typeSamplerComparison, typeinfo.typeF32Vec3, typeinfo.typeI32, typeinfo.typeF32]),
-      ...genType('texture', MASK_WEBGL2, typeinfo.typeF32, [typeinfo.typeTexDepth2DArray, typeinfo.typeF32Vec4]),
+      ...genType('textureSampleCompare', MASK_WEBGPU, typeinfo.typeF32, [
+        typeinfo.typeTexDepth2DArray,
+        typeinfo.typeSamplerComparison,
+        typeinfo.typeF32Vec2,
+        typeinfo.typeI32,
+        typeinfo.typeF32
+      ]),
+      ...genType('textureSampleCompare', MASK_WEBGPU, typeinfo.typeF32, [
+        typeinfo.typeTexDepthCubeArray,
+        typeinfo.typeSamplerComparison,
+        typeinfo.typeF32Vec3,
+        typeinfo.typeI32,
+        typeinfo.typeF32
+      ]),
+      ...genType('texture', MASK_WEBGL2, typeinfo.typeF32, [
+        typeinfo.typeTexDepth2DArray,
+        typeinfo.typeF32Vec4
+      ])
     ],
     normalizeFunc(pb, name, ...args) {
       if (args.length !== 4) {
@@ -1437,23 +2337,96 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
   // textureSampleLevel(tex: PBShaderExp, coords: PBShaderExp, level: number|PBShaderExp)
   textureSampleLevel: {
     overloads: [
-      ...genType('textureSampleLevel', MASK_WEBGPU, typeinfo.typeF32Vec4, [typeinfo.typeTex2D, typeinfo.typeSampler, typeinfo.typeF32Vec2, typeinfo.typeF32]),
-      ...genType('textureSampleLevel', MASK_WEBGPU, typeinfo.typeF32Vec4, [typeinfo.typeTex3D, typeinfo.typeSampler, typeinfo.typeF32Vec3, typeinfo.typeF32]),
-      ...genType('textureSampleLevel', MASK_WEBGPU, typeinfo.typeF32Vec4, [typeinfo.typeTexCube, typeinfo.typeSampler, typeinfo.typeF32Vec3, typeinfo.typeF32]),
-      ...genType('textureSampleLevel', MASK_WEBGPU, typeinfo.typeF32Vec4, [typeinfo.typeTexExternal, typeinfo.typeSampler, typeinfo.typeF32Vec2]),
-      ...genType('textureSampleLevel', MASK_WEBGPU, typeinfo.typeF32, [typeinfo.typeTexDepth2D, typeinfo.typeSampler, typeinfo.typeF32Vec2, typeinfo.typeI32]),
-      ...genType('textureSampleLevel', MASK_WEBGPU, typeinfo.typeF32, [typeinfo.typeTexDepthCube, typeinfo.typeSampler, typeinfo.typeF32Vec3, typeinfo.typeI32]),
-      ...genType('textureLod', MASK_WEBGL2, typeinfo.typeF32Vec4, [typeinfo.typeTex2D, typeinfo.typeF32Vec2, typeinfo.typeF32]),
-      ...genType('textureLod', MASK_WEBGL2, typeinfo.typeF32Vec4, [typeinfo.typeTexDepth2D, typeinfo.typeF32Vec2, typeinfo.typeF32]),
-      ...genType('textureLod', MASK_WEBGL2, typeinfo.typeF32Vec4, [typeinfo.typeTexExternal, typeinfo.typeF32Vec2, typeinfo.typeF32]),
-      ...genType('textureLod', MASK_WEBGL2, typeinfo.typeF32Vec4, [typeinfo.typeTex3D, typeinfo.typeF32Vec3, typeinfo.typeF32]),
-      ...genType('textureLod', MASK_WEBGL2, typeinfo.typeF32Vec4, [typeinfo.typeTexCube, typeinfo.typeF32Vec3, typeinfo.typeF32]),
-      ...genType('textureLod', MASK_WEBGL2, typeinfo.typeF32Vec4, [typeinfo.typeTexDepthCube, typeinfo.typeF32Vec3, typeinfo.typeF32]),
-      ...genType('texture2DLodEXT', MASK_WEBGL1, typeinfo.typeF32Vec4, [typeinfo.typeTex2D, typeinfo.typeF32Vec2, typeinfo.typeF32]),
-      ...genType('texture2DLodEXT', MASK_WEBGL1, typeinfo.typeF32Vec4, [typeinfo.typeTexDepth2D, typeinfo.typeF32Vec2, typeinfo.typeF32]),
-      ...genType('texture2DLodEXT', MASK_WEBGL1, typeinfo.typeF32Vec4, [typeinfo.typeTexExternal, typeinfo.typeF32Vec2, typeinfo.typeF32]),
-      ...genType('textureCubeLodEXT', MASK_WEBGL1, typeinfo.typeF32Vec4, [typeinfo.typeTexCube, typeinfo.typeF32Vec3, typeinfo.typeF32]),
-      ...genType('textureCubeLodEXT', MASK_WEBGL1, typeinfo.typeF32Vec4, [typeinfo.typeTexDepthCube, typeinfo.typeF32Vec3, typeinfo.typeF32]),
+      ...genType('textureSampleLevel', MASK_WEBGPU, typeinfo.typeF32Vec4, [
+        typeinfo.typeTex2D,
+        typeinfo.typeSampler,
+        typeinfo.typeF32Vec2,
+        typeinfo.typeF32
+      ]),
+      ...genType('textureSampleLevel', MASK_WEBGPU, typeinfo.typeF32Vec4, [
+        typeinfo.typeTex3D,
+        typeinfo.typeSampler,
+        typeinfo.typeF32Vec3,
+        typeinfo.typeF32
+      ]),
+      ...genType('textureSampleLevel', MASK_WEBGPU, typeinfo.typeF32Vec4, [
+        typeinfo.typeTexCube,
+        typeinfo.typeSampler,
+        typeinfo.typeF32Vec3,
+        typeinfo.typeF32
+      ]),
+      ...genType('textureSampleLevel', MASK_WEBGPU, typeinfo.typeF32Vec4, [
+        typeinfo.typeTexExternal,
+        typeinfo.typeSampler,
+        typeinfo.typeF32Vec2
+      ]),
+      ...genType('textureSampleLevel', MASK_WEBGPU, typeinfo.typeF32, [
+        typeinfo.typeTexDepth2D,
+        typeinfo.typeSampler,
+        typeinfo.typeF32Vec2,
+        typeinfo.typeI32
+      ]),
+      ...genType('textureSampleLevel', MASK_WEBGPU, typeinfo.typeF32, [
+        typeinfo.typeTexDepthCube,
+        typeinfo.typeSampler,
+        typeinfo.typeF32Vec3,
+        typeinfo.typeI32
+      ]),
+      ...genType('textureLod', MASK_WEBGL2, typeinfo.typeF32Vec4, [
+        typeinfo.typeTex2D,
+        typeinfo.typeF32Vec2,
+        typeinfo.typeF32
+      ]),
+      ...genType('textureLod', MASK_WEBGL2, typeinfo.typeF32Vec4, [
+        typeinfo.typeTexDepth2D,
+        typeinfo.typeF32Vec2,
+        typeinfo.typeF32
+      ]),
+      ...genType('textureLod', MASK_WEBGL2, typeinfo.typeF32Vec4, [
+        typeinfo.typeTexExternal,
+        typeinfo.typeF32Vec2,
+        typeinfo.typeF32
+      ]),
+      ...genType('textureLod', MASK_WEBGL2, typeinfo.typeF32Vec4, [
+        typeinfo.typeTex3D,
+        typeinfo.typeF32Vec3,
+        typeinfo.typeF32
+      ]),
+      ...genType('textureLod', MASK_WEBGL2, typeinfo.typeF32Vec4, [
+        typeinfo.typeTexCube,
+        typeinfo.typeF32Vec3,
+        typeinfo.typeF32
+      ]),
+      ...genType('textureLod', MASK_WEBGL2, typeinfo.typeF32Vec4, [
+        typeinfo.typeTexDepthCube,
+        typeinfo.typeF32Vec3,
+        typeinfo.typeF32
+      ]),
+      ...genType('texture2DLodEXT', MASK_WEBGL1, typeinfo.typeF32Vec4, [
+        typeinfo.typeTex2D,
+        typeinfo.typeF32Vec2,
+        typeinfo.typeF32
+      ]),
+      ...genType('texture2DLodEXT', MASK_WEBGL1, typeinfo.typeF32Vec4, [
+        typeinfo.typeTexDepth2D,
+        typeinfo.typeF32Vec2,
+        typeinfo.typeF32
+      ]),
+      ...genType('texture2DLodEXT', MASK_WEBGL1, typeinfo.typeF32Vec4, [
+        typeinfo.typeTexExternal,
+        typeinfo.typeF32Vec2,
+        typeinfo.typeF32
+      ]),
+      ...genType('textureCubeLodEXT', MASK_WEBGL1, typeinfo.typeF32Vec4, [
+        typeinfo.typeTexCube,
+        typeinfo.typeF32Vec3,
+        typeinfo.typeF32
+      ]),
+      ...genType('textureCubeLodEXT', MASK_WEBGL1, typeinfo.typeF32Vec4, [
+        typeinfo.typeTexDepthCube,
+        typeinfo.typeF32Vec3,
+        typeinfo.typeF32
+      ])
     ],
     normalizeFunc(pb, name, ...args) {
       const tex = args[0];
@@ -1469,8 +2442,15 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
           return pb.textureLoad(tex, pb.ivec2(args[1] as any), 0);
         } else {
           const sampler = pb.getDefaultSampler(tex, false);
-          const level = texType.isDepthTexture() && (typeof args[2] === 'number' || (args[2] instanceof PBShaderExp && args[2].$ast.getType().typeId === typeinfo.typeF32.typeId)) ? pb.int(args[2]) : args[2];
-          const ret = texType.isExternalTexture() ? callBuiltin(pb, name, tex, sampler, args[1]) : callBuiltin(pb, name, tex, sampler, args[1], level);
+          const level =
+            texType.isDepthTexture() &&
+            (typeof args[2] === 'number' ||
+              (args[2] instanceof PBShaderExp && args[2].$ast.getType().typeId === typeinfo.typeF32.typeId))
+              ? pb.int(args[2])
+              : args[2];
+          const ret = texType.isExternalTexture()
+            ? callBuiltin(pb, name, tex, sampler, args[1])
+            : callBuiltin(pb, name, tex, sampler, args[1], level);
           if (ret.$ast.getType().typeId === typeinfo.typeF32.typeId) {
             return pb.vec4(ret, 0, 0, 1);
           } else {
@@ -1479,18 +2459,48 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
         }
       } else {
         pb.getDefaultSampler(tex, false);
-        return texType.isExternalTexture() ? callBuiltin(pb, name, args[0], args[1], 0) : callBuiltin(pb, name, args[0], args[1], args[2]);
+        return texType.isExternalTexture()
+          ? callBuiltin(pb, name, args[0], args[1], 0)
+          : callBuiltin(pb, name, args[0], args[1], args[2]);
       }
     }
   },
   // textureArraySampleLevel(tex: PBShaderExp, coords: PBShaderExp, arrayIndex: number|PBShaderExp, level: number|PBShaderExp)
   textureArraySampleLevel: {
     overloads: [
-      ...genType('textureSampleLevel', MASK_WEBGPU, typeinfo.typeF32Vec4, [typeinfo.typeTex2DArray, typeinfo.typeSampler, typeinfo.typeF32Vec2, typeinfo.typeI32, typeinfo.typeF32]),
-      ...genType('textureSampleLevel', MASK_WEBGPU, typeinfo.typeF32Vec4, [typeinfo.typeTexCubeArray, typeinfo.typeSampler, typeinfo.typeF32Vec3, typeinfo.typeI32, typeinfo.typeF32]),
-      ...genType('textureSampleLevel', MASK_WEBGPU, typeinfo.typeF32, [typeinfo.typeTexDepth2DArray, typeinfo.typeSampler, typeinfo.typeF32Vec2, typeinfo.typeI32, typeinfo.typeI32]),
-      ...genType('textureSampleLevel', MASK_WEBGPU, typeinfo.typeF32, [typeinfo.typeTexDepthCubeArray, typeinfo.typeSampler, typeinfo.typeF32Vec3, typeinfo.typeI32, typeinfo.typeI32]),
-      ...genType('textureLod', MASK_WEBGL2, typeinfo.typeF32Vec4, [typeinfo.typeTex2DArray, typeinfo.typeF32Vec3, typeinfo.typeF32]),
+      ...genType('textureSampleLevel', MASK_WEBGPU, typeinfo.typeF32Vec4, [
+        typeinfo.typeTex2DArray,
+        typeinfo.typeSampler,
+        typeinfo.typeF32Vec2,
+        typeinfo.typeI32,
+        typeinfo.typeF32
+      ]),
+      ...genType('textureSampleLevel', MASK_WEBGPU, typeinfo.typeF32Vec4, [
+        typeinfo.typeTexCubeArray,
+        typeinfo.typeSampler,
+        typeinfo.typeF32Vec3,
+        typeinfo.typeI32,
+        typeinfo.typeF32
+      ]),
+      ...genType('textureSampleLevel', MASK_WEBGPU, typeinfo.typeF32, [
+        typeinfo.typeTexDepth2DArray,
+        typeinfo.typeSampler,
+        typeinfo.typeF32Vec2,
+        typeinfo.typeI32,
+        typeinfo.typeI32
+      ]),
+      ...genType('textureSampleLevel', MASK_WEBGPU, typeinfo.typeF32, [
+        typeinfo.typeTexDepthCubeArray,
+        typeinfo.typeSampler,
+        typeinfo.typeF32Vec3,
+        typeinfo.typeI32,
+        typeinfo.typeI32
+      ]),
+      ...genType('textureLod', MASK_WEBGL2, typeinfo.typeF32Vec4, [
+        typeinfo.typeTex2DArray,
+        typeinfo.typeF32Vec3,
+        typeinfo.typeF32
+      ])
     ],
     normalizeFunc(pb, name, ...args) {
       if (args.length !== 4) {
@@ -1506,7 +2516,12 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
       }
       if (pb.getDeviceType() === 'webgpu') {
         const sampler = pb.getDefaultSampler(tex, false);
-        const level = texType.isDepthTexture() && (typeof args[3] === 'number' || (args[3] instanceof PBShaderExp && args[3].$ast.getType().typeId === typeinfo.typeF32.typeId)) ? pb.int(args[3]) : args[3];
+        const level =
+          texType.isDepthTexture() &&
+          (typeof args[3] === 'number' ||
+            (args[3] instanceof PBShaderExp && args[3].$ast.getType().typeId === typeinfo.typeF32.typeId))
+            ? pb.int(args[3])
+            : args[3];
         const ret = callBuiltin(pb, name, tex, sampler, args[1], args[2], level);
         if (ret.$ast.getType().typeId === typeinfo.typeF32.typeId) {
           return pb.vec4(ret, 0, 0, 1);
@@ -1523,10 +2538,24 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
   // textureSampleCompare(tex: PBShaderExp, coords: PBShaderExp, depthRef: number|PBShaderExp)
   textureSampleCompareLevel: {
     overloads: [
-      ...genType('textureSampleCompareLevel', MASK_WEBGPU, typeinfo.typeF32, [typeinfo.typeTexDepth2D, typeinfo.typeSamplerComparison, typeinfo.typeF32Vec2, typeinfo.typeF32]),
-      ...genType('textureSampleCompareLevel', MASK_WEBGPU, typeinfo.typeF32, [typeinfo.typeTexDepthCube, typeinfo.typeSamplerComparison, typeinfo.typeF32Vec3, typeinfo.typeF32]),
-      ...genType('textureLod', MASK_WEBGL2, typeinfo.typeF32, [typeinfo.typeTexDepth2D, typeinfo.typeF32Vec3, typeinfo.typeF32]),
-      ...genType('texture', MASK_WEBGL2, typeinfo.typeF32, [typeinfo.typeTexDepthCube, typeinfo.typeF32Vec4]),
+      ...genType('textureSampleCompareLevel', MASK_WEBGPU, typeinfo.typeF32, [
+        typeinfo.typeTexDepth2D,
+        typeinfo.typeSamplerComparison,
+        typeinfo.typeF32Vec2,
+        typeinfo.typeF32
+      ]),
+      ...genType('textureSampleCompareLevel', MASK_WEBGPU, typeinfo.typeF32, [
+        typeinfo.typeTexDepthCube,
+        typeinfo.typeSamplerComparison,
+        typeinfo.typeF32Vec3,
+        typeinfo.typeF32
+      ]),
+      ...genType('textureLod', MASK_WEBGL2, typeinfo.typeF32, [
+        typeinfo.typeTexDepth2D,
+        typeinfo.typeF32Vec3,
+        typeinfo.typeF32
+      ]),
+      ...genType('texture', MASK_WEBGL2, typeinfo.typeF32, [typeinfo.typeTexDepthCube, typeinfo.typeF32Vec4])
     ],
     normalizeFunc(pb, name, ...args) {
       if (args.length !== 3) {
@@ -1551,16 +2580,33 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
         } else {
           coordsComposite = pb.vec3(args[1] as any, args[2] as any);
         }
-        return texType.isCubeTexture() ? callBuiltin(pb, name, tex, coordsComposite) : callBuiltin(pb, name, tex, coordsComposite, 0);
+        return texType.isCubeTexture()
+          ? callBuiltin(pb, name, tex, coordsComposite)
+          : callBuiltin(pb, name, tex, coordsComposite, 0);
       }
     }
   },
   // textureArraySampleCompareLevel(tex: PBShaderExp, coords: PBShaderExp, arrayIndex: number|PBShaderExp, depthRef: number|PBShaderExp)
   textureArraySampleCompareLevel: {
     overloads: [
-      ...genType('textureSampleCompareLevel', MASK_WEBGPU, typeinfo.typeF32, [typeinfo.typeTexDepth2DArray, typeinfo.typeSamplerComparison, typeinfo.typeF32Vec2, typeinfo.typeI32, typeinfo.typeF32]),
-      ...genType('textureSampleCompareLevel', MASK_WEBGPU, typeinfo.typeF32, [typeinfo.typeTexDepthCubeArray, typeinfo.typeSamplerComparison, typeinfo.typeF32Vec3, typeinfo.typeI32, typeinfo.typeF32]),
-      ...genType('texture', MASK_WEBGL2, typeinfo.typeF32, [typeinfo.typeTexDepth2DArray, typeinfo.typeF32Vec4]),
+      ...genType('textureSampleCompareLevel', MASK_WEBGPU, typeinfo.typeF32, [
+        typeinfo.typeTexDepth2DArray,
+        typeinfo.typeSamplerComparison,
+        typeinfo.typeF32Vec2,
+        typeinfo.typeI32,
+        typeinfo.typeF32
+      ]),
+      ...genType('textureSampleCompareLevel', MASK_WEBGPU, typeinfo.typeF32, [
+        typeinfo.typeTexDepthCubeArray,
+        typeinfo.typeSamplerComparison,
+        typeinfo.typeF32Vec3,
+        typeinfo.typeI32,
+        typeinfo.typeF32
+      ]),
+      ...genType('texture', MASK_WEBGL2, typeinfo.typeF32, [
+        typeinfo.typeTexDepth2DArray,
+        typeinfo.typeF32Vec4
+      ])
     ],
     normalizeFunc(pb, name, ...args) {
       if (args.length !== 4) {
@@ -1587,14 +2633,57 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
   // textureSampleGrad(tex: PBShaderExp, coords: PBShaderExp, ddx: PBShaderExp, ddy: PBShaderExp)
   textureSampleGrad: {
     overloads: [
-      ...genType('textureSampleGrad', MASK_WEBGPU, typeinfo.typeF32Vec4, [typeinfo.typeTex2D, typeinfo.typeSampler, typeinfo.typeF32Vec2, typeinfo.typeF32Vec2, typeinfo.typeF32Vec2]),
-      ...genType('textureSampleGrad', MASK_WEBGPU, typeinfo.typeF32Vec4, [typeinfo.typeTex3D, typeinfo.typeSampler, typeinfo.typeF32Vec3, typeinfo.typeF32Vec3, typeinfo.typeF32Vec3]),
-      ...genType('textureSampleGrad', MASK_WEBGPU, typeinfo.typeF32Vec4, [typeinfo.typeTexCube, typeinfo.typeSampler, typeinfo.typeF32Vec3, typeinfo.typeF32Vec3, typeinfo.typeF32Vec3]),
-      ...genType('textureGrad', MASK_WEBGL2, typeinfo.typeF32Vec4, [typeinfo.typeTex2D, typeinfo.typeF32Vec2, typeinfo.typeF32Vec2, typeinfo.typeF32Vec2]),
-      ...genType('textureGrad', MASK_WEBGL2, typeinfo.typeF32Vec4, [typeinfo.typeTex3D, typeinfo.typeF32Vec3, typeinfo.typeF32Vec3, typeinfo.typeF32Vec3]),
-      ...genType('textureGrad', MASK_WEBGL2, typeinfo.typeF32Vec4, [typeinfo.typeTexCube, typeinfo.typeF32Vec3, typeinfo.typeF32Vec3, typeinfo.typeF32Vec3]),
-      ...genType('texture2DGradEXT', MASK_WEBGL1, typeinfo.typeF32Vec4, [typeinfo.typeTex2D, typeinfo.typeF32Vec2, typeinfo.typeF32Vec2, typeinfo.typeF32Vec2]),
-      ...genType('textureCubeGradEXT', MASK_WEBGL1, typeinfo.typeF32Vec4, [typeinfo.typeTexCube, typeinfo.typeF32Vec3, typeinfo.typeF32Vec3, typeinfo.typeF32Vec3]),
+      ...genType('textureSampleGrad', MASK_WEBGPU, typeinfo.typeF32Vec4, [
+        typeinfo.typeTex2D,
+        typeinfo.typeSampler,
+        typeinfo.typeF32Vec2,
+        typeinfo.typeF32Vec2,
+        typeinfo.typeF32Vec2
+      ]),
+      ...genType('textureSampleGrad', MASK_WEBGPU, typeinfo.typeF32Vec4, [
+        typeinfo.typeTex3D,
+        typeinfo.typeSampler,
+        typeinfo.typeF32Vec3,
+        typeinfo.typeF32Vec3,
+        typeinfo.typeF32Vec3
+      ]),
+      ...genType('textureSampleGrad', MASK_WEBGPU, typeinfo.typeF32Vec4, [
+        typeinfo.typeTexCube,
+        typeinfo.typeSampler,
+        typeinfo.typeF32Vec3,
+        typeinfo.typeF32Vec3,
+        typeinfo.typeF32Vec3
+      ]),
+      ...genType('textureGrad', MASK_WEBGL2, typeinfo.typeF32Vec4, [
+        typeinfo.typeTex2D,
+        typeinfo.typeF32Vec2,
+        typeinfo.typeF32Vec2,
+        typeinfo.typeF32Vec2
+      ]),
+      ...genType('textureGrad', MASK_WEBGL2, typeinfo.typeF32Vec4, [
+        typeinfo.typeTex3D,
+        typeinfo.typeF32Vec3,
+        typeinfo.typeF32Vec3,
+        typeinfo.typeF32Vec3
+      ]),
+      ...genType('textureGrad', MASK_WEBGL2, typeinfo.typeF32Vec4, [
+        typeinfo.typeTexCube,
+        typeinfo.typeF32Vec3,
+        typeinfo.typeF32Vec3,
+        typeinfo.typeF32Vec3
+      ]),
+      ...genType('texture2DGradEXT', MASK_WEBGL1, typeinfo.typeF32Vec4, [
+        typeinfo.typeTex2D,
+        typeinfo.typeF32Vec2,
+        typeinfo.typeF32Vec2,
+        typeinfo.typeF32Vec2
+      ]),
+      ...genType('textureCubeGradEXT', MASK_WEBGL1, typeinfo.typeF32Vec4, [
+        typeinfo.typeTexCube,
+        typeinfo.typeF32Vec3,
+        typeinfo.typeF32Vec3,
+        typeinfo.typeF32Vec3
+      ])
     ],
     normalizeFunc(pb, name, ...args) {
       if (args.length !== 4) {
@@ -1620,9 +2709,28 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
   // textureArraySampleGrad(tex: PBShaderExp, coords: PBShaderExp, arrayIndex: number|PBShaderExp, ddx: PBShaderExp, ddy: PBShaderExp)
   textureArraySampleGrad: {
     overloads: [
-      ...genType('textureSampleGrad', MASK_WEBGPU, typeinfo.typeF32Vec4, [typeinfo.typeTex2DArray, typeinfo.typeSampler, typeinfo.typeF32Vec2, typeinfo.typeI32, typeinfo.typeF32Vec2, typeinfo.typeF32Vec2]),
-      ...genType('textureSampleGrad', MASK_WEBGPU, typeinfo.typeF32Vec4, [typeinfo.typeTexCubeArray, typeinfo.typeSampler, typeinfo.typeF32Vec3, typeinfo.typeI32, typeinfo.typeF32Vec3, typeinfo.typeF32Vec3]),
-      ...genType('textureGrad', MASK_WEBGL2, typeinfo.typeF32Vec4, [typeinfo.typeTex2DArray, typeinfo.typeF32Vec3, typeinfo.typeF32Vec2, typeinfo.typeF32Vec2]),
+      ...genType('textureSampleGrad', MASK_WEBGPU, typeinfo.typeF32Vec4, [
+        typeinfo.typeTex2DArray,
+        typeinfo.typeSampler,
+        typeinfo.typeF32Vec2,
+        typeinfo.typeI32,
+        typeinfo.typeF32Vec2,
+        typeinfo.typeF32Vec2
+      ]),
+      ...genType('textureSampleGrad', MASK_WEBGPU, typeinfo.typeF32Vec4, [
+        typeinfo.typeTexCubeArray,
+        typeinfo.typeSampler,
+        typeinfo.typeF32Vec3,
+        typeinfo.typeI32,
+        typeinfo.typeF32Vec3,
+        typeinfo.typeF32Vec3
+      ]),
+      ...genType('textureGrad', MASK_WEBGL2, typeinfo.typeF32Vec4, [
+        typeinfo.typeTex2DArray,
+        typeinfo.typeF32Vec3,
+        typeinfo.typeF32Vec2,
+        typeinfo.typeF32Vec2
+      ])
     ],
     normalizeFunc(pb, name, ...args) {
       if (args.length !== 5) {
@@ -1647,7 +2755,7 @@ const builtinFunctionsAll: { [name: string]: { overloads?: [typeinfo.PBFunctionT
     }
   },
   storageBarrier: { overloads: genType('storageBarrier', MASK_WEBGPU, typeinfo.typeVoid, []) },
-  workgroupBarrier: { overloads: genType('workgroupBarrier', MASK_WEBGPU, typeinfo.typeVoid, []) },
+  workgroupBarrier: { overloads: genType('workgroupBarrier', MASK_WEBGPU, typeinfo.typeVoid, []) }
 };
 
 /** @internal */
@@ -1656,6 +2764,6 @@ export function setBuiltinFuncs(cls: typeof ProgramBuilder) {
     cls.prototype[k] = function (this: ProgramBuilder, ...args: ExpValueType[]): PBShaderExp {
       const normalizeFunc = builtinFunctionsAll?.[k]?.normalizeFunc || callBuiltin;
       return normalizeFunc(this, k, ...args);
-    }
+    };
   }
 }

@@ -4,7 +4,7 @@ import { assert, rand, randInt, randNonZero, toFloat32 } from './common';
 
 type VectorType = Vector2 | Vector3 | Vector4;
 interface VectorConstructor {
-  new(...args: any[]): VectorType;
+  new (...args: any[]): VectorType;
   add: Function;
   sub: Function;
   mul: Function;
@@ -17,7 +17,7 @@ interface VectorConstructor {
 
 type MatrixType = Matrix3x3 | Matrix4x4;
 interface MatrixConstructor {
-  new(...args: any[]): MatrixType;
+  new (...args: any[]): MatrixType;
   add: Function;
   sub: Function;
   mul: Function;
@@ -80,10 +80,13 @@ export function testVectorType(c: VectorConstructor, size: 2 | 3 | 4 | 16) {
       op[0](v1, v2, v3);
       for (let i = 0; i < size; i++) {
         const t = op[2](v1.getArray()[i], v2.getArray()[i]);
-        assert(Math.abs(t - v3.getArray()[i]) < 0.01 && Math.abs(t - v4.getArray()[i]) < 0.01, `${op[3]} failed`);
+        assert(
+          Math.abs(t - v3.getArray()[i]) < 0.01 && Math.abs(t - v4.getArray()[i]) < 0.01,
+          `${op[3]} failed`
+        );
       }
       op[1].bind(v1)(v2 as any);
-      assert(v1.equalsTo(v3), `${op[3]} failed`)
+      assert(v1.equalsTo(v3), `${op[3]} failed`);
     }
     const factor = rand();
     const v5 = randVec();
@@ -151,15 +154,27 @@ export function testQuaternion() {
     const z = rand();
     const w = rand();
     const q2 = new Quaternion(x, y, z, w);
-    assert(Math.abs(q2.x - x) < 0.01 && Math.abs(q2.y - y) < 0.01 && Math.abs(q2.z - z) < 0.01 && Math.abs(q2.w - w) < 0.01, 'assign constructor failed');
+    assert(
+      Math.abs(q2.x - x) < 0.01 &&
+        Math.abs(q2.y - y) < 0.01 &&
+        Math.abs(q2.z - z) < 0.01 &&
+        Math.abs(q2.w - w) < 0.01,
+      'assign constructor failed'
+    );
     const q3 = new Quaternion([x, y, z, w]);
     assert(q3.x === q2.x && q3.y === q2.y && q3.z === q2.z && q3.w === q2.w, 'array constructor failed');
     const axis = new Vector3(-0.10452544552113772, 0.43864725489574524, -0.8925598114474093); //new chaospace.Vector3(rand(), rand(), rand()).inplaceNormalize();
     const angle = 3.1390559093244788; //rand (0, Math.PI);
     const axisAngle = new Quaternion(Matrix3x3.rotation(axis, angle)).getAxisAngle();
-    assert(axisAngle.xyz().equalsTo(axis) && numberEquals(axisAngle.w, angle), 'chaospace.Matrix3x3 constructor failed');
+    assert(
+      axisAngle.xyz().equalsTo(axis) && numberEquals(axisAngle.w, angle),
+      'chaospace.Matrix3x3 constructor failed'
+    );
     const axisAngle2 = new Quaternion(Matrix4x4.rotation(axis, angle)).getAxisAngle();
-    assert(axisAngle2.xyz().equalsTo(axis) && numberEquals(axisAngle2.w, angle), 'chaospace.Matrix4x4 constructor failed');
+    assert(
+      axisAngle2.xyz().equalsTo(axis) && numberEquals(axisAngle2.w, angle),
+      'chaospace.Matrix4x4 constructor failed'
+    );
   })();
   (function testNormalize() {
     const q1 = new Quaternion(rand(), rand(), rand(), rand()).inplaceNormalize();
@@ -189,22 +204,40 @@ export function testQuaternion() {
     const matY = Matrix3x3.rotationY(angle2);
     const matZ = Matrix3x3.rotationZ(angle3);
     const testMat = new Matrix3x3();
-    const rotMatrixXYZ = Matrix3x3.identity().multiplyRightAffine(matX).multiplyRightAffine(matY).multiplyRightAffine(matZ);
+    const rotMatrixXYZ = Matrix3x3.identity()
+      .multiplyRightAffine(matX)
+      .multiplyRightAffine(matY)
+      .multiplyRightAffine(matZ);
     Quaternion.fromEulerAngle(angle1, angle2, angle3, 'XYZ').toMatrix(testMat);
     assert(testMat.equalsTo(rotMatrixXYZ), 'euler angle XYZ failed');
-    const rotMatrixXZY = Matrix3x3.identity().multiplyRightAffine(matX).multiplyRightAffine(matZ).multiplyRightAffine(matY);
+    const rotMatrixXZY = Matrix3x3.identity()
+      .multiplyRightAffine(matX)
+      .multiplyRightAffine(matZ)
+      .multiplyRightAffine(matY);
     Quaternion.fromEulerAngle(angle1, angle2, angle3, 'XZY').toMatrix(testMat);
     assert(testMat.equalsTo(rotMatrixXZY), 'euler angle XZY failed');
-    const rotMatrixYXZ = Matrix3x3.identity().multiplyRightAffine(matY).multiplyRightAffine(matX).multiplyRightAffine(matZ);
+    const rotMatrixYXZ = Matrix3x3.identity()
+      .multiplyRightAffine(matY)
+      .multiplyRightAffine(matX)
+      .multiplyRightAffine(matZ);
     Quaternion.fromEulerAngle(angle1, angle2, angle3, 'YXZ').toMatrix(testMat);
     assert(testMat.equalsTo(rotMatrixYXZ), 'euler angle YXZ failed');
-    const rotMatrixYZX = Matrix3x3.identity().multiplyRightAffine(matY).multiplyRightAffine(matZ).multiplyRightAffine(matX);
+    const rotMatrixYZX = Matrix3x3.identity()
+      .multiplyRightAffine(matY)
+      .multiplyRightAffine(matZ)
+      .multiplyRightAffine(matX);
     Quaternion.fromEulerAngle(angle1, angle2, angle3, 'YZX').toMatrix(testMat);
     assert(testMat.equalsTo(rotMatrixYZX), 'euler angle YZX failed');
-    const rotMatrixZXY = Matrix3x3.identity().multiplyRightAffine(matZ).multiplyRightAffine(matX).multiplyRightAffine(matY);
+    const rotMatrixZXY = Matrix3x3.identity()
+      .multiplyRightAffine(matZ)
+      .multiplyRightAffine(matX)
+      .multiplyRightAffine(matY);
     Quaternion.fromEulerAngle(angle1, angle2, angle3, 'ZXY').toMatrix(testMat);
     assert(testMat.equalsTo(rotMatrixZXY), 'euler angle ZXY failed');
-    const rotMatrixZYX = Matrix3x3.identity().multiplyRightAffine(matZ).multiplyRightAffine(matY).multiplyRightAffine(matX);
+    const rotMatrixZYX = Matrix3x3.identity()
+      .multiplyRightAffine(matZ)
+      .multiplyRightAffine(matY)
+      .multiplyRightAffine(matX);
     Quaternion.fromEulerAngle(angle1, angle2, angle3, 'ZYX').toMatrix(testMat);
     assert(testMat.equalsTo(rotMatrixZYX), 'euler angle ZYX failed');
   })();
@@ -272,10 +305,13 @@ export function testMatrixType(c: MatrixConstructor, rows: number, cols: number)
       op[0](m1, m2, m3);
       for (let i = 0; i < size; i++) {
         const t = op[2](m1.getArray()[i], m2.getArray()[i]);
-        assert(Math.abs(t - m3.getArray()[i]) < 0.01 && Math.abs(t - m4.getArray()[i]) < 0.01, `${op[3]} failed`);
+        assert(
+          Math.abs(t - m3.getArray()[i]) < 0.01 && Math.abs(t - m4.getArray()[i]) < 0.01,
+          `${op[3]} failed`
+        );
       }
       op[1].bind(m1)(m2 as any);
-      assert(m1.equalsTo(m3), `${op[3]} failed`)
+      assert(m1.equalsTo(m3), `${op[3]} failed`);
     }
     const factor = rand();
     const m5 = randMatrix();
@@ -295,7 +331,10 @@ export function testMatrixType(c: MatrixConstructor, rows: number, cols: number)
     const m2 = c.identity();
     for (let i = 0; i < size; i++) {
       const val = i % (cols + 1) === 0 ? 1 : 0;
-      assert(Math.abs(m1.getArray()[i] - val) < 0.01 && Math.abs(m2.getArray()[i] - val) < 0.01, 'identity failed');
+      assert(
+        Math.abs(m1.getArray()[i] - val) < 0.01 && Math.abs(m2.getArray()[i] - val) < 0.01,
+        'identity failed'
+      );
     }
   })();
   (function testInverse() {
@@ -313,7 +352,10 @@ export function testMatrixType(c: MatrixConstructor, rows: number, cols: number)
       const v1 = { x: rand(), y: rand(), z: rand() };
       const m = c.translation(t);
       const v2 = m.transformPoint(v1);
-      assert(numberEquals(v2.x, v1.x + t.x) && numberEquals(v2.y, v1.y + t.y) && numberEquals(v2.z, v1.z + t.z), 'translation failed');
+      assert(
+        numberEquals(v2.x, v1.x + t.x) && numberEquals(v2.y, v1.y + t.y) && numberEquals(v2.z, v1.z + t.z),
+        'translation failed'
+      );
       if (rows === 4 && cols === 4) {
         const m1 = randMatrix() as Matrix4x4;
         const t1 = { x: rand(), y: rand(), z: rand() };
@@ -333,7 +375,10 @@ export function testMatrixType(c: MatrixConstructor, rows: number, cols: number)
     const v1 = { x: rand(), y: rand(), z: rand() };
     const m = c.scaling(s);
     const v2 = m.transformPoint(v1);
-    assert(numberEquals(v2.x, v1.x * s.x) && numberEquals(v2.y, v1.y * s.y) && numberEquals(v2.z, v1.z * s.z), 'scaling failed');
+    assert(
+      numberEquals(v2.x, v1.x * s.x) && numberEquals(v2.y, v1.y * s.y) && numberEquals(v2.z, v1.z * s.z),
+      'scaling failed'
+    );
     if (rows === 4 && cols === 4) {
       const m1 = randMatrix() as Matrix4x4;
       const s1 = { x: rand(), y: rand(), z: rand() };
@@ -352,21 +397,30 @@ export function testMatrixType(c: MatrixConstructor, rows: number, cols: number)
     const v1 = { x: 0, y: 1, z: 0 };
     const m = c.rotationX(angle);
     const v2 = m.transformPoint(v1);
-    assert(numberEquals(v2.x, 0) && numberEquals(v2.y, Math.cos(angle)) && numberEquals(v2.z, Math.sin(angle)), 'rotationX failed');
+    assert(
+      numberEquals(v2.x, 0) && numberEquals(v2.y, Math.cos(angle)) && numberEquals(v2.z, Math.sin(angle)),
+      'rotationX failed'
+    );
   })();
   (function testRotationY() {
     const angle = rand(-Math.PI * 2, Math.PI * 2);
     const v1 = { x: 0, y: 0, z: 1 };
     const m = c.rotationY(angle);
     const v2 = m.transformPoint(v1);
-    assert(numberEquals(v2.x, Math.sin(angle)) && numberEquals(v2.y, 0) && numberEquals(v2.z, Math.cos(angle)), 'rotationY failed');
+    assert(
+      numberEquals(v2.x, Math.sin(angle)) && numberEquals(v2.y, 0) && numberEquals(v2.z, Math.cos(angle)),
+      'rotationY failed'
+    );
   })();
   (function testRotationZ() {
     const angle = rand(-Math.PI * 2, Math.PI * 2);
     const v1 = { x: 1, y: 0, z: 0 };
     const m = c.rotationZ(angle);
     const v2 = m.transformPoint(v1);
-    assert(numberEquals(v2.x, Math.cos(angle)) && numberEquals(v2.y, Math.sin(angle)) && numberEquals(v2.z, 0), 'rotationZ failed');
+    assert(
+      numberEquals(v2.x, Math.cos(angle)) && numberEquals(v2.y, Math.sin(angle)) && numberEquals(v2.z, 0),
+      'rotationZ failed'
+    );
   })();
   (function testRotation() {
     const angle = rand(-Math.PI * 2, Math.PI * 2);
@@ -382,12 +436,18 @@ export function testMatrixType(c: MatrixConstructor, rows: number, cols: number)
     assert(vz1.equalsTo(vz2), 'rotation failed');
     if (rows === 4 && cols === 4) {
       const m1 = randMatrix() as Matrix4x4;
-      const r1 = Matrix4x4.rotation(new Vector3(rand(), rand(), rand()).inplaceNormalize(), rand(0, Math.PI * 2));
+      const r1 = Matrix4x4.rotation(
+        new Vector3(rand(), rand(), rand()).inplaceNormalize(),
+        rand(0, Math.PI * 2)
+      );
       const m2 = m1.multiplyRight(r1);
       m1.rotateRight(r1);
       assert(m1.equalsTo(m2), 'rotateRight test failed');
       const m3 = randMatrix() as Matrix4x4;
-      const r2 = Matrix4x4.rotation(new Vector3(rand(), rand(), rand()).inplaceNormalize(), rand(0, Math.PI * 2));
+      const r2 = Matrix4x4.rotation(
+        new Vector3(rand(), rand(), rand()).inplaceNormalize(),
+        rand(0, Math.PI * 2)
+      );
       const m4 = m3.multiplyLeft(r2);
       m3.rotateLeft(r2);
       assert(m3.equalsTo(m4), 'rotateLeft test failed');
@@ -403,7 +463,9 @@ export function testMatrixType(c: MatrixConstructor, rows: number, cols: number)
       const s = new Vector3();
       const r = new Matrix4x4();
       matrix.decompose(s, r, t);
-      const matrix2 = Matrix4x4.translation(t).multiplyRightAffine(r).multiplyRightAffine(Matrix4x4.scaling(s));
+      const matrix2 = Matrix4x4.translation(t)
+        .multiplyRightAffine(r)
+        .multiplyRightAffine(Matrix4x4.scaling(s));
       assert(matrix.equalsTo(matrix2), 'decompose test failed');
       const eye2 = new Vector3();
       const target2 = new Vector3();
@@ -428,14 +490,14 @@ export function testMatrixType(c: MatrixConstructor, rows: number, cols: number)
       assert(m1.equalsTo(m2), 'projection test failed');
       const vx1 = m2.transformPoint(new Vector4(left, bottom, -near, 1));
       vx1.scaleBy(1 / vx1.w);
-      const vx2 = m2.transformPoint(new Vector4(right * far / near, top * far / near, -far, 1));
+      const vx2 = m2.transformPoint(new Vector4((right * far) / near, (top * far) / near, -far, 1));
       vx2.scaleBy(1 / vx2.w);
       assert(vx1.equalsTo(vmin), 'projection test failed');
       assert(vx2.equalsTo(vmax), 'projection test failed');
-      const leftFar = toFloat32(left * far / near);
-      const rightFar = toFloat32(right * far / near);
-      const bottomFar = toFloat32(bottom * far / near);
-      const topFar = toFloat32(top * far / near);
+      const leftFar = toFloat32((left * far) / near);
+      const rightFar = toFloat32((right * far) / near);
+      const bottomFar = toFloat32((bottom * far) / near);
+      const topFar = toFloat32((top * far) / near);
       const v = [
         new Vector3(left, bottom, -near),
         new Vector3(right, bottom, -near),
@@ -444,7 +506,7 @@ export function testMatrixType(c: MatrixConstructor, rows: number, cols: number)
         new Vector3(leftFar, bottomFar, -far),
         new Vector3(rightFar, bottomFar, -far),
         new Vector3(rightFar, topFar, -far),
-        new Vector3(leftFar, topFar, -far),
+        new Vector3(leftFar, topFar, -far)
       ];
       const v2 = [
         new Vector4(-1, -1, -1, 1),
@@ -454,7 +516,7 @@ export function testMatrixType(c: MatrixConstructor, rows: number, cols: number)
         new Vector4(-1, -1, 1, 1),
         new Vector4(1, -1, 1, 1),
         new Vector4(1, 1, 1, 1),
-        new Vector4(-1, 1, 1, 1),
+        new Vector4(-1, 1, 1, 1)
       ];
       for (let i = 0; i < 8; i++) {
         const t = m1.transformPoint(v[i]);
@@ -470,7 +532,7 @@ export function testMatrixType(c: MatrixConstructor, rows: number, cols: number)
         new Vector3(left, bottom, -far),
         new Vector3(right, bottom, -far),
         new Vector3(right, top, -far),
-        new Vector3(left, top, -far),
+        new Vector3(left, top, -far)
       ];
       const v4 = [
         new Vector4(-1, -1, -1, 1),
@@ -480,7 +542,7 @@ export function testMatrixType(c: MatrixConstructor, rows: number, cols: number)
         new Vector4(-1, -1, 1, 1),
         new Vector4(1, -1, 1, 1),
         new Vector4(1, 1, 1, 1),
-        new Vector4(-1, 1, 1, 1),
+        new Vector4(-1, 1, 1, 1)
       ];
       for (let i = 0; i < 8; i++) {
         const t = m3.transformPoint(v3[i]);

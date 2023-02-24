@@ -7,7 +7,7 @@ export enum TextureTarget {
   Texture2D = 1,
   Texture3D = 2,
   TextureCubemap = 3,
-  Texture2DArray = 4,
+  Texture2DArray = 4
 }
 
 export enum TextureOption {
@@ -17,7 +17,7 @@ export enum TextureOption {
   MINFILTER_LINEAR = 1 << 3,
   MIPFILTER_LINEAR = 1 << 4,
   REPEATABLE_U = 1 << 3,
-  REPEATABLE_V = 1 << 4,
+  REPEATABLE_V = 1 << 4
 }
 
 export enum CompareFunc {
@@ -41,14 +41,14 @@ export enum TextureWrapping {
   Unknown = 0,
   Repeat,
   MirroredRepeat,
-  ClampToEdge,
+  ClampToEdge
 }
 
 export enum TextureFilter {
   Unknown = 0,
   None,
   Nearest,
-  Linear,
+  Linear
 }
 
 const RED_SHIFT = 0;
@@ -96,7 +96,6 @@ const COMPRESSION_FORMAT_ASTC_10x10 = 22 << COMPRESSED_FORMAT_SHIFT;
 const COMPRESSION_FORMAT_ASTC_12x10 = 23 << COMPRESSED_FORMAT_SHIFT;
 const COMPRESSION_FORMAT_ASTC_12x12 = 24 << COMPRESSED_FORMAT_SHIFT;
 
-
 const COMPRESSION_FORMAT_BITMASK = 0x1f << COMPRESSED_FORMAT_SHIFT;
 const RED_BITMASK = 1 << RED_SHIFT;
 const GREEN_BITMASK = 1 << GREEN_SHIFT;
@@ -110,76 +109,814 @@ const SIGNED_BITMASK = 1 << SIGNED_SHIFT;
 const SRGB_BITMASK = 1 << SRGB_SHIFT;
 const BGR_BITMASK = 1 << BGR_SHIFT;
 
-export function makeTextureFormat(compression: number, r: boolean, g: boolean, b: boolean, a: boolean, depth: boolean, stencil: boolean, float: boolean, integer: boolean, signed: boolean, srgb: boolean, bgr: boolean, blockWidth: number, blockHeight: number, blockSize: number): TextureFormat {
+export function makeTextureFormat(
+  compression: number,
+  r: boolean,
+  g: boolean,
+  b: boolean,
+  a: boolean,
+  depth: boolean,
+  stencil: boolean,
+  float: boolean,
+  integer: boolean,
+  signed: boolean,
+  srgb: boolean,
+  bgr: boolean,
+  blockWidth: number,
+  blockHeight: number,
+  blockSize: number
+): TextureFormat {
   const compressionBits = compression << COMPRESSED_FORMAT_SHIFT;
-  const colorBits = (r ? RED_BITMASK : 0) | (g ? GREEN_BITMASK : 0) | (b ? BLUE_BITMASK : 0) | (a ? ALPHA_BITMASK : 0);
+  const colorBits =
+    (r ? RED_BITMASK : 0) | (g ? GREEN_BITMASK : 0) | (b ? BLUE_BITMASK : 0) | (a ? ALPHA_BITMASK : 0);
   const depthStencilBits = (depth ? DEPTH_BITMASK : 0) | (stencil ? STENCIL_BITMASK : 0);
   const floatBits = float ? FLOAT_BITMASK : 0;
   const integerBits = integer ? INTEGER_BITMASK : 0;
   const signedBits = signed ? SIGNED_BITMASK : 0;
   const srgbBits = srgb ? SRGB_BITMASK : 0;
   const bgrBits = bgr ? BGR_BITMASK : 0;
-  const blockBits = (blockWidth << BLOCK_WIDTH_SHIFT) | (blockHeight << BLOCK_HEIGHT_SHIFT) | (blockSize << BLOCK_SIZE_SHIFT);
-  return compressionBits | colorBits | depthStencilBits | floatBits | integerBits | signedBits | srgbBits | bgrBits | blockBits;
+  const blockBits =
+    (blockWidth << BLOCK_WIDTH_SHIFT) | (blockHeight << BLOCK_HEIGHT_SHIFT) | (blockSize << BLOCK_SIZE_SHIFT);
+  return (
+    compressionBits |
+    colorBits |
+    depthStencilBits |
+    floatBits |
+    integerBits |
+    signedBits |
+    srgbBits |
+    bgrBits |
+    blockBits
+  );
 }
 
 export enum TextureFormat {
   Unknown = 0,
-  R8UNORM = makeTextureFormat(0, true, false, false, false, false, false, false, false, false, false, false, 1, 1, 1),
-  R8SNORM = makeTextureFormat(0, true, false, false, false, false, false, false, false, true, false, false, 1, 1, 1),
-  R16F = makeTextureFormat(0, true, false, false, false, false, false, true, false, true, false, false, 1, 1, 2),
-  R32F = makeTextureFormat(0, true, false, false, false, false, false, true, false, true, false, false, 1, 1, 4),
-  R8UI = makeTextureFormat(0, true, false, false, false, false, false, false, true, false, false, false, 1, 1, 1),
-  R8I = makeTextureFormat(0, true, false, false, false, false, false, false, true, true, false, false, 1, 1, 1),
-  R16UI = makeTextureFormat(0, true, false, false, false, false, false, false, true, false, false, false, 1, 1, 2),
-  R16I = makeTextureFormat(0, true, false, false, false, false, false, false, true, true, false, false, 1, 1, 2),
-  R32UI = makeTextureFormat(0, true, false, false, false, false, false, false, true, false, false, false, 1, 1, 4),
-  R32I = makeTextureFormat(0, true, false, false, false, false, false, false, true, true, false, false, 1, 1, 4),
-  RG8UNORM = makeTextureFormat(0, true, true, false, false, false, false, false, false, false, false, false, 1, 1, 2),
-  RG8SNORM = makeTextureFormat(0, true, true, false, false, false, false, false, false, true, false, false, 1, 1, 2),
-  RG16F = makeTextureFormat(0, true, true, false, false, false, false, true, false, true, false, false, 1, 1, 4),
-  RG32F = makeTextureFormat(0, true, true, false, false, false, false, true, false, true, false, false, 1, 1, 8),
-  RG8UI = makeTextureFormat(0, true, true, false, false, false, false, false, true, false, false, false, 1, 1, 2),
-  RG8I = makeTextureFormat(0, true, true, false, false, false, false, false, true, true, false, false, 1, 1, 2),
-  RG16UI = makeTextureFormat(0, true, true, false, false, false, false, false, true, false, false, false, 1, 1, 4),
-  RG16I = makeTextureFormat(0, true, true, false, false, false, false, false, true, true, false, false, 1, 1, 4),
-  RG32UI = makeTextureFormat(0, true, true, false, false, false, false, false, true, false, false, false, 1, 1, 8),
-  RG32I = makeTextureFormat(0, true, true, false, false, false, false, false, true, true, false, false, 1, 1, 8),
-  RGBA8UNORM = makeTextureFormat(0, true, true, true, true, false, false, false, false, false, false, false, 1, 1, 4),
-  RGBA8UNORM_SRGB = makeTextureFormat(0, true, true, true, true, false, false, false, false, false, true, false, 1, 1, 4),
-  RGBA8SNORM = makeTextureFormat(0, true, true, true, true, false, false, false, false, true, false, false, 1, 1, 4),
-  BGRA8UNORM = makeTextureFormat(0, true, true, true, true, false, false, false, false, false, false, true, 1, 1, 4),
-  BGRA8UNORM_SRGB = makeTextureFormat(0, true, true, true, true, false, false, false, false, false, true, true, 1, 1, 4),
-  RGBA16F = makeTextureFormat(0, true, true, true, true, false, false, true, false, true, false, false, 1, 1, 8),
-  RGBA32F = makeTextureFormat(0, true, true, true, true, false, false, true, false, true, false, false, 1, 1, 16),
-  RGBA8UI = makeTextureFormat(0, true, true, true, true, false, false, false, true, false, false, false, 1, 1, 4),
-  RGBA8I = makeTextureFormat(0, true, true, true, true, false, false, false, true, true, false, false, 1, 1, 4),
-  RGBA16UI = makeTextureFormat(0, true, true, true, true, false, false, false, true, false, false, false, 1, 1, 8),
-  RGBA16I = makeTextureFormat(0, true, true, true, true, false, false, false, true, true, false, false, 1, 1, 8),
-  RGBA32UI = makeTextureFormat(0, true, true, true, true, false, false, false, true, false, false, false, 1, 1, 16),
-  RGBA32I = makeTextureFormat(0, true, true, true, true, false, false, false, true, true, false, false, 1, 1, 16),
-  D16 = makeTextureFormat(0, false, false, false, false, true, false, false, false, false, false, false, 1, 1, 2),
-  D24 = makeTextureFormat(0, false, false, false, false, true, false, false, false, false, false, false, 0, 0, 0),
-  D32F = makeTextureFormat(0, false, false, false, false, true, false, true, false, true, false, false, 1, 1, 4),
-  D24S8 = makeTextureFormat(0, false, false, false, false, true, true, false, false, false, false, false, 1, 1, 4),
-  D32FS8 = makeTextureFormat(0, false, false, false, false, true, true, true, false, true, false, false, 1, 1, 5),
+  R8UNORM = makeTextureFormat(
+    0,
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    1,
+    1,
+    1
+  ),
+  R8SNORM = makeTextureFormat(
+    0,
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    true,
+    false,
+    false,
+    1,
+    1,
+    1
+  ),
+  R16F = makeTextureFormat(
+    0,
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    true,
+    false,
+    true,
+    false,
+    false,
+    1,
+    1,
+    2
+  ),
+  R32F = makeTextureFormat(
+    0,
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    true,
+    false,
+    true,
+    false,
+    false,
+    1,
+    1,
+    4
+  ),
+  R8UI = makeTextureFormat(
+    0,
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    true,
+    false,
+    false,
+    false,
+    1,
+    1,
+    1
+  ),
+  R8I = makeTextureFormat(
+    0,
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    true,
+    true,
+    false,
+    false,
+    1,
+    1,
+    1
+  ),
+  R16UI = makeTextureFormat(
+    0,
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    true,
+    false,
+    false,
+    false,
+    1,
+    1,
+    2
+  ),
+  R16I = makeTextureFormat(
+    0,
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    true,
+    true,
+    false,
+    false,
+    1,
+    1,
+    2
+  ),
+  R32UI = makeTextureFormat(
+    0,
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    true,
+    false,
+    false,
+    false,
+    1,
+    1,
+    4
+  ),
+  R32I = makeTextureFormat(
+    0,
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    true,
+    true,
+    false,
+    false,
+    1,
+    1,
+    4
+  ),
+  RG8UNORM = makeTextureFormat(
+    0,
+    true,
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    1,
+    1,
+    2
+  ),
+  RG8SNORM = makeTextureFormat(
+    0,
+    true,
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    true,
+    false,
+    false,
+    1,
+    1,
+    2
+  ),
+  RG16F = makeTextureFormat(
+    0,
+    true,
+    true,
+    false,
+    false,
+    false,
+    false,
+    true,
+    false,
+    true,
+    false,
+    false,
+    1,
+    1,
+    4
+  ),
+  RG32F = makeTextureFormat(
+    0,
+    true,
+    true,
+    false,
+    false,
+    false,
+    false,
+    true,
+    false,
+    true,
+    false,
+    false,
+    1,
+    1,
+    8
+  ),
+  RG8UI = makeTextureFormat(
+    0,
+    true,
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    true,
+    false,
+    false,
+    false,
+    1,
+    1,
+    2
+  ),
+  RG8I = makeTextureFormat(
+    0,
+    true,
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    true,
+    true,
+    false,
+    false,
+    1,
+    1,
+    2
+  ),
+  RG16UI = makeTextureFormat(
+    0,
+    true,
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    true,
+    false,
+    false,
+    false,
+    1,
+    1,
+    4
+  ),
+  RG16I = makeTextureFormat(
+    0,
+    true,
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    true,
+    true,
+    false,
+    false,
+    1,
+    1,
+    4
+  ),
+  RG32UI = makeTextureFormat(
+    0,
+    true,
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    true,
+    false,
+    false,
+    false,
+    1,
+    1,
+    8
+  ),
+  RG32I = makeTextureFormat(
+    0,
+    true,
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    true,
+    true,
+    false,
+    false,
+    1,
+    1,
+    8
+  ),
+  RGBA8UNORM = makeTextureFormat(
+    0,
+    true,
+    true,
+    true,
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    1,
+    1,
+    4
+  ),
+  RGBA8UNORM_SRGB = makeTextureFormat(
+    0,
+    true,
+    true,
+    true,
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    true,
+    false,
+    1,
+    1,
+    4
+  ),
+  RGBA8SNORM = makeTextureFormat(
+    0,
+    true,
+    true,
+    true,
+    true,
+    false,
+    false,
+    false,
+    false,
+    true,
+    false,
+    false,
+    1,
+    1,
+    4
+  ),
+  BGRA8UNORM = makeTextureFormat(
+    0,
+    true,
+    true,
+    true,
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    true,
+    1,
+    1,
+    4
+  ),
+  BGRA8UNORM_SRGB = makeTextureFormat(
+    0,
+    true,
+    true,
+    true,
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    true,
+    true,
+    1,
+    1,
+    4
+  ),
+  RGBA16F = makeTextureFormat(
+    0,
+    true,
+    true,
+    true,
+    true,
+    false,
+    false,
+    true,
+    false,
+    true,
+    false,
+    false,
+    1,
+    1,
+    8
+  ),
+  RGBA32F = makeTextureFormat(
+    0,
+    true,
+    true,
+    true,
+    true,
+    false,
+    false,
+    true,
+    false,
+    true,
+    false,
+    false,
+    1,
+    1,
+    16
+  ),
+  RGBA8UI = makeTextureFormat(
+    0,
+    true,
+    true,
+    true,
+    true,
+    false,
+    false,
+    false,
+    true,
+    false,
+    false,
+    false,
+    1,
+    1,
+    4
+  ),
+  RGBA8I = makeTextureFormat(
+    0,
+    true,
+    true,
+    true,
+    true,
+    false,
+    false,
+    false,
+    true,
+    true,
+    false,
+    false,
+    1,
+    1,
+    4
+  ),
+  RGBA16UI = makeTextureFormat(
+    0,
+    true,
+    true,
+    true,
+    true,
+    false,
+    false,
+    false,
+    true,
+    false,
+    false,
+    false,
+    1,
+    1,
+    8
+  ),
+  RGBA16I = makeTextureFormat(
+    0,
+    true,
+    true,
+    true,
+    true,
+    false,
+    false,
+    false,
+    true,
+    true,
+    false,
+    false,
+    1,
+    1,
+    8
+  ),
+  RGBA32UI = makeTextureFormat(
+    0,
+    true,
+    true,
+    true,
+    true,
+    false,
+    false,
+    false,
+    true,
+    false,
+    false,
+    false,
+    1,
+    1,
+    16
+  ),
+  RGBA32I = makeTextureFormat(
+    0,
+    true,
+    true,
+    true,
+    true,
+    false,
+    false,
+    false,
+    true,
+    true,
+    false,
+    false,
+    1,
+    1,
+    16
+  ),
+  D16 = makeTextureFormat(
+    0,
+    false,
+    false,
+    false,
+    false,
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    1,
+    1,
+    2
+  ),
+  D24 = makeTextureFormat(
+    0,
+    false,
+    false,
+    false,
+    false,
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    0,
+    0,
+    0
+  ),
+  D32F = makeTextureFormat(
+    0,
+    false,
+    false,
+    false,
+    false,
+    true,
+    false,
+    true,
+    false,
+    true,
+    false,
+    false,
+    1,
+    1,
+    4
+  ),
+  D24S8 = makeTextureFormat(
+    0,
+    false,
+    false,
+    false,
+    false,
+    true,
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    1,
+    1,
+    4
+  ),
+  D32FS8 = makeTextureFormat(
+    0,
+    false,
+    false,
+    false,
+    false,
+    true,
+    true,
+    true,
+    false,
+    true,
+    false,
+    false,
+    1,
+    1,
+    5
+  ),
   // compressed texture formats
-  DXT1 = makeTextureFormat(COMPRESSION_FORMAT_BC1, true, true, true, true, false, false, false, false, false, false, false, 4, 4, 8),
-  DXT1_SRGB = makeTextureFormat(COMPRESSION_FORMAT_BC1, true, true, true, true, false, false, false, false, false, true, false, 4, 4, 8),
-  DXT3 = makeTextureFormat(COMPRESSION_FORMAT_BC2, true, true, true, true, false, false, false, false, false, false, false, 4, 4, 16),
-  DXT3_SRGB = makeTextureFormat(COMPRESSION_FORMAT_BC2, true, true, true, true, false, false, false, false, false, true, false, 4, 4, 16),
-  DXT5 = makeTextureFormat(COMPRESSION_FORMAT_BC3, true, true, true, true, false, false, false, false, false, false, false, 4, 4, 16),
-  DXT5_SRGB = makeTextureFormat(COMPRESSION_FORMAT_BC3, true, true, true, true, false, false, false, false, false, true, false, 4, 4, 16),
+  DXT1 = makeTextureFormat(
+    COMPRESSION_FORMAT_BC1,
+    true,
+    true,
+    true,
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    4,
+    4,
+    8
+  ),
+  DXT1_SRGB = makeTextureFormat(
+    COMPRESSION_FORMAT_BC1,
+    true,
+    true,
+    true,
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    true,
+    false,
+    4,
+    4,
+    8
+  ),
+  DXT3 = makeTextureFormat(
+    COMPRESSION_FORMAT_BC2,
+    true,
+    true,
+    true,
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    4,
+    4,
+    16
+  ),
+  DXT3_SRGB = makeTextureFormat(
+    COMPRESSION_FORMAT_BC2,
+    true,
+    true,
+    true,
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    true,
+    false,
+    4,
+    4,
+    16
+  ),
+  DXT5 = makeTextureFormat(
+    COMPRESSION_FORMAT_BC3,
+    true,
+    true,
+    true,
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    4,
+    4,
+    16
+  ),
+  DXT5_SRGB = makeTextureFormat(
+    COMPRESSION_FORMAT_BC3,
+    true,
+    true,
+    true,
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    true,
+    false,
+    4,
+    4,
+    16
+  )
 }
 
 export function linearTextureFormatToSRGB(format: TextureFormat): TextureFormat {
   switch (format) {
-    case TextureFormat.RGBA8UNORM: return TextureFormat.RGBA8UNORM_SRGB;
-    case TextureFormat.BGRA8UNORM: return TextureFormat.BGRA8UNORM_SRGB;
-    case TextureFormat.DXT1: return TextureFormat.DXT1_SRGB;
-    case TextureFormat.DXT3: return TextureFormat.DXT3_SRGB;
-    case TextureFormat.DXT5: return TextureFormat.DXT5_SRGB;
-    default: return format;
+    case TextureFormat.RGBA8UNORM:
+      return TextureFormat.RGBA8UNORM_SRGB;
+    case TextureFormat.BGRA8UNORM:
+      return TextureFormat.BGRA8UNORM_SRGB;
+    case TextureFormat.DXT1:
+      return TextureFormat.DXT1_SRGB;
+    case TextureFormat.DXT3:
+      return TextureFormat.DXT3_SRGB;
+    case TextureFormat.DXT5:
+      return TextureFormat.DXT5_SRGB;
+    default:
+      return format;
   }
 }
 export function hasAlphaChannel(format: TextureFormat): boolean {
@@ -299,13 +1036,7 @@ function encode5551(r: number, g: number, b: number, a: number) {
   return ((b & 0x1f) << 1) | ((g & 0x1f) << 6) | ((r & 0x1f) << 11) | (a >= 0.5 ? 1 : 0);
 }
 
-export function encodePixel(
-  format: TextureFormat,
-  r: number,
-  g: number,
-  b: number,
-  a: number,
-): TypedArray {
+export function encodePixel(format: TextureFormat, r: number, g: number, b: number, a: number): TypedArray {
   switch (format) {
     case TextureFormat.R8UNORM:
       return new Uint8Array([normalizeColorComponent(r, 255)]);
@@ -353,7 +1084,7 @@ export function encodePixel(
         normalizeColorComponent(r, 255),
         normalizeColorComponent(g, 255),
         normalizeColorComponent(b, 255),
-        normalizeColorComponent(a, 255),
+        normalizeColorComponent(a, 255)
       ]);
     case TextureFormat.BGRA8UNORM:
     case TextureFormat.BGRA8UNORM_SRGB:
@@ -361,14 +1092,14 @@ export function encodePixel(
         normalizeColorComponent(b, 255),
         normalizeColorComponent(g, 255),
         normalizeColorComponent(r, 255),
-        normalizeColorComponent(a, 255),
+        normalizeColorComponent(a, 255)
       ]);
     case TextureFormat.RGBA8SNORM:
       return new Int8Array([
         normalizeColorComponentSigned(r, 255),
         normalizeColorComponentSigned(g, 255),
         normalizeColorComponentSigned(b, 255),
-        normalizeColorComponentSigned(a, 255),
+        normalizeColorComponentSigned(a, 255)
       ]);
     case TextureFormat.RGBA16F:
       return new Uint16Array([floatToHalf(r), floatToHalf(g), floatToHalf(b), floatToHalf(a)]);
@@ -397,7 +1128,7 @@ export function encodePixelToArray(
   g: number,
   b: number,
   a: number,
-  arr: Array<number>,
+  arr: Array<number>
 ): void {
   switch (format) {
     case TextureFormat.R8UNORM:
@@ -466,7 +1197,7 @@ export function encodePixelToArray(
         normalizeColorComponent(r, 255),
         normalizeColorComponent(g, 255),
         normalizeColorComponent(b, 255),
-        normalizeColorComponent(a, 255),
+        normalizeColorComponent(a, 255)
       );
       break;
     case TextureFormat.BGRA8UNORM:
@@ -475,7 +1206,7 @@ export function encodePixelToArray(
         normalizeColorComponent(b, 255),
         normalizeColorComponent(g, 255),
         normalizeColorComponent(r, 255),
-        normalizeColorComponent(a, 255),
+        normalizeColorComponent(a, 255)
       );
       break;
     case TextureFormat.RGBA8SNORM:
@@ -483,7 +1214,7 @@ export function encodePixelToArray(
         normalizeColorComponentSigned(r, 255),
         normalizeColorComponentSigned(g, 255),
         normalizeColorComponentSigned(b, 255),
-        normalizeColorComponentSigned(a, 255),
+        normalizeColorComponentSigned(a, 255)
       );
       break;
     case TextureFormat.RGBA16F:
@@ -520,12 +1251,11 @@ export enum PrimitiveType {
   TriangleFan = 2,
   LineList = 3,
   LineStrip = 4,
-  PointList = 5,
+  PointList = 5
 }
 
 export enum ShaderType {
   Vertex = 1 << 0,
   Fragment = 1 << 1,
-  Compute = 1 << 2,
+  Compute = 1 << 2
 }
-

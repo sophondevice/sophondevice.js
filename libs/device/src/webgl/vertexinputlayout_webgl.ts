@@ -1,7 +1,14 @@
 import { PrimitiveType } from '../base_types';
 import { WebGLGPUObject } from './gpuobject_webgl';
 import { WebGLEnum } from './webgl_enum';
-import { VertexInputLayout, StructuredBuffer, IndexBuffer, getVertexBufferAttribType, getVertexBufferStride, VertexSemantic } from '../gpuobject';
+import {
+  VertexInputLayout,
+  StructuredBuffer,
+  IndexBuffer,
+  getVertexBufferAttribType,
+  getVertexBufferStride,
+  VertexSemantic
+} from '../gpuobject';
 import { VertexData } from '../vertexdata';
 import { typeMap } from './constants_webgl';
 import type { WebGLDevice } from './device_webgl';
@@ -53,12 +60,7 @@ export class WebGLVertexInputLayout
     this._device.setVertexData(this);
     this._device.draw(primitiveType, first, count);
   }
-  drawInstanced(
-    primitiveType: PrimitiveType,
-    first: number,
-    count: number,
-    numInstances: number,
-  ): void {
+  drawInstanced(primitiveType: PrimitiveType, first: number, count: number, numInstances: number): void {
     this._device.setVertexData(this);
     this._device.drawInstanced(primitiveType, first, count, numInstances);
   }
@@ -102,7 +104,7 @@ export class WebGLVertexInputLayout
             typeMap[vertexType.scalarType],
             false,
             stride,
-            bufferInfo.offset,
+            bufferInfo.offset
           );
           this._device.instancedArraysExt.vertexAttribDivisor(loc, 1);
         } else {
@@ -112,7 +114,7 @@ export class WebGLVertexInputLayout
             typeMap[vertexType.scalarType],
             false,
             stride,
-            drawOffset * stride + bufferInfo.offset,
+            drawOffset * stride + bufferInfo.offset
           );
         }
       } else {
@@ -124,7 +126,7 @@ export class WebGLVertexInputLayout
     }
     gl.bindBuffer(
       WebGLEnum.ELEMENT_ARRAY_BUFFER,
-      this._vertexData.indexBuffer ? this._vertexData.indexBuffer.object : null,
+      this._vertexData.indexBuffer ? this._vertexData.indexBuffer.object : null
     );
   }
 }

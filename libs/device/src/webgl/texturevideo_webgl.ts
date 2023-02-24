@@ -54,7 +54,14 @@ export class WebGLTextureVideo extends WebGLBaseTexture implements TextureVideo<
       const params = (this.getTextureCaps() as WebGLTextureCap).getTextureFormatInfo(this._format);
       this._device.context.bindTexture(target, this._object);
       this._device.context.pixelStorei(this._device.context.UNPACK_ALIGNMENT, 1);
-      this._device.context.texImage2D(target, 0, params.glInternalFormat, params.glFormat, params.glType[0], this._source);
+      this._device.context.texImage2D(
+        target,
+        0,
+        params.glInternalFormat,
+        params.glFormat,
+        params.glType[0],
+        this._source
+      );
     }
   }
   /** @internal */
@@ -73,6 +80,12 @@ export class WebGLTextureVideo extends WebGLBaseTexture implements TextureVideo<
         }
       });
     }
-    this.allocInternal(TextureFormat.RGBA8UNORM, Math.max(this._source.videoWidth, 1), Math.max(this._source.videoHeight, 1), 1, 1);
+    this.allocInternal(
+      TextureFormat.RGBA8UNORM,
+      Math.max(this._source.videoWidth, 1),
+      Math.max(this._source.videoHeight, 1),
+      1,
+      1
+    );
   }
 }

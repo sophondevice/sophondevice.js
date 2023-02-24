@@ -13,7 +13,7 @@ import {
   YGOverflow,
   YGPositionType,
   YGUnit,
-  YGWrap,
+  YGWrap
 } from './enums';
 
 import {
@@ -109,13 +109,13 @@ import {
   YGNodeNewWithConfig,
   YGNodeNew,
   YGNodeStyleSetPosition,
-  YGNodeGetInstanceCount,
+  YGNodeGetInstanceCount
 } from './yoga';
 
-import {YGNode} from './ygnode';
-import {YGValue} from './ygvalue';
-import {YGConfig} from './ygconfig';
-import {YGFloatSanitize} from './utils';
+import { YGNode } from './ygnode';
+import { YGValue } from './ygvalue';
+import { YGConfig } from './ygconfig';
+import { YGFloatSanitize } from './utils';
 
 export const ALIGN_AUTO = YGAlign.Auto;
 export const ALIGN_FLEX_START = YGAlign.FlexStart;
@@ -200,7 +200,7 @@ export class Size {
     }
   }
 
-  static fromJS(obj: {width: number; height: number}) {
+  static fromJS(obj: { width: number; height: number }) {
     return new Size(obj.width, obj.height);
   }
 }

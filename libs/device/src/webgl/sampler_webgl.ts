@@ -1,29 +1,40 @@
 import { WebGLGPUObject } from './gpuobject_webgl';
 import { WebGLEnum } from './webgl_enum';
 import { TextureWrapping, TextureFilter } from '../base_types';
-import { textureTargetMap, textureWrappingMap, textureMagFilterToWebGL, textureMinFilterToWebGL, compareFuncMap } from './constants_webgl';
+import {
+  textureTargetMap,
+  textureWrappingMap,
+  textureMagFilterToWebGL,
+  textureMinFilterToWebGL,
+  compareFuncMap
+} from './constants_webgl';
 import type { SamplerOptions, TextureSampler } from '../gpuobject';
 import type { WebGLBaseTexture } from './basetexture_webgl';
 import type { WebGLDevice } from './device_webgl';
 import { isWebGL2 } from './utils';
 
-export class WebGLTextureSampler extends WebGLGPUObject<WebGLSampler> implements TextureSampler<WebGLSampler>
+export class WebGLTextureSampler
+  extends WebGLGPUObject<WebGLSampler>
+  implements TextureSampler<WebGLSampler>
 {
   private _options: SamplerOptions;
   constructor(device: WebGLDevice, options: SamplerOptions) {
     super(device);
-    this._options = Object.assign({
-      addressU: TextureWrapping.ClampToEdge,
-      addressV: TextureWrapping.ClampToEdge,
-      addressW: TextureWrapping.ClampToEdge,
-      magFilter: TextureFilter.Nearest,
-      minFilter: TextureFilter.Nearest,
-      mipFilter: TextureFilter.None,
-      lodMin: 0,
-      lodMax: 32,
-      compare: null,
-      maxAnisotropy: 1
-    }, options || {});
+    this._options = Object.assign(
+      {
+        addressU: TextureWrapping.ClampToEdge,
+        addressV: TextureWrapping.ClampToEdge,
+        addressW: TextureWrapping.ClampToEdge,
+        magFilter: TextureFilter.Nearest,
+        minFilter: TextureFilter.Nearest,
+        mipFilter: TextureFilter.None,
+        lodMin: 0,
+        lodMax: 32,
+        compare: null,
+        maxAnisotropy: 1
+      },
+      options || {}
+    );
     this._load();
   }
   get addressModeU() {
@@ -74,8 +85,16 @@ export class WebGLTextureSampler extends WebGLGPUObject<WebGLSampler> implements
       gl.bindTexture(target, texture.object);
       gl.texParameteri(target, WebGLEnum.TEXTURE_WRAP_S, textureWrappingMap[this._options.addressU]);
       gl.texParameteri(target, WebGLEnum.TEXTURE_WRAP_T, textureWrappingMap[this._options.addressV]);
-      gl.texParameteri(target, WebGLEnum.TEXTURE_MAG_FILTER, textureMagFilterToWebGL(this._options.magFilter));
-      gl.texParameteri(target, WebGLEnum.TEXTURE_MIN_FILTER, textureMinFilterToWebGL(this._options.minFilter, this._options.mipFilter));
+      gl.texParameteri(
+        target,
+        WebGLEnum.TEXTURE_MAG_FILTER,
+        textureMagFilterToWebGL(this._options.magFilter)
+      );
+      gl.texParameteri(
+        target,
+        WebGLEnum.TEXTURE_MIN_FILTER,
+        textureMinFilterToWebGL(this._options.minFilter, this._options.mipFilter)
+      );
       if (this._device.getTextureCaps().supportAnisotropicFiltering) {
         gl.texParameterf(target, WebGLEnum.TEXTURE_MAX_ANISOTROPY, this._options.maxAnisotropy);
       }
@@ -91,18 +110,42 @@ export class WebGLTextureSampler extends WebGLGPUObject<WebGLSampler> implements
       if (!this._object) {
         this._object = gl.createSampler();
       }
-      gl.samplerParameteri(this._object, WebGLEnum.TEXTURE_WRAP_S, textureWrappingMap[this._options.addressU]);
-      gl.samplerParameteri(this._object, WebGLEnum.TEXTURE_WRAP_T, textureWrappingMap[this._options.addressV]);
-      gl.samplerParameteri(this._object, WebGLEnum.TEXTURE_WRAP_R, textureWrappingMap[this._options.addressW]);
-      gl.samplerParameteri(this._object, WebGLEnum.TEXTURE_MAG_FILTER, textureMagFilterToWebGL(this._options.magFilter));
-      gl.samplerParameteri(this._object, WebGLEnum.TEXTURE_MIN_FILTER, textureMinFilterToWebGL(this._options.minFilter, this._options.mipFilter));
+      gl.samplerParameteri(
+        this._object,
+        WebGLEnum.TEXTURE_WRAP_S,
+        textureWrappingMap[this._options.addressU]
+      );
+      gl.samplerParameteri(
+        this._object,
+        WebGLEnum.TEXTURE_WRAP_T,
+        textureWrappingMap[this._options.addressV]
+      );
+      gl.samplerParameteri(
+        this._object,
+        WebGLEnum.TEXTURE_WRAP_R,
+        textureWrappingMap[this._options.addressW]
+      );
+      gl.samplerParameteri(
+        this._object,
+        WebGLEnum.TEXTURE_MAG_FILTER,
+        textureMagFilterToWebGL(this._options.magFilter)
+      );
+      gl.samplerParameteri(
+        this._object,
+        WebGLEnum.TEXTURE_MIN_FILTER,
+        textureMinFilterToWebGL(this._options.minFilter, this._options.mipFilter)
+      );
       gl.samplerParameterf(this._object, WebGLEnum.TEXTURE_MIN_LOD, this._options.lodMin);
       gl.samplerParameterf(this._object, WebGLEnum.TEXTURE_MAX_LOD, this._options.lodMax);
       if (this._options.compare === null) {
         gl.samplerParameteri(this._object, WebGLEnum.TEXTURE_COMPARE_MODE, WebGLEnum.NONE);
       } else {
         gl.samplerParameteri(this._object, WebGLEnum.TEXTURE_COMPARE_MODE, WebGLEnum.COMPARE_REF_TO_TEXTURE);
-        gl.samplerParameteri(this._object, WebGLEnum.TEXTURE_COMPARE_FUNC, compareFuncMap[this._options.compare]);
+        gl.samplerParameteri(
+          this._object,
+          WebGLEnum.TEXTURE_COMPARE_FUNC,
+          compareFuncMap[this._options.compare]
+        );
       }
       if (this._device.getTextureCaps().supportAnisotropicFiltering) {
         gl.samplerParameterf(this._object, WebGLEnum.TEXTURE_MAX_ANISOTROPY, this._options.maxAnisotropy);

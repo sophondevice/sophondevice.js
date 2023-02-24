@@ -1,7 +1,27 @@
 import { WebGPUObject } from './gpuobject_webgpu';
 import { TextureCaps } from '../device';
-import { TextureTarget, TextureFilter, TextureWrapping, TextureFormat, isCompressedTextureFormat, isDepthTextureFormat, isFloatTextureFormat, isIntegerTextureFormat, isSignedTextureFormat, CompareFunc, getTextureFormatBlockWidth, getTextureFormatBlockHeight, getTextureFormatBlockSize } from '../base_types';
-import { GPUResourceUsageFlags, SamplerOptions, BaseTexture, TextureSampler, GPUDataBuffer } from '../gpuobject';
+import {
+  TextureTarget,
+  TextureFilter,
+  TextureWrapping,
+  TextureFormat,
+  isCompressedTextureFormat,
+  isDepthTextureFormat,
+  isFloatTextureFormat,
+  isIntegerTextureFormat,
+  isSignedTextureFormat,
+  CompareFunc,
+  getTextureFormatBlockWidth,
+  getTextureFormatBlockHeight,
+  getTextureFormatBlockSize
+} from '../base_types';
+import {
+  GPUResourceUsageFlags,
+  SamplerOptions,
+  BaseTexture,
+  TextureSampler,
+  GPUDataBuffer
+} from '../gpuobject';
 import { UploadRingBuffer, UploadTexture, UploadImage } from './uploadringbuffer';
 import { textureFormatMap } from './constants_webgpu';
 import type { TypedArray } from '@sophon/base';
@@ -9,7 +29,9 @@ import type { WebGPUDevice } from './device';
 import type { WebGPUBuffer } from './buffer_webgpu';
 import type { WebGPUTextureCap, ITextureFormatInfoWebGPU } from './capabilities_webgpu';
 
-export abstract class WebGPUBaseTexture<T extends GPUTexture|GPUExternalTexture = GPUTexture> extends WebGPUObject<T> {
+export abstract class WebGPUBaseTexture<
+  T extends GPUTexture | GPUExternalTexture = GPUTexture
+> extends WebGPUObject<T> {
   protected _target: TextureTarget;
   protected _hash: string;
   protected _memCost: number;
@@ -155,18 +177,45 @@ export abstract class WebGPUBaseTexture<T extends GPUTexture|GPUExternalTexture 
   getDefaultView(): GPUTextureView {
     if (!this._defaultView && this._object && !this.isTextureVideo()) {
       this._defaultView = this._device.gpuCreateTextureView(this._object as GPUTexture, {
-        dimension: this.isTextureCube() ? 'cube' : this.isTexture3D() ? '3d' : this.isTexture2DArray() ? '2d-array' : '2d',
+        dimension: this.isTextureCube()
+          ? 'cube'
+          : this.isTexture3D()
+          ? '3d'
+          : this.isTexture2DArray()
+          ? '2d-array'
+          : '2d',
         arrayLayerCount: this.isTextureCube() ? 6 : this.isTexture2DArray() ? this._depth : 1,
-        aspect: isDepthTextureFormat(this.format) ? 'depth-only' : 'all',
+        aspect: isDepthTextureFormat(this.format) ? 'depth-only' : 'all'
       });
     }
     return this._defaultView;
   }
-  copyPixelDataToBuffer(x: number, y: number, w: number, h: number, layer: number, level: number, buffer: GPUDataBuffer): void {
+  copyPixelDataToBuffer(
+    x: number,
+    y: number,
+    w: number,
+    h: number,
+    layer: number,
+    level: number,
+    buffer: GPUDataBuffer
+  ): void {
     if (this.isTextureVideo()) {
       throw new Error('copyPixelDataToBuffer() failed: can not copy pixel data of video texture');
     }
-    WebGPUBaseTexture.copyTexturePixelsToBuffer(this._device.device, this.object as GPUTexture, this.width, this.height, this.format, x, y, w, h, layer, level, buffer);
+    WebGPUBaseTexture.copyTexturePixelsToBuffer(
+      this._device.device,
+      this.object as GPUTexture,
+      this.width,
+      this.height,
+      this.format,
+      x,
+      y,
+      w,
+      h,
+      layer,
+      level,
+      buffer
+    );
   }
   generateMipmaps() {
     this._mipmapDirty = true;
@@ -177,24 +226,28 @@ export abstract class WebGPUBaseTexture<T extends GPUTexture|GPUExternalTexture 
       for (const u of this._pendingUploads) {
         if ((u as UploadTexture).mappedBuffer) {
           const upload = u as UploadTexture;
-          cmdEncoder.copyBufferToTexture({
-            buffer: upload.mappedBuffer.buffer,
-            offset: upload.mappedBuffer.offset,
-            bytesPerRow: upload.bufferStride,
-            rowsPerImage: upload.uploadHeight,
-          }, {
-            texture: this._object as GPUTexture,
-            origin: {
-              x: upload.uploadOffsetX,
-              y: upload.uploadOffsetY,
-              z: upload.uploadOffsetZ,
+          cmdEncoder.copyBufferToTexture(
+            {
+              buffer: upload.mappedBuffer.buffer,
+              offset: upload.mappedBuffer.offset,
+              bytesPerRow: upload.bufferStride,
+              rowsPerImage: upload.uploadHeight
             },
-            mipLevel: upload.mipLevel,
-          }, {
-            width: upload.uploadWidth,
-            height: upload.uploadHeight,
-            depthOrArrayLayers: upload.uploadDepth
-          });
+            {
+              texture: this._object as GPUTexture,
+              origin: {
+                x: upload.uploadOffsetX,
+                y: upload.uploadOffsetY,
+                z: upload.uploadOffsetZ
+              },
+              mipLevel: upload.mipLevel
+            },
+            {
+              width: upload.uploadWidth,
+              height: upload.uploadHeight,
+              depthOrArrayLayers: upload.uploadDepth
+            }
+          );
         } else if ((u as UploadImage).image) {
           const upload = u as UploadImage;
           // FIXME: copy image cannot be queued into the command buffer
@@ -248,7 +301,13 @@ export abstract class WebGPUBaseTexture<T extends GPUTexture|GPUExternalTexture 
     return Math.floor(Math.log2(Math.max(width, height))) + 1;
   }
   /** @internal */
-  protected allocInternal(format: TextureFormat, width: number, height: number, depth: number, numMipLevels: number) {
+  protected allocInternal(
+    format: TextureFormat,
+    width: number,
+    height: number,
+    depth: number,
+    numMipLevels: number
+  ) {
     if (this.isTextureVideo()) {
       return;
     }
@@ -260,7 +319,11 @@ export abstract class WebGPUBaseTexture<T extends GPUTexture|GPUExternalTexture 
         numMipLevels = autoMipLevelCount;
       }
     }
-    if (this._object && (this._format !== format || this._width !== width || this._height !== height || this._depth !== depth, this._mipLevelCount !== numMipLevels)) {
+    if (
+      this._object &&
+      (this._format !== format || this._width !== width || this._height !== height || this._depth !== depth,
+      this._mipLevelCount !== numMipLevels)
+    ) {
       const obj = this._object;
       this._device.runNextFrame(() => {
         (obj as GPUTexture).destroy();
@@ -287,20 +350,41 @@ export abstract class WebGPUBaseTexture<T extends GPUTexture|GPUExternalTexture 
           mipLevelCount: this._mipLevelCount,
           sampleCount: 1,
           dimension: this.isTexture3D() ? '3d' : '2d',
-          usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.COPY_SRC
-            | (this._renderable && !this.isTexture3D() ? GPUTextureUsage.RENDER_ATTACHMENT : 0)
-            | ((this._flags & GPUResourceUsageFlags.TF_WRITABLE) ? GPUTextureUsage.STORAGE_BINDING : 0)
+          usage:
+            GPUTextureUsage.TEXTURE_BINDING |
+            GPUTextureUsage.COPY_DST |
+            GPUTextureUsage.COPY_SRC |
+            (this._renderable && !this.isTexture3D() ? GPUTextureUsage.RENDER_ATTACHMENT : 0) |
+            (this._flags & GPUResourceUsageFlags.TF_WRITABLE ? GPUTextureUsage.STORAGE_BINDING : 0)
         }) as any;
-        const memCost = (this.getTextureCaps() as WebGPUTextureCap).calcMemoryUsage(this._format, this._width * this._height * (this.isTextureCube() ? 6 : this._depth));
+        const memCost = (this.getTextureCaps() as WebGPUTextureCap).calcMemoryUsage(
+          this._format,
+          this._width * this._height * (this.isTextureCube() ? 6 : this._depth)
+        );
         this._device.updateVideoMemoryCost(memCost - this._memCost);
         this._memCost = memCost;
       }
     }
   }
   /** @internal */
-  static copyTexturePixelsToBuffer(device: GPUDevice, texture: GPUTexture, texWidth: number, texHeight: number, format: TextureFormat, x: number, y: number, w: number, h: number, layer: number, level: number, buffer: GPUDataBuffer): void {
+  static copyTexturePixelsToBuffer(
+    device: GPUDevice,
+    texture: GPUTexture,
+    texWidth: number,
+    texHeight: number,
+    format: TextureFormat,
+    x: number,
+    y: number,
+    w: number,
+    h: number,
+    layer: number,
+    level: number,
+    buffer: GPUDataBuffer
+  ): void {
     if (!((buffer as WebGPUBuffer).gpuUsage & GPUBufferUsage.COPY_DST)) {
-      throw new Error('copyTexturePixelsToBuffer() failed: destination buffer does not have COPY_DST usage set');
+      throw new Error(
+        'copyTexturePixelsToBuffer() failed: destination buffer does not have COPY_DST usage set'
+      );
     }
     const blockWidth = getTextureFormatBlockWidth(format);
     const blockHeight = getTextureFormatBlockHeight(format);
@@ -312,30 +396,45 @@ export abstract class WebGPUBaseTexture<T extends GPUTexture|GPUExternalTexture 
     const bufferSize = blocksPerRow * rowStride;
     const bufferSizeAligned = blocksPerCol * bufferStride;
     if (buffer.byteLength < bufferSize) {
-      throw new Error(`copyTexturePixelsToBuffer() failed: destination buffer size is ${buffer.byteLength}, should be at least ${bufferSize}`);
+      throw new Error(
+        `copyTexturePixelsToBuffer() failed: destination buffer size is ${buffer.byteLength}, should be at least ${bufferSize}`
+      );
     }
-    const tmpBuffer = device.createBuffer({ size: bufferSizeAligned, usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.COPY_SRC });
-    const encoder = device.createCommandEncoder();
-    encoder.copyTextureToBuffer({
-      texture: texture,
-      mipLevel: level ?? 0,
-      origin: {
-        x: x,
-        y: y,
-        z: layer ?? 0
-      }
-    }, {
-      buffer: tmpBuffer as GPUBuffer,
-      offset: 0,
-      bytesPerRow: bufferStride
-    }, {
-      width: w,
-      height: h,
-      depthOrArrayLayers: 1
+    const tmpBuffer = device.createBuffer({
+      size: bufferSizeAligned,
+      usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.COPY_SRC
     });
+    const encoder = device.createCommandEncoder();
+    encoder.copyTextureToBuffer(
+      {
+        texture: texture,
+        mipLevel: level ?? 0,
+        origin: {
+          x: x,
+          y: y,
+          z: layer ?? 0
+        }
+      },
+      {
+        buffer: tmpBuffer as GPUBuffer,
+        offset: 0,
+        bytesPerRow: bufferStride
+      },
+      {
+        width: w,
+        height: h,
+        depthOrArrayLayers: 1
+      }
+    );
     if (bufferSize !== bufferSizeAligned) {
       for (let i = 0; i < blocksPerCol; i++) {
-        encoder.copyBufferToBuffer(tmpBuffer, i * bufferStride, buffer.object as GPUBuffer, i * rowStride, rowStride);
+        encoder.copyBufferToBuffer(
+          tmpBuffer,
+          i * bufferStride,
+          buffer.object as GPUBuffer,
+          i * rowStride,
+          rowStride
+        );
       }
     } else {
       encoder.copyBufferToBuffer(tmpBuffer, 0, buffer.object as GPUBuffer, 0, bufferSize);
@@ -344,7 +443,16 @@ export abstract class WebGPUBaseTexture<T extends GPUTexture|GPUExternalTexture 
     tmpBuffer.destroy();
   }
   /** @internal */
-  protected uploadRaw(pixels: TypedArray, width: number, height: number, depth: number, offsetX: number, offsetY: number, offsetZ: number, miplevel: number) {
+  protected uploadRaw(
+    pixels: TypedArray,
+    width: number,
+    height: number,
+    depth: number,
+    offsetX: number,
+    offsetY: number,
+    offsetZ: number,
+    miplevel: number
+  ) {
     const data = new Uint8Array(pixels.buffer, pixels.byteOffset, pixels.byteLength);
     const info = (this._device.getTextureCaps() as WebGPUTextureCap).getTextureFormatInfo(this._format);
     const blockWidth = info.blockWidth || 1;
@@ -363,12 +471,12 @@ export abstract class WebGPUBaseTexture<T extends GPUTexture|GPUExternalTexture 
         origin: {
           x: offsetX,
           y: offsetY,
-          z: offsetZ,
-        },
+          z: offsetZ
+        }
       };
       const dataLayout: GPUImageDataLayout = {
         bytesPerRow: rowStride,
-        rowsPerImage: blockHeight * blocksPerCol,
+        rowsPerImage: blockHeight * blocksPerCol
       };
       const size: GPUExtent3D = {
         width: blockWidth * blocksPerRow,
@@ -390,7 +498,10 @@ export abstract class WebGPUBaseTexture<T extends GPUTexture|GPUExternalTexture 
           const srcLayerOffset = d * rowStride * blocksPerRow;
           const dstLayerOffset = d * bufferStride * blocksPerCol;
           for (let i = 0; i < blocksPerCol; i++) {
-            dst.set(src.subarray(srcLayerOffset + i * rowStride, srcLayerOffset + (i + 1) * rowStride), dstLayerOffset + i * bufferStride);
+            dst.set(
+              src.subarray(srcLayerOffset + i * rowStride, srcLayerOffset + (i + 1) * rowStride),
+              dstLayerOffset + i * bufferStride
+            );
           }
         }
       }
@@ -403,13 +514,24 @@ export abstract class WebGPUBaseTexture<T extends GPUTexture|GPUExternalTexture 
         uploadHeight: blockHeight * blocksPerCol,
         uploadDepth: depth,
         bufferStride: bufferStride,
-        mipLevel: miplevel,
+        mipLevel: miplevel
       });
     }
   }
   /** @internal */
-  protected uploadImageData(data: ImageBitmap | HTMLCanvasElement, width: number, height: number, offsetX: number, offsetY: number, miplevel: number, faceIndex: number) {
-    if (!this._device.isTextureUploading(this as any) && this._device.device.queue.copyExternalImageToTexture) {
+  protected uploadImageData(
+    data: ImageBitmap | HTMLCanvasElement,
+    width: number,
+    height: number,
+    offsetX: number,
+    offsetY: number,
+    miplevel: number,
+    faceIndex: number
+  ) {
+    if (
+      !this._device.isTextureUploading(this as any) &&
+      this._device.device.queue.copyExternalImageToTexture
+    ) {
       this.clearPendingUploads();
       const copyView: GPUImageCopyTextureTagged = {
         texture: this._object as GPUTexture,
@@ -441,15 +563,14 @@ export abstract class WebGPUBaseTexture<T extends GPUTexture|GPUExternalTexture 
   protected _getSamplerOptions(params: Partial<ITextureFormatInfoWebGPU>, shadow: boolean): SamplerOptions {
     const comparison = this.isDepth() && shadow;
     const filterable = params.filterable || comparison;
-    const magFilter = filterable
-      ? TextureFilter.Linear
-      : TextureFilter.Nearest;
-    const minFilter = params.filterable
-      ? TextureFilter.Linear
-      : TextureFilter.Nearest;
-    const mipFilter = this._mipLevelCount > 1
-      ? filterable ? TextureFilter.Linear : TextureFilter.Nearest
-      : TextureFilter.None;
+    const magFilter = filterable ? TextureFilter.Linear : TextureFilter.Nearest;
+    const minFilter = params.filterable ? TextureFilter.Linear : TextureFilter.Nearest;
+    const mipFilter =
+      this._mipLevelCount > 1
+        ? filterable
+          ? TextureFilter.Linear
+          : TextureFilter.Nearest
+        : TextureFilter.None;
     const addressU = TextureWrapping.ClampToEdge;
     const addressV = TextureWrapping.ClampToEdge;
     const addressW = TextureWrapping.ClampToEdge;
@@ -461,7 +582,7 @@ export abstract class WebGPUBaseTexture<T extends GPUTexture|GPUExternalTexture 
       magFilter,
       minFilter,
       mipFilter,
-      compare,
+      compare
     };
   }
   /** @internal */

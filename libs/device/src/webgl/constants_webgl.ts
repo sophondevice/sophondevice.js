@@ -1,5 +1,12 @@
 import { CubeFace } from '@sophon/base';
-import { CompareFunc, TextureFilter, TextureWrapping, PrimitiveType, TextureTarget, CompareMode } from '../base_types';
+import {
+  CompareFunc,
+  TextureFilter,
+  TextureWrapping,
+  PrimitiveType,
+  TextureTarget,
+  CompareMode
+} from '../base_types';
 import { PBPrimitiveType } from '../builder/types';
 import { WebGLEnum } from './webgl_enum';
 import { BlendEquation, BlendFunc, FaceMode, FaceWinding, StencilOp } from '../render_states';
@@ -17,7 +24,7 @@ export const blendEquationInvMap = {
   [WebGLEnum.FUNC_SUBTRACT]: BlendEquation.SUBTRACT,
   [WebGLEnum.FUNC_REVERSE_SUBTRACT]: BlendEquation.REVERSE_SUBTRACT,
   [WebGLEnum.FUNC_MAX]: BlendEquation.MAX,
-  [WebGLEnum.FUNC_MIN]: BlendEquation.MIN,
+  [WebGLEnum.FUNC_MIN]: BlendEquation.MIN
 };
 
 export const blendFuncMap = {
@@ -35,7 +42,7 @@ export const blendFuncMap = {
   [BlendFunc.CONSTANT_COLOR]: WebGLEnum.CONSTANT_COLOR,
   [BlendFunc.INV_CONSTANT_COLOR]: WebGLEnum.ONE_MINUS_CONSTANT_COLOR,
   [BlendFunc.CONSTANT_ALPHA]: WebGLEnum.CONSTANT_ALPHA,
-  [BlendFunc.INV_CONSTANT_ALPHA]: WebGLEnum.ONE_MINUS_CONSTANT_ALPHA,
+  [BlendFunc.INV_CONSTANT_ALPHA]: WebGLEnum.ONE_MINUS_CONSTANT_ALPHA
 };
 
 export const blendFuncInvMap = {
@@ -53,29 +60,29 @@ export const blendFuncInvMap = {
   [WebGLEnum.CONSTANT_COLOR]: BlendFunc.CONSTANT_COLOR,
   [WebGLEnum.ONE_MINUS_CONSTANT_COLOR]: BlendFunc.INV_CONSTANT_COLOR,
   [WebGLEnum.CONSTANT_ALPHA]: BlendFunc.CONSTANT_ALPHA,
-  [WebGLEnum.ONE_MINUS_CONSTANT_ALPHA]: BlendFunc.INV_CONSTANT_ALPHA,
+  [WebGLEnum.ONE_MINUS_CONSTANT_ALPHA]: BlendFunc.INV_CONSTANT_ALPHA
 };
 
 export const faceModeMap = {
   [FaceMode.NONE]: WebGLEnum.NONE,
   [FaceMode.FRONT]: WebGLEnum.FRONT,
-  [FaceMode.BACK]: WebGLEnum.BACK,
+  [FaceMode.BACK]: WebGLEnum.BACK
 };
 
 export const faceModeInvMap = {
   [WebGLEnum.NONE]: [FaceMode.NONE],
   [WebGLEnum.FRONT]: [FaceMode.FRONT],
-  [WebGLEnum.BACK]: [FaceMode.BACK],
+  [WebGLEnum.BACK]: [FaceMode.BACK]
 };
 
 export const faceWindingMap = {
   [FaceWinding.CW]: WebGLEnum.CW,
-  [FaceWinding.CCW]: WebGLEnum.CCW,
+  [FaceWinding.CCW]: WebGLEnum.CCW
 };
 
 export const faceWindingInvMap = {
   [WebGLEnum.CW]: [FaceWinding.CW],
-  [WebGLEnum.CCW]: [FaceWinding.CCW],
+  [WebGLEnum.CCW]: [FaceWinding.CCW]
 };
 
 export const stencilOpMap = {
@@ -86,7 +93,7 @@ export const stencilOpMap = {
   [StencilOp.INCR_WRAP]: WebGLEnum.INCR_WRAP,
   [StencilOp.DECR]: WebGLEnum.DECR,
   [StencilOp.DECR_WRAP]: WebGLEnum.DECR_WRAP,
-  [StencilOp.INVERT]: WebGLEnum.INVERT,
+  [StencilOp.INVERT]: WebGLEnum.INVERT
 };
 
 export const stencilOpInvMap = {
@@ -97,7 +104,7 @@ export const stencilOpInvMap = {
   [WebGLEnum.INCR_WRAP]: StencilOp.INCR_WRAP,
   [WebGLEnum.DECR]: StencilOp.DECR,
   [WebGLEnum.DECR_WRAP]: StencilOp.DECR_WRAP,
-  [WebGLEnum.INVERT]: StencilOp.INVERT,
+  [WebGLEnum.INVERT]: StencilOp.INVERT
 };
 
 export const compareFuncMap = {
@@ -109,7 +116,7 @@ export const compareFuncMap = {
   [CompareFunc.Greater]: WebGLEnum.GREATER,
   [CompareFunc.Equal]: WebGLEnum.EQUAL,
   [CompareFunc.NotEqual]: WebGLEnum.NOTEQUAL,
-  [CompareFunc.Never]: WebGLEnum.NEVER,
+  [CompareFunc.Never]: WebGLEnum.NEVER
 };
 
 export const compareFuncInvMap = {
@@ -121,13 +128,13 @@ export const compareFuncInvMap = {
   [WebGLEnum.GREATER]: CompareFunc.Greater,
   [WebGLEnum.EQUAL]: CompareFunc.Equal,
   [WebGLEnum.NOTEQUAL]: CompareFunc.NotEqual,
-  [WebGLEnum.NEVER]: CompareFunc.Never,
+  [WebGLEnum.NEVER]: CompareFunc.Never
 };
 
 export const textureWrappingMap = {
   [TextureWrapping.Repeat]: WebGLEnum.REPEAT,
   [TextureWrapping.MirroredRepeat]: WebGLEnum.MIRRORED_REPEAT,
-  [TextureWrapping.ClampToEdge]: WebGLEnum.CLAMP_TO_EDGE,
+  [TextureWrapping.ClampToEdge]: WebGLEnum.CLAMP_TO_EDGE
 };
 
 export const typeMap = {
@@ -150,8 +157,8 @@ export const typeMap = {
   [PBPrimitiveType.U32]: WebGLEnum.UNSIGNED_INT,
   [PBPrimitiveType.U32VEC2]: WebGLEnum.UNSIGNED_INT_VEC2,
   [PBPrimitiveType.U32VEC3]: WebGLEnum.UNSIGNED_INT_VEC3,
-  [PBPrimitiveType.U32VEC4]: WebGLEnum.UNSIGNED_INT_VEC4,
-}
+  [PBPrimitiveType.U32VEC4]: WebGLEnum.UNSIGNED_INT_VEC4
+};
 
 export const primitiveTypeMap = {
   [PrimitiveType.TriangleList]: WebGLEnum.TRIANGLES,
@@ -159,19 +166,19 @@ export const primitiveTypeMap = {
   [PrimitiveType.TriangleFan]: WebGLEnum.TRIANGLE_FAN,
   [PrimitiveType.LineList]: WebGLEnum.LINES,
   [PrimitiveType.LineStrip]: WebGLEnum.LINE_STRIP,
-  [PrimitiveType.PointList]: WebGLEnum.POINTS,
+  [PrimitiveType.PointList]: WebGLEnum.POINTS
 };
 
 export const textureTargetMap = {
   [TextureTarget.Texture2D]: WebGLEnum.TEXTURE_2D,
   [TextureTarget.Texture3D]: WebGLEnum.TEXTURE_3D,
   [TextureTarget.TextureCubemap]: WebGLEnum.TEXTURE_CUBE_MAP,
-  [TextureTarget.Texture2DArray]: WebGLEnum.TEXTURE_2D_ARRAY,
+  [TextureTarget.Texture2DArray]: WebGLEnum.TEXTURE_2D_ARRAY
 };
 
 export const CompareModeMap = {
   [CompareMode.None]: WebGLEnum.NONE,
-  [CompareMode.RefToTexture]: WebGLEnum.COMPARE_REF_TO_TEXTURE,
+  [CompareMode.RefToTexture]: WebGLEnum.COMPARE_REF_TO_TEXTURE
 };
 
 export const cubeMapFaceMap = {
@@ -180,7 +187,7 @@ export const cubeMapFaceMap = {
   [CubeFace.PY]: WebGLEnum.TEXTURE_CUBE_MAP_POSITIVE_Y,
   [CubeFace.NY]: WebGLEnum.TEXTURE_CUBE_MAP_NEGATIVE_Y,
   [CubeFace.PZ]: WebGLEnum.TEXTURE_CUBE_MAP_POSITIVE_Z,
-  [CubeFace.NZ]: WebGLEnum.TEXTURE_CUBE_MAP_NEGATIVE_Z,
+  [CubeFace.NZ]: WebGLEnum.TEXTURE_CUBE_MAP_NEGATIVE_Z
 };
 
 export function textureMagFilterToWebGL(magFilter: TextureFilter) {
@@ -219,4 +226,3 @@ export function textureMinFilterToWebGL(minFilter: TextureFilter, mipFilter: Tex
   }
   return WebGLEnum.NONE;
 }
-

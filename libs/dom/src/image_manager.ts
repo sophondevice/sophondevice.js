@@ -16,7 +16,7 @@ export class ImageManager {
     this._cachedImages = {};
     this._urlImages = {};
     this._atlasManager = new AtlasManager(this._renderer, 1024, 1024, 0, false);
-    this._atlasManager.atlasTextureRestoreHandler = async tex => {
+    this._atlasManager.atlasTextureRestoreHandler = async (tex) => {
       if (!this._atlasManager.isEmpty()) {
         this._atlasManager.clear();
         this._createBuiltinImages();
@@ -77,7 +77,7 @@ export class ImageManager {
       { x: atlasInfo.uMin, y: atlasInfo.vMin },
       { x: atlasInfo.uMax, y: atlasInfo.vMax },
       { x: 0.5, y: 0.5 },
-      { x: 0.5, y: 0.5 },
+      { x: 0.5, y: 0.5 }
     );
 
     // button
@@ -91,7 +91,7 @@ export class ImageManager {
       { x: atlasInfo.uMin, y: atlasInfo.vMin },
       { x: atlasInfo.uMax, y: atlasInfo.vMax },
       { x: 0.5, y: 0.5 },
-      { x: 0.5, y: 0.5 },
+      { x: 0.5, y: 0.5 }
     );
 
     size = 32;
@@ -104,7 +104,7 @@ export class ImageManager {
     this._cachedImages['default.scrollbar.down'] = new TextureAtlas(
       this._atlasManager.getAtlasTexture(atlasInfo.atlasIndex),
       { x: atlasInfo.uMin, y: atlasInfo.vMin },
-      { x: atlasInfo.uMax, y: atlasInfo.vMax },
+      { x: atlasInfo.uMax, y: atlasInfo.vMax }
     );
 
     ctx.fillStyle = '#ffffff';
@@ -116,7 +116,7 @@ export class ImageManager {
     this._cachedImages['default.scrollbar.up'] = new TextureAtlas(
       this._atlasManager.getAtlasTexture(atlasInfo.atlasIndex),
       { x: atlasInfo.uMin, y: atlasInfo.vMin },
-      { x: atlasInfo.uMax, y: atlasInfo.vMax },
+      { x: atlasInfo.uMax, y: atlasInfo.vMax }
     );
 
     ctx.fillStyle = '#ffffff';
@@ -128,7 +128,7 @@ export class ImageManager {
     this._cachedImages['default.scrollbar.left'] = new TextureAtlas(
       this._atlasManager.getAtlasTexture(atlasInfo.atlasIndex),
       { x: atlasInfo.uMin, y: atlasInfo.vMin },
-      { x: atlasInfo.uMax, y: atlasInfo.vMax },
+      { x: atlasInfo.uMax, y: atlasInfo.vMax }
     );
 
     ctx.fillStyle = '#ffffff';
@@ -140,7 +140,7 @@ export class ImageManager {
     this._cachedImages['default.scrollbar.right'] = new TextureAtlas(
       this._atlasManager.getAtlasTexture(atlasInfo.atlasIndex),
       { x: atlasInfo.uMin, y: atlasInfo.vMin },
-      { x: atlasInfo.uMax, y: atlasInfo.vMax },
+      { x: atlasInfo.uMax, y: atlasInfo.vMax }
     );
 
     cvs = null;
@@ -157,7 +157,7 @@ function pathTriangle(
   anchorY: number,
   left: number,
   right: number,
-  top: number,
+  top: number
 ) {
   ctx.beginPath();
   if (orientation === ORIENTATION_VERTICAL) {

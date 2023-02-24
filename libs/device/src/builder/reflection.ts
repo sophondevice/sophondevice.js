@@ -2,7 +2,7 @@ import type { PBGlobalScope, ProgramBuilder } from './programbuilder';
 import type { PBShaderExp } from './base';
 import { VertexSemantic } from '../gpuobject';
 
-export type PBReflectionTagGetter = (scope: PBGlobalScope)=>PBShaderExp;
+export type PBReflectionTagGetter = (scope: PBGlobalScope) => PBShaderExp;
 
 export class PBReflection {
   /** @internal */
@@ -29,7 +29,10 @@ export class PBReflection {
   tag(name: string): PBShaderExp;
   tag(name: string, getter: PBReflectionTagGetter): void;
   tag(values: Record<string, PBReflectionTagGetter>): void;
-  tag(arg0: string|Record<string, PBReflectionTagGetter>, arg1?: PBReflectionTagGetter): PBShaderExp|void {
+  tag(
+    arg0: string | Record<string, PBReflectionTagGetter>,
+    arg1?: PBReflectionTagGetter
+  ): PBShaderExp | void {
     if (typeof arg0 === 'string') {
       if (arg1 === undefined) {
         return this.getTag(arg0);

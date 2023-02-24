@@ -1,12 +1,21 @@
 import { Vector3, Vector4, Quaternion, Matrix4x4, REvent } from '@sophon/base';
 import { Viewer, DeviceType } from '@sophon/device';
-import { Scene, OrbitCameraModel, ForwardRenderScheme, DirectionalLight, SpotLight, UnlitMaterial, Mesh, PBRMetallicRoughnessMaterial } from '@sophon/scene';
+import {
+  Scene,
+  OrbitCameraModel,
+  ForwardRenderScheme,
+  DirectionalLight,
+  SpotLight,
+  UnlitMaterial,
+  Mesh,
+  PBRMetallicRoughnessMaterial
+} from '@sophon/scene';
 import { GUI, GUIRenderer, RElement, RKeyEvent } from '@sophon/dom';
 import * as common from '../common';
 
 (async function () {
   const viewer = new Viewer(document.getElementById('canvas') as HTMLCanvasElement);
-  await viewer.initDevice(common.getQueryString('dev') as DeviceType || 'webgl', { msaa: false });
+  await viewer.initDevice((common.getQueryString('dev') as DeviceType) || 'webgl', { msaa: false });
   const guiRenderer = new GUIRenderer(viewer.device);
   const gui = new GUI(guiRenderer);
   await gui.deserializeFromXML(document.querySelector('#main-ui').innerHTML);
@@ -15,7 +24,14 @@ import * as common from '../common';
   const scene = new Scene(viewer.device);
   const scheme = new ForwardRenderScheme(viewer.device);
   const camera = scene.addCamera().lookAt(new Vector3(0, 8, 30), new Vector3(0, 8, 0), Vector3.axisPY());
-  camera.setProjectionMatrix(Matrix4x4.perspective(Math.PI / 3, viewer.device.getDrawingBufferWidth() / viewer.device.getDrawingBufferHeight(), 1, 260));
+  camera.setProjectionMatrix(
+    Matrix4x4.perspective(
+      Math.PI / 3,
+      viewer.device.getDrawingBufferWidth() / viewer.device.getDrawingBufferHeight(),
+      1,
+      260
+    )
+  );
   camera.mouseInputSource = sceneView;
   camera.keyboardInputSource = sceneView;
   camera.setModel(new OrbitCameraModel({ distance: camera.position.magnitude }));
@@ -105,7 +121,14 @@ new HemiSphericLight(scene, null)
 
   sceneView.addEventListener('layout', function (this: RElement) {
     const rect = this.getClientRect();
-    camera.setProjectionMatrix(Matrix4x4.perspective(camera.getFOV(), rect.width / rect.height, camera.getNearPlane(), camera.getFarPlane()));
+    camera.setProjectionMatrix(
+      Matrix4x4.perspective(
+        camera.getFOV(),
+        rect.width / rect.height,
+        camera.getNearPlane(),
+        camera.getFarPlane()
+      )
+    );
   });
 
   let pause = false;
@@ -123,11 +146,17 @@ new HemiSphericLight(scene, null)
         pointlight.position.x = 15 * Math.sin(elapsed / 3000);
         pointlight.position.y = 25;
         pointlight.position.z = 15 * Math.cos(elapsed / 3000);
-        pointlight.position.y = 30 + 15 * Math.sin(elapsed / 3000)
+        pointlight.position.y = 30 + 15 * Math.sin(elapsed / 3000);
       }
       if (directionlight) {
-        directionlight.setRotation(Quaternion.fromAxisAngle(Vector3.axisNX(), Math.PI * (0.5 + 0.25 * Math.sin(elapsed / 2000))));
-        directionlight.lookAt(new Vector3(0, 28, 0), new Vector3(40 * Math.cos(elapsed / 2000), 0, 40 * Math.sin(elapsed / 2000)), Vector3.axisPY());
+        directionlight.setRotation(
+          Quaternion.fromAxisAngle(Vector3.axisNX(), Math.PI * (0.5 + 0.25 * Math.sin(elapsed / 2000)))
+        );
+        directionlight.lookAt(
+          new Vector3(0, 28, 0),
+          new Vector3(40 * Math.cos(elapsed / 2000), 0, 40 * Math.sin(elapsed / 2000)),
+          Vector3.axisPY()
+        );
       }
     }
   });
@@ -137,8 +166,5 @@ new HemiSphericLight(scene, null)
     scheme.renderScene(scene, camera);
   });
 
-  viewer.device.runLoop(device => gui.render());
-
-}());
-
-
+  viewer.device.runLoop((device) => gui.render());
+})();

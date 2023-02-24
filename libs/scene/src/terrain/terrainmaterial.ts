@@ -11,7 +11,7 @@ import type { ShadowMapPass } from '../renderers';
 export enum TerrainRenderMode {
   UNKNOWN = 0,
   NORMAL = 1,
-  DETAIL = 2,
+  DETAIL = 2
 }
 
 export const MAX_DETAIL_TEXTURE_LEVELS = 8;
@@ -68,7 +68,10 @@ export class TerrainMaterial extends Material {
   protected _createProgram(pb: ProgramBuilder, ctx: DrawContext, func: number): GPUProgram {
     const that = this;
     const lib = new ShaderLib(pb);
-    if (ctx.materialFunc === values.MATERIAL_FUNC_DEPTH_SHADOW && (ctx.renderPass as ShadowMapPass).light.shadow.depthClampEnabled) {
+    if (
+      ctx.materialFunc === values.MATERIAL_FUNC_DEPTH_SHADOW &&
+      (ctx.renderPass as ShadowMapPass).light.shadow.depthClampEnabled
+    ) {
       pb.emulateDepthClamp = true;
     } else {
       pb.emulateDepthClamp = false;
@@ -87,7 +90,10 @@ export class TerrainMaterial extends Material {
         this.scaleOffset = pb.defineStruct(null, 'std140', pb.vec4('value'))().uniform(2);
         this.terrainInfo = terrainInfoStruct().uniform(2); // terrainSizeX, terrainSizeZ, numDetailTextureLevels, detailTextureSize
         this.$mainFunc(function () {
-          this.$l.p = pb.add(pb.mul(this.$inputs.pos.xz, this.scaleOffset.value.xz), this.scaleOffset.value.yw);
+          this.$l.p = pb.add(
+            pb.mul(this.$inputs.pos.xz, this.scaleOffset.value.xz),
+            this.scaleOffset.value.yw
+          );
           this.$l.pos = pb.vec3(this.p.x, this.$inputs.height, this.p.y);
           // this.$builtins.position = lib.ftransform(this.$l.pos);
           this.$outputs.uv = pb.div(this.p.xy, pb.vec2(this.terrainInfo.value.xy));
@@ -109,11 +115,13 @@ export class TerrainMaterial extends Material {
           this.$outputs.outColor = pb.vec4();
           this.$mainFunc(function () {
             this.$outputs.outColor = pb.vec4(1);
-          })
+          });
         } else if (func === values.MATERIAL_FUNC_DEPTH_SHADOW) {
           this.$outputs.outColor = pb.vec4();
           this.$mainFunc(function () {
-            this.$outputs.outColor = (ctx.renderPass as ShadowMapPass).light.shadow.computeShadowMapDepth(this);
+            this.$outputs.outColor = (ctx.renderPass as ShadowMapPass).light.shadow.computeShadowMapDepth(
+              this
+            );
           });
         } else {
           throw new Error(`unknown material function: ${func}`);

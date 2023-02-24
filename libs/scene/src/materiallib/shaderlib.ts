@@ -153,7 +153,12 @@ export class ShaderLib {
         this.$l.m1 = pb.globalScope[funcNameGetBoneMatrixFromTexture](pb.int(blendIndices[1]));
         this.$l.m2 = pb.globalScope[funcNameGetBoneMatrixFromTexture](pb.int(blendIndices[2]));
         this.$l.m3 = pb.globalScope[funcNameGetBoneMatrixFromTexture](pb.int(blendIndices[3]));
-        this.$l.m = pb.add(pb.mul(this.m0, blendWeights.x), pb.mul(this.m1, blendWeights.y), pb.mul(this.m2, blendWeights.z), pb.mul(this.m3, blendWeights.w));
+        this.$l.m = pb.add(
+          pb.mul(this.m0, blendWeights.x),
+          pb.mul(this.m1, blendWeights.y),
+          pb.mul(this.m2, blendWeights.z),
+          pb.mul(this.m3, blendWeights.w)
+        );
         this.$return(pb.mul(invBindMatrix, this.m));
         /*
         if (pb.getDeviceType() === 'webgl') {
@@ -199,12 +204,19 @@ export class ShaderLib {
     const blendWeights = pb.globalScope.$getVertexAttrib('blendWeights');
     if (boneMatrices && blendIndices && blendWeights) {
       if (!pb.getFunction(ShaderLib.funcNameTransformSkinnedVertex)) {
-        pb.globalScope.$function(ShaderLib.funcNameTransformSkinnedVertex, [pb.vec3('pos'), pb.mat4('skinningMatrix')], function () {
-          this.$l.skinnedVertex = pb.mul(this.skinningMatrix, pb.vec4(this.pos, 1));
-          this.$return(pb.div(this.$l.skinnedVertex.xyz, this.$l.skinnedVertex.w));
-        });
+        pb.globalScope.$function(
+          ShaderLib.funcNameTransformSkinnedVertex,
+          [pb.vec3('pos'), pb.mat4('skinningMatrix')],
+          function () {
+            this.$l.skinnedVertex = pb.mul(this.skinningMatrix, pb.vec4(this.pos, 1));
+            this.$return(pb.div(this.$l.skinnedVertex.xyz, this.$l.skinnedVertex.w));
+          }
+        );
       }
-      return pb.globalScope[ShaderLib.funcNameTransformSkinnedVertex](pos || pb.globalScope.$getVertexAttrib('position'), skinningMatrix);
+      return pb.globalScope[ShaderLib.funcNameTransformSkinnedVertex](
+        pos || pb.globalScope.$getVertexAttrib('position'),
+        skinningMatrix
+      );
     } else {
       return pos;
     }
@@ -216,11 +228,18 @@ export class ShaderLib {
     const blendWeights = pb.globalScope.$getVertexAttrib('blendWeights');
     if (boneMatrices && blendIndices && blendWeights) {
       if (!pb.getFunction(ShaderLib.funcNameTransformSkinnedNormal)) {
-        pb.globalScope.$function(ShaderLib.funcNameTransformSkinnedNormal, [pb.vec3('normal'), pb.mat4('skinningMatrix')], function () {
-          this.$return(pb.mul(this.skinningMatrix, pb.vec4(this.normal, 0)).xyz);
-        });
+        pb.globalScope.$function(
+          ShaderLib.funcNameTransformSkinnedNormal,
+          [pb.vec3('normal'), pb.mat4('skinningMatrix')],
+          function () {
+            this.$return(pb.mul(this.skinningMatrix, pb.vec4(this.normal, 0)).xyz);
+          }
+        );
       }
-      return pb.globalScope[ShaderLib.funcNameTransformSkinnedNormal](normal || pb.globalScope.$getVertexAttrib('normal'), skinningMatrix);
+      return pb.globalScope[ShaderLib.funcNameTransformSkinnedNormal](
+        normal || pb.globalScope.$getVertexAttrib('normal'),
+        skinningMatrix
+      );
     } else {
       return normal;
     }
@@ -232,18 +251,25 @@ export class ShaderLib {
     const blendWeights = pb.globalScope.$getVertexAttrib('blendWeights');
     if (boneMatrices && blendIndices && blendWeights) {
       if (!pb.getFunction(ShaderLib.funcNameTransformSkinnedTangent)) {
-        pb.globalScope.$function(ShaderLib.funcNameTransformSkinnedTangent, [pb.vec4('tangent'), pb.mat4('skinningMatrix')], function () {
-          this.$l.skinnedTangent = pb.mul(this.skinningMatrix, pb.vec4(this.tangent.xyz, 0)).xyz;
-          this.$return(pb.vec4(this.$l.skinnedTangent, this.tangent.w));
-        });
+        pb.globalScope.$function(
+          ShaderLib.funcNameTransformSkinnedTangent,
+          [pb.vec4('tangent'), pb.mat4('skinningMatrix')],
+          function () {
+            this.$l.skinnedTangent = pb.mul(this.skinningMatrix, pb.vec4(this.tangent.xyz, 0)).xyz;
+            this.$return(pb.vec4(this.$l.skinnedTangent, this.tangent.w));
+          }
+        );
       }
-      return pb.globalScope[ShaderLib.funcNameTransformSkinnedTangent](tangent || pb.globalScope.$getVertexAttrib('tangent'), skinningMatrix);
+      return pb.globalScope[ShaderLib.funcNameTransformSkinnedTangent](
+        tangent || pb.globalScope.$getVertexAttrib('tangent'),
+        skinningMatrix
+      );
     } else {
       return tangent;
     }
   }
   worldSpacePositionToClip(pos: PBShaderExp): PBShaderExp {
-    if (!pos || !pos.isVector() || (pos.numComponents() !== 3)) {
+    if (!pos || !pos.isVector() || pos.numComponents() !== 3) {
       throw new Error('worldSpacePositionToClip() failed: pos parameter type must be vec3');
     }
     const pb = this.builder;
@@ -266,13 +292,15 @@ export class ShaderLib {
     return pb.globalScope[ShaderLib.funcNameWorldSpacePositionToClip](pos);
   }
   objectSpacePositionToWorld(pos: PBShaderExp): PBShaderExp {
-    if (!pos || !pos.isVector() || (pos.numComponents() !== 3)) {
+    if (!pos || !pos.isVector() || pos.numComponents() !== 3) {
       throw new Error('objectSpacePositionToWorld() failed: position parameter type must be vec3');
     }
     const pb = this.builder;
     const scope = pb.currentScope();
     if (!scope || !(scope instanceof PBInsideFunctionScope)) {
-      throw new Error('objectSpacePositionToWorld() failed: objectSpacePositionToWorld() must be called inside a function');
+      throw new Error(
+        'objectSpacePositionToWorld() failed: objectSpacePositionToWorld() must be called inside a function'
+      );
     }
     if (!pb.getFunction(ShaderLib.funcNameObjectSpacePositionToWorld)) {
       pb.globalScope.$function(ShaderLib.funcNameObjectSpacePositionToWorld, [pb.vec3('pos')], function () {
@@ -289,7 +317,9 @@ export class ShaderLib {
     const pb = this.builder;
     const scope = pb.currentScope();
     if (!scope || !(scope instanceof PBInsideFunctionScope)) {
-      throw new Error('objectSpaceVectorToWorld() failed: objectSpaceVectorToWorld() must be called inside a function');
+      throw new Error(
+        'objectSpaceVectorToWorld() failed: objectSpaceVectorToWorld() must be called inside a function'
+      );
     }
     if (!pb.getFunction(ShaderLib.funcNameObjectSpaceVectorToWorld)) {
       pb.globalScope.$function(ShaderLib.funcNameObjectSpaceVectorToWorld, [pb.vec3('v')], function () {
@@ -312,15 +342,29 @@ export class ShaderLib {
   linearToNonLinear(depth: PBShaderExp, nearFar?: PBShaderExp): PBShaderExp {
     const pb = this.builder;
     nearFar = nearFar || pb.currentScope().$query(ShaderLib.USAGE_CAMERA_PARAMS);
-    return pb.div(pb.sub(nearFar.y, pb.div(pb.mul(nearFar.x, nearFar.y), depth)), pb.sub(nearFar.y, nearFar.x));
+    return pb.div(
+      pb.sub(nearFar.y, pb.div(pb.mul(nearFar.x, nearFar.y), depth)),
+      pb.sub(nearFar.y, nearFar.x)
+    );
   }
   encode2HalfToRGBA(a: PBShaderExp | number, b: PBShaderExp | number): PBShaderExp {
     const pb = this.builder;
     if (!pb.getFunction(ShaderLib.funcNameEncode2HalfToRGBA)) {
-      pb.globalScope.$function(ShaderLib.funcNameEncode2HalfToRGBA, [pb.float('a'), pb.float('b')], function () {
-        this.$l.t = pb.vec4(this.a, pb.fract(pb.mul(this.a, 255)), this.b, pb.fract(pb.mul(this.b, 255)));
-        this.$return(pb.vec4(pb.sub(this.t.x, pb.div(this.t.y, 255)), this.t.y, pb.sub(this.t.z, pb.div(this.t.w, 255)), this.t.w));
-      });
+      pb.globalScope.$function(
+        ShaderLib.funcNameEncode2HalfToRGBA,
+        [pb.float('a'), pb.float('b')],
+        function () {
+          this.$l.t = pb.vec4(this.a, pb.fract(pb.mul(this.a, 255)), this.b, pb.fract(pb.mul(this.b, 255)));
+          this.$return(
+            pb.vec4(
+              pb.sub(this.t.x, pb.div(this.t.y, 255)),
+              this.t.y,
+              pb.sub(this.t.z, pb.div(this.t.w, 255)),
+              this.t.w
+            )
+          );
+        }
+      );
     }
     return pb.globalScope[ShaderLib.funcNameEncode2HalfToRGBA](a, b);
   }
@@ -328,7 +372,12 @@ export class ShaderLib {
     const pb = this.builder;
     if (!pb.getFunction(ShaderLib.funcNameDecode2HalfFromRGBA)) {
       pb.globalScope.$function(ShaderLib.funcNameDecode2HalfFromRGBA, [pb.vec4('value')], function () {
-        this.$return(pb.vec2(pb.add(this.value.x, pb.div(this.value.y, 255)), pb.add(this.value.z, pb.div(this.value.w, 255))));
+        this.$return(
+          pb.vec2(
+            pb.add(this.value.x, pb.div(this.value.y, 255)),
+            pb.add(this.value.z, pb.div(this.value.w, 255))
+          )
+        );
       });
     }
     return pb.globalScope[ShaderLib.funcNameDecode2HalfFromRGBA](value);
@@ -336,29 +385,43 @@ export class ShaderLib {
   encodeNormalizedFloatToRGBA(value: PBShaderExp | number): PBShaderExp {
     const pb = this.builder;
     if (!pb.getFunction(ShaderLib.funcNameEncodeNormalizedFloatToRGBA)) {
-      pb.globalScope.$function(ShaderLib.funcNameEncodeNormalizedFloatToRGBA, [pb.float('value')], function () {
-        this.$l.bitShift = pb.vec4(256 * 256 * 256, 256 * 256, 256, 1);
-        this.$l.bitMask = pb.vec4(0, 1 / 256, 1 / 256, 1 / 256);
-        this.$l.t = pb.fract(pb.mul(this.value, this.bitShift));
-        this.$return(pb.sub(this.t, pb.mul(this.t.xxyz, this.bitMask)));
-      });
+      pb.globalScope.$function(
+        ShaderLib.funcNameEncodeNormalizedFloatToRGBA,
+        [pb.float('value')],
+        function () {
+          this.$l.bitShift = pb.vec4(256 * 256 * 256, 256 * 256, 256, 1);
+          this.$l.bitMask = pb.vec4(0, 1 / 256, 1 / 256, 1 / 256);
+          this.$l.t = pb.fract(pb.mul(this.value, this.bitShift));
+          this.$return(pb.sub(this.t, pb.mul(this.t.xxyz, this.bitMask)));
+        }
+      );
     }
     return pb.globalScope[ShaderLib.funcNameEncodeNormalizedFloatToRGBA](value);
   }
   decodeNormalizedFloatFromRGBA(value: PBShaderExp): PBShaderExp {
     const sb = this.builder;
-    if (!value || !value.$typeinfo.isPrimitiveType() || value.$typeinfo.primitiveType !== PBPrimitiveType.F32VEC4) {
+    if (
+      !value ||
+      !value.$typeinfo.isPrimitiveType() ||
+      value.$typeinfo.primitiveType !== PBPrimitiveType.F32VEC4
+    ) {
       throw new Error('decodeNormalizedFloatFromRGBA() failed: parameter type must be vec4');
     }
     const scope = sb.currentScope();
     if (!scope || !(scope instanceof PBInsideFunctionScope)) {
-      throw new Error('decodeNormalizedFloatFromRGBA() failed: decodeNormalizedFloatFromRGBA() must be called inside a function');
+      throw new Error(
+        'decodeNormalizedFloatFromRGBA() failed: decodeNormalizedFloatFromRGBA() must be called inside a function'
+      );
     }
     if (!sb.getFunction(ShaderLib.funcNameDecodeNormalizedFloatFromRGBA)) {
-      sb.globalScope.$function(ShaderLib.funcNameDecodeNormalizedFloatFromRGBA, [sb.vec4('value')], function () {
-        this.$l.bitShift = sb.vec4(1 / (256 * 256 * 256), 1 / (256 * 256), 1 / 256, 1);
-        this.$return(sb.dot(this.value, this.bitShift));
-      });
+      sb.globalScope.$function(
+        ShaderLib.funcNameDecodeNormalizedFloatFromRGBA,
+        [sb.vec4('value')],
+        function () {
+          this.$l.bitShift = sb.vec4(1 / (256 * 256 * 256), 1 / (256 * 256), 1 / 256, 1);
+          this.$return(sb.dot(this.value, this.bitShift));
+        }
+      );
     }
     return scope[ShaderLib.funcNameDecodeNormalizedFloatFromRGBA](value);
   }
@@ -378,9 +441,19 @@ export class ShaderLib {
     }
     return pb.globalScope[funcNameCalcFaceNormal](pos);
   }
-  evalNormal(worldNormal: PBShaderExp, normalMapTexCoord?: PBShaderExp, worldTangent?: PBShaderExp, worldBinormal?: PBShaderExp, worldPosition?: PBShaderExp): PBShaderExp {
+  evalNormal(
+    worldNormal: PBShaderExp,
+    normalMapTexCoord?: PBShaderExp,
+    worldTangent?: PBShaderExp,
+    worldBinormal?: PBShaderExp,
+    worldPosition?: PBShaderExp
+  ): PBShaderExp {
     const pb = this.builder;
-    if (!worldNormal || !worldNormal.$typeinfo.isPrimitiveType() || worldNormal.$typeinfo.primitiveType !== PBPrimitiveType.F32VEC3) {
+    if (
+      !worldNormal ||
+      !worldNormal.$typeinfo.isPrimitiveType() ||
+      worldNormal.$typeinfo.primitiveType !== PBPrimitiveType.F32VEC3
+    ) {
       throw new Error('evalNormal() failed: worldNormal parameter must be vec3');
     }
     const scope = pb.currentScope();
@@ -404,62 +477,106 @@ export class ShaderLib {
     }
     if (!pb.getFunction(ShaderLib.funcNameCotangentFrame)) {
       if (worldTangent) {
-        pb.globalScope.$function(ShaderLib.funcNameCotangentFrame, [pb.vec3('normal'), pb.vec3('tangent'), pb.vec3('binormal')], function () {
-          this.$return(pb.mat3(pb.normalize(this.tangent), pb.normalize(this.binormal), pb.normalize(this.normal)));
-        });
+        pb.globalScope.$function(
+          ShaderLib.funcNameCotangentFrame,
+          [pb.vec3('normal'), pb.vec3('tangent'), pb.vec3('binormal')],
+          function () {
+            this.$return(
+              pb.mat3(pb.normalize(this.tangent), pb.normalize(this.binormal), pb.normalize(this.normal))
+            );
+          }
+        );
       } else {
-        if (!worldPosition || !worldPosition.$typeinfo.isPrimitiveType() || worldPosition.$typeinfo.primitiveType !== PBPrimitiveType.F32VEC3) {
+        if (
+          !worldPosition ||
+          !worldPosition.$typeinfo.isPrimitiveType() ||
+          worldPosition.$typeinfo.primitiveType !== PBPrimitiveType.F32VEC3
+        ) {
           throw new Error('evalNormal() failed: worldPosition parameter type must be vec3');
         }
-        pb.globalScope.$function(ShaderLib.funcNameCotangentFrame, [pb.vec3('normal'), pb.vec3('p'), pb.vec2('uv')], function () {
-          this.$l.n = pb.normalize(this.normal);
-          this.$l.dp1 = pb.dpdx(this.p);
-          this.$l.dp2 = pb.dpdy(this.p);
-          this.$l.duv1 = pb.dpdx(this.uv);
-          this.$l.duv2 = pb.dpdy(this.uv);
-          this.$l.dp2perp = pb.cross(this.dp2, this.n);
-          this.$l.dp1perp = pb.cross(this.n, this.dp1);
-          this.$l.tangent = pb.add(pb.mul(this.dp2perp, this.duv1.x), pb.mul(this.dp1perp, this.duv2.x));
-          this.$l.bitangent = pb.add(pb.mul(this.dp2perp, this.duv1.y), pb.mul(this.dp1perp, this.duv2.y));
-          this.$l.invmax = pb.inverseSqrt(pb.max(pb.dot(this.tangent, this.tangent), pb.dot(this.bitangent, this.bitangent)));
-          this.$return(
-            pb.mat3(pb.mul(this.tangent, this.invmax), pb.mul(this.bitangent, this.invmax), this.n),
-          );
-        });
+        pb.globalScope.$function(
+          ShaderLib.funcNameCotangentFrame,
+          [pb.vec3('normal'), pb.vec3('p'), pb.vec2('uv')],
+          function () {
+            this.$l.n = pb.normalize(this.normal);
+            this.$l.dp1 = pb.dpdx(this.p);
+            this.$l.dp2 = pb.dpdy(this.p);
+            this.$l.duv1 = pb.dpdx(this.uv);
+            this.$l.duv2 = pb.dpdy(this.uv);
+            this.$l.dp2perp = pb.cross(this.dp2, this.n);
+            this.$l.dp1perp = pb.cross(this.n, this.dp1);
+            this.$l.tangent = pb.add(pb.mul(this.dp2perp, this.duv1.x), pb.mul(this.dp1perp, this.duv2.x));
+            this.$l.bitangent = pb.add(pb.mul(this.dp2perp, this.duv1.y), pb.mul(this.dp1perp, this.duv2.y));
+            this.$l.invmax = pb.inverseSqrt(
+              pb.max(pb.dot(this.tangent, this.tangent), pb.dot(this.bitangent, this.bitangent))
+            );
+            this.$return(
+              pb.mat3(pb.mul(this.tangent, this.invmax), pb.mul(this.bitangent, this.invmax), this.n)
+            );
+          }
+        );
       }
       pb.globalScope.$function(
         ShaderLib.funcNamePerturbNormal,
         [pb.mat3('cotangentFrame'), pb.vec2('uv'), pb.float('scale')],
         function () {
-          this.$l.color = pb.sub(pb.mul(pb.textureSample(pb.queryGlobal(ShaderLib.USAGE_NORMAL_MAP), this.uv).xyz, 2), pb.vec3(1, 1, 1));
+          this.$l.color = pb.sub(
+            pb.mul(pb.textureSample(pb.queryGlobal(ShaderLib.USAGE_NORMAL_MAP), this.uv).xyz, 2),
+            pb.vec3(1, 1, 1)
+          );
           this.color = pb.mul(this.color, pb.vec3(this.scale, this.scale, 1));
           this.$return(pb.normalize(pb.mul(this.cotangentFrame, this.color)));
-        },
+        }
       );
     }
     if (!pb.getFunction(ShaderLib.funcNameEvalPixelNormal)) {
       if (worldTangent) {
-        pb.globalScope.$function(ShaderLib.funcNameEvalPixelNormal, [pb.vec3('normal'), pb.vec3('tangent'), pb.vec3('binormal'), pb.vec2('uv')], function () {
-          this.$l.TBN = pb.globalScope[ShaderLib.funcNameCotangentFrame](this.normal, this.tangent, this.binormal);
-          this.$l.n = pb.globalScope[ShaderLib.funcNamePerturbNormal](this.TBN, this.uv, pb.queryGlobal(ShaderLib.USAGE_NORMAL_SCALE) || 1);
-          this.$if(pb.not(this.$builtins.frontFacing), function () {
-            this.n = pb.neg(this.n);
-          });
-          this.$return(this.n);
-        });
+        pb.globalScope.$function(
+          ShaderLib.funcNameEvalPixelNormal,
+          [pb.vec3('normal'), pb.vec3('tangent'), pb.vec3('binormal'), pb.vec2('uv')],
+          function () {
+            this.$l.TBN = pb.globalScope[ShaderLib.funcNameCotangentFrame](
+              this.normal,
+              this.tangent,
+              this.binormal
+            );
+            this.$l.n = pb.globalScope[ShaderLib.funcNamePerturbNormal](
+              this.TBN,
+              this.uv,
+              pb.queryGlobal(ShaderLib.USAGE_NORMAL_SCALE) || 1
+            );
+            this.$if(pb.not(this.$builtins.frontFacing), function () {
+              this.n = pb.neg(this.n);
+            });
+            this.$return(this.n);
+          }
+        );
       } else {
-        pb.globalScope.$function(ShaderLib.funcNameEvalPixelNormal, [pb.vec3('normal'), pb.vec3('pos'), pb.vec2('uv')], function () {
-          this.$l.TBN = pb.globalScope[ShaderLib.funcNameCotangentFrame](this.normal, this.pos, this.uv);
-          this.$l.n = pb.globalScope[ShaderLib.funcNamePerturbNormal](this.TBN, this.uv, pb.queryGlobal(ShaderLib.USAGE_NORMAL_SCALE) || 1);
-          this.$if(pb.not(this.$builtins.frontFacing), function () {
-            this.n = pb.neg(this.n);
-          });
-          this.$return(this.n);
-        });
+        pb.globalScope.$function(
+          ShaderLib.funcNameEvalPixelNormal,
+          [pb.vec3('normal'), pb.vec3('pos'), pb.vec2('uv')],
+          function () {
+            this.$l.TBN = pb.globalScope[ShaderLib.funcNameCotangentFrame](this.normal, this.pos, this.uv);
+            this.$l.n = pb.globalScope[ShaderLib.funcNamePerturbNormal](
+              this.TBN,
+              this.uv,
+              pb.queryGlobal(ShaderLib.USAGE_NORMAL_SCALE) || 1
+            );
+            this.$if(pb.not(this.$builtins.frontFacing), function () {
+              this.n = pb.neg(this.n);
+            });
+            this.$return(this.n);
+          }
+        );
       }
     }
     return worldTangent
-      ? pb.globalScope[ShaderLib.funcNameEvalPixelNormal](worldNormal, worldTangent, worldBinormal, normalMapTexCoord)
+      ? pb.globalScope[ShaderLib.funcNameEvalPixelNormal](
+          worldNormal,
+          worldTangent,
+          worldBinormal,
+          normalMapTexCoord
+        )
       : pb.globalScope[ShaderLib.funcNameEvalPixelNormal](worldNormal, worldPosition, normalMapTexCoord);
   }
   encodeColorOutput(outputColor: PBShaderExp): PBShaderExp {
@@ -516,7 +633,10 @@ export class ShaderLib {
     const pb = this.builder;
     if (!pb.getFunction(ShaderLib.funcNameDecodeNormalSP)) {
       pb.globalScope.$function(ShaderLib.funcNameDecodeNormalSP, [pb.vec2('enc')], function () {
-        this.$l.nn = pb.add(pb.mul(pb.vec3(this.enc.xy, 0), pb.vec3(2 * scale, 2 * scale, 0)), pb.vec3(-scale, -scale, 1));
+        this.$l.nn = pb.add(
+          pb.mul(pb.vec3(this.enc.xy, 0), pb.vec3(2 * scale, 2 * scale, 0)),
+          pb.vec3(-scale, -scale, 1)
+        );
         this.$l.g = pb.div(2, pb.dot(this.$l.nn, this.$l.nn));
         this.$return(pb.vec3(pb.mul(this.$l.nn.xy, this.$l.g), pb.sub(this.$l.g, 1)));
       });
@@ -537,4 +657,3 @@ export class ShaderLib {
     return pb.globalScope[funcNamePseudoRandom](fragCoord);
   }
 }
-

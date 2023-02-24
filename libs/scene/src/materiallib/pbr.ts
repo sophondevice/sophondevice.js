@@ -1,6 +1,6 @@
-import { StandardMaterial } from "./standard";
-import { PBRLightModelMR, PBRLightModelSG } from "./lightmodel";
-import type { Device } from "@sophon/device";
+import { StandardMaterial } from './standard';
+import { PBRLightModelMR, PBRLightModelSG } from './lightmodel';
+import type { Device } from '@sophon/device';
 
 export class PBRMetallicRoughnessMaterial extends StandardMaterial<PBRLightModelMR> {
   constructor(device: Device) {

@@ -1,6 +1,6 @@
-import { WebGLGPUBuffer } from "./buffer_webgl";
-import { PBPrimitiveTypeInfo, typeU16, typeU32 } from "../builder";
-import { GPUResourceUsageFlags, IndexBuffer } from "../gpuobject";
+import { WebGLGPUBuffer } from './buffer_webgl';
+import { PBPrimitiveTypeInfo, typeU16, typeU32 } from '../builder';
+import { GPUResourceUsageFlags, IndexBuffer } from '../gpuobject';
 import type { WebGLDevice } from './device_webgl';
 
 export class WebGLIndexBuffer extends WebGLGPUBuffer implements IndexBuffer {

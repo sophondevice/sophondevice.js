@@ -1,5 +1,5 @@
-import {NodeType} from './values';
-import type {RNode} from './node';
+import { NodeType } from './values';
+import type { RNode } from './node';
 
 interface IndexIterator extends Iterator<[number, RNode]> {
   lastIndex: number;
@@ -48,7 +48,7 @@ class ElementIndexer {
   }
   forEach(
     callback: (currentValue: RNode, currentIndex?: number, listObj?: unknown) => void,
-    thisArg?: unknown,
+    thisArg?: unknown
   ) {
     for (const entry of this.entries()) {
       callback && callback.call(thisArg, entry[1], entry[0], this);
@@ -82,17 +82,17 @@ class ElementIndexer {
     this._length = -1;
     this._currentIndex = 0;
     switch (this._mode) {
-    case ElementIndexer.MODE_ALL:
-      this._currentNode = this._parent._getLayout().firstChild()?.element || null;
-      break;
-    case ElementIndexer.MODE_NON_INTERNAL:
-      this._currentNode = this._getFirstNonInternalNode();
-      break;
-    case ElementIndexer.MODE_ELEMENT_NON_INTERNAL:
-      this._currentNode = this._getFirstNonInternalElement();
-      break;
-    default:
-      break;
+      case ElementIndexer.MODE_ALL:
+        this._currentNode = this._parent._getLayout().firstChild()?.element || null;
+        break;
+      case ElementIndexer.MODE_NON_INTERNAL:
+        this._currentNode = this._getFirstNonInternalNode();
+        break;
+      case ElementIndexer.MODE_ELEMENT_NON_INTERNAL:
+        this._currentNode = this._getFirstNonInternalElement();
+        break;
+      default:
+        break;
     }
     while (this._currentIndex < index && this._currentNode) {
       this._next();
@@ -142,15 +142,15 @@ class ElementIndexer {
     }
     if (this._length < 0) {
       switch (this._mode) {
-      case ElementIndexer.MODE_ALL:
-        this._length = this._getLengthAll();
-        break;
-      case ElementIndexer.MODE_NON_INTERNAL:
-        this._length = this._getLengthNonInternalNode();
-        break;
-      case ElementIndexer.MODE_ELEMENT_NON_INTERNAL:
-        this._length = this._getLengthNonInternalElement();
-        break;
+        case ElementIndexer.MODE_ALL:
+          this._length = this._getLengthAll();
+          break;
+        case ElementIndexer.MODE_NON_INTERNAL:
+          this._length = this._getLengthNonInternalNode();
+          break;
+        case ElementIndexer.MODE_ELEMENT_NON_INTERNAL:
+          this._length = this._getLengthNonInternalElement();
+          break;
       }
     }
     return this._length;
@@ -171,17 +171,17 @@ class ElementIndexer {
               this.lastIndex = -1;
               return {
                 done: true,
-                value: null,
+                value: null
               };
             } else {
               return {
                 done: false,
-                value: this.lastIndex,
+                value: this.lastIndex
               };
             }
-          },
+          }
         };
-      },
+      }
     };
   }
   private _getEntriesIterator() {
@@ -200,19 +200,19 @@ class ElementIndexer {
               this.lastIndex = -1;
               return {
                 done: true,
-                value: null,
+                value: null
               };
             } else {
               const ret: IteratorResult<[number, RNode]> = {
                 done: false,
-                value: [that._currentIndex, that._currentNode],
+                value: [that._currentIndex, that._currentNode]
               };
               that._next();
               return ret;
             }
-          },
+          }
         };
-      },
+      }
     };
   }
   private _getValuesIterator() {
@@ -231,44 +231,43 @@ class ElementIndexer {
               this.lastIndex = -1;
               return {
                 done: true,
-                value: null,
+                value: null
               };
             } else {
               const ret: IteratorResult<RNode> = {
                 done: false,
-                value: that._currentNode,
+                value: that._currentNode
               };
               that._next();
               return ret;
             }
-          },
+          }
         };
-      },
+      }
     };
   }
   private _next(): void {
     if (this._currentNode) {
       switch (this._mode) {
-      case ElementIndexer.MODE_ALL: {
-        this._currentNode = this._currentNode._getLayout().nextSibling()?.element || null;
-        break;
-      }
-      case ElementIndexer.MODE_NON_INTERNAL: {
-        do {
+        case ElementIndexer.MODE_ALL: {
           this._currentNode = this._currentNode._getLayout().nextSibling()?.element || null;
-        } while (this._currentNode?._isInternal());
-        break;
-      }
-      case ElementIndexer.MODE_ELEMENT_NON_INTERNAL: {
-        do {
-          this._currentNode = this._currentNode._getLayout().nextSibling()?.element || null;
-        } while (
-          this._currentNode &&
-            (this._currentNode._isInternal() ||
-              this._currentNode.nodeType !== NodeType.ELEMENT_NODE)
-        );
-        break;
-      }
+          break;
+        }
+        case ElementIndexer.MODE_NON_INTERNAL: {
+          do {
+            this._currentNode = this._currentNode._getLayout().nextSibling()?.element || null;
+          } while (this._currentNode?._isInternal());
+          break;
+        }
+        case ElementIndexer.MODE_ELEMENT_NON_INTERNAL: {
+          do {
+            this._currentNode = this._currentNode._getLayout().nextSibling()?.element || null;
+          } while (
+            this._currentNode &&
+            (this._currentNode._isInternal() || this._currentNode.nodeType !== NodeType.ELEMENT_NODE)
+          );
+          break;
+        }
       }
       this._currentIndex++;
     }
@@ -276,26 +275,25 @@ class ElementIndexer {
   private _previous(): void {
     if (this._currentNode) {
       switch (this._mode) {
-      case ElementIndexer.MODE_ALL: {
-        this._currentNode = this._currentNode._getLayout().previousSibling()?.element || null;
-        break;
-      }
-      case ElementIndexer.MODE_NON_INTERNAL: {
-        do {
+        case ElementIndexer.MODE_ALL: {
           this._currentNode = this._currentNode._getLayout().previousSibling()?.element || null;
-        } while (this._currentNode?._isInternal());
-        break;
-      }
-      case ElementIndexer.MODE_ELEMENT_NON_INTERNAL: {
-        do {
-          this._currentNode = this._currentNode._getLayout().previousSibling()?.element || null;
-        } while (
-          this._currentNode &&
-            (this._currentNode._isInternal() ||
-              this._currentNode.nodeType !== NodeType.ELEMENT_NODE)
-        );
-        break;
-      }
+          break;
+        }
+        case ElementIndexer.MODE_NON_INTERNAL: {
+          do {
+            this._currentNode = this._currentNode._getLayout().previousSibling()?.element || null;
+          } while (this._currentNode?._isInternal());
+          break;
+        }
+        case ElementIndexer.MODE_ELEMENT_NON_INTERNAL: {
+          do {
+            this._currentNode = this._currentNode._getLayout().previousSibling()?.element || null;
+          } while (
+            this._currentNode &&
+            (this._currentNode._isInternal() || this._currentNode.nodeType !== NodeType.ELEMENT_NODE)
+          );
+          break;
+        }
       }
       this._currentIndex--;
     }
@@ -311,7 +309,7 @@ export interface RNodeList {
   indexOf(node: RNode): number;
   forEach(
     callback: (currentValue: RNode, currentIndex?: number, listObj?: RNodeList) => void,
-    thisArg?: unknown,
+    thisArg?: unknown
   ): void;
   [index: number]: RNode;
 }
@@ -334,7 +332,7 @@ export class RStaticNodeList {
       },
       set: function () {
         return false;
-      },
+      }
     });
   }
   get length(): number {
@@ -355,17 +353,17 @@ export class RStaticNodeList {
               this.lastIndex = -1;
               return {
                 done: true,
-                value: null,
+                value: null
               };
             } else {
               return {
                 done: false,
-                value: [this.lastIndex, that.item(this.lastIndex)],
+                value: [this.lastIndex, that.item(this.lastIndex)]
               };
             }
-          },
+          }
         };
-      },
+      }
     };
   }
   keys(): Iterable<number> {
@@ -380,17 +378,17 @@ export class RStaticNodeList {
               this.lastIndex = -1;
               return {
                 done: true,
-                value: null,
+                value: null
               };
             } else {
               return {
                 done: false,
-                value: this.lastIndex,
+                value: this.lastIndex
               };
             }
-          },
+          }
         };
-      },
+      }
     };
   }
   values(): Iterable<RNode> {
@@ -405,17 +403,17 @@ export class RStaticNodeList {
               this.lastIndex = -1;
               return {
                 done: true,
-                value: null,
+                value: null
               };
             } else {
               return {
                 done: false,
-                value: that.item(this.lastIndex),
+                value: that.item(this.lastIndex)
               };
             }
-          },
+          }
         };
-      },
+      }
     };
   }
   indexOf(node: RNode): number {
@@ -423,7 +421,7 @@ export class RStaticNodeList {
   }
   forEach(
     callback: (currentValue: RNode, currentIndex?: number, listObj?: RNodeList) => void,
-    thisArg?: unknown,
+    thisArg?: unknown
   ): void {
     const that = this;
     if (callback) {
@@ -460,7 +458,7 @@ export class RLiveNodeList {
           target._indexer[name] = value;
           return true;
         }
-      },
+      }
     });
     return proxy;
   }

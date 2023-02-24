@@ -36,10 +36,14 @@ export class PBValueOutOfRange extends PBError {
 
 /** @internal */
 export class PBTypeCastError extends PBError {
-  value: ExpValueType|string;
-  valueType: PBTypeInfo|string;
-  expectedType: PBTypeInfo|string;
-  constructor(value: ExpValueType|string, valueType: PBTypeInfo|string, expectedType: PBTypeInfo|string) {
+  value: ExpValueType | string;
+  valueType: PBTypeInfo | string;
+  expectedType: PBTypeInfo | string;
+  constructor(
+    value: ExpValueType | string,
+    valueType: PBTypeInfo | string,
+    expectedType: PBTypeInfo | string
+  ) {
     super();
     this.value = value;
     this.valueType = valueType;
@@ -47,8 +51,12 @@ export class PBTypeCastError extends PBError {
   }
   getMessage(deviceType: DeviceType): string {
     const valueStr = typeof this.value === 'string' ? this.value : expValueToString(deviceType, this.value);
-    const valueTypeStr = typeof this.valueType === 'string' ? this.valueType : expValueTypeToString(deviceType, this.valueType);
-    const expectedTypeStr = typeof this.expectedType === 'string' ? this.expectedType : expValueTypeToString(deviceType, this.expectedType);
+    const valueTypeStr =
+      typeof this.valueType === 'string' ? this.valueType : expValueTypeToString(deviceType, this.valueType);
+    const expectedTypeStr =
+      typeof this.expectedType === 'string'
+        ? this.expectedType
+        : expValueTypeToString(deviceType, this.expectedType);
     return `cannot convert '${valueStr}' of type '${valueTypeStr}' to type ${expectedTypeStr}`;
   }
 }
@@ -91,7 +99,9 @@ export class PBParamValueError extends PBError {
     this.reason = reason || null;
   }
   getMessage(deviceType: DeviceType): string {
-    return `invalid parameter value for function '${this.func}'${this.param ? ': ' + this.param : ''}${this.reason ? ': ' + this.reason : ''}}`;
+    return `invalid parameter value for function '${this.func}'${this.param ? ': ' + this.param : ''}${
+      this.reason ? ': ' + this.reason : ''
+    }}`;
   }
 }
 

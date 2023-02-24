@@ -1,5 +1,14 @@
 import { REvent, Vector4 } from '@sophon/base';
-import { Viewer, ProgramBuilder, Geometry, makeVertexBufferType, PBStructTypeInfo, StructuredBuffer, BindGroup, PrimitiveType } from '@sophon/device';
+import {
+  Viewer,
+  ProgramBuilder,
+  Geometry,
+  makeVertexBufferType,
+  PBStructTypeInfo,
+  StructuredBuffer,
+  BindGroup,
+  PrimitiveType
+} from '@sophon/device';
 import { GUIRenderer, GUI, RElement } from '@sophon/dom';
 
 (async function () {
@@ -32,21 +41,23 @@ import { GUIRenderer, GUI, RElement } from '@sophon/dom';
       this.$mainFunc(function () {
         this.$outputs.color = pb.vec4(1);
       });
-    },
+    }
   });
   const spriteUpdateProgram = pb.buildComputeProgram({
     label: 'spriteUpdate',
     workgroupSize: [64, 1, 1],
     compute() {
       const structParticle = pb.defineStruct('Particle', 'default', pb.vec2('pos'), pb.vec2('vel'));
-      const structParams = pb.defineStruct('SimParams', 'std140',
+      const structParams = pb.defineStruct(
+        'SimParams',
+        'std140',
         pb.float('deltaT'),
         pb.float('rule1Distance'),
         pb.float('rule2Distance'),
         pb.float('rule3Distance'),
         pb.float('rule1Scale'),
         pb.float('rule2Scale'),
-        pb.float('rule3Scale'),
+        pb.float('rule3Scale')
       );
       const structParticles = pb.defineStruct('Particles', 'default', structParticle[0]('particles'));
       this.params = structParams().uniform(0);
@@ -111,10 +122,14 @@ import { GUIRenderer, GUI, RElement } from '@sophon/dom';
       });
     }
   });
-  const spriteVertexBuffer = viewer.device.createStructuredBuffer(makeVertexBufferType(3, 'position_f32x2'), {
-    usage: 'vertex',
-    managed: true
-  }, new Float32Array([-0.01, -0.02, 0.01, -0.02, 0.0, 0.02]));
+  const spriteVertexBuffer = viewer.device.createStructuredBuffer(
+    makeVertexBufferType(3, 'position_f32x2'),
+    {
+      usage: 'vertex',
+      managed: true
+    },
+    new Float32Array([-0.01, -0.02, 0.01, -0.02, 0.0, 0.02])
+  );
   const simParams = {
     deltaT: 0.04,
     rule1Distance: 0.1,
@@ -124,9 +139,12 @@ import { GUIRenderer, GUI, RElement } from '@sophon/dom';
     rule2Scale: 0.05,
     rule3Scale: 0.005
   };
-  const uniformBuffer = viewer.device.createStructuredBuffer(spriteUpdateProgram.getBindingInfo('params').type as PBStructTypeInfo, {
-    usage: 'uniform'
-  });
+  const uniformBuffer = viewer.device.createStructuredBuffer(
+    spriteUpdateProgram.getBindingInfo('params').type as PBStructTypeInfo,
+    {
+      usage: 'uniform'
+    }
+  );
   const numParticles = 1500;
   const initialParticleData = new Float32Array(numParticles * 4);
   for (let i = 0; i < numParticles; ++i) {
@@ -139,10 +157,16 @@ import { GUIRenderer, GUI, RElement } from '@sophon/dom';
   const particleBindGroups: BindGroup[] = [];
   const primitives: Geometry[] = [];
   for (let i = 0; i < 2; i++) {
-    particleBuffers.push(viewer.device.createStructuredBuffer(makeVertexBufferType(numParticles, 'tex0_f32x2', 'tex1_f32x2'), {
-      usage: 'vertex',
-      storage: true
-    }, initialParticleData));
+    particleBuffers.push(
+      viewer.device.createStructuredBuffer(
+        makeVertexBufferType(numParticles, 'tex0_f32x2', 'tex1_f32x2'),
+        {
+          usage: 'vertex',
+          storage: true
+        },
+        initialParticleData
+      )
+    );
   }
   for (let i = 0; i < 2; i++) {
     const bindGroup = viewer.device.createBindGroup(spriteUpdateProgram.bindGroupLayouts[0]);
@@ -178,8 +202,5 @@ import { GUIRenderer, GUI, RElement } from '@sophon/dom';
     primitives[(t + 1) % 2].drawInstanced(numParticles);
     t++;
   });
-  viewer.device.runLoop(device => gui.render());
-
-}());
-
-
+  viewer.device.runLoop((device) => gui.render());
+})();

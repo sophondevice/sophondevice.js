@@ -1,8 +1,8 @@
-import {RElement} from './element';
-import {RTextContentChangeEvent} from './events';
-import type {GUI} from './gui';
-import type {RSelector} from './selector';
-import type {IStyleSheet} from './style';
+import { RElement } from './element';
+import { RTextContentChangeEvent } from './events';
+import type { GUI } from './gui';
+import type { RSelector } from './selector';
+import type { IStyleSheet } from './style';
 
 /** @internal */
 export interface IStyleDefiniation {

@@ -142,7 +142,16 @@ export class Scene extends REventTarget {
     return sky;
   }
   addCamera(matrix?: Matrix4x4): Camera {
-    return new Camera(this, matrix || Matrix4x4.perspective(Math.PI / 3, this._device.getDrawingBufferWidth() / this._device.getDrawingBufferHeight(), 1, 100));
+    return new Camera(
+      this,
+      matrix ||
+        Matrix4x4.perspective(
+          Math.PI / 3,
+          this._device.getDrawingBufferWidth() / this._device.getDrawingBufferHeight(),
+          1,
+          100
+        )
+    );
   }
   raycast(camera: Camera, screenX: number, screenY: number): GraphNode {
     const viewport = this.device.getViewport();
@@ -157,14 +166,9 @@ export class Scene extends REventTarget {
     viewportHeight: number,
     screenX: number,
     screenY: number,
-    invModelMatrix?: Matrix4x4,
+    invModelMatrix?: Matrix4x4
   ): Ray {
-    const vClip = new Vector4(
-      (2 * screenX) / viewportWidth - 1,
-      1 - (2 * screenY) / viewportHeight,
-      1,
-      1,
-    );
+    const vClip = new Vector4((2 * screenX) / viewportWidth - 1, 1 - (2 * screenY) / viewportHeight, 1, 1);
     const vWorld = camera.invViewProjectionMatrix.transform(vClip);
     vWorld.scaleBy(1 / vWorld.w);
     let vEye = camera.worldMatrix.getRow(3).xyz();
@@ -314,4 +318,3 @@ export namespace Scene {
     }
   }
 }
-

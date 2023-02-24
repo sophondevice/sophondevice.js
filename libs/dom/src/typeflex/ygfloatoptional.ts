@@ -1,4 +1,4 @@
-import {YGFloatIsUndefined} from './yoga';
+import { YGFloatIsUndefined } from './yoga';
 
 class YGFloatOptional {
   private value_: number;
@@ -95,4 +95,4 @@ class YGFloatOptional {
   }
 }
 
-export {YGFloatOptional};
+export { YGFloatOptional };

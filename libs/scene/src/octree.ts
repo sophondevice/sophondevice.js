@@ -12,7 +12,7 @@ export enum OctreePlacement {
   NPP = 4,
   NPN = 5,
   NNP = 6,
-  NNN = 7,
+  NNN = 7
 }
 export class OctreeNode {
   /** @internal */
@@ -116,7 +116,7 @@ export class OctreeNode {
       const maxPoint = new Vector3(
         minPoint.x + nodeSize * 2,
         minPoint.y + nodeSize * 2,
-        minPoint.z + nodeSize * 2,
+        minPoint.z + nodeSize * 2
       );
       this._boxLoosed = new AABB(minPoint, maxPoint);
     }
@@ -453,11 +453,7 @@ export class Octree {
       pz = 0;
     }
     const index = px + py * dim + pz * dim * dim;
-    if (
-      candidate &&
-      candidate.getChunk().getLevel() === level &&
-      candidate.getPosition() === index
-    ) {
+    if (candidate && candidate.getChunk().getLevel() === level && candidate.getPosition() === index) {
       return candidate;
     }
     return this._chunks[level].getOrCreateNodeChain(index);

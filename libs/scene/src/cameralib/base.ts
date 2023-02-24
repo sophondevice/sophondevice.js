@@ -72,7 +72,7 @@ export class BaseCameraModel {
       input.removeEventListener('keyup', this._keyUpHandler);
     }
   }
-  reset(): void { }
+  reset(): void {}
   onMouseDown(evt: IMouseEvent): void {
     if (evt.target === this._camera?.mouseInputSource) {
       this._onMouseDown(evt);
@@ -103,17 +103,17 @@ export class BaseCameraModel {
       this._onKeyUp(evt);
     }
   }
-  update(): void { }
+  update(): void {}
   /** @internal */
-  protected _onMouseDown(evt: IMouseEvent): void { }
+  protected _onMouseDown(evt: IMouseEvent): void {}
   /** @internal */
-  protected _onMouseUp(evt: IMouseEvent): void { }
+  protected _onMouseUp(evt: IMouseEvent): void {}
   /** @internal */
-  protected _onMouseWheel(evt: IMouseEvent): void { }
+  protected _onMouseWheel(evt: IMouseEvent): void {}
   /** @internal */
-  protected _onMouseMove(evt: IMouseEvent): void { }
+  protected _onMouseMove(evt: IMouseEvent): void {}
   /** @internal */
-  protected _onKeyDown(evt: IKeyEvent): void { }
+  protected _onKeyDown(evt: IKeyEvent): void {}
   /** @internal */
-  protected _onKeyUp(evt: IKeyEvent): void { }
+  protected _onKeyUp(evt: IKeyEvent): void {}
 }

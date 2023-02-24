@@ -1,5 +1,5 @@
-import {IRectangle, Rectangle} from './geom/Rectangle';
-import {Bin} from './abstract-bin';
+import { IRectangle, Rectangle } from './geom/Rectangle';
+import { Bin } from './abstract-bin';
 
 export class OversizedElementBin<T extends IRectangle = Rectangle> extends Bin<T> {
   public rects: T[] = [];
@@ -28,7 +28,7 @@ export class OversizedElementBin<T extends IRectangle = Rectangle> extends Bin<T
     this.freeRects = [];
     this.maxWidth = this.width;
     this.maxHeight = this.height;
-    this.options = {smart: false, pot: false, square: false};
+    this.options = { smart: false, pot: false, square: false };
   }
 
   add() {

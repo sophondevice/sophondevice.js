@@ -1,4 +1,4 @@
-import { 
+import {
   Device,
   BindGroup,
   ShaderType,
@@ -10,12 +10,12 @@ import {
   TextureSampler,
   PBGlobalScope,
   TextureCreationOptions
-} from "@sophon/device";
-import { ShadowImpl } from "./shadow_impl";
-import { Blitter, BlitType } from "../blitter";
-import { ShaderLib } from "../materiallib";
-import { computeShadowMapDepth, filterShadowVSM } from "../renderers/shadowmap.shaderlib";
-import type { ShadowMapper, ShadowMapType, ShadowMode } from "./shadowmapper";
+} from '@sophon/device';
+import { ShadowImpl } from './shadow_impl';
+import { Blitter, BlitType } from '../blitter';
+import { ShaderLib } from '../materiallib';
+import { computeShadowMapDepth, filterShadowVSM } from '../renderers/shadowmap.shaderlib';
+import type { ShadowMapper, ShadowMapType, ShadowMode } from './shadowmapper';
 
 export class VSMBlitter extends Blitter {
   protected _phase: 'horizonal' | 'vertical';
@@ -57,9 +57,14 @@ export class VSMBlitter extends Blitter {
     const pb = scope.$builder;
     if (pb.shaderType === ShaderType.Fragment) {
       scope.blurSize = pb.float().uniform(0);
-      scope.blurMultiplyVec = type === 'cube'
-        ? this._phase === 'horizonal' ? pb.vec3(1, 0, 0) : pb.vec3(0, 1, 0)
-        : this._phase === 'horizonal' ? pb.vec2(1, 0) : pb.vec2(0, 1);
+      scope.blurMultiplyVec =
+        type === 'cube'
+          ? this._phase === 'horizonal'
+            ? pb.vec3(1, 0, 0)
+            : pb.vec3(0, 1, 0)
+          : this._phase === 'horizonal'
+          ? pb.vec2(1, 0)
+          : pb.vec2(0, 1);
       scope.numBlurPixelsPerSide = pb.float((this._kernelSize + 1) / 2);
       scope.weight = pb.float(1 / (this._kernelSize * this._kernelSize));
     }
@@ -67,7 +72,13 @@ export class VSMBlitter extends Blitter {
   setUniforms(bindGroup: BindGroup) {
     bindGroup.setValue('blurSize', this._blurSize);
   }
-  readTexel(scope: PBInsideFunctionScope, type: BlitType, srcTex: PBShaderExp, srcUV: PBShaderExp, srcLayer: PBShaderExp): PBShaderExp {
+  readTexel(
+    scope: PBInsideFunctionScope,
+    type: BlitType,
+    srcTex: PBShaderExp,
+    srcUV: PBShaderExp,
+    srcLayer: PBShaderExp
+  ): PBShaderExp {
     const pb = scope.$builder;
     const texel = super.readTexel(scope, type, srcTex, srcUV, srcLayer);
     if (this._packFloat) {
@@ -81,7 +92,12 @@ export class VSMBlitter extends Blitter {
       return texel;
     }
   }
-  writeTexel(scope: PBInsideFunctionScope, type: BlitType, srcUV: PBShaderExp, texel: PBShaderExp): PBShaderExp {
+  writeTexel(
+    scope: PBInsideFunctionScope,
+    type: BlitType,
+    srcUV: PBShaderExp,
+    texel: PBShaderExp
+  ): PBShaderExp {
     const pb = scope.$builder;
     const outTexel = super.writeTexel(scope, type, srcUV, texel);
     if (this._packFloat) {
@@ -91,15 +107,33 @@ export class VSMBlitter extends Blitter {
       return outTexel;
     }
   }
-  filter(scope: PBInsideFunctionScope, type: BlitType, srcTex: PBShaderExp, srcUV: PBShaderExp, srcLayer: PBShaderExp): PBShaderExp {
+  filter(
+    scope: PBInsideFunctionScope,
+    type: BlitType,
+    srcTex: PBShaderExp,
+    srcUV: PBShaderExp,
+    srcLayer: PBShaderExp
+  ): PBShaderExp {
     const that = this;
     const pb = scope.$builder;
     scope.d0 = that.readTexel(scope, type, srcTex, srcUV, srcLayer);
     scope.mean = pb.float(0);
     scope.squaredMean = pb.float(0);
     scope.$for(pb.float('i'), 1, scope.numBlurPixelsPerSide, function () {
-      this.d1 = that.readTexel(this, type, srcTex, pb.sub(srcUV, pb.mul(this.blurMultiplyVec, this.blurSize, this.i)), srcLayer);
-      this.d2 = that.readTexel(this, type, srcTex, pb.add(srcUV, pb.mul(this.blurMultiplyVec, this.blurSize, this.i)), srcLayer);
+      this.d1 = that.readTexel(
+        this,
+        type,
+        srcTex,
+        pb.sub(srcUV, pb.mul(this.blurMultiplyVec, this.blurSize, this.i)),
+        srcLayer
+      );
+      this.d2 = that.readTexel(
+        this,
+        type,
+        srcTex,
+        pb.add(srcUV, pb.mul(this.blurMultiplyVec, this.blurSize, this.i)),
+        srcLayer
+      );
       this.mean = pb.add(this.mean, this.d1.x);
       this.mean = pb.add(this.mean, this.d2.x);
       if (that._phase === 'horizonal') {
@@ -221,15 +255,33 @@ export class VSM extends ShadowImpl {
     return this._shadowSampler;
   }
   /** @internal */
-  protected isTextureInvalid(shadowMapper: ShadowMapper, texture: ShadowMapType, target: TextureTarget, format: TextureFormat, width: number, height: number): boolean {
-    return texture && (texture.target !== target
-      || texture.format !== format
-      || texture.width !== width
-      || texture.height !== height
-      || texture.depth !== shadowMapper.numShadowCascades);
+  protected isTextureInvalid(
+    shadowMapper: ShadowMapper,
+    texture: ShadowMapType,
+    target: TextureTarget,
+    format: TextureFormat,
+    width: number,
+    height: number
+  ): boolean {
+    return (
+      texture &&
+      (texture.target !== target ||
+        texture.format !== format ||
+        texture.width !== width ||
+        texture.height !== height ||
+        texture.depth !== shadowMapper.numShadowCascades)
+    );
   }
   /** @internal */
-  protected createTexture(device: Device, target: TextureTarget, format: TextureFormat, width: number, height: number, depth: number, mipmap: boolean): ShadowMapType {
+  protected createTexture(
+    device: Device,
+    target: TextureTarget,
+    format: TextureFormat,
+    width: number,
+    height: number,
+    depth: number,
+    mipmap: boolean
+  ): ShadowMapType {
     const options: TextureCreationOptions = {
       colorSpace: 'linear',
       noMipmap: !mipmap
@@ -264,13 +316,17 @@ export class VSM extends ShadowImpl {
       this._blurMap2?.dispose();
       this._blurMap2 = null;
     }
-    if (this.isTextureInvalid(shadowMapper, this._blurMap, target, colorFormat, blurMapWidth, blurMapHeight)) {
+    if (
+      this.isTextureInvalid(shadowMapper, this._blurMap, target, colorFormat, blurMapWidth, blurMapHeight)
+    ) {
       this._blurFramebuffer?.dispose();
       this._blurFramebuffer = null;
       this._blurMap?.dispose();
       this._blurMap = null;
     }
-    if (this.isTextureInvalid(shadowMapper, this._blurMap2, target, colorFormat, blurMapWidth, blurMapHeight)) {
+    if (
+      this.isTextureInvalid(shadowMapper, this._blurMap2, target, colorFormat, blurMapWidth, blurMapHeight)
+    ) {
       this._blurFramebuffer2?.dispose();
       this._blurFramebuffer2 = null;
       this._blurMap2?.dispose();
@@ -278,16 +334,34 @@ export class VSM extends ShadowImpl {
     }
     if (blur) {
       if (!this._blurMap || this._blurMap.disposed) {
-        this._blurMap = this.createTexture(device, target, colorFormat, blurMapWidth, blurMapHeight, shadowMapper.numShadowCascades, false);
+        this._blurMap = this.createTexture(
+          device,
+          target,
+          colorFormat,
+          blurMapWidth,
+          blurMapHeight,
+          shadowMapper.numShadowCascades,
+          false
+        );
       }
-      if (!this._blurMap2 || (this._mipmap !== this._blurMap2.mipLevelCount > 1) || this._blurMap2.disposed) {
-        this._blurMap2 = this.createTexture(device, target, colorFormat, blurMapWidth, blurMapHeight, shadowMapper.numShadowCascades, this._mipmap);
+      if (!this._blurMap2 || this._mipmap !== this._blurMap2.mipLevelCount > 1 || this._blurMap2.disposed) {
+        this._blurMap2 = this.createTexture(
+          device,
+          target,
+          colorFormat,
+          blurMapWidth,
+          blurMapHeight,
+          shadowMapper.numShadowCascades,
+          this._mipmap
+        );
       }
       if (!this._blurFramebuffer || this._blurFramebuffer.disposed) {
         this._blurFramebuffer = device.createFrameBuffer({ colorAttachments: [{ texture: this._blurMap }] });
       }
       if (!this._blurFramebuffer2 || this._blurFramebuffer2.disposed) {
-        this._blurFramebuffer2 = device.createFrameBuffer({ colorAttachments: [{ texture: this._blurMap2 }] });
+        this._blurFramebuffer2 = device.createFrameBuffer({
+          colorAttachments: [{ texture: this._blurMap2 }]
+        });
       }
     }
     this._shadowSampler = null;
@@ -305,18 +379,27 @@ export class VSM extends ShadowImpl {
     }
   }
   isSupported(shadowMapper: ShadowMapper): boolean {
-    return this.getShadowMapColorFormat(shadowMapper) !== TextureFormat.Unknown && this.getShadowMapDepthFormat(shadowMapper) !== TextureFormat.Unknown;
+    return (
+      this.getShadowMapColorFormat(shadowMapper) !== TextureFormat.Unknown &&
+      this.getShadowMapDepthFormat(shadowMapper) !== TextureFormat.Unknown
+    );
   }
   getShaderHash(): string {
     return '';
   }
   getShadowMapColorFormat(shadowMapper: ShadowMapper): TextureFormat {
     const device = shadowMapper.light.scene.device;
-    return device.getTextureCaps().supportFloatColorBuffer && device.getTextureCaps().supportLinearFloatTexture
-      ? device.getDeviceType() === 'webgl' ? TextureFormat.RGBA32F : TextureFormat.RG32F
-      : device.getTextureCaps().supportHalfFloatColorBuffer && device.getTextureCaps().supportLinearHalfFloatTexture
-        ? device.getDeviceType() === 'webgl' ? TextureFormat.RGBA16F : TextureFormat.RG16F
-        : TextureFormat.RGBA8UNORM;
+    return device.getTextureCaps().supportFloatColorBuffer &&
+      device.getTextureCaps().supportLinearFloatTexture
+      ? device.getDeviceType() === 'webgl'
+        ? TextureFormat.RGBA32F
+        : TextureFormat.RG32F
+      : device.getTextureCaps().supportHalfFloatColorBuffer &&
+        device.getTextureCaps().supportLinearHalfFloatTexture
+      ? device.getDeviceType() === 'webgl'
+        ? TextureFormat.RGBA16F
+        : TextureFormat.RG16F
+      : TextureFormat.RGBA8UNORM;
   }
   getShadowMapDepthFormat(shadowMapper: ShadowMapper): TextureFormat {
     return TextureFormat.D24S8;
@@ -324,53 +407,118 @@ export class VSM extends ShadowImpl {
   computeShadowMapDepth(shadowMapper: ShadowMapper, scope: PBInsideFunctionScope): PBShaderExp {
     return computeShadowMapDepth(scope, shadowMapper.shadowMap.format);
   }
-  computeShadowCSM(shadowMapper: ShadowMapper, scope: PBInsideFunctionScope, shadowVertex: PBShaderExp, NdotL: PBShaderExp, split: PBShaderExp): PBShaderExp {
+  computeShadowCSM(
+    shadowMapper: ShadowMapper,
+    scope: PBInsideFunctionScope,
+    shadowVertex: PBShaderExp,
+    NdotL: PBShaderExp,
+    split: PBShaderExp
+  ): PBShaderExp {
     const funcNameComputeShadowCSM = 'lib_computeShadowCSM';
     const pb = scope.$builder;
     if (!pb.getFunction(funcNameComputeShadowCSM)) {
-      pb.globalScope.$function(funcNameComputeShadowCSM, [pb.vec4('shadowVertex'), pb.float('NdotL'), pb.int('split')], function () {
-        this.$l.shadowCoord = pb.div(this.shadowVertex, this.shadowVertex.w);
-        this.$l.shadowCoord = pb.add(pb.mul(this.shadowCoord, 0.5), 0.5);
-        this.$l.inShadow = pb.all(pb.bvec2(pb.all(pb.bvec4(pb.greaterThanEqual(this.shadowCoord.x, 0), pb.lessThanEqual(this.shadowCoord.x, 1), pb.greaterThanEqual(this.shadowCoord.y, 0), pb.lessThanEqual(this.shadowCoord.y, 1))), pb.lessThanEqual(this.shadowCoord.z, 1)));
-        this.$l.shadow = pb.float(1);
-        this.$if(this.inShadow, function () {
-          this.$l.shadowBias = shadowMapper.computeShadowBiasCSM(this, this.NdotL, this.split);
-          this.shadowCoord.z = pb.sub(this.shadowCoord.z, this.shadowBias);
-          this.shadow = filterShadowVSM(this, shadowMapper.light.lightType, shadowMapper.shadowMap.format, this.shadowCoord, this.split);
-        });
-        this.$return(this.shadow);
-      });
+      pb.globalScope.$function(
+        funcNameComputeShadowCSM,
+        [pb.vec4('shadowVertex'), pb.float('NdotL'), pb.int('split')],
+        function () {
+          this.$l.shadowCoord = pb.div(this.shadowVertex, this.shadowVertex.w);
+          this.$l.shadowCoord = pb.add(pb.mul(this.shadowCoord, 0.5), 0.5);
+          this.$l.inShadow = pb.all(
+            pb.bvec2(
+              pb.all(
+                pb.bvec4(
+                  pb.greaterThanEqual(this.shadowCoord.x, 0),
+                  pb.lessThanEqual(this.shadowCoord.x, 1),
+                  pb.greaterThanEqual(this.shadowCoord.y, 0),
+                  pb.lessThanEqual(this.shadowCoord.y, 1)
+                )
+              ),
+              pb.lessThanEqual(this.shadowCoord.z, 1)
+            )
+          );
+          this.$l.shadow = pb.float(1);
+          this.$if(this.inShadow, function () {
+            this.$l.shadowBias = shadowMapper.computeShadowBiasCSM(this, this.NdotL, this.split);
+            this.shadowCoord.z = pb.sub(this.shadowCoord.z, this.shadowBias);
+            this.shadow = filterShadowVSM(
+              this,
+              shadowMapper.light.lightType,
+              shadowMapper.shadowMap.format,
+              this.shadowCoord,
+              this.split
+            );
+          });
+          this.$return(this.shadow);
+        }
+      );
     }
     return pb.globalScope[funcNameComputeShadowCSM](shadowVertex, NdotL, split);
   }
-  computeShadow(shadowMapper: ShadowMapper, scope: PBInsideFunctionScope, shadowVertex: PBShaderExp, NdotL: PBShaderExp): PBShaderExp {
+  computeShadow(
+    shadowMapper: ShadowMapper,
+    scope: PBInsideFunctionScope,
+    shadowVertex: PBShaderExp,
+    NdotL: PBShaderExp
+  ): PBShaderExp {
     const funcNameComputeShadow = 'lib_computeShadow';
     const pb = scope.$builder;
     const lib = new ShaderLib(pb);
     const that = this;
     if (!pb.getFunction(funcNameComputeShadow)) {
-      pb.globalScope.$function(funcNameComputeShadow, [pb.vec4('shadowVertex'), pb.float('NdotL')], function () {
-        if (shadowMapper.light.isPointLight()) {
-          this.$l.shadowBias = shadowMapper.computeShadowBias(this, this.distance, this.NdotL);
-          this.$l.coord = pb.vec4(this.shadowVertex.xyz, pb.sub(pb.div(pb.length(this.shadowVertex.xyz), this.global.light.lightParams[0].w), this.shadowBias));
-          this.$return(filterShadowVSM(this, shadowMapper.light.lightType, shadowMapper.shadowMap.format, this.coord));
-        } else {
-          this.$l.shadowCoord = pb.div(this.shadowVertex, this.shadowVertex.w);
-          this.$l.shadowCoord = pb.add(pb.mul(this.shadowCoord, 0.5), 0.5);
-          this.$l.inShadow = pb.all(pb.bvec2(pb.all(pb.bvec4(pb.greaterThanEqual(this.shadowCoord.x, 0), pb.lessThanEqual(this.shadowCoord.x, 1), pb.greaterThanEqual(this.shadowCoord.y, 0), pb.lessThanEqual(this.shadowCoord.y, 1))), pb.lessThanEqual(this.shadowCoord.z, 1)));
-          this.$l.shadow = pb.float(1);
-          this.$if(this.inShadow, function () {
-            if (shadowMapper.light.isSpotLight()) {
-              this.$l.nearFar = pb.getDeviceType() === 'webgl' ? this.global.light.shadowCameraParams.xy : this.global.light.lightParams[5].xy;
-              this.shadowCoord.z = lib.nonLinearDepthToLinearNormalized(this.shadowCoord.z, this.nearFar);
-            }
-            this.$l.shadowBias = shadowMapper.computeShadowBias(this, this.shadowCoord.z, this.NdotL);
-            this.shadowCoord.z = pb.sub(this.shadowCoord.z, this.shadowBias);
-            this.shadow = filterShadowVSM(this, shadowMapper.light.lightType, shadowMapper.shadowMap.format, this.shadowCoord);
-          });
-          this.$return(this.shadow);
+      pb.globalScope.$function(
+        funcNameComputeShadow,
+        [pb.vec4('shadowVertex'), pb.float('NdotL')],
+        function () {
+          if (shadowMapper.light.isPointLight()) {
+            this.$l.shadowBias = shadowMapper.computeShadowBias(this, this.distance, this.NdotL);
+            this.$l.coord = pb.vec4(
+              this.shadowVertex.xyz,
+              pb.sub(
+                pb.div(pb.length(this.shadowVertex.xyz), this.global.light.lightParams[0].w),
+                this.shadowBias
+              )
+            );
+            this.$return(
+              filterShadowVSM(this, shadowMapper.light.lightType, shadowMapper.shadowMap.format, this.coord)
+            );
+          } else {
+            this.$l.shadowCoord = pb.div(this.shadowVertex, this.shadowVertex.w);
+            this.$l.shadowCoord = pb.add(pb.mul(this.shadowCoord, 0.5), 0.5);
+            this.$l.inShadow = pb.all(
+              pb.bvec2(
+                pb.all(
+                  pb.bvec4(
+                    pb.greaterThanEqual(this.shadowCoord.x, 0),
+                    pb.lessThanEqual(this.shadowCoord.x, 1),
+                    pb.greaterThanEqual(this.shadowCoord.y, 0),
+                    pb.lessThanEqual(this.shadowCoord.y, 1)
+                  )
+                ),
+                pb.lessThanEqual(this.shadowCoord.z, 1)
+              )
+            );
+            this.$l.shadow = pb.float(1);
+            this.$if(this.inShadow, function () {
+              if (shadowMapper.light.isSpotLight()) {
+                this.$l.nearFar =
+                  pb.getDeviceType() === 'webgl'
+                    ? this.global.light.shadowCameraParams.xy
+                    : this.global.light.lightParams[5].xy;
+                this.shadowCoord.z = lib.nonLinearDepthToLinearNormalized(this.shadowCoord.z, this.nearFar);
+              }
+              this.$l.shadowBias = shadowMapper.computeShadowBias(this, this.shadowCoord.z, this.NdotL);
+              this.shadowCoord.z = pb.sub(this.shadowCoord.z, this.shadowBias);
+              this.shadow = filterShadowVSM(
+                this,
+                shadowMapper.light.lightType,
+                shadowMapper.shadowMap.format,
+                this.shadowCoord
+              );
+            });
+            this.$return(this.shadow);
+          }
         }
-      });
+      );
     }
     return pb.globalScope[funcNameComputeShadow](shadowVertex, NdotL);
   }

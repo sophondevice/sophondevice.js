@@ -1,6 +1,6 @@
-import {RElement} from './element';
-import type {GUI} from './gui';
-import type {IStyleSheet} from './style';
+import { RElement } from './element';
+import type { GUI } from './gui';
+import type { IStyleSheet } from './style';
 
 export class DummyElement extends RElement {
   constructor(uiscene: GUI) {
@@ -8,6 +8,6 @@ export class DummyElement extends RElement {
   }
   /** @internal */
   _getDefaultStyleSheet(): IStyleSheet {
-    return {display: 'none'};
+    return { display: 'none' };
   }
 }

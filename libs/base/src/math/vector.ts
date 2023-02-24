@@ -41,7 +41,7 @@ export enum CubeFace {
   PY = 2,
   NY = 3,
   PZ = 4,
-  NZ = 5,
+  NZ = 5
 }
 
 export class VectorBase extends IterableWrapper {
@@ -309,8 +309,8 @@ export interface IVector3Like {
 export class Vector3 extends VectorBase {
   constructor(x: number, y: number, z: number);
   constructor(array: number[]);
-  constructor(rhs: Vector3)
-  constructor(array: Float32Array)
+  constructor(rhs: Vector3);
+  constructor(array: Float32Array);
   constructor();
   constructor(xOrOther?: number | number[] | Vector3 | Float32Array, y?: number, z?: number) {
     super(xOrOther instanceof Float32Array ? xOrOther : 3);
@@ -546,7 +546,12 @@ export class Vector4 extends VectorBase {
   constructor(rhs: Vector4);
   constructor(v3: Vector3, w: number);
   constructor();
-  constructor(xOrOther?: number | number[] | Vector3 | Vector4 | Float32Array, y?: number, z?: number, w?: number) {
+  constructor(
+    xOrOther?: number | number[] | Vector3 | Vector4 | Float32Array,
+    y?: number,
+    z?: number,
+    w?: number
+  ) {
     super(xOrOther instanceof Float32Array ? xOrOther : 4);
     if (xOrOther !== undefined && !(xOrOther instanceof Float32Array)) {
       if (typeof xOrOther === 'number') {
@@ -795,7 +800,12 @@ export class Quaternion extends VectorBase {
   constructor(matrix: Matrix3x3);
   constructor(matrix: Matrix4x4);
   constructor();
-  constructor(xOrOther?: number | number[] | Quaternion | Matrix3x3 | Matrix4x4 | Float32Array, y?: number, z?: number, w?: number) {
+  constructor(
+    xOrOther?: number | number[] | Quaternion | Matrix3x3 | Matrix4x4 | Float32Array,
+    y?: number,
+    z?: number,
+    w?: number
+  ) {
     super(xOrOther instanceof Float32Array ? xOrOther : 4);
     if (xOrOther !== undefined && !(xOrOther instanceof Float32Array)) {
       if (xOrOther instanceof Matrix3x3 || xOrOther instanceof Matrix4x4) {
@@ -907,12 +917,7 @@ export class Quaternion extends VectorBase {
   unitVectorToUnitVector(from: IVector3Like, to: IVector3Like) {
     return Quaternion.unitVectorToUnitVector(from, to, this);
   }
-  fromEulerAngle(
-    a: number,
-    b: number,
-    c: number,
-    order: 'XYZ' | 'YXZ' | 'ZXY' | 'ZYX' | 'YZX' | 'XZY',
-  ) {
+  fromEulerAngle(a: number, b: number, c: number, order: 'XYZ' | 'YXZ' | 'ZXY' | 'ZYX' | 'YZX' | 'XZY') {
     return Quaternion.fromEulerAngle(a, b, c, order, this);
   }
   fromAxisAngle(axis: IVector3Like, angle: number) {
@@ -978,7 +983,7 @@ export class Quaternion extends VectorBase {
     return result.set(
       (1 - yy - zz) * v.x + (xy - wz) * v.y + (xz + wy) * v.z,
       (xy + wz) * v.x + (1 - xx - zz) * v.y + (yz - wx) * v.z,
-      (xz - wy) * v.x + (yz + wx) * v.y + (1 - xx - yy) * v.z,
+      (xz - wy) * v.x + (yz + wx) * v.y + (1 - xx - yy) * v.z
     );
   }
   addBy(other: Quaternion): Quaternion {
@@ -1056,7 +1061,7 @@ export class Quaternion extends VectorBase {
         a.x * s + b.x * t,
         a.y * s + b.y * t,
         a.z * s + b.z * t,
-        a.w * s + b.w * t,
+        a.w * s + b.w * t
       );
     }
     const halfSin = Math.sqrt(halfSinSqr);
@@ -1067,17 +1072,13 @@ export class Quaternion extends VectorBase {
       ax * ratioA + bx * ratioB,
       ay * ratioA + by * ratioB,
       az * ratioA + bz * ratioB,
-      aw * ratioA + bw * ratioB,
+      aw * ratioA + bw * ratioB
     );
   }
   static angleBetween(a: IVector4Like, b: IVector4Like): number {
     return 2 * Math.acos(Math.abs(numberClamp(this.dot(a, b), -1, 1)));
   }
-  static unitVectorToUnitVector(
-    from: IVector3Like,
-    to: IVector3Like,
-    result?: Quaternion,
-  ): Quaternion {
+  static unitVectorToUnitVector(from: IVector3Like, to: IVector3Like, result?: Quaternion): Quaternion {
     // assume from and to are unit vectors
     result = result || new Quaternion();
     let r = Vector3.dot(from, to) + 1;
@@ -1093,7 +1094,7 @@ export class Quaternion extends VectorBase {
         from.y * to.z - from.z * to.y,
         from.z * to.x - from.x * to.z,
         from.x * to.y - from.y * to.x,
-        r,
+        r
       );
     }
   }
@@ -1102,7 +1103,7 @@ export class Quaternion extends VectorBase {
     b: number,
     c: number,
     order: 'XYZ' | 'YXZ' | 'ZXY' | 'ZYX' | 'YZX' | 'XZY',
-    result?: Quaternion,
+    result?: Quaternion
   ): Quaternion {
     result = result || new Quaternion();
     const c1 = Math.cos(a / 2);
@@ -1117,42 +1118,42 @@ export class Quaternion extends VectorBase {
           s1 * c2 * c3 + c1 * s2 * s3,
           c1 * s2 * c3 - s1 * c2 * s3,
           c1 * c2 * s3 + s1 * s2 * c3,
-          c1 * c2 * c3 - s1 * s2 * s3,
+          c1 * c2 * c3 - s1 * s2 * s3
         );
       case 'YXZ':
         return result.set(
           s1 * c2 * c3 + c1 * s2 * s3,
           c1 * s2 * c3 - s1 * c2 * s3,
           c1 * c2 * s3 - s1 * s2 * c3,
-          c1 * c2 * c3 + s1 * s2 * s3,
+          c1 * c2 * c3 + s1 * s2 * s3
         );
       case 'ZXY':
         return result.set(
           s1 * c2 * c3 - c1 * s2 * s3,
           c1 * s2 * c3 + s1 * c2 * s3,
           c1 * c2 * s3 + s1 * s2 * c3,
-          c1 * c2 * c3 - s1 * s2 * s3,
+          c1 * c2 * c3 - s1 * s2 * s3
         );
       case 'ZYX':
         return result.set(
           s1 * c2 * c3 - c1 * s2 * s3,
           c1 * s2 * c3 + s1 * c2 * s3,
           c1 * c2 * s3 - s1 * s2 * c3,
-          c1 * c2 * c3 + s1 * s2 * s3,
+          c1 * c2 * c3 + s1 * s2 * s3
         );
       case 'YZX':
         return result.set(
           s1 * c2 * c3 + c1 * s2 * s3,
           c1 * s2 * c3 + s1 * c2 * s3,
           c1 * c2 * s3 - s1 * s2 * c3,
-          c1 * c2 * c3 - s1 * s2 * s3,
+          c1 * c2 * c3 - s1 * s2 * s3
         );
       case 'XZY':
         return result.set(
           s1 * c2 * c3 - c1 * s2 * s3,
           c1 * s2 * c3 - s1 * c2 * s3,
           c1 * c2 * s3 + s1 * s2 * c3,
-          c1 * c2 * c3 + s1 * s2 * s3,
+          c1 * c2 * c3 + s1 * s2 * s3
         );
     }
   }
@@ -1174,7 +1175,7 @@ export class Quaternion extends VectorBase {
         (matrix.m21 - matrix.m12) * s,
         (matrix.m02 - matrix.m20) * s,
         (matrix.m10 - matrix.m01) * s,
-        0.25 / s,
+        0.25 / s
       );
     } else if (matrix.m00 > matrix.m11 && matrix.m00 > matrix.m22) {
       s = 2 * Math.sqrt(1 + matrix.m00 - matrix.m11 - matrix.m22);
@@ -1182,7 +1183,7 @@ export class Quaternion extends VectorBase {
         0.25 * s,
         (matrix.m01 + matrix.m10) / s,
         (matrix.m02 + matrix.m20) / s,
-        (matrix.m21 - matrix.m12) / s,
+        (matrix.m21 - matrix.m12) / s
       );
     } else if (matrix.m11 > matrix.m22) {
       s = 2 * Math.sqrt(1 - matrix.m00 + matrix.m11 - matrix.m22);
@@ -1190,7 +1191,7 @@ export class Quaternion extends VectorBase {
         (matrix.m10 + matrix.m01) / s,
         0.25 * s,
         (matrix.m21 + matrix.m12) / s,
-        (matrix.m02 - matrix.m20) / s,
+        (matrix.m02 - matrix.m20) / s
       );
     } else {
       s = 2 * Math.sqrt(1 - matrix.m00 - matrix.m11 + matrix.m22);
@@ -1198,7 +1199,7 @@ export class Quaternion extends VectorBase {
         (matrix.m02 + matrix.m20) / s,
         (matrix.m12 + matrix.m21) / s,
         0.25 * s,
-        (matrix.m10 - matrix.m01) / s,
+        (matrix.m10 - matrix.m01) / s
       );
     }
     return result;
@@ -1301,11 +1302,7 @@ export class Matrix3x3 extends VectorBase {
     this.changeNotify();
   }
   getRow(row: number, result?: Vector3): Vector3 {
-    return (result || new Vector3()).set(
-      this._v[row * 3],
-      this._v[row * 3 + 1],
-      this._v[row * 3 + 2],
-    );
+    return (result || new Vector3()).set(this._v[row * 3], this._v[row * 3 + 1], this._v[row * 3 + 2]);
   }
   setRow(row: number, v: IVector3Like) {
     this._v[row * 3] = v.x;
@@ -1652,7 +1649,7 @@ export class Matrix3x3 extends VectorBase {
     return result.set(
       v[0] * px + v[3] * py + v[6] * pz,
       v[1] * px + v[4] * py + v[7] * pz,
-      v[2] * px + v[5] * py + v[8] * pz,
+      v[2] * px + v[5] * py + v[8] * pz
     );
   }
   transformPoint(vec: IVector3Like, result?: Vector3): Vector3 {
@@ -1850,15 +1847,11 @@ export class Matrix4x4 extends VectorBase {
       this._v[row * 4],
       this._v[row * 4 + 1],
       this._v[row * 4 + 2],
-      this._v[row * 4 + 3],
+      this._v[row * 4 + 3]
     );
   }
   getRow3(row: number, result?: Vector3): Vector3 {
-    return (result || new Vector3()).set(
-      this._v[row * 4],
-      this._v[row * 4 + 1],
-      this._v[row * 4 + 2],
-    );
+    return (result || new Vector3()).set(this._v[row * 4], this._v[row * 4 + 1], this._v[row * 4 + 2]);
   }
   setRow(row: number, v: IVector4Like) {
     this._v[row * 4] = v.x;
@@ -1869,12 +1862,7 @@ export class Matrix4x4 extends VectorBase {
     return this;
   }
   getCol(col: number, result?: Vector4): Vector4 {
-    return (result || new Vector4()).set(
-      this._v[col],
-      this._v[4 + col],
-      this._v[8 + col],
-      this._v[12 + col],
-    );
+    return (result || new Vector4()).set(this._v[col], this._v[4 + col], this._v[8 + col], this._v[12 + col]);
   }
   setCol(col: number, v: IVector4Like) {
     this._v[col] = v.x;
@@ -1967,7 +1955,7 @@ export class Matrix4x4 extends VectorBase {
     top: number,
     znear: number,
     zfar: number,
-    result?: Matrix4x4,
+    result?: Matrix4x4
   ): Matrix4x4 {
     result = result || new Matrix4x4();
     const v = result.getArray();
@@ -2015,7 +2003,7 @@ export class Matrix4x4 extends VectorBase {
     aspect: number,
     znear: number,
     zfar: number,
-    result?: Matrix4x4,
+    result?: Matrix4x4
   ): Matrix4x4 {
     const h = znear * Math.tan(fovY * 0.5);
     const w = h * aspect;
@@ -2026,7 +2014,7 @@ export class Matrix4x4 extends VectorBase {
     aspect: number,
     znear: number,
     zfar: number,
-    result?: Matrix4x4,
+    result?: Matrix4x4
   ): Matrix4x4 {
     const h = znear * Math.tan(fovY * 0.5);
     const w = h * aspect;
@@ -2038,7 +2026,8 @@ export class Matrix4x4 extends VectorBase {
       ((nearPlane.x > 0 ? 1 : nearPlane.x < 0 ? -1 : 0) + perspectiveMatrix.m20) / perspectiveMatrix.m00,
       ((nearPlane.y > 0 ? 1 : nearPlane.y < 0 ? -1 : 0) + perspectiveMatrix.m21) / perspectiveMatrix.m11,
       -1,
-      (1 + perspectiveMatrix.m22) / perspectiveMatrix.m32);
+      (1 + perspectiveMatrix.m22) / perspectiveMatrix.m32
+    );
     const c = Vector4.scale(nearPlane, 2 / Vector4.dot(nearPlane, q));
     result.m02 = c.x;
     result.m12 = c.y;
@@ -2084,7 +2073,7 @@ export class Matrix4x4 extends VectorBase {
     top: number,
     znear: number,
     zfar: number,
-    result?: Matrix4x4,
+    result?: Matrix4x4
   ): Matrix4x4 {
     result = result || new Matrix4x4();
     const v = result.getArray();
@@ -2118,7 +2107,7 @@ export class Matrix4x4 extends VectorBase {
     top: number,
     znear: number,
     zfar: number,
-    result?: Matrix4x4,
+    result?: Matrix4x4
   ): Matrix4x4 {
     result = result || new Matrix4x4();
     const v = result.getArray();
@@ -2139,7 +2128,7 @@ export class Matrix4x4 extends VectorBase {
     v[11] = -1;
     v[12] = 0;
     v[13] = 0;
-    v[14] = znear * zfar / dz;
+    v[14] = (znear * zfar) / dz;
     v[15] = 0;
 
     result.changeNotify();
@@ -2237,10 +2226,8 @@ export class Matrix4x4 extends VectorBase {
 
     const t0 = tmp_0 * m11 + tmp_3 * m21 + tmp_4 * m31 - (tmp_1 * m11 + tmp_2 * m21 + tmp_5 * m31);
     const t1 = tmp_1 * m01 + tmp_6 * m21 + tmp_9 * m31 - (tmp_0 * m01 + tmp_7 * m21 + tmp_8 * m31);
-    const t2 =
-      tmp_2 * m01 + tmp_7 * m11 + tmp_10 * m31 - (tmp_3 * m01 + tmp_6 * m11 + tmp_11 * m31);
-    const t3 =
-      tmp_5 * m01 + tmp_8 * m11 + tmp_11 * m21 - (tmp_4 * m01 + tmp_9 * m11 + tmp_10 * m21);
+    const t2 = tmp_2 * m01 + tmp_7 * m11 + tmp_10 * m31 - (tmp_3 * m01 + tmp_6 * m11 + tmp_11 * m31);
+    const t3 = tmp_5 * m01 + tmp_8 * m11 + tmp_11 * m21 - (tmp_4 * m01 + tmp_9 * m11 + tmp_10 * m21);
 
     const d = 1.0 / (m00 * t0 + m10 * t1 + m20 * t2 + m30 * t3);
 
@@ -2248,38 +2235,18 @@ export class Matrix4x4 extends VectorBase {
     t[1] = d * t1;
     t[2] = d * t2;
     t[3] = d * t3;
-    t[4] =
-      d * (tmp_1 * m10 + tmp_2 * m20 + tmp_5 * m30 - (tmp_0 * m10 + tmp_3 * m20 + tmp_4 * m30));
-    t[5] =
-      d * (tmp_0 * m00 + tmp_7 * m20 + tmp_8 * m30 - (tmp_1 * m00 + tmp_6 * m20 + tmp_9 * m30));
-    t[6] =
-      d * (tmp_3 * m00 + tmp_6 * m10 + tmp_11 * m30 - (tmp_2 * m00 + tmp_7 * m10 + tmp_10 * m30));
-    t[7] =
-      d * (tmp_4 * m00 + tmp_9 * m10 + tmp_10 * m20 - (tmp_5 * m00 + tmp_8 * m10 + tmp_11 * m20));
-    t[8] =
-      d *
-      (tmp_12 * m13 + tmp_15 * m23 + tmp_16 * m33 - (tmp_13 * m13 + tmp_14 * m23 + tmp_17 * m33));
-    t[9] =
-      d *
-      (tmp_13 * m03 + tmp_18 * m23 + tmp_21 * m33 - (tmp_12 * m03 + tmp_19 * m23 + tmp_20 * m33));
-    t[10] =
-      d *
-      (tmp_14 * m03 + tmp_19 * m13 + tmp_22 * m33 - (tmp_15 * m03 + tmp_18 * m13 + tmp_23 * m33));
-    t[11] =
-      d *
-      (tmp_17 * m03 + tmp_20 * m13 + tmp_23 * m23 - (tmp_16 * m03 + tmp_21 * m13 + tmp_22 * m23));
-    t[12] =
-      d *
-      (tmp_14 * m22 + tmp_17 * m32 + tmp_13 * m12 - (tmp_16 * m32 + tmp_12 * m12 + tmp_15 * m22));
-    t[13] =
-      d *
-      (tmp_20 * m32 + tmp_12 * m02 + tmp_19 * m22 - (tmp_18 * m22 + tmp_21 * m32 + tmp_13 * m02));
-    t[14] =
-      d *
-      (tmp_18 * m12 + tmp_23 * m32 + tmp_15 * m02 - (tmp_22 * m32 + tmp_14 * m02 + tmp_19 * m12));
-    t[15] =
-      d *
-      (tmp_22 * m22 + tmp_16 * m02 + tmp_21 * m12 - (tmp_20 * m12 + tmp_23 * m22 + tmp_17 * m02));
+    t[4] = d * (tmp_1 * m10 + tmp_2 * m20 + tmp_5 * m30 - (tmp_0 * m10 + tmp_3 * m20 + tmp_4 * m30));
+    t[5] = d * (tmp_0 * m00 + tmp_7 * m20 + tmp_8 * m30 - (tmp_1 * m00 + tmp_6 * m20 + tmp_9 * m30));
+    t[6] = d * (tmp_3 * m00 + tmp_6 * m10 + tmp_11 * m30 - (tmp_2 * m00 + tmp_7 * m10 + tmp_10 * m30));
+    t[7] = d * (tmp_4 * m00 + tmp_9 * m10 + tmp_10 * m20 - (tmp_5 * m00 + tmp_8 * m10 + tmp_11 * m20));
+    t[8] = d * (tmp_12 * m13 + tmp_15 * m23 + tmp_16 * m33 - (tmp_13 * m13 + tmp_14 * m23 + tmp_17 * m33));
+    t[9] = d * (tmp_13 * m03 + tmp_18 * m23 + tmp_21 * m33 - (tmp_12 * m03 + tmp_19 * m23 + tmp_20 * m33));
+    t[10] = d * (tmp_14 * m03 + tmp_19 * m13 + tmp_22 * m33 - (tmp_15 * m03 + tmp_18 * m13 + tmp_23 * m33));
+    t[11] = d * (tmp_17 * m03 + tmp_20 * m13 + tmp_23 * m23 - (tmp_16 * m03 + tmp_21 * m13 + tmp_22 * m23));
+    t[12] = d * (tmp_14 * m22 + tmp_17 * m32 + tmp_13 * m12 - (tmp_16 * m32 + tmp_12 * m12 + tmp_15 * m22));
+    t[13] = d * (tmp_20 * m32 + tmp_12 * m02 + tmp_19 * m22 - (tmp_18 * m22 + tmp_21 * m32 + tmp_13 * m02));
+    t[14] = d * (tmp_18 * m12 + tmp_23 * m32 + tmp_15 * m02 - (tmp_22 * m32 + tmp_14 * m02 + tmp_19 * m12));
+    t[15] = d * (tmp_22 * m22 + tmp_16 * m02 + tmp_21 * m12 - (tmp_20 * m12 + tmp_23 * m22 + tmp_17 * m02));
 
     result.changeNotify();
     return result;
@@ -2496,12 +2463,7 @@ export class Matrix4x4 extends VectorBase {
     result.changeNotify();
     return result;
   }
-  static lookAt(
-    eye: IVector3Like,
-    target: IVector3Like,
-    up: IVector3Like,
-    result?: Matrix4x4,
-  ): Matrix4x4 {
+  static lookAt(eye: IVector3Like, target: IVector3Like, up: IVector3Like, result?: Matrix4x4): Matrix4x4 {
     result = result || new Matrix4x4();
     const v = result.getArray();
     const zAxis = Vector3.normalize(Vector3.sub(eye, target));
@@ -2792,11 +2754,7 @@ export class Matrix4x4 extends VectorBase {
     result.changeNotify();
     return result;
   }
-  static rotateRight(
-    m: Matrix4x4,
-    r: Matrix3x3 | Matrix4x4 | Quaternion,
-    result?: Matrix4x4,
-  ): Matrix4x4 {
+  static rotateRight(m: Matrix4x4, r: Matrix3x3 | Matrix4x4 | Quaternion, result?: Matrix4x4): Matrix4x4 {
     result = result || new Matrix4x4();
     const v = result.getArray();
     const a = m.getArray();
@@ -2846,11 +2804,7 @@ export class Matrix4x4 extends VectorBase {
     result.changeNotify();
     return result;
   }
-  static rotateLeft(
-    m: Matrix4x4,
-    r: Matrix3x3 | Matrix4x4 | Quaternion,
-    result?: Matrix4x4,
-  ): Matrix4x4 {
+  static rotateLeft(m: Matrix4x4, r: Matrix3x3 | Matrix4x4 | Quaternion, result?: Matrix4x4): Matrix4x4 {
     result = result || new Matrix4x4();
     const v = result.getArray();
     const a = r instanceof Quaternion ? new Matrix3x3(r) : r;
@@ -2938,14 +2892,14 @@ export class Matrix4x4 extends VectorBase {
   }
   getNearPlaneWidth(): number {
     if (this.isPerspective()) {
-      return 2 * this.getNearPlane() / this._v[0];
+      return (2 * this.getNearPlane()) / this._v[0];
     } else {
       return 2 / this._v[0];
     }
   }
   getNearPlaneHeight(): number {
     if (this.isPerspective()) {
-      return 2 * this.getNearPlane() / this._v[5];
+      return (2 * this.getNearPlane()) / this._v[5];
     } else {
       return 2 / this._v[5];
     }
@@ -2960,14 +2914,14 @@ export class Matrix4x4 extends VectorBase {
   }
   getFarPlaneWidth(): number {
     if (this.isPerspective()) {
-      return this.getNearPlaneWidth() * this.getFarPlane() / this.getNearPlane();
+      return (this.getNearPlaneWidth() * this.getFarPlane()) / this.getNearPlane();
     } else {
       return this.getNearPlaneWidth();
     }
   }
   getFarPlaneHeight(): number {
     if (this.isPerspective()) {
-      return this.getNearPlaneHeight() * this.getFarPlane() / this.getNearPlane();
+      return (this.getNearPlaneHeight() * this.getFarPlane()) / this.getNearPlane();
     } else {
       return this.getNearPlaneHeight();
     }
@@ -3072,7 +3026,7 @@ export class Matrix4x4 extends VectorBase {
       v[0] * px + v[4] * py + v[8] * pz + v[12],
       v[1] * px + v[5] * py + v[9] * pz + v[13],
       v[2] * px + v[6] * py + v[10] * pz + v[14],
-      v[3] * px + v[7] * py + v[11] * pz + v[15],
+      v[3] * px + v[7] * py + v[11] * pz + v[15]
     );
   }
   transformPointAffine(point: IVector3Like, result?: Vector3): Vector3 {
@@ -3084,7 +3038,7 @@ export class Matrix4x4 extends VectorBase {
     return result.set(
       v[0] * px + v[4] * py + v[8] * pz + v[12],
       v[1] * px + v[5] * py + v[9] * pz + v[13],
-      v[2] * px + v[6] * py + v[10] * pz + v[14],
+      v[2] * px + v[6] * py + v[10] * pz + v[14]
     );
   }
   transformVector(vec: IVector3Like, result?: Vector4): Vector4 {
@@ -3097,7 +3051,7 @@ export class Matrix4x4 extends VectorBase {
       v[0] * vx + v[4] * vy + v[8] * vz,
       v[1] * vx + v[5] * vy + v[9] * vz,
       v[2] * vx + v[6] * vy + v[10] * vz,
-      v[3] * vx + v[7] * vy + v[11] * vz,
+      v[3] * vx + v[7] * vy + v[11] * vz
     );
   }
   transformVectorAffine(vec: IVector3Like, result?: Vector3): Vector3 {
@@ -3109,7 +3063,7 @@ export class Matrix4x4 extends VectorBase {
     return result.set(
       v[0] * vx + v[4] * vy + v[8] * vz,
       v[1] * vx + v[5] * vy + v[9] * vz,
-      v[2] * vx + v[6] * vy + v[10] * vz,
+      v[2] * vx + v[6] * vy + v[10] * vz
     );
   }
   transform(vec: IVector4Like, result?: Vector4): Vector4 {
@@ -3123,7 +3077,7 @@ export class Matrix4x4 extends VectorBase {
       v[0] * vx + v[4] * vy + v[8] * vz + v[12] * vw,
       v[1] * vx + v[5] * vy + v[9] * vz + v[13] * vw,
       v[2] * vx + v[6] * vy + v[10] * vz + v[14] * vw,
-      v[3] * vx + v[7] * vy + v[11] * vz + v[15] * vw,
+      v[3] * vx + v[7] * vy + v[11] * vz + v[15] * vw
     );
   }
   transformAffine(vec: IVector4Like, result?: Vector4): Vector4 {
@@ -3137,7 +3091,7 @@ export class Matrix4x4 extends VectorBase {
       v[0] * vx + v[4] * vy + v[8] * vz + v[12] * vw,
       v[1] * vx + v[5] * vy + v[9] * vz + v[13] * vw,
       v[2] * vx + v[6] * vy + v[10] * vz + v[14] * vw,
-      vec.w,
+      vec.w
     );
   }
   det() {
@@ -3257,11 +3211,10 @@ export class Matrix4x4 extends VectorBase {
   decomposeLookAt(eye?: Vector3, target?: Vector3, up?: Vector3) {
     eye && eye.set(this._v[12], this._v[13], this._v[14]);
     up && up.set(this._v[4], this._v[5], this._v[6]);
-    target &&
-      target.set(this._v[12] - this._v[8], this._v[13] - this._v[9], this._v[14] - this._v[10]);
+    target && target.set(this._v[12] - this._v[8], this._v[13] - this._v[9], this._v[14] - this._v[10]);
     return this;
   }
-  toDualQuaternion(): { real: Quaternion, dual: Quaternion, scale: Vector3 } {
+  toDualQuaternion(): { real: Quaternion; dual: Quaternion; scale: Vector3 } {
     const t = new Vector3();
     const r = new Quaternion();
     const s = new Vector3();

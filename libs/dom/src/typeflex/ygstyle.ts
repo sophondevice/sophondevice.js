@@ -8,21 +8,21 @@ import {
   YGOverflow,
   YGDisplay,
   YGEdgeCount,
-  YGUnit,
+  YGUnit
 } from './enums';
 
-import {YGValueEqual, YGValueArrayEqual, cloneYGValueArray} from './utils';
+import { YGValueEqual, YGValueArrayEqual, cloneYGValueArray } from './utils';
 
-import {YGValue} from './ygvalue';
-import {YGFloatOptional} from './ygfloatoptional';
+import { YGValue } from './ygvalue';
+import { YGFloatOptional } from './ygfloatoptional';
 
-const kYGValueUndefined: () => YGValue = function() {
+const kYGValueUndefined: () => YGValue = function () {
   return new YGValue(0, YGUnit.Undefined);
 };
 const kYGValueAuto: () => YGValue = function () {
   return new YGValue(0, YGUnit.Auto);
 };
-const kYGDefaultEdgeValuesUnit: () => Array<YGValue> = function() {
+const kYGDefaultEdgeValuesUnit: () => Array<YGValue> = function () {
   return [
     kYGValueUndefined(),
     kYGValueUndefined(),
@@ -32,20 +32,14 @@ const kYGDefaultEdgeValuesUnit: () => Array<YGValue> = function() {
     kYGValueUndefined(),
     kYGValueUndefined(),
     kYGValueUndefined(),
-    kYGValueUndefined(),
+    kYGValueUndefined()
   ];
 };
 const kYGDefaultDimensionValuesAutoUnit: () => [YGValue, YGValue] = function () {
-  return [
-    kYGValueAuto(),
-    kYGValueAuto(),
-  ];
+  return [kYGValueAuto(), kYGValueAuto()];
 };
-const kYGDefaultDimensionValuesUnit: () => [YGValue, YGValue] = function() {
-  return [
-    kYGValueUndefined(),
-    kYGValueUndefined(),
-  ];
+const kYGDefaultDimensionValuesUnit: () => [YGValue, YGValue] = function () {
+  return [kYGValueUndefined(), kYGValueUndefined()];
 };
 class YGStyle {
   public direction: YGDirection;
@@ -117,11 +111,9 @@ class YGStyle {
       YGValueArrayEqual(this.minDimensions, style.minDimensions) &&
       YGValueArrayEqual(this.maxDimensions, style.maxDimensions);
 
-    areNonFloatValuesEqual =
-      areNonFloatValuesEqual && this.flex.isUndefined() == style.flex.isUndefined();
+    areNonFloatValuesEqual = areNonFloatValuesEqual && this.flex.isUndefined() == style.flex.isUndefined();
     if (areNonFloatValuesEqual && !this.flex.isUndefined() && !style.flex.isUndefined()) {
-      areNonFloatValuesEqual =
-        areNonFloatValuesEqual && this.flex.getValue() == style.flex.getValue();
+      areNonFloatValuesEqual = areNonFloatValuesEqual && this.flex.getValue() == style.flex.getValue();
     }
 
     areNonFloatValuesEqual =
@@ -178,4 +170,4 @@ class YGStyle {
   }
 }
 
-export {YGStyle};
+export { YGStyle };

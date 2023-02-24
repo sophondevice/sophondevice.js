@@ -19,11 +19,10 @@ export class CommandQueueImmediate {
     this._renderPass = new WebGPURenderPass(device);
     this._computePass = new WebGPUComputePass(device);
   }
-  get currentPass(): WebGPURenderPass|WebGPUComputePass {
+  get currentPass(): WebGPURenderPass | WebGPUComputePass {
     return this._renderPass.active ? this._renderPass : this._computePass.active ? this._computePass : null;
   }
-  beginFrame(): void {
-  }
+  beginFrame(): void {}
   endFrame(): void {
     this._renderPass.end();
     this._computePass.end();
@@ -41,13 +40,47 @@ export class CommandQueueImmediate {
   getFramebufferInfo(): FrameBufferInfo {
     return this._renderPass.getFrameBufferInfo();
   }
-  compute(program: WebGPUProgram, bindGroups: WebGPUBindGroup[], bindGroupOffsets: Iterable<number>[], workgroupCountX: number, workgroupCountY: number, workgroupCountZ: number) {
+  compute(
+    program: WebGPUProgram,
+    bindGroups: WebGPUBindGroup[],
+    bindGroupOffsets: Iterable<number>[],
+    workgroupCountX: number,
+    workgroupCountY: number,
+    workgroupCountZ: number
+  ) {
     this._renderPass.end();
-    this._computePass.compute(program, bindGroups, bindGroupOffsets, workgroupCountX, workgroupCountY, workgroupCountZ);
+    this._computePass.compute(
+      program,
+      bindGroups,
+      bindGroupOffsets,
+      workgroupCountX,
+      workgroupCountY,
+      workgroupCountZ
+    );
   }
-  draw(program: WebGPUProgram, vertexData: WebGPUVertexInputLayout, stateSet: WebGPURenderStateSet, bindGroups: WebGPUBindGroup[], bindGroupOffsets: Iterable<number>[], primitiveType: PrimitiveType, first: number, count: number, numInstances: number): void {
+  draw(
+    program: WebGPUProgram,
+    vertexData: WebGPUVertexInputLayout,
+    stateSet: WebGPURenderStateSet,
+    bindGroups: WebGPUBindGroup[],
+    bindGroupOffsets: Iterable<number>[],
+    primitiveType: PrimitiveType,
+    first: number,
+    count: number,
+    numInstances: number
+  ): void {
     this._computePass.end();
-    this._renderPass.draw(program, vertexData, stateSet, bindGroups, bindGroupOffsets, primitiveType, first, count, numInstances);
+    this._renderPass.draw(
+      program,
+      vertexData,
+      stateSet,
+      bindGroups,
+      bindGroupOffsets,
+      primitiveType,
+      first,
+      count,
+      numInstances
+    );
   }
   setViewport();
   setViewport(x: number, y: number, w: number, h: number): void;

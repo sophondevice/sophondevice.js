@@ -23,11 +23,7 @@ export class ListIterator<T = unknown> {
     if (!this.valid()) {
       throw new Error('Failed to get next iterator: this iterator is invalid');
     }
-    return new ListIterator<T>(
-      this._dl,
-      this._reverse ? this._node.prev : this._node.next,
-      this._reverse,
-    );
+    return new ListIterator<T>(this._dl, this._reverse ? this._node.prev : this._node.next, this._reverse);
   }
   prev(): ListIterator<T> {
     if (this.valid()) {
@@ -39,11 +35,7 @@ export class ListIterator<T = unknown> {
     if (!this.valid()) {
       throw new Error('Failed to get previous iterator: this iterator is invalid');
     }
-    return new ListIterator<T>(
-      this._dl,
-      this._reverse ? this._node.next : this._node.prev,
-      this._reverse,
-    );
+    return new ListIterator<T>(this._dl, this._reverse ? this._node.next : this._node.prev, this._reverse);
   }
   get node() {
     return this._node;

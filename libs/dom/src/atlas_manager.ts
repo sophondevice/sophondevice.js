@@ -40,17 +40,13 @@ export class AtlasManager {
     cacheWidth?: number,
     cacheHeight?: number,
     cachePadding?: number,
-    linearSpace?: boolean,
+    linearSpace?: boolean
   ) {
     this._renderer = renderer;
     this._cacheWidth =
-      typeof cacheWidth === 'number'
-        ? cacheWidth || AtlasManager.ATLAS_WIDTH
-        : AtlasManager.ATLAS_WIDTH;
+      typeof cacheWidth === 'number' ? cacheWidth || AtlasManager.ATLAS_WIDTH : AtlasManager.ATLAS_WIDTH;
     this._cacheHeight =
-      typeof cacheHeight === 'number'
-        ? cacheHeight || AtlasManager.ATLAS_HEIGHT
-        : AtlasManager.ATLAS_HEIGHT;
+      typeof cacheHeight === 'number' ? cacheHeight || AtlasManager.ATLAS_HEIGHT : AtlasManager.ATLAS_HEIGHT;
     this._cachePadding = typeof cachePadding === 'number' ? cachePadding : 0;
     this._linearSpace = Boolean(linearSpace);
     this._packer = new MaxRectsPacker(this._cacheWidth, this._cacheHeight, this._cachePadding, {
@@ -59,7 +55,7 @@ export class AtlasManager {
       square: false,
       allowRotation: false,
       border: 1,
-      tag: false,
+      tag: false
     });
     this._atlasList = [];
     this._atlasInfoMap = {};
@@ -87,7 +83,7 @@ export class AtlasManager {
       square: false,
       allowRotation: false,
       border: 1,
-      tag: false,
+      tag: false
     });
     for (const tex of this._atlasList) {
       const t = tex;
@@ -96,14 +92,7 @@ export class AtlasManager {
     this._atlasList = [];
     this._atlasInfoMap = {};
   }
-  pushCanvas(
-    key: string,
-    ctx: CanvasRenderingContext2D,
-    x: number,
-    y: number,
-    w: number,
-    h: number,
-  ) {
+  pushCanvas(key: string, ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number) {
     /*
     const imgdata = ctx.getImageData(x, y, w, h);
     return this.pushBitmap(key, imgdata);
@@ -118,7 +107,7 @@ export class AtlasManager {
         rc.width,
         rc.height,
         x,
-        y,
+        y
       );
       const info: IAtlasInfo = {
         atlasIndex: this._packer.bins.length - 1,
@@ -127,7 +116,7 @@ export class AtlasManager {
         uMax: (rc.x + rc.width) / (this._cacheWidth + this._cachePadding),
         vMax: (rc.y + rc.height) / (this._cacheHeight + this._cachePadding),
         width: rc.width,
-        height: rc.height,
+        height: rc.height
       };
       this._atlasInfoMap[key] = info;
       return info;
@@ -136,12 +125,7 @@ export class AtlasManager {
   pushBitmap(key: string, bitmap: ImageData): IAtlasInfo {
     const rc = this._packer.add(bitmap.width, bitmap.height, null);
     if (rc) {
-      this._updateAtlasTexture(
-        this._packer.bins.length - 1,
-        bitmap,
-        rc.x,
-        rc.y,
-      );
+      this._updateAtlasTexture(this._packer.bins.length - 1, bitmap, rc.x, rc.y);
       const info: IAtlasInfo = {
         atlasIndex: this._packer.bins.length - 1,
         uMin: rc.x / (this._cacheWidth + this._cachePadding),
@@ -149,7 +133,7 @@ export class AtlasManager {
         uMax: (rc.x + rc.width) / (this._cacheWidth + this._cachePadding),
         vMax: (rc.y + rc.height) / (this._cacheHeight + this._cachePadding),
         width: rc.width,
-        height: rc.height,
+        height: rc.height
       };
       this._atlasInfoMap[key] = info;
       return info;
@@ -159,10 +143,15 @@ export class AtlasManager {
   /** @internal */
   protected _createAtlasTexture(): Texture2D {
     const zeroColor = { r: 0, g: 0, b: 0, a: 0 };
-    const tex = this._renderer.createTexture(this._cacheWidth + this._cachePadding, this._cacheHeight + this._cachePadding, zeroColor, this._linearSpace);
-    tex.restoreHandler = async tex => {
+    const tex = this._renderer.createTexture(
+      this._cacheWidth + this._cachePadding,
+      this._cacheHeight + this._cachePadding,
+      zeroColor,
+      this._linearSpace
+    );
+    tex.restoreHandler = async (tex) => {
       this._renderer.clearTexture(tex as Texture2D, zeroColor);
-      this._atlasRestoreHandler && await this._atlasRestoreHandler(tex as BaseTexture);
+      this._atlasRestoreHandler && (await this._atlasRestoreHandler(tex as BaseTexture));
     };
     return tex;
   }
@@ -175,7 +164,7 @@ export class AtlasManager {
     w: number,
     h: number,
     xOffset: number,
-    yOffset: number,
+    yOffset: number
   ) {
     let textureAtlas: Texture2D = null;
     if (atlasIndex === this._atlasList.length) {
@@ -187,12 +176,7 @@ export class AtlasManager {
     this._renderer.updateTextureWithCanvas(textureAtlas, bitmap, xOffset, yOffset, w, h, x, y);
   }
   /** @internal */
-  private _updateAtlasTexture(
-    atlasIndex: number,
-    bitmap: ImageData,
-    x: number,
-    y: number,
-  ) {
+  private _updateAtlasTexture(atlasIndex: number, bitmap: ImageData, x: number, y: number) {
     let textureAtlas: Texture2D = null;
     if (atlasIndex === this._atlasList.length) {
       textureAtlas = this._createAtlasTexture();

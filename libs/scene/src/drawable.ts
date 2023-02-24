@@ -1,23 +1,23 @@
-import { ListIterator, Matrix4x4 } from "@sophon/base";
-import type { Texture2D } from "@sophon/device";
-import type { XForm } from "./xform";
-import type { BoundingVolume } from "./bounding_volume";
-import type { Camera } from "./camera";
-import type { EnvironmentLighting } from "./materiallib";
-import type { RenderPass } from "./renderers";
-import type { InstanceData } from "./render_queue";
-import type { ShadowMapper } from "./shadow";
+import { ListIterator, Matrix4x4 } from '@sophon/base';
+import type { Texture2D } from '@sophon/device';
+import type { XForm } from './xform';
+import type { BoundingVolume } from './bounding_volume';
+import type { Camera } from './camera';
+import type { EnvironmentLighting } from './materiallib';
+import type { RenderPass } from './renderers';
+import type { InstanceData } from './render_queue';
+import type { ShadowMapper } from './shadow';
 
 export interface DrawContext {
-  camera: Camera,
-  target: Drawable,
-  renderPass: RenderPass,
+  camera: Camera;
+  target: Drawable;
+  renderPass: RenderPass;
   renderPassHash: string;
-  materialFunc: number,
-  environment?: EnvironmentLighting,
-  envStrength?: number,
+  materialFunc: number;
+  environment?: EnvironmentLighting;
+  envStrength?: number;
   shadowMapper?: ShadowMapper;
-  instanceData?: InstanceData
+  instanceData?: InstanceData;
 }
 
 export interface Drawable {

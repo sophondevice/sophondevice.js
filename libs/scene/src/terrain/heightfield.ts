@@ -1,5 +1,5 @@
-import { Vector3, Vector4 } from "@sophon/base";
-import { BoundingBox } from "../bounding_volume";
+import { Vector3, Vector4 } from '@sophon/base';
+import { BoundingBox } from '../bounding_volume';
 
 /*
 function intersectRayTriangle (start: Vector3, normal: Vector3, v1: Vector3, v2: Vector3, v3: Vector3, cull: boolean): number {
@@ -44,7 +44,7 @@ function intersectRayTriangle (start: Vector3, normal: Vector3, v1: Vector3, v2:
 
 export interface HeightfieldBBoxTreeNode {
   bbox: BoundingBox;
-  rc: { x: number, y: number, w: number, h: number };
+  rc: { x: number; y: number; w: number; h: number };
   left: HeightfieldBBoxTreeNode;
   right: HeightfieldBBoxTreeNode;
 }
@@ -131,7 +131,7 @@ export class HeightfieldBBoxTree {
       bbox: new BoundingBox(),
       rc: { x: 0, y: 0, w: 0, h: 0 },
       left: null,
-      right: null,
+      right: null
     };
   }
   computeNodeBoundingBox(node: HeightfieldBBoxTreeNode, bbox: BoundingBox, vertices: Vector4[]) {
@@ -139,11 +139,18 @@ export class HeightfieldBBoxTree {
     for (let i = 0; i < node.rc.w; i++) {
       for (let j = 0; j < node.rc.h; j++) {
         const index = node.rc.x + i + (node.rc.y + j) * this._resX;
-        bbox.extend(vertices[index])
+        bbox.extend(vertices[index]);
       }
     }
   }
-  createChildNode(node: HeightfieldBBoxTreeNode, x: number, y: number, w: number, h: number, vertices: Vector4[]): boolean {
+  createChildNode(
+    node: HeightfieldBBoxTreeNode,
+    x: number,
+    y: number,
+    w: number,
+    h: number,
+    vertices: Vector4[]
+  ): boolean {
     node.rc.x = x;
     node.rc.y = y;
     node.rc.w = w;
@@ -191,13 +198,28 @@ export class HeightField {
     this.m_sizeX = 0;
     this.m_sizeZ = 0;
   }
-  init(sizeX: number, sizeZ: number, offsetX: number, offsetZ: number, spacingX: number, spacingZ: number, vScale: number, heights: Float32Array, patchSize: number): boolean {
+  init(
+    sizeX: number,
+    sizeZ: number,
+    offsetX: number,
+    offsetZ: number,
+    spacingX: number,
+    spacingZ: number,
+    vScale: number,
+    heights: Float32Array,
+    patchSize: number
+  ): boolean {
     const v: Vector4[] = [];
     for (let i = 0; i < sizeZ; ++i) {
       const srcOffset = i * sizeX;
       const dstOffset = (sizeZ - i - 1) * sizeX;
       for (let j = 0; j < sizeX; ++j) {
-        v[dstOffset + j] = new Vector4(offsetX + j * spacingX, heights[srcOffset + j] * vScale, offsetZ + i * spacingZ, 1);
+        v[dstOffset + j] = new Vector4(
+          offsetX + j * spacingX,
+          heights[srcOffset + j] * vScale,
+          offsetZ + i * spacingZ,
+          1
+        );
       }
     }
     this.m_bboxTree = new HeightfieldBBoxTree(sizeX, sizeZ, v, patchSize);
@@ -246,7 +268,7 @@ export class HeightField {
         const h10 = heights[x + 1 + y * this.m_sizeX];
         const sx = (h00 + h01 - h11 - h10) * 0.5;
         const sy = (h00 + h10 - h01 - h11) * 0.5;
-        const index = (x + (this.m_sizeZ - 2 - y) * (this.m_sizeX - 1));
+        const index = x + (this.m_sizeZ - 2 - y) * (this.m_sizeX - 1);
         v.set(sx * scaleZ, 2 * scaleX * scaleZ, -sy * scaleX).inplaceNormalize();
         normals[index * 4 + 0] = Math.floor((v.x * 0.5 + 0.5) * 255);
         normals[index * 4 + 1] = Math.floor((v.y * 0.5 + 0.5) * 255);
@@ -266,8 +288,9 @@ export class HeightField {
       for (let x = 0; x < this.m_sizeX; ++x) {
         const h = heights[x + y * this.m_sizeX];
         const h00 = x > 0 && y > 0 ? heights[x - 1 + (y - 1) * this.m_sizeX] : h;
-        const h01 = y > 0 && y < this.m_sizeZ - 1 ? heights[(x - 1) + (y + 1) * this.m_sizeX] : h;
-        const h11 = x < this.m_sizeX - 1 && y < this.m_sizeZ - 1 ? heights[x + 1 + (y + 1) * this.m_sizeX] : h;
+        const h01 = y > 0 && y < this.m_sizeZ - 1 ? heights[x - 1 + (y + 1) * this.m_sizeX] : h;
+        const h11 =
+          x < this.m_sizeX - 1 && y < this.m_sizeZ - 1 ? heights[x + 1 + (y + 1) * this.m_sizeX] : h;
         const h10 = x < this.m_sizeX - 1 && y > 0 ? heights[x + 1 + (y - 1) * this.m_sizeX] : h;
         const sx = (h00 + h01 - h11 - h10) * 0.5;
         const sy = (h00 + h10 - h01 - h11) * 0.5;

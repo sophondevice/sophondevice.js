@@ -8,9 +8,9 @@ declare global {
 }
 
 async function loadPng(url: string): Promise<{
-  width: number,
-  height: number,
-  bitmap: Uint8Array | Uint16Array,
+  width: number;
+  height: number;
+  bitmap: Uint8Array | Uint16Array;
 }> {
   const pngtoy = new window.PngToy();
   await pngtoy.fetch(url);
@@ -22,7 +22,7 @@ export async function loadEarthSculptorMap(scene: Scene, mapUrl: string): Promis
   const map = await assetManager.fetchTextData(mapUrl);
   const baseUrl = mapUrl.slice(0, mapUrl.lastIndexOf('/'));
   const options: { [name: string]: string[] } = {};
-  map.split(/\r?\n/).forEach(opt => {
+  map.split(/\r?\n/).forEach((opt) => {
     const entry = opt.trim();
     if (entry) {
       const parts: string[] = [];
@@ -62,7 +62,7 @@ export async function loadEarthSculptorMap(scene: Scene, mapUrl: string): Promis
   const heightMap = `${baseUrl}/${mapName}.png`;
   const maskMap = options.tiletexturesize ? `${baseUrl}/${mapName}_d0.png` : `${baseUrl}/${mapName}_d.png`;
   const baseMap = options.tiletexturesize ? `${baseUrl}/${mapName}_c0.png` : `${baseUrl}/${mapName}_c.png`;
-  const detailScales = options.detailscales.map(val => Number(val));
+  const detailScales = options.detailscales.map((val) => Number(val));
   const detailMaps: string[] = [];
   for (let i = 1; i <= 4; i++) {
     const tex = options[`detailtexture${i}`][0].replace(/\\/g, '/');
@@ -75,7 +75,7 @@ export async function loadEarthSculptorMap(scene: Scene, mapUrl: string): Promis
   const heights = new Float32Array(sizeX * sizeZ);
   for (let i = 0; i < sizeX * sizeZ; i++) {
     const h = ((heightValues[i] & 0xff) << 8) | ((heightValues[i] & 0xff00) >>> 8);
-    heights[i] = h / 65535 * heightScale;
+    heights[i] = (h / 65535) * heightScale;
   }
   const terrain = new Terrain(scene);
   terrain.create(sizeX, sizeZ, heights, new Vector3(1, 1, 1), 33);
@@ -85,7 +85,10 @@ export async function loadEarthSculptorMap(scene: Scene, mapUrl: string): Promis
   for (let i = 0; i < 4; i++) {
     const scaleX = sizeX / detailScales[i];
     const scaleZ = sizeZ / detailScales[i];
-    terrain.material.addDetailMap(await assetManager.fetchTexture(detailMaps[i]), new Vector2(scaleX, scaleZ));
+    terrain.material.addDetailMap(
+      await assetManager.fetchTexture(detailMaps[i]),
+      new Vector2(scaleX, scaleZ)
+    );
   }
   return terrain;
 }

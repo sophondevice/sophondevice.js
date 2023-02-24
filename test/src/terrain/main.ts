@@ -7,7 +7,7 @@ import { loadEarthSculptorMap } from './earthscuptor';
 
 (async function () {
   const viewer = new Viewer(document.getElementById('canvas') as HTMLCanvasElement);
-  await viewer.initDevice(common.getQueryString('dev') as DeviceType || 'webgl', { msaa: true });
+  await viewer.initDevice((common.getQueryString('dev') as DeviceType) || 'webgl', { msaa: true });
   const guiRenderer = new GUIRenderer(viewer.device);
   const gui = new GUI(guiRenderer);
 
@@ -17,15 +17,20 @@ import { loadEarthSculptorMap } from './earthscuptor';
   const scene = new Scene(viewer.device);
   const scheme = new ForwardRenderScheme(viewer.device);
   const camera = scene.addCamera();
-  camera.setProjectionMatrix(Matrix4x4.perspective(Math.PI / 3, viewer.device.getDrawingBufferWidth() / viewer.device.getDrawingBufferHeight(), 1, 300));
+  camera.setProjectionMatrix(
+    Matrix4x4.perspective(
+      Math.PI / 3,
+      viewer.device.getDrawingBufferWidth() / viewer.device.getDrawingBufferHeight(),
+      1,
+      300
+    )
+  );
   camera.mouseInputSource = sceneView;
   camera.keyboardInputSource = sceneView;
   camera.setModel(new FPSCameraModel({ moveSpeed: 0.5 }));
   scene.envLightStrength = 0.5;
 
-  const light = new DirectionalLight(scene)
-    .setColor(new Vector4(1, 1, 1, 1))
-    .setCastShadow(false);
+  const light = new DirectionalLight(scene).setColor(new Vector4(1, 1, 1, 1)).setCastShadow(false);
   light.lookAt(new Vector3(10, 3, 10), new Vector3(0, 0, 0), Vector3.axisPY());
   light.shadow.shadowMapSize = 2048;
   light.shadow.numShadowCascades = 4;
@@ -40,7 +45,7 @@ import { loadEarthSculptorMap } from './earthscuptor';
   });
 
   function loadTerrain(filename) {
-    loadEarthSculptorMap(scene, filename).then(terrain => {
+    loadEarthSculptorMap(scene, filename).then((terrain) => {
       terrain.castShadow = true;
       const eyePos = terrain.getBoundingVolume().toAABB().maxPoint;
       const destPos = terrain.getBoundingVolume().toAABB().center;
@@ -75,7 +80,14 @@ import { loadEarthSculptorMap } from './earthscuptor';
   }
   sceneView.addEventListener('layout', function (this: RElement) {
     const rect = this.getClientRect();
-    camera.setProjectionMatrix(Matrix4x4.perspective(camera.getFOV(), rect.width / rect.height, camera.getNearPlane(), camera.getFarPlane()));
+    camera.setProjectionMatrix(
+      Matrix4x4.perspective(
+        camera.getFOV(),
+        rect.width / rect.height,
+        camera.getNearPlane(),
+        camera.getFarPlane()
+      )
+    );
   });
 
   sceneView.addEventListener('draw', function (this: RElement, evt: REvent) {
@@ -84,8 +96,5 @@ import { loadEarthSculptorMap } from './earthscuptor';
   });
 
   loadTerrain('./assets/maps/map1/test1.map');
-  viewer.device.runLoop(device => gui.render());
-
-}());
-
-
+  viewer.device.runLoop((device) => gui.render());
+})();

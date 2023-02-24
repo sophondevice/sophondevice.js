@@ -13,16 +13,21 @@ export class WebGLGPUBuffer extends WebGLGPUObject<WebGLBuffer> implements GPUDa
   protected _memCost: number;
   constructor(device: WebGLDevice, usage: number, data: TypedArray | number, systemMemory = false) {
     super(device);
-    if ((usage & GPUResourceUsageFlags.BF_VERTEX) && (usage & GPUResourceUsageFlags.BF_INDEX)) {
+    if (usage & GPUResourceUsageFlags.BF_VERTEX && usage & GPUResourceUsageFlags.BF_INDEX) {
       throw new Error('buffer usage must not have Vertex and Index simultaneously');
     }
-    if (!device.isWebGL2 && !(usage & GPUResourceUsageFlags.BF_VERTEX) && !(usage & GPUResourceUsageFlags.BF_INDEX) && !(usage & GPUResourceUsageFlags.BF_UNIFORM)) {
+    if (
+      !device.isWebGL2 &&
+      !(usage & GPUResourceUsageFlags.BF_VERTEX) &&
+      !(usage & GPUResourceUsageFlags.BF_INDEX) &&
+      !(usage & GPUResourceUsageFlags.BF_UNIFORM)
+    ) {
       throw new Error('no Vertex or Index or Uniform usage set when creating buffer');
     }
     if (device.isWebGL2 && !(usage & ~GPUResourceUsageFlags.DYNAMIC)) {
       throw new Error('buffer usage not set when creating buffer');
     }
-    if ((usage & GPUResourceUsageFlags.DYNAMIC) && (usage & GPUResourceUsageFlags.MANAGED)) {
+    if (usage & GPUResourceUsageFlags.DYNAMIC && usage & GPUResourceUsageFlags.MANAGED) {
       throw new Error('buffer usage DYNAMIC and MANAGED can not be both set');
     }
     this._object = null;
@@ -33,7 +38,7 @@ export class WebGLGPUBuffer extends WebGLGPUObject<WebGLBuffer> implements GPUDa
       throw new Error('can not create buffer with zero size');
     }
     this._systemMemory = !!systemMemory;
-    if (this._systemMemory || (this._usage & GPUResourceUsageFlags.MANAGED)) {
+    if (this._systemMemory || this._usage & GPUResourceUsageFlags.MANAGED) {
       this._systemMemoryBuffer = new Uint8Array(this._size);
       if (data && typeof data !== 'number') {
         this._systemMemoryBuffer.set(new Uint8Array(data.buffer, data.byteOffset, data.byteLength));
@@ -64,9 +69,16 @@ export class WebGLGPUBuffer extends WebGLGPUObject<WebGLBuffer> implements GPUDa
     if (dstByteOffset + srcLength * data.BYTES_PER_ELEMENT > this.byteLength) {
       throw new Error('bufferSubData() failed: dest buffer is too small');
     }
-    if (this._systemMemory || (this._usage & GPUResourceUsageFlags.MANAGED)) {
+    if (this._systemMemory || this._usage & GPUResourceUsageFlags.MANAGED) {
       // copy to system backup buffer if present
-      this._systemMemoryBuffer.set(new Uint8Array(data.buffer, data.byteOffset + srcPos * data.BYTES_PER_ELEMENT, srcLength * data.BYTES_PER_ELEMENT), dstByteOffset);
+      this._systemMemoryBuffer.set(
+        new Uint8Array(
+          data.buffer,
+          data.byteOffset + srcPos * data.BYTES_PER_ELEMENT,
+          srcLength * data.BYTES_PER_ELEMENT
+        ),
+        dstByteOffset
+      );
     }
     if (!this._systemMemory && !this.device.isContextLost()) {
       if (this.disposed) {
@@ -80,7 +92,7 @@ export class WebGLGPUBuffer extends WebGLGPUObject<WebGLBuffer> implements GPUDa
       if (this._usage & GPUResourceUsageFlags.BF_INDEX) {
         target = WebGLEnum.ELEMENT_ARRAY_BUFFER;
       } else if (this._usage & GPUResourceUsageFlags.BF_VERTEX) {
-        target = WebGLEnum.ARRAY_BUFFER
+        target = WebGLEnum.ARRAY_BUFFER;
       } else if (this._usage & GPUResourceUsageFlags.BF_UNIFORM) {
         target = WebGLEnum.UNIFORM_BUFFER;
       } else if (this._usage & (GPUResourceUsageFlags.BF_READ | GPUResourceUsageFlags.BF_WRITE)) {
@@ -90,19 +102,33 @@ export class WebGLGPUBuffer extends WebGLGPUObject<WebGLBuffer> implements GPUDa
       }
       this._device.context.bindBuffer(target, this._object);
       if (this._device.isWebGL2) {
-        (this._device.context as WebGL2RenderingContext).bufferSubData(target, dstByteOffset, data, srcPos, srcLength);
+        (this._device.context as WebGL2RenderingContext).bufferSubData(
+          target,
+          dstByteOffset,
+          data,
+          srcPos,
+          srcLength
+        );
       } else {
         this._device.context.bufferSubData(target, dstByteOffset, data);
       }
     }
   }
-  async getBufferSubData(dstBuffer?: Uint8Array, offsetInBytes?: number, sizeInBytes?: number): Promise<Uint8Array> {
+  async getBufferSubData(
+    dstBuffer?: Uint8Array,
+    offsetInBytes?: number,
+    sizeInBytes?: number
+  ): Promise<Uint8Array> {
     if (this.disposed) {
       this.reload();
     }
     return this._getBufferData(dstBuffer, offsetInBytes, sizeInBytes);
   }
-  protected async _getBufferData(dstBuffer?: Uint8Array, offsetInBytes?: number, sizeInBytes?: number): Promise<Uint8Array> {
+  protected async _getBufferData(
+    dstBuffer?: Uint8Array,
+    offsetInBytes?: number,
+    sizeInBytes?: number
+  ): Promise<Uint8Array> {
     offsetInBytes = Number(offsetInBytes) || 0;
     sizeInBytes = Number(sizeInBytes) || this.byteLength - offsetInBytes;
     if (offsetInBytes < 0 || offsetInBytes + sizeInBytes > this.byteLength) {
@@ -127,7 +153,7 @@ export class WebGLGPUBuffer extends WebGLGPUObject<WebGLBuffer> implements GPUDa
       if (this._usage & GPUResourceUsageFlags.BF_INDEX) {
         target = WebGLEnum.ELEMENT_ARRAY_BUFFER;
       } else if (this._usage & GPUResourceUsageFlags.BF_VERTEX) {
-        target = WebGLEnum.ARRAY_BUFFER
+        target = WebGLEnum.ARRAY_BUFFER;
       } else if (this._usage & GPUResourceUsageFlags.BF_UNIFORM) {
         target = WebGLEnum.UNIFORM_BUFFER;
       } else if (this._usage & (GPUResourceUsageFlags.BF_READ | GPUResourceUsageFlags.BF_WRITE)) {
@@ -163,7 +189,8 @@ export class WebGLGPUBuffer extends WebGLGPUObject<WebGLBuffer> implements GPUDa
         this._object = this._device.context.createBuffer();
       }
       this._device.vaoExt?.bindVertexArray(null);
-      let usage = (this._usage & GPUResourceUsageFlags.DYNAMIC) ? WebGLEnum.DYNAMIC_DRAW : WebGLEnum.STATIC_DRAW;
+      let usage =
+        this._usage & GPUResourceUsageFlags.DYNAMIC ? WebGLEnum.DYNAMIC_DRAW : WebGLEnum.STATIC_DRAW;
       let target: number;
       if (this._usage & GPUResourceUsageFlags.BF_INDEX) {
         target = WebGLEnum.ELEMENT_ARRAY_BUFFER;
@@ -190,7 +217,12 @@ export class WebGLGPUBuffer extends WebGLGPUObject<WebGLBuffer> implements GPUDa
     this._memCost = this._size;
   }
   /** @internal */
-  private async clientWaitAsync(gl: WebGL2RenderingContext, sync: WebGLSync, flags: number, interval_ms: number) {
+  private async clientWaitAsync(
+    gl: WebGL2RenderingContext,
+    sync: WebGLSync,
+    flags: number,
+    interval_ms: number
+  ) {
     return new Promise<void>((resolve, reject) => {
       function test() {
         const res = gl.clientWaitSync(sync, flags, 0);

@@ -9,7 +9,15 @@ export class WebImageLoader extends AbstractTextureLoader {
   supportMIMEType(mimeType: string): boolean {
     return mimeType === 'image/jpg' || mimeType === 'image/jpeg' || mimeType === 'image/png';
   }
-  async load(assetManager: AssetManager, filename: string, mimeType: string, data: ArrayBuffer, srgb: boolean, noMipmap: boolean, texture?: BaseTexture): Promise<BaseTexture> {
+  async load(
+    assetManager: AssetManager,
+    filename: string,
+    mimeType: string,
+    data: ArrayBuffer,
+    srgb: boolean,
+    noMipmap: boolean,
+    texture?: BaseTexture
+  ): Promise<BaseTexture> {
     return new Promise<BaseTexture>((resolve, reject) => {
       if (!mimeType) {
         reject('unknown image file type');
@@ -21,8 +29,8 @@ export class WebImageLoader extends AbstractTextureLoader {
       img.onload = () => {
         createImageBitmap(img, {
           premultiplyAlpha: 'none',
-          colorSpaceConversion: 'none',
-        }).then(bm => {
+          colorSpaceConversion: 'none'
+        }).then((bm) => {
           const options: TextureCreationOptions = {
             colorSpace: srgb ? 'srgb' : 'linear',
             noMipmap: !!noMipmap,
@@ -36,10 +44,9 @@ export class WebImageLoader extends AbstractTextureLoader {
           }
         });
       };
-      img.onerror = err => {
+      img.onerror = (err) => {
         reject(err);
       };
     });
   }
 }
-

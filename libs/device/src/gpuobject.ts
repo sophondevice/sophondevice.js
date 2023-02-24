@@ -6,9 +6,15 @@ import {
   TextureFormat,
   TextureWrapping,
   TextureFilter,
-  CompareFunc,
+  CompareFunc
 } from './base_types';
-import { PBTypeInfo, PBArrayTypeInfo, PBPrimitiveTypeInfo, PBStructTypeInfo, PBPrimitiveType } from './builder/types';
+import {
+  PBTypeInfo,
+  PBArrayTypeInfo,
+  PBPrimitiveTypeInfo,
+  PBStructTypeInfo,
+  PBPrimitiveType
+} from './builder/types';
 import type { Device } from './device';
 
 export type TextureImageElement = ImageBitmap | HTMLCanvasElement;
@@ -358,7 +364,7 @@ const vertexAttribFormatMap = {
   custom1_u32: [VERTEX_ATTRIB_CUSTOM1, PBPrimitiveType.U32, 4],
   custom1_u32x2: [VERTEX_ATTRIB_CUSTOM1, PBPrimitiveType.U32VEC2, 8],
   custom1_u32x3: [VERTEX_ATTRIB_CUSTOM1, PBPrimitiveType.U32VEC3, 12],
-  custom1_u32x4: [VERTEX_ATTRIB_CUSTOM1, PBPrimitiveType.U32VEC4, 16],
+  custom1_u32x4: [VERTEX_ATTRIB_CUSTOM1, PBPrimitiveType.U32VEC4, 16]
 } as const;
 
 export type VertexAttribFormat = keyof typeof vertexAttribFormatMap;
@@ -379,7 +385,7 @@ const vertexAttribNameMap = {
   texCoord6: VERTEX_ATTRIB_TEXCOORD6,
   texCoord7: VERTEX_ATTRIB_TEXCOORD7,
   custom0: VERTEX_ATTRIB_CUSTOM0,
-  custom1: VERTEX_ATTRIB_CUSTOM1,
+  custom1: VERTEX_ATTRIB_CUSTOM1
 } as const;
 
 export type VertexSemantic = keyof typeof vertexAttribNameMap;
@@ -400,11 +406,11 @@ const vertexAttribNameRevMap = {
   [VERTEX_ATTRIB_TEXCOORD6]: 'texCoord6',
   [VERTEX_ATTRIB_TEXCOORD7]: 'texCoord7',
   [VERTEX_ATTRIB_CUSTOM0]: 'custom0',
-  [VERTEX_ATTRIB_CUSTOM1]: 'custom1',
+  [VERTEX_ATTRIB_CUSTOM1]: 'custom1'
 } as const;
 
-export type TextureColorSpace = 'srgb'|'linear';
-export type BufferUsage = 'vertex'|'index'|'uniform'|'read'|'write';
+export type TextureColorSpace = 'srgb' | 'linear';
+export type BufferUsage = 'vertex' | 'index' | 'uniform' | 'read' | 'write';
 export interface BaseCreationOptions {
   dynamic?: boolean;
   managed?: boolean;
@@ -422,18 +428,18 @@ export interface BufferCreationOptions extends BaseCreationOptions {
 
 /** @internal */
 export enum GPUResourceUsageFlags {
-  TF_LINEAR_COLOR_SPACE = (1 << 1),
-  TF_NO_MIPMAP = (1 << 2),
-  TF_WRITABLE = (1 << 3),
-  TF_NO_GC = (1 << 4),
-  BF_VERTEX = (1 << 5),
-  BF_INDEX = (1 << 6),
-  BF_READ = (1 << 7),
-  BF_WRITE = (1 << 8),
-  BF_UNIFORM = (1 << 9),
-  BF_STORAGE = (1 << 10),
-  DYNAMIC = (1 << 11),
-  MANAGED = (1 << 12),
+  TF_LINEAR_COLOR_SPACE = 1 << 1,
+  TF_NO_MIPMAP = 1 << 2,
+  TF_WRITABLE = 1 << 3,
+  TF_NO_GC = 1 << 4,
+  BF_VERTEX = 1 << 5,
+  BF_INDEX = 1 << 6,
+  BF_READ = 1 << 7,
+  BF_WRITE = 1 << 8,
+  BF_UNIFORM = 1 << 9,
+  BF_STORAGE = 1 << 10,
+  DYNAMIC = 1 << 11,
+  MANAGED = 1 << 12
 }
 
 export function getVertexAttribByName(name: VertexSemantic): number {
@@ -465,7 +471,10 @@ export function getVertexBufferStride(vertexBufferType: PBStructTypeInfo) {
   }
 }
 
-export function getVertexBufferAttribTypeBySemantic(vertexBufferType: PBStructTypeInfo, semantic: VertexSemantic): PBPrimitiveTypeInfo {
+export function getVertexBufferAttribTypeBySemantic(
+  vertexBufferType: PBStructTypeInfo,
+  semantic: VertexSemantic
+): PBPrimitiveTypeInfo {
   const k = vertexBufferType.structMembers[0];
   const vertexType = (k.type as PBArrayTypeInfo).elementType;
   if (vertexType.isStructType()) {
@@ -476,11 +485,14 @@ export function getVertexBufferAttribTypeBySemantic(vertexBufferType: PBStructTy
     }
     return null;
   } else {
-    return k.name === semantic ? vertexType as PBPrimitiveTypeInfo : null;
+    return k.name === semantic ? (vertexType as PBPrimitiveTypeInfo) : null;
   }
 }
 
-export function getVertexBufferAttribType(vertexBufferType: PBStructTypeInfo, attrib: number): PBPrimitiveTypeInfo {
+export function getVertexBufferAttribType(
+  vertexBufferType: PBStructTypeInfo,
+  attrib: number
+): PBPrimitiveTypeInfo {
   const attribName = getVertexAttribName(attrib);
   if (!attribName) {
     return null;
@@ -494,19 +506,27 @@ export function makeVertexBufferType(length: number, ...attributes: VertexAttrib
   }
   if (attributes.length === 1) {
     const format = vertexAttribFormatMap[attributes[0]];
-    return new PBStructTypeInfo(null, 'packed', [{
-      name: getVertexAttribName(format[0]),
-      type: new PBArrayTypeInfo(PBPrimitiveTypeInfo.getCachedTypeInfo(format[1]), length),
-    }]);
+    return new PBStructTypeInfo(null, 'packed', [
+      {
+        name: getVertexAttribName(format[0]),
+        type: new PBArrayTypeInfo(PBPrimitiveTypeInfo.getCachedTypeInfo(format[1]), length)
+      }
+    ]);
   } else {
-    const vertexType = new PBStructTypeInfo(null, 'packed', attributes.map(attrib => ({
-      name: getVertexAttribName(vertexAttribFormatMap[attrib][0]),
-      type: PBPrimitiveTypeInfo.getCachedTypeInfo(vertexAttribFormatMap[attrib][1]),
-    })));
-    return new PBStructTypeInfo(null, 'packed', [{
-      name: 'value',
-      type: new PBArrayTypeInfo(vertexType, length),
-    }]);
+    const vertexType = new PBStructTypeInfo(
+      null,
+      'packed',
+      attributes.map((attrib) => ({
+        name: getVertexAttribName(vertexAttribFormatMap[attrib][0]),
+        type: PBPrimitiveTypeInfo.getCachedTypeInfo(vertexAttribFormatMap[attrib][1])
+      }))
+    );
+    return new PBStructTypeInfo(null, 'packed', [
+      {
+        name: 'value',
+        type: new PBArrayTypeInfo(vertexType, length)
+      }
+    ]);
   }
 }
 
@@ -587,10 +607,10 @@ export interface TextureMipmapData {
 }
 
 export interface IFrameBufferTextureAttachment {
-  texture?: BaseTexture,
-  face?: number,
-  layer?: number,
-  level?: number,
+  texture?: BaseTexture;
+  face?: number;
+  layer?: number;
+  level?: number;
 }
 
 export interface IFrameBufferOptions {
@@ -666,16 +686,16 @@ export interface BindPointInfo {
 }
 
 export interface SamplerOptions {
-  addressU?: TextureWrapping,
-  addressV?: TextureWrapping,
-  addressW?: TextureWrapping,
-  magFilter?: TextureFilter,
-  minFilter?: TextureFilter,
-  mipFilter?: TextureFilter,
-  lodMin?: number,
-  lodMax?: number,
-  compare?: CompareFunc,
-  maxAnisotropy?: number
+  addressU?: TextureWrapping;
+  addressV?: TextureWrapping;
+  addressW?: TextureWrapping;
+  magFilter?: TextureFilter;
+  minFilter?: TextureFilter;
+  mipFilter?: TextureFilter;
+  lodMin?: number;
+  lodMax?: number;
+  compare?: CompareFunc;
+  maxAnisotropy?: number;
 }
 
 export interface GPUObject<T = unknown> {
@@ -738,7 +758,15 @@ export interface BaseTexture<T = unknown> extends GPUObject<T> {
 
 export interface Texture2D<T = unknown> extends BaseTexture<T> {
   update(data: TypedArray, xOffset: number, yOffset: number, width: number, height: number): void;
-  updateFromElement(data: TextureImageElement, xOffset: number, yOffset: number, x: number, y: number, width: number, height: number): void;
+  updateFromElement(
+    data: TextureImageElement,
+    xOffset: number,
+    yOffset: number,
+    x: number,
+    y: number,
+    width: number,
+    height: number
+  ): void;
   loadFromElement(element: TextureImageElement, creationFlags?: number): void;
   createWithMipmapData(data: TextureMipmapData, creationFlags?: number): void;
   readPixels(x: number, y: number, w: number, h: number, buffer: TypedArray): Promise<void>;
@@ -746,14 +774,39 @@ export interface Texture2D<T = unknown> extends BaseTexture<T> {
 }
 
 export interface Texture2DArray<T = unknown> extends BaseTexture<T> {
-  update(data: TypedArray, xOffset: number, yOffset: number, zOffset: number, width: number, height: number, depth: number): void;
-  updateFromElement(data: TextureImageElement, xOffset: number, yOffset: number, layerIndex: number, x: number, y: number, width: number, height: number): void;
+  update(
+    data: TypedArray,
+    xOffset: number,
+    yOffset: number,
+    zOffset: number,
+    width: number,
+    height: number,
+    depth: number
+  ): void;
+  updateFromElement(
+    data: TextureImageElement,
+    xOffset: number,
+    yOffset: number,
+    layerIndex: number,
+    x: number,
+    y: number,
+    width: number,
+    height: number
+  ): void;
   readPixels(layer: number, x: number, y: number, w: number, h: number, buffer: TypedArray): Promise<void>;
   readPixelsToBuffer(layer: number, x: number, y: number, w: number, h: number, buffer: GPUDataBuffer): void;
 }
 
 export interface Texture3D<T = unknown> extends BaseTexture<T> {
-  update(data: TypedArray, xOffset: number, yOffset: number, zOffset: number, width: number, height: number, depth: number): void;
+  update(
+    data: TypedArray,
+    xOffset: number,
+    yOffset: number,
+    zOffset: number,
+    width: number,
+    height: number,
+    depth: number
+  ): void;
   readPixels(layer: number, x: number, y: number, w: number, h: number, buffer: TypedArray): Promise<void>;
   readPixelsToBuffer(layer: number, x: number, y: number, w: number, h: number, buffer: GPUDataBuffer): void;
 }
@@ -767,7 +820,16 @@ export interface TextureCube<T = unknown> extends BaseTexture<T> {
     height: number,
     face: CubeFace
   ): void;
-  updateFromElement(data: TextureImageElement, xOffset: number, yOffset: number, face: number, x: number, y: number, width: number, height: number): void;
+  updateFromElement(
+    data: TextureImageElement,
+    xOffset: number,
+    yOffset: number,
+    face: number,
+    x: number,
+    y: number,
+    width: number,
+    height: number
+  ): void;
   createWithMipmapData(data: TextureMipmapData, creationFlags?: number): void;
   readPixels(face: number, x: number, y: number, w: number, h: number, buffer: TypedArray): Promise<void>;
   readPixelsToBuffer(face: number, x: number, y: number, w: number, h: number, buffer: GPUDataBuffer): void;
@@ -805,12 +867,7 @@ export interface VertexInputLayout<T = unknown> extends GPUObject<T> {
   getIndexBuffer(): IndexBuffer;
   bind(): void;
   draw(primitiveType: PrimitiveType, first: number, count: number): void;
-  drawInstanced(
-    primitiveType: PrimitiveType,
-    first: number,
-    count: number,
-    numInstances: number,
-  );
+  drawInstanced(primitiveType: PrimitiveType, first: number, count: number, numInstances: number);
 }
 
 export interface FrameBuffer<T = unknown> extends GPUObject<T> {

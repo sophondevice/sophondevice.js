@@ -6,13 +6,13 @@ import type { RenderPass } from './renderers';
 
 export interface InstanceData {
   worldMatrices: Matrix4x4[];
-  hash: string,
+  hash: string;
 }
 
 export interface IRenderQueueItem {
-  drawable: Drawable,
-  sortDistance: number,
-  instanceData: InstanceData,
+  drawable: Drawable;
+  sortDistance: number;
+  instanceData: InstanceData;
 }
 
 interface RenderItemList {
@@ -48,7 +48,7 @@ export class RenderQueue {
           opaqueList: [],
           opaqueInstanceList: {},
           transList: [],
-          transInstanceList: {},
+          transInstanceList: {}
         };
         this._itemLists[renderOrder] = itemList;
       }
@@ -58,14 +58,17 @@ export class RenderQueue {
         const instanceList = trans ? itemList.transInstanceList : itemList.opaqueInstanceList;
         const hash = drawable.getInstanceId(this._renderPass);
         const index = instanceList[hash];
-        if (index === undefined || list[index].instanceData.worldMatrices.length === this.getMaxBatchSize(camera.scene.device)) {
+        if (
+          index === undefined ||
+          list[index].instanceData.worldMatrices.length === this.getMaxBatchSize(camera.scene.device)
+        ) {
           instanceList[hash] = list.length;
           list.push({
             drawable,
             sortDistance: drawable.getSortDistance(camera),
             instanceData: {
               worldMatrices: [drawable.getXForm().worldMatrix],
-              hash: hash,
+              hash: hash
             }
           });
         } else {
@@ -75,7 +78,7 @@ export class RenderQueue {
         list.push({
           drawable,
           sortDistance: drawable.getSortDistance(camera),
-          instanceData: null,
+          instanceData: null
         });
       }
     }

@@ -1,7 +1,13 @@
 import { CubeFace } from '@sophon/base';
 import { WebGLGPUObject } from './gpuobject_webgl';
 import { WebGLEnum } from './webgl_enum';
-import { BaseTexture, IFrameBufferTextureAttachment, FrameBuffer, IFrameBufferOptions, GPUResourceUsageFlags } from '../gpuobject';
+import {
+  BaseTexture,
+  IFrameBufferTextureAttachment,
+  FrameBuffer,
+  IFrameBufferOptions,
+  GPUResourceUsageFlags
+} from '../gpuobject';
 import { cubeMapFaceMap } from './constants_webgl';
 import type { WebGLDevice } from './device_webgl';
 import { hasStencilChannel } from '../base_types';
@@ -9,7 +15,10 @@ import { hasStencilChannel } from '../base_types';
 const STATUS_UNCHECKED = 0;
 const STATUS_OK = 1;
 const STATUS_FAILED = 2;
-export class WebGLFrameBuffer extends WebGLGPUObject<WebGLFramebuffer> implements FrameBuffer<WebGLFramebuffer> {
+export class WebGLFrameBuffer
+  extends WebGLGPUObject<WebGLFramebuffer>
+  implements FrameBuffer<WebGLFramebuffer>
+{
   private _options: IFrameBufferOptions;
   private _viewport: number[];
   private _scissor: [number, number, number, number];
@@ -28,18 +37,25 @@ export class WebGLFrameBuffer extends WebGLGPUObject<WebGLFramebuffer> implement
     this._status = STATUS_UNCHECKED;
     this._options = {
       colorAttachments: opt?.colorAttachments
-        ? opt.colorAttachments.map((value) => Object.assign({
-          texture: null,
-          face: 0,
-          layer: 0,
-          level: 0
-        }, value))
+        ? opt.colorAttachments.map((value) =>
+            Object.assign(
+              {
+                texture: null,
+                face: 0,
+                layer: 0,
+                level: 0
+              },
+              value
+            )
+          )
         : null,
       depthAttachment: opt?.depthAttachment ? Object.assign({}, opt.depthAttachment) : null
     };
     this._width = 0;
     this._height = 0;
-    this._drawBuffers = this._options.colorAttachments.map((val, index) => val.texture ? WebGLEnum.COLOR_ATTACHMENT0 + index : WebGLEnum.NONE);
+    this._drawBuffers = this._options.colorAttachments.map((val, index) =>
+      val.texture ? WebGLEnum.COLOR_ATTACHMENT0 + index : WebGLEnum.NONE
+    );
     this._isMRT = this._drawBuffers.length > 1;
     this._init();
   }
@@ -129,7 +145,7 @@ export class WebGLFrameBuffer extends WebGLGPUObject<WebGLFramebuffer> implement
     return this._options?.depthAttachment?.texture || null;
   }
   getColorAttachments(): BaseTexture[] {
-    return this._options.colorAttachments?.map(val => val.texture || null) || [];
+    return this._options.colorAttachments?.map((val) => val.texture || null) || [];
   }
   bind(): boolean {
     if (this._object) {
@@ -195,7 +211,7 @@ export class WebGLFrameBuffer extends WebGLGPUObject<WebGLFramebuffer> implement
           attachment,
           cubeMapFaceMap[info.face ?? CubeFace.PX],
           info.texture.object,
-          info.level ?? 0,
+          info.level ?? 0
         );
       } else if (info.texture.isTexture2DArray() || info.texture.isTexture3D()) {
         (this._device.context as WebGL2RenderingContext).framebufferTextureLayer(
@@ -254,7 +270,10 @@ export class WebGLFrameBuffer extends WebGLGPUObject<WebGLFramebuffer> implement
         if (this._height === 0) {
           this._height = colorAttachment.texture.height;
         }
-        if (this._width !== colorAttachment.texture.width || this._height !== colorAttachment.texture.height) {
+        if (
+          this._width !== colorAttachment.texture.width ||
+          this._height !== colorAttachment.texture.height
+        ) {
           console.error('init frame buffer failed: color attachment textures must have same size');
           return;
         }

@@ -1,5 +1,5 @@
-import { ShaderType, BindGroup, PBShaderExp, PBInsideFunctionScope, PBGlobalScope } from "@sophon/device";
-import { Blitter, BlitType } from "./blitter";
+import { ShaderType, BindGroup, PBShaderExp, PBInsideFunctionScope, PBGlobalScope } from '@sophon/device';
+import { Blitter, BlitType } from './blitter';
 
 export class GammaBlitter extends Blitter {
   protected _gamma: number;
@@ -16,7 +16,13 @@ export class GammaBlitter extends Blitter {
   setUniforms(bindGroup: BindGroup) {
     bindGroup.setValue('gamma', this._gamma);
   }
-  filter(scope: PBInsideFunctionScope, type: BlitType, srcTex: PBShaderExp, srcUV: PBShaderExp, srcLayer: PBShaderExp): PBShaderExp {
+  filter(
+    scope: PBInsideFunctionScope,
+    type: BlitType,
+    srcTex: PBShaderExp,
+    srcUV: PBShaderExp,
+    srcLayer: PBShaderExp
+  ): PBShaderExp {
     const pb = scope.$builder;
     return pb.pow(this.readTexel(scope, type, srcTex, srcUV, srcLayer), pb.vec4(pb.vec3(scope.gamma), 1));
   }

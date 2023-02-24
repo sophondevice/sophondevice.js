@@ -1,5 +1,13 @@
 import { Vector4, Frustum } from '@sophon/base';
-import { PBShaderExp, PBGlobalScope, BindGroup, RenderStateSet, FaceMode, TextureFormat, PBInsideFunctionScope } from '@sophon/device';
+import {
+  PBShaderExp,
+  PBGlobalScope,
+  BindGroup,
+  RenderStateSet,
+  FaceMode,
+  TextureFormat,
+  PBInsideFunctionScope
+} from '@sophon/device';
 import { RenderPass } from './renderpass';
 import { RENDER_PASS_TYPE_SHADOWMAP } from '../values';
 import { PunctualLight } from '../light';
@@ -18,7 +26,13 @@ class DebugBlitter extends CopyBlitter {
     super();
     this.packFloat = false;
   }
-  filter(scope: PBInsideFunctionScope, type: BlitType, srcTex: PBShaderExp, srcUV: PBShaderExp, srcLayer: PBShaderExp): PBShaderExp {
+  filter(
+    scope: PBInsideFunctionScope,
+    type: BlitType,
+    srcTex: PBShaderExp,
+    srcUV: PBShaderExp,
+    srcLayer: PBShaderExp
+  ): PBShaderExp {
     const pb = scope.$builder;
     const texel = this.readTexel(scope, type, srcTex, srcUV, srcLayer);
     if (this.packFloat) {
@@ -35,7 +49,13 @@ class DebugBlitter extends CopyBlitter {
 
 class BlurBlitter extends GaussianBlurBlitter {
   public packFloat: boolean;
-  readTexel(scope: PBInsideFunctionScope, type: BlitType, srcTex: PBShaderExp, srcUV: PBShaderExp, srcLayer: PBShaderExp): PBShaderExp {
+  readTexel(
+    scope: PBInsideFunctionScope,
+    type: BlitType,
+    srcTex: PBShaderExp,
+    srcUV: PBShaderExp,
+    srcLayer: PBShaderExp
+  ): PBShaderExp {
     const pb = scope.$builder;
     const texel = super.readTexel(scope, type, srcTex, srcUV, srcLayer);
     if (this.packFloat) {
@@ -45,7 +65,12 @@ class BlurBlitter extends GaussianBlurBlitter {
       return texel;
     }
   }
-  writeTexel(scope: PBInsideFunctionScope, type: BlitType, srcUV: PBShaderExp, texel: PBShaderExp): PBShaderExp {
+  writeTexel(
+    scope: PBInsideFunctionScope,
+    type: BlitType,
+    srcUV: PBShaderExp,
+    texel: PBShaderExp
+  ): PBShaderExp {
     const pb = scope.$builder;
     const outTexel = super.writeTexel(scope, type, srcUV, texel);
     if (this.packFloat) {
@@ -137,7 +162,7 @@ export class ShadowMapPass extends RenderPass {
     const result: number[] = [0, 0, 0, 0, 0];
     for (let i = 0; i <= numCascades; ++i) {
       const fIDM = i / numCascades;
-      const fLog = nearPlane * Math.pow((farPlane / nearPlane), fIDM);
+      const fLog = nearPlane * Math.pow(farPlane / nearPlane, fIDM);
       const fUniform = nearPlane + (farPlane - nearPlane) * fIDM;
       result[i] = fLog * this._splitLambda + fUniform * (1 - this._splitLambda);
     }
@@ -157,7 +182,7 @@ export class ShadowMapPass extends RenderPass {
       pb.mat4('viewProjectionMatrix'),
       pb.mat4('viewMatrix'),
       pb.mat4('projectionMatrix'),
-      pb.vec4('params'),
+      pb.vec4('params')
     );
     const structLight = pb.defineStruct(
       null,
@@ -166,23 +191,20 @@ export class ShadowMapPass extends RenderPass {
       pb.vec4('directionCutoff'),
       pb.mat4('viewMatrix'),
       pb.vec4('depthBias'),
-      pb.int('lightType'),
+      pb.int('lightType')
     );
-    const structGlobal = pb.defineStruct(
-      null,
-      'std140',
-      structCamera('camera'),
-      structLight('light'),
-    );
-    pb.globalScope.global = structGlobal().uniform(0).tag({
-      camera: {
-        position: ShaderLib.USAGE_CAMERA_POSITION,
-        viewProjectionMatrix: ShaderLib.USAGE_VIEW_PROJ_MATRIX,
-        viewMatrix: ShaderLib.USAGE_VIEW_MATRIX,
-        projectionMatrix: ShaderLib.USAGE_PROJECTION_MATRIX,
-        params: ShaderLib.USAGE_CAMERA_PARAMS,
-      }
-    });
+    const structGlobal = pb.defineStruct(null, 'std140', structCamera('camera'), structLight('light'));
+    pb.globalScope.global = structGlobal()
+      .uniform(0)
+      .tag({
+        camera: {
+          position: ShaderLib.USAGE_CAMERA_POSITION,
+          viewProjectionMatrix: ShaderLib.USAGE_VIEW_PROJ_MATRIX,
+          viewMatrix: ShaderLib.USAGE_VIEW_MATRIX,
+          projectionMatrix: ShaderLib.USAGE_PROJECTION_MATRIX,
+          params: ShaderLib.USAGE_CAMERA_PARAMS
+        }
+      });
   }
   /** @internal */
   protected setLightUniforms(bindGroup: BindGroup, ctx: DrawContext, light: PunctualLight) {
@@ -200,14 +222,33 @@ export class ShadowMapPass extends RenderPass {
     ctx.environment?.updateBindGroup(bindGroup);
   }
   /** @internal */
-  protected calcDepthBiasParams(shadowMapCamera: Camera, shadowMapSize: number, depthBias: number, normalBias: number, depthScale: number, result: Vector4): void {
+  protected calcDepthBiasParams(
+    shadowMapCamera: Camera,
+    shadowMapSize: number,
+    depthBias: number,
+    normalBias: number,
+    depthScale: number,
+    result: Vector4
+  ): void {
     const frustum = shadowMapCamera.frustum;
     const sizeNear = Math.min(
-      Math.abs(frustum.getCorner(Frustum.CORNER_RIGHT_TOP_NEAR).x - frustum.getCorner(Frustum.CORNER_LEFT_TOP_NEAR).x),
-      Math.abs(frustum.getCorner(Frustum.CORNER_RIGHT_TOP_NEAR).y - frustum.getCorner(Frustum.CORNER_RIGHT_BOTTOM_NEAR).y));
+      Math.abs(
+        frustum.getCorner(Frustum.CORNER_RIGHT_TOP_NEAR).x - frustum.getCorner(Frustum.CORNER_LEFT_TOP_NEAR).x
+      ),
+      Math.abs(
+        frustum.getCorner(Frustum.CORNER_RIGHT_TOP_NEAR).y -
+          frustum.getCorner(Frustum.CORNER_RIGHT_BOTTOM_NEAR).y
+      )
+    );
     const sizeFar = Math.min(
-      Math.abs(frustum.getCorner(Frustum.CORNER_RIGHT_TOP_FAR).x - frustum.getCorner(Frustum.CORNER_LEFT_TOP_FAR).x),
-      Math.abs(frustum.getCorner(Frustum.CORNER_RIGHT_TOP_FAR).y - frustum.getCorner(Frustum.CORNER_RIGHT_BOTTOM_FAR).y));
+      Math.abs(
+        frustum.getCorner(Frustum.CORNER_RIGHT_TOP_FAR).x - frustum.getCorner(Frustum.CORNER_LEFT_TOP_FAR).x
+      ),
+      Math.abs(
+        frustum.getCorner(Frustum.CORNER_RIGHT_TOP_FAR).y -
+          frustum.getCorner(Frustum.CORNER_RIGHT_BOTTOM_FAR).y
+      )
+    );
     const scaleFactor = sizeNear / shadowMapSize / 2;
     result.set(depthBias * scaleFactor, normalBias * scaleFactor, depthScale, sizeFar / sizeNear);
   }
@@ -307,7 +348,7 @@ export class ShadowMapPass extends RenderPass {
       target: null,
       renderPass: this,
       renderPassHash: null,
-      materialFunc: values.MATERIAL_FUNC_DEPTH_SHADOW,
+      materialFunc: values.MATERIAL_FUNC_DEPTH_SHADOW
     };
     const device = this._renderScheme.device;
     const bindGroup = this.getGlobalBindGroup(ctx);
@@ -315,7 +356,9 @@ export class ShadowMapPass extends RenderPass {
     this.setLightUniforms(bindGroup, ctx, this._currentLight);
     this.setCameraUniforms(bindGroup, ctx, this._verticalFlip !== this.isAutoFlip());
     ctx.renderPassHash = this.getGlobalBindGroupHash(ctx);
-    for (const order of Object.keys(renderQueue.items).map(val => Number(val)).sort((a, b) => a - b)) {
+    for (const order of Object.keys(renderQueue.items)
+      .map((val) => Number(val))
+      .sort((a, b) => a - b)) {
       const renderItems = renderQueue.items[order];
       for (const item of renderItems.opaqueList) {
         if (!item.drawable.isUnlit()) {

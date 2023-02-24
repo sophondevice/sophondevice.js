@@ -26,7 +26,7 @@ import type { Font } from './font';
 import type { RPrimitiveBatchList } from './primitive';
 
 interface IElementConstructor {
-  new(gui: GUI, ...args: unknown[]): RElement;
+  new (gui: GUI, ...args: unknown[]): RElement;
 }
 
 class DrawVisitor {
@@ -38,15 +38,10 @@ class DrawVisitor {
     this._renderer = gui.renderer;
     this._drawDragImage = false;
   }
-  beginTraverse() { }
+  beginTraverse() {}
   beginTraverseNode(w: RNode) {
     const dragSession = this._gui.getDragSession();
-    if (
-      dragSession &&
-      dragSession.started &&
-      w === dragSession.node &&
-      dragSession.dragImage.length === 0
-    ) {
+    if (dragSession && dragSession.started && w === dragSession.node && dragSession.dragImage.length === 0) {
       this._drawDragImage = true;
     }
   }
@@ -82,8 +77,8 @@ class DrawVisitor {
         w.batchList.clone({
           colorTransformFunc: (c) => {
             return { r: c.r, g: c.g, b: c.b, a: c.a * 0.5 };
-          },
-        }),
+          }
+        })
       );
     }
   }
@@ -106,7 +101,8 @@ export class ElementRegistry {
     if (typeof tagName === 'string') {
       console.assert(
         !this._constructors[tagName],
-        'Failed to register element type: tagname already registered');
+        'Failed to register element type: tagname already registered'
+      );
       this._constructors[tagName] = ctor;
     }
   }
@@ -131,7 +127,7 @@ const elementRegistry = new ElementRegistry({
   scrollbar: ScrollBar,
   option: Option,
   select: Select,
-  slider: Slider,
+  slider: Slider
 });
 
 const deviceMouseEvents = {
@@ -140,13 +136,13 @@ const deviceMouseEvents = {
   [RMouseEvent.NAME_RENDERER_MOUSEMOVE]: RMouseEvent.NAME_MOUSEMOVE,
   [RMouseEvent.NAME_RENDERER_MOUSECLICK]: RMouseEvent.NAME_MOUSECLICK,
   [RMouseEvent.NAME_RENDERER_MOUSEDBLCLICK]: RMouseEvent.NAME_MOUSEDBLCLICK,
-  [RMouseEvent.NAME_RENDERER_MOUSEWHEEL]: RMouseEvent.NAME_MOUSEWHEEL,
+  [RMouseEvent.NAME_RENDERER_MOUSEWHEEL]: RMouseEvent.NAME_MOUSEWHEEL
 };
 
 const deviceKeyEvents = {
   [RKeyEvent.NAME_RENDERER_KEYDOWN]: RKeyEvent.NAME_KEYDOWN,
   [RKeyEvent.NAME_RENDERER_KEYUP]: RKeyEvent.NAME_KEYUP,
-  [RKeyEvent.NAME_RENDERER_KEYPRESS]: RKeyEvent.NAME_KEYPRESS,
+  [RKeyEvent.NAME_RENDERER_KEYPRESS]: RKeyEvent.NAME_KEYPRESS
 };
 
 const DRAG_DISTANCE = 4;
@@ -203,8 +199,8 @@ class DragSession {
                 this.gui.shiftKey,
                 this.gui.altKey,
                 this.gui.metaKey,
-                this.dataTransfer,
-              ),
+                this.dataTransfer
+              )
             );
           }
         }
@@ -221,8 +217,8 @@ class DragSession {
             this.gui.shiftKey,
             this.gui.altKey,
             this.gui.metaKey,
-            this.dataTransfer,
-          ),
+            this.dataTransfer
+          )
         );
         this.overNode = hover.element;
       }
@@ -245,7 +241,7 @@ class DragSession {
           this.gui.shiftKey,
           this.gui.altKey,
           this.gui.metaKey,
-          dataTransfer,
+          dataTransfer
         );
         this.node.dispatchEvent(dragStartEvent);
         if (dragStartEvent.defaultPrevented) {
@@ -269,7 +265,7 @@ class DragSession {
         false,
         false,
         false,
-        null,
+        null
       );
       this.timer = window.setInterval(() => {
         const hover = this.gui.getHover();
@@ -286,7 +282,7 @@ class DragSession {
             this.gui.ctrlKey,
             this.gui.shiftKey,
             this.gui.altKey,
-            this.gui.metaKey,
+            this.gui.metaKey
           );
           this.cachedDragOverEvent.dataTransfer = this.dataTransfer;
           hover.element.dispatchEvent(this.cachedDragOverEvent);
@@ -313,8 +309,8 @@ class DragSession {
               this.gui.shiftKey,
               this.gui.altKey,
               this.gui.metaKey,
-              this.dataTransfer,
-            ),
+              this.dataTransfer
+            )
           );
         }
       }
@@ -333,8 +329,8 @@ class DragSession {
             this.gui.shiftKey,
             this.gui.altKey,
             this.gui.metaKey,
-            this.dataTransfer,
-          ),
+            this.dataTransfer
+          )
         );
       }
 
@@ -521,10 +517,7 @@ export class GUI extends REventTarget {
         }
         let info: { element: RNode; x: number; y: number } = null;
         for (const el of this._hoverElements) {
-          if (
-            !el.element.isElement() ||
-            el.element.style.pointerEvents !== 'none'
-          ) {
+          if (!el.element.isElement() || el.element.style.pointerEvents !== 'none') {
             info = el;
             break;
           }
@@ -538,16 +531,8 @@ export class GUI extends REventTarget {
             this._activeElement = info.element;
             this._activeElement._onMouseDown(info.x, info.y);
             this.setFocus(info.element);
-            if (
-              this._activeElement.isElement() &&
-              this._activeElement.getAttribute('draggable') === 'true'
-            ) {
-              this._dragSession = new DragSession(
-                this,
-                this._activeElement,
-                mouseEvent.x,
-                mouseEvent.y,
-              );
+            if (this._activeElement.isElement() && this._activeElement.getAttribute('draggable') === 'true') {
+              this._dragSession = new DragSession(this, this._activeElement, mouseEvent.x, mouseEvent.y);
             }
           }
         } else if (evt === RMouseEvent.NAME_RENDERER_MOUSEUP) {
@@ -582,7 +567,7 @@ export class GUI extends REventTarget {
             mouseEvent.ctrlKey,
             mouseEvent.shiftKey,
             mouseEvent.altKey,
-            mouseEvent.metaKey,
+            mouseEvent.metaKey
           );
           (info ? info.element : this.document).dispatchEvent(me);
           if (click) {
@@ -599,7 +584,7 @@ export class GUI extends REventTarget {
               mouseEvent.ctrlKey,
               mouseEvent.shiftKey,
               mouseEvent.altKey,
-              mouseEvent.metaKey,
+              mouseEvent.metaKey
             );
             (info ? info.element : this.document).dispatchEvent(ce);
           }
@@ -623,8 +608,8 @@ export class GUI extends REventTarget {
               keyEvent.ctrlKey,
               keyEvent.shiftKey,
               keyEvent.altKey,
-              keyEvent.metaKey,
-            ),
+              keyEvent.metaKey
+            )
           );
         }
       });
@@ -677,12 +662,12 @@ export class GUI extends REventTarget {
         } else {
           this._markStyleRefreshForElement(data.parent || el);
         }
-        if (
-          !this._guiLoading &&
-          (el.tagName === 'link' || (numChildren > 0 && el.querySelector('link')))
-        ) {
-          const linkElements = [...(el.tagName === 'link' ? [el] : []), ...el.querySelectorAll('link').values()];
-          linkElements.forEach(linkEl => {
+        if (!this._guiLoading && (el.tagName === 'link' || (numChildren > 0 && el.querySelector('link')))) {
+          const linkElements = [
+            ...(el.tagName === 'link' ? [el] : []),
+            ...el.querySelectorAll('link').values()
+          ];
+          linkElements.forEach((linkEl) => {
             this._importLinkContent(linkEl as RElement);
           });
         }
@@ -714,11 +699,9 @@ export class GUI extends REventTarget {
     this._bounds = rect ? { ...rect } : null;
     this._topLayout.node.setPosition(Yoga.EDGE_LEFT, this._bounds ? this._bounds.x : 0);
     this._topLayout.node.setPosition(Yoga.EDGE_TOP, this._bounds ? this._bounds.y : 0);
-    this._topLayout.node.setWidth(
-      this._bounds ? this._bounds.width : this._renderer.getDrawingBufferWidth(),
-    );
+    this._topLayout.node.setWidth(this._bounds ? this._bounds.width : this._renderer.getDrawingBufferWidth());
     this._topLayout.node.setHeight(
-      this._bounds ? this._bounds.height : this._renderer.getDrawingBufferHeight(),
+      this._bounds ? this._bounds.height : this._renderer.getDrawingBufferHeight()
     );
     this.invalidateLayout();
   }
@@ -866,16 +849,13 @@ export class GUI extends REventTarget {
               ruleList.push({
                 rule: rule,
                 stylesheet: def.stylesheet,
-                extra: def.extra,
+                extra: def.extra
               });
             }
           }
         }
         let allElements: RElement[] = null;
-        const pseudoMap: Map<
-          RNode,
-          Map<string, { stylesheet: IStyleSheet; extra: unknown }[]>
-        > = new Map();
+        const pseudoMap: Map<RNode, Map<string, { stylesheet: IStyleSheet; extra: unknown }[]>> = new Map();
         if (this._styleFullRefresh) {
           allElements = this._querySelectorAll(this._document, '*', true, true);
         }
@@ -891,12 +871,11 @@ export class GUI extends REventTarget {
               const pseudoTypes: Map<string, { stylesheet: IStyleSheet; extra: unknown }[]> =
                 pseudoMap.get(node) || new Map();
               pseudoMap.set(node, pseudoTypes);
-              const styleList: { stylesheet: IStyleSheet; extra: unknown }[] =
-                pseudoTypes.get(type) || [];
+              const styleList: { stylesheet: IStyleSheet; extra: unknown }[] = pseudoTypes.get(type) || [];
               pseudoTypes.set(type, styleList);
               styleList.push({
                 stylesheet: rule.stylesheet,
-                extra: rule.extra,
+                extra: rule.extra
               });
             });
             for (const e of rule.rule.targets) {
@@ -1028,7 +1007,7 @@ export class GUI extends REventTarget {
           this._ruleListImported.push({
             rule: rule,
             stylesheet: def.stylesheet,
-            extra: def.extra,
+            extra: def.extra
           });
         }
       }
@@ -1082,11 +1061,21 @@ export class GUI extends REventTarget {
     return this._glyphManager.clipStringToWidth(str, width, charMargin, start, font);
   }
   /** @internal */
-  _querySelectorAll<T extends RElement>(root: RNode, selectors: string, excludeRoot: boolean, allowInternal: boolean): T[] {
+  _querySelectorAll<T extends RElement>(
+    root: RNode,
+    selectors: string,
+    excludeRoot: boolean,
+    allowInternal: boolean
+  ): T[] {
     return new RSelector(selectors).resolve(root, excludeRoot, allowInternal) as T[];
   }
   /** @internal */
-  _querySelectorOne<T extends RElement>(root: RNode, selectors: string, excludeRoot: boolean, allowInternal): T {
+  _querySelectorOne<T extends RElement>(
+    root: RNode,
+    selectors: string,
+    excludeRoot: boolean,
+    allowInternal
+  ): T {
     return this._querySelectorAll<T>(root, selectors, excludeRoot, allowInternal)[0] || null;
   }
   /** @internal */
@@ -1143,9 +1132,7 @@ export class GUI extends REventTarget {
     }
   }
   /** @internal */
-  _parseStyleContent(
-    content: string,
-  ): { selector: RSelector; stylesheet: IStyleSheet; extra: unknown }[] {
+  _parseStyleContent(content: string): { selector: RSelector; stylesheet: IStyleSheet; extra: unknown }[] {
     const result: {
       selector: RSelector;
       stylesheet: IStyleSheet;
@@ -1155,7 +1142,7 @@ export class GUI extends REventTarget {
       .split(/[\r\n]+/)
       .join('')
       .replace(/\/\*[\s\S]*?\*\//g, '');
-    for (; ;) {
+    for (;;) {
       const lbracket = content.indexOf('{');
       const rbracket = content.indexOf('}');
       if (lbracket < 0 || rbracket < 0 || lbracket > rbracket) {
@@ -1208,7 +1195,7 @@ export class GUI extends REventTarget {
         break;
       }
       default: {
-        throw new Error(`Invalid rel attribute for link: ${rel}`)
+        throw new Error(`Invalid rel attribute for link: ${rel}`);
       }
     }
   }
@@ -1288,8 +1275,8 @@ export class GUI extends REventTarget {
                 this._ctrlKey,
                 this._shiftKey,
                 this._altKey,
-                this._metaKey,
-              ),
+                this._metaKey
+              )
             );
           }
         }
@@ -1312,8 +1299,8 @@ export class GUI extends REventTarget {
                 this._ctrlKey,
                 this._shiftKey,
                 this._altKey,
-                this._metaKey,
-              ),
+                this._metaKey
+              )
             );
           }
         }
@@ -1342,7 +1329,7 @@ export class GUI extends REventTarget {
           this._ctrlKey,
           this._shiftKey,
           this._altKey,
-          this._metaKey,
+          this._metaKey
         );
         evtOut.relatedTarget = newHover.element;
         lastHover.element.dispatchEvent(evtOut);
@@ -1361,7 +1348,7 @@ export class GUI extends REventTarget {
           this._ctrlKey,
           this._shiftKey,
           this._altKey,
-          this._metaKey,
+          this._metaKey
         );
         evtOver.relatedTarget = lastHover.element;
         newHover.element.dispatchEvent(evtOver);

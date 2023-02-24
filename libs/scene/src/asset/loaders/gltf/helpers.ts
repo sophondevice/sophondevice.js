@@ -1,7 +1,15 @@
-import { I8_BITMASK, U8_BITMASK, I16_BITMASK, U16_BITMASK, I32_BITMASK, U32_BITMASK, F32_BITMASK } from "@sophon/device";
-import { Accessor, AccessorSparse } from "./gltf";
-import type { TypedArray } from "@sophon/base";
-import type { GLTFContent } from "./gltf_loader";
+import {
+  I8_BITMASK,
+  U8_BITMASK,
+  I16_BITMASK,
+  U16_BITMASK,
+  I32_BITMASK,
+  U32_BITMASK,
+  F32_BITMASK
+} from '@sophon/device';
+import { Accessor, AccessorSparse } from './gltf';
+import type { TypedArray } from '@sophon/base';
+import type { GLTFContent } from './gltf_loader';
 
 export const enum ComponentType {
   UNKNOWN = 0,
@@ -11,8 +19,8 @@ export const enum ComponentType {
   USHORT = 5123, // GL.UNSIGNED_SHORT
   INT = 5124, // GL.INT
   UINT = 5125, // GL.UNSIGNED_INT
-  FLOAT = 5126, // GL.FLOAT
-};
+  FLOAT = 5126 // GL.FLOAT
+}
 
 export type GLTFComponentType = 'SCALAR' | 'VEC2' | 'VEC3' | 'VEC4' | 'MAT2' | 'MAT3' | 'MAT4';
 
@@ -65,19 +73,17 @@ export class GLTFAccessor {
       let arrayLength = 0;
       if (bufferView.byteStride !== undefined && bufferView.byteStride !== 0) {
         if (componentSize !== 0) {
-          arrayLength = bufferView.byteStride / componentSize * (this.count - 1) + componentCount;
+          arrayLength = (bufferView.byteStride / componentSize) * (this.count - 1) + componentCount;
+        } else {
+          console.warn("Invalid component type in accessor '" + (this.name ? this.name : '') + "'");
         }
-        else {
-          console.warn("Invalid component type in accessor '" + (this.name ? this.name : "") + "'");
-        }
-      }
-      else {
+      } else {
         arrayLength = this.count * componentCount;
       }
 
       if (arrayLength * componentSize > buffer.byteLength - byteOffset) {
         arrayLength = (buffer.byteLength - byteOffset) / componentSize;
-        console.warn("Count in accessor '" + (this.name ? this.name : "") + "' is too large.");
+        console.warn("Count in accessor '" + (this.name ? this.name : '') + "' is too large.");
       }
 
       switch (this.componentType) {
@@ -103,15 +109,13 @@ export class GLTFAccessor {
           this._typedView = new Float32Array(buffer, byteOffset, arrayLength);
           break;
       }
-    }
-    else if (this.sparse !== undefined) {
+    } else if (this.sparse !== undefined) {
       this._typedView = this.createView();
     }
 
     if (!this._typedView) {
-      console.warn("Failed to convert buffer view to typed view!: " + this.bufferView);
-    }
-    else if (this.sparse !== undefined) {
+      console.warn('Failed to convert buffer view to typed view!: ' + this.bufferView);
+    } else if (this.sparse !== undefined) {
       this.applySparse(gltf, this._typedView);
     }
 
@@ -127,7 +131,9 @@ export class GLTFAccessor {
     }
 
     const typedView = this.getTypedView(gltf);
-    this._normalizedTypedView = this.normalized ? GLTFAccessor.dequantize(typedView, this.componentType) : typedView;
+    this._normalizedTypedView = this.normalized
+      ? GLTFAccessor.dequantize(typedView, this.componentType)
+      : typedView;
     return this._normalizedTypedView;
   }
 
@@ -182,14 +188,16 @@ export class GLTFAccessor {
       const bufferView = gltf.bufferViews[this.bufferView];
       const buffer = gltf._loadedBuffers[bufferView.buffer];
       const byteOffset = this.byteOffset + (bufferView.byteOffset ?? 0);
-      const stride = (bufferView.byteStride !== undefined && bufferView.byteStride !== 0) ? bufferView.byteStride : componentCount * componentSize;
+      const stride =
+        bufferView.byteStride !== undefined && bufferView.byteStride !== 0
+          ? bufferView.byteStride
+          : componentCount * componentSize;
       const dataView = new DataView(buffer, byteOffset, this.count * stride);
       for (let i = 0; i < arrayLength; ++i) {
         const offset = Math.floor(i / componentCount) * stride + (i % componentCount) * componentSize;
         this._filteredView[i] = dataView[func](offset, true);
       }
-    }
-    else if (this.sparse !== undefined) {
+    } else if (this.sparse !== undefined) {
       this._filteredView = this.createView();
     }
 
@@ -221,7 +229,9 @@ export class GLTFAccessor {
     }
 
     const filteredView = this.getDeinterlacedView(gltf);
-    this._normalizedFilteredView = this.normalized ? GLTFAccessor.dequantize(filteredView, this.componentType) : filteredView;
+    this._normalizedFilteredView = this.normalized
+      ? GLTFAccessor.dequantize(filteredView, this.componentType)
+      : filteredView;
     return this._normalizedFilteredView;
   }
 
@@ -307,13 +317,13 @@ export class GLTFAccessor {
   static dequantize(typedArray: TypedArray, componentType: ComponentType) {
     switch (componentType) {
       case ComponentType.BYTE:
-        return new Float32Array(typedArray).map(c => Math.max(c / 127.0, -1.0));
+        return new Float32Array(typedArray).map((c) => Math.max(c / 127.0, -1.0));
       case ComponentType.UBYTE:
-        return new Float32Array(typedArray).map(c => c / 255.0);
+        return new Float32Array(typedArray).map((c) => c / 255.0);
       case ComponentType.SHORT:
-        return new Float32Array(typedArray).map(c => Math.max(c / 32767.0, -1.0));
+        return new Float32Array(typedArray).map((c) => Math.max(c / 32767.0, -1.0));
       case ComponentType.USHORT:
-        return new Float32Array(typedArray).map(c => c / 65535.0);
+        return new Float32Array(typedArray).map((c) => c / 65535.0);
       default:
         return typedArray;
     }
@@ -321,27 +331,43 @@ export class GLTFAccessor {
 
   getComponentCount(type: GLTFComponentType) {
     switch (type) {
-      case 'SCALAR': return 1;
-      case 'VEC2': return 2;
-      case 'VEC3': return 3;
-      case 'VEC4': return 4;
-      case 'MAT2': return 4;
-      case 'MAT3': return 9;
-      case 'MAT4': return 16;
-      default: return 0;
+      case 'SCALAR':
+        return 1;
+      case 'VEC2':
+        return 2;
+      case 'VEC3':
+        return 3;
+      case 'VEC4':
+        return 4;
+      case 'MAT2':
+        return 4;
+      case 'MAT3':
+        return 9;
+      case 'MAT4':
+        return 16;
+      default:
+        return 0;
     }
   }
 
   getTypeMask(componentType: ComponentType): number {
     switch (componentType) {
-      case ComponentType.BYTE: return I8_BITMASK;
-      case ComponentType.UBYTE: return U8_BITMASK;
-      case ComponentType.SHORT: return I16_BITMASK;
-      case ComponentType.USHORT: return U16_BITMASK;
-      case ComponentType.INT: return I32_BITMASK;
-      case ComponentType.UINT: return U32_BITMASK;
-      case ComponentType.FLOAT: return F32_BITMASK;
-      default: return 0;
+      case ComponentType.BYTE:
+        return I8_BITMASK;
+      case ComponentType.UBYTE:
+        return U8_BITMASK;
+      case ComponentType.SHORT:
+        return I16_BITMASK;
+      case ComponentType.USHORT:
+        return U16_BITMASK;
+      case ComponentType.INT:
+        return I32_BITMASK;
+      case ComponentType.UINT:
+        return U32_BITMASK;
+      case ComponentType.FLOAT:
+        return F32_BITMASK;
+      default:
+        return 0;
     }
   }
 

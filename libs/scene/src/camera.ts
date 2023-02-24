@@ -228,7 +228,7 @@ export class Camera extends SceneNode {
     if (this._model !== model) {
       if (model && model._getCamera() && model._getCamera() !== this) {
         throw new Error(
-          'Camera.setModel failed: one camera model object cannot be assigned to multiple camera',
+          'Camera.setModel failed: one camera model object cannot be assigned to multiple camera'
         );
       }
       if (this._model) {

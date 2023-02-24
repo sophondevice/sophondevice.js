@@ -2,7 +2,10 @@ import { WebGPUBaseTexture } from './basetexture_webgpu';
 import { TextureVideo } from '../gpuobject';
 import type { WebGPUDevice } from './device';
 
-export class WebGPUTextureVideo extends WebGPUBaseTexture<GPUExternalTexture> implements TextureVideo<GPUExternalTexture> {
+export class WebGPUTextureVideo
+  extends WebGPUBaseTexture<GPUExternalTexture>
+  implements TextureVideo<GPUExternalTexture>
+{
   private _source: HTMLVideoElement;
   constructor(device: WebGPUDevice, element: HTMLVideoElement) {
     super(device);
@@ -29,7 +32,10 @@ export class WebGPUTextureVideo extends WebGPUBaseTexture<GPUExternalTexture> im
     }
   }
   updateVideoFrame(): boolean {
-    if ((!this._object || (this._object as any).expired || (this._object as any).expired === undefined) && this._source.readyState > 2) {
+    if (
+      (!this._object || (this._object as any).expired || (this._object as any).expired === undefined) &&
+      this._source.readyState > 2
+    ) {
       this._object = this._device.gpuImportExternalTexture(this._source);
       return true;
     }

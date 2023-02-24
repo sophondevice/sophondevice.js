@@ -21,12 +21,18 @@ const StorageTextureFormatMap = {
   rg32sint: TextureFormat.RG32I,
   rgba32float: TextureFormat.RGBA32F,
   rgba32uint: TextureFormat.RGBA32UI,
-  rgba32sint: TextureFormat.RGBA32I,
+  rgba32sint: TextureFormat.RGBA32I
 };
 
-export type StorageTextureConstructor = { [k in keyof typeof StorageTextureFormatMap]: (s?: string) => PBShaderExp };
+export type StorageTextureConstructor = {
+  [k in keyof typeof StorageTextureFormatMap]: (s?: string) => PBShaderExp;
+};
 
-function vec_n(this: ProgramBuilder, vecType: typeinfo.PBPrimitiveTypeInfo, ...args: (number | boolean | string | PBShaderExp)[]): PBShaderExp {
+function vec_n(
+  this: ProgramBuilder,
+  vecType: typeinfo.PBPrimitiveTypeInfo,
+  ...args: (number | boolean | string | PBShaderExp)[]
+): PBShaderExp {
   if (this.getDeviceType() === 'webgl') {
     if (vecType.scalarType === typeinfo.PBPrimitiveType.U32) {
       throw new errors.PBDeviceNotSupport('unsigned integer type');
@@ -40,12 +46,15 @@ function vec_n(this: ProgramBuilder, vecType: typeinfo.PBPrimitiveTypeInfo, ...a
     return new PBShaderExp(args[0], vecType);
   } else {
     const exp = new PBShaderExp('', vecType);
-    exp.$ast = new AST.ASTShaderExpConstructor(exp.$typeinfo, args.map(arg => {
-      if (typeof arg === 'string') {
-        throw new errors.PBParamTypeError('vec_n');
-      }
-      return arg instanceof PBShaderExp ? arg.$ast : arg;
-    }));
+    exp.$ast = new AST.ASTShaderExpConstructor(
+      exp.$typeinfo,
+      args.map((arg) => {
+        if (typeof arg === 'string') {
+          throw new errors.PBParamTypeError('vec_n');
+        }
+        return arg instanceof PBShaderExp ? arg.$ast : arg;
+      })
+    );
     return exp;
   }
 }
@@ -99,7 +108,7 @@ const simpleCtors = {
   utexCube: typeinfo.typeUTexCube,
   utex2DArray: typeinfo.typeUTex2DArray,
   sampler: typeinfo.typeSampler,
-  samplerComparison: typeinfo.typeSamplerComparison,
+  samplerComparison: typeinfo.typeSamplerComparison
 };
 
 function makeStorageTextureCtor(type: typeinfo.PBTextureType): StorageTextureConstructor {
@@ -121,19 +130,22 @@ const texStorageCtors = {
 
 /** @internal */
 export function setConstructors(cls: typeof ProgramBuilder) {
-  Object.keys(primitiveCtors).forEach(k => {
-    cls.prototype[k] = makeConstructor(function (this: ProgramBuilder, ...args: any[]): PBShaderExp {
-      return vec_n.call(this, primitiveCtors[k], ...args);
-    } as ShaderTypeFunc, primitiveCtors[k]);
+  Object.keys(primitiveCtors).forEach((k) => {
+    cls.prototype[k] = makeConstructor(
+      function (this: ProgramBuilder, ...args: any[]): PBShaderExp {
+        return vec_n.call(this, primitiveCtors[k], ...args);
+      } as ShaderTypeFunc,
+      primitiveCtors[k]
+    );
   });
-  Object.keys(simpleCtors).forEach(k => {
+  Object.keys(simpleCtors).forEach((k) => {
     cls.prototype[k] = function (this: ProgramBuilder, rhs: string): PBShaderExp {
       return new PBShaderExp(rhs, simpleCtors[k]);
     };
   });
-  Object.keys(texStorageCtors).forEach(k => {
+  Object.keys(texStorageCtors).forEach((k) => {
     cls.prototype[k] = makeStorageTextureCtor(texStorageCtors[k]);
-  });  
+  });
 }
 
 /*

@@ -98,10 +98,12 @@ export class WebGPUFrameBuffer extends WebGPUObject<unknown> implements FrameBuf
     return this._options?.depthAttachment?.texture || null;
   }
   getColorAttachments(): BaseTexture[] {
-    return this._options?.colorAttachments?.map(val => val?.texture || null) || [];
+    return this._options?.colorAttachments?.map((val) => val?.texture || null) || [];
   }
   getColorFormats(): GPUTextureFormat[] {
-    return this._options?.colorAttachments?.map(val => (val?.texture as WebGPUBaseTexture)?.gpuFormat || null);
+    return this._options?.colorAttachments?.map(
+      (val) => (val?.texture as WebGPUBaseTexture)?.gpuFormat || null
+    );
   }
   getDepthFormat(): GPUTextureFormat {
     return (this._options.depthAttachment?.texture as WebGPUBaseTexture)?.gpuFormat || null;
@@ -123,7 +125,10 @@ export class WebGPUFrameBuffer extends WebGPUObject<unknown> implements FrameBuf
         if (this._height === 0) {
           this._height = colorAttachment.texture.height;
         }
-        if (this._width !== colorAttachment.texture.width || this._height !== colorAttachment.texture.height) {
+        if (
+          this._width !== colorAttachment.texture.width ||
+          this._height !== colorAttachment.texture.height
+        ) {
           console.error('init frame buffer failed: color attachment textures must have same size');
           return;
         }

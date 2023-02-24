@@ -32,7 +32,7 @@ export class Rectangle implements IRectangle {
     x = 0,
     y = 0,
     rot = false,
-    allowRotation: boolean | undefined = undefined,
+    allowRotation: boolean | undefined = undefined
   ) {
     this._width = width;
     this._height = height;

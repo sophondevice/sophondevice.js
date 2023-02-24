@@ -1,12 +1,19 @@
 import { Vector3, Vector4, Quaternion, Matrix4x4, REvent } from '@sophon/base';
 import { Viewer, DeviceType } from '@sophon/device';
-import { Scene, ForwardRenderScheme, FPSCameraModel, DirectionalLight, PBRMetallicRoughnessMaterial, Mesh } from '@sophon/scene';
+import {
+  Scene,
+  ForwardRenderScheme,
+  FPSCameraModel,
+  DirectionalLight,
+  PBRMetallicRoughnessMaterial,
+  Mesh
+} from '@sophon/scene';
 import { GUI, GUIRenderer, RElement } from '@sophon/dom';
 import * as common from '../common';
 
 (async function () {
   const viewer = new Viewer(document.getElementById('canvas') as HTMLCanvasElement);
-  await viewer.initDevice(common.getQueryString('dev') as DeviceType || 'webgl', { msaa: true });
+  await viewer.initDevice((common.getQueryString('dev') as DeviceType) || 'webgl', { msaa: true });
   const guiRenderer = new GUIRenderer(viewer.device);
   const gui = new GUI(guiRenderer);
   await gui.deserializeFromXML(document.querySelector('#main-ui').innerHTML);
@@ -16,7 +23,14 @@ import * as common from '../common';
   scene.envLightStrength = 0.2;
   const scheme = new ForwardRenderScheme(viewer.device);
   const camera = scene.addCamera().lookAt(new Vector3(0, 8, 30), new Vector3(0, 8, 0), Vector3.axisPY());
-  camera.setProjectionMatrix(Matrix4x4.perspective(Math.PI / 3, viewer.device.getDrawingBufferWidth() / viewer.device.getDrawingBufferHeight(), 1, 1000));
+  camera.setProjectionMatrix(
+    Matrix4x4.perspective(
+      Math.PI / 3,
+      viewer.device.getDrawingBufferWidth() / viewer.device.getDrawingBufferHeight(),
+      1,
+      1000
+    )
+  );
   camera.mouseInputSource = sceneView;
   camera.keyboardInputSource = sceneView;
   camera.setModel(new FPSCameraModel({ moveSpeed: 0.5 }));
@@ -59,14 +73,27 @@ import * as common from '../common';
 
   sceneView.addEventListener('layout', function (this: RElement) {
     const rect = this.getClientRect();
-    camera.setProjectionMatrix(Matrix4x4.perspective(camera.getFOV(), rect.width / rect.height, camera.getNearPlane(), camera.getFarPlane()));
+    camera.setProjectionMatrix(
+      Matrix4x4.perspective(
+        camera.getFOV(),
+        rect.width / rect.height,
+        camera.getNearPlane(),
+        camera.getFarPlane()
+      )
+    );
   });
 
   scene.addEventListener('tick', () => {
     const elapsed = viewer.device.frameInfo.elapsedOverall;
     if (false && directionlight) {
-      directionlight.setRotation(Quaternion.fromAxisAngle(Vector3.axisNX(), Math.PI * (0.5 + 0.25 * Math.sin(elapsed / 2000))));
-      directionlight.lookAt(new Vector3(0, 28, 0), new Vector3(40 * Math.cos(elapsed / 2000), 0, 40 * Math.sin(elapsed / 2000)), Vector3.axisPY());
+      directionlight.setRotation(
+        Quaternion.fromAxisAngle(Vector3.axisNX(), Math.PI * (0.5 + 0.25 * Math.sin(elapsed / 2000)))
+      );
+      directionlight.lookAt(
+        new Vector3(0, 28, 0),
+        new Vector3(40 * Math.cos(elapsed / 2000), 0, 40 * Math.sin(elapsed / 2000)),
+        Vector3.axisPY()
+      );
     }
   });
 
@@ -75,8 +102,5 @@ import * as common from '../common';
     scheme.renderScene(scene, camera);
   });
 
-  viewer.device.runLoop(device => gui.render());
-
-}());
-
-
+  viewer.device.runLoop((device) => gui.render());
+})();

@@ -152,11 +152,7 @@ export class Plane extends VectorBase {
   }
   nearestPointToPoint(p: IVector3Like, result?: Vector3): Vector3 {
     const d = this.distanceToPoint(p);
-    return (result || new Vector3()).set(
-      p.x - this._v[0] * d,
-      p.y - this._v[1] * d,
-      p.z - this._v[2] * d,
-    );
+    return (result || new Vector3()).set(p.x - this._v[0] * d, p.y - this._v[1] * d, p.z - this._v[2] * d);
   }
   getNormal(result?: Vector3): Vector3 {
     return (result || new Vector3()).set(this._v[0], this._v[1], this._v[2]);

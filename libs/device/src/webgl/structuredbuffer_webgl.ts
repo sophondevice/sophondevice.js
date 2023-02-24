@@ -1,21 +1,21 @@
-import { WebGLGPUBuffer } from "./buffer_webgl";
-import { StructuredBufferData } from "../uniformdata";
-import { PBTypeInfo, PBStructTypeInfo, PBPrimitiveType } from "../builder";
-import { GPUResourceUsageFlags, StructuredBuffer, StructuredValue } from "../gpuobject";
-import type { TypedArray } from "@sophon/base";
+import { WebGLGPUBuffer } from './buffer_webgl';
+import { StructuredBufferData } from '../uniformdata';
+import { PBTypeInfo, PBStructTypeInfo, PBPrimitiveType } from '../builder';
+import { GPUResourceUsageFlags, StructuredBuffer, StructuredValue } from '../gpuobject';
+import type { TypedArray } from '@sophon/base';
 import type { WebGLDevice } from './device_webgl';
 
 export class WebGLStructuredBuffer extends WebGLGPUBuffer implements StructuredBuffer {
   private _structure: PBStructTypeInfo;
   private _data: StructuredBufferData;
   constructor(device: WebGLDevice, structure: PBStructTypeInfo, usage: number, source?: TypedArray) {
-    if (!(structure?.isStructType())) {
+    if (!structure?.isStructType()) {
       throw new Error('invalid structure type');
     }
     if (usage & GPUResourceUsageFlags.BF_INDEX) {
       throw new Error('structured buffer must not have Index usage flag');
     }
-    if ((usage & GPUResourceUsageFlags.BF_READ) || (usage & GPUResourceUsageFlags.BF_WRITE)) {
+    if (usage & GPUResourceUsageFlags.BF_READ || usage & GPUResourceUsageFlags.BF_WRITE) {
       throw new Error('structured buffer must not have Read or Write usage flags');
     }
     if (usage & GPUResourceUsageFlags.BF_VERTEX) {
@@ -28,7 +28,9 @@ export class WebGLStructuredBuffer extends WebGLGPUBuffer implements StructuredB
     }
     const layout = structure.toBufferLayout(0, structure.layout);
     if (source && layout.byteSize !== source.byteLength) {
-      throw new Error(`create structured buffer failed: invalid source size: ${source.byteLength}, should be ${layout.byteSize}`);
+      throw new Error(
+        `create structured buffer failed: invalid source size: ${source.byteLength}, should be ${layout.byteSize}`
+      );
     }
     const useSystemMemory = !device.isWebGL2 && (usage & GPUResourceUsageFlags.BF_UNIFORM) !== 0;
     super(device, usage, source || layout.byteSize, useSystemMemory);
@@ -59,7 +61,11 @@ export class WebGLStructuredBuffer extends WebGLGPUBuffer implements StructuredB
       return type.scalarType !== PBPrimitiveType.BOOL && !type.isMatrixType();
     } else if (type.isStructType()) {
       for (const member of type.structMembers) {
-        if (!member.type.isPrimitiveType() || member.type.scalarType === PBPrimitiveType.BOOL || member.type.isMatrixType()) {
+        if (
+          !member.type.isPrimitiveType() ||
+          member.type.scalarType === PBPrimitiveType.BOOL ||
+          member.type.isMatrixType()
+        ) {
           return false;
         }
       }

@@ -1,8 +1,8 @@
-import {Button} from './button';
-import {Slider} from './slider';
-import {RMouseEvent} from '../events';
-import type {GUI} from '../gui';
-import type {IStyleSheet} from '../style';
+import { Button } from './button';
+import { Slider } from './slider';
+import { RMouseEvent } from '../events';
+import type { GUI } from '../gui';
+import type { IStyleSheet } from '../style';
 
 export class ScrollBar extends Slider {
   /** @internal */
@@ -66,13 +66,13 @@ export class ScrollBar extends Slider {
       'style',
       vertical
         ? `position:absolute;left:0;right:0;top:0;height:${this.buttonSize};background-image:default.scrollbar.up`
-        : `position:absolute;left:0;top:0;bottom:0;width:${this.buttonSize};background-image:default.scrollbar.left`,
+        : `position:absolute;left:0;top:0;bottom:0;width:${this.buttonSize};background-image:default.scrollbar.left`
     );
     this._buttonDown.setAttribute(
       'style',
       vertical
         ? `position:absolute;left:0;right:0;bottom:0;height:${this.buttonSize};background-image:default.scrollbar.down;`
-        : `position:absolute;right:0;top:0;bottom:0;width:${this.buttonSize};background-image:default.scrollbar.right`,
+        : `position:absolute;right:0;top:0;bottom:0;width:${this.buttonSize};background-image:default.scrollbar.right`
     );
     this._invalidateLayout();
     this._uiscene._markStyleRefreshForElement(this);

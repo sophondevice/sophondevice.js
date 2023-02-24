@@ -1,12 +1,12 @@
-import {YGDirection} from './enums';
-import {YGFloatOptional} from './ygfloatoptional';
-import {YGCachedMeasurement} from './internal';
-import {YGFloatArrayEqual} from './utils';
-import {YGFloatIsUndefined} from './yoga';
+import { YGDirection } from './enums';
+import { YGFloatOptional } from './ygfloatoptional';
+import { YGCachedMeasurement } from './internal';
+import { YGFloatArrayEqual } from './utils';
+import { YGFloatIsUndefined } from './yoga';
 
-const kYGDefaultDimensionValues: () => [number, number] = function() {
+const kYGDefaultDimensionValues: () => [number, number] = function () {
   return [undefined, undefined];
-}
+};
 const YG_MAX_CACHED_RESULT_COUNT = 16;
 
 function buildCache(c: number): Array<YGCachedMeasurement> {
@@ -140,7 +140,7 @@ class YGLayout {
       this.margin[2],
       this.margin[3],
       this.margin[4],
-      this.margin[5],
+      this.margin[5]
     ];
     newLayout.border = [
       this.border[0],
@@ -148,7 +148,7 @@ class YGLayout {
       this.border[2],
       this.border[3],
       this.border[4],
-      this.border[5],
+      this.border[5]
     ];
     newLayout.padding = [
       this.padding[0],
@@ -156,11 +156,11 @@ class YGLayout {
       this.padding[2],
       this.padding[3],
       this.padding[4],
-      this.padding[5],
+      this.padding[5]
     ];
     newLayout.cachedMeasurements = buildCache(YG_MAX_CACHED_RESULT_COUNT);
     return newLayout;
   }
 }
 
-export {YGLayout};
+export { YGLayout };

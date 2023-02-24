@@ -45,12 +45,12 @@ export class FPSCameraModel extends BaseCameraModel implements AbstractCameraMod
           forward: 'KeyW',
           backward: 'KeyS',
           left: 'KeyA',
-          right: 'KeyD',
+          right: 'KeyD'
         },
         moveSpeed: 0.2,
-        rotateSpeed: 0.01,
+        rotateSpeed: 0.01
       },
-      options || {},
+      options || {}
     );
   }
   reset() {
@@ -93,7 +93,7 @@ export class FPSCameraModel extends BaseCameraModel implements AbstractCameraMod
       const alpha = Math.atan2(zAxis.z, zAxis.x) + dx * this.options.rotateSpeed;
       const beta = Math.min(
         Math.PI / 2.1,
-        Math.max(-Math.PI / 2.1, Math.asin(zAxis.y) + dy * this.options.rotateSpeed),
+        Math.max(-Math.PI / 2.1, Math.asin(zAxis.y) + dy * this.options.rotateSpeed)
       );
       const newY = Math.sin(beta);
       const r = Math.sqrt(Math.max(0, 1 - newY * newY));
@@ -103,17 +103,7 @@ export class FPSCameraModel extends BaseCameraModel implements AbstractCameraMod
       const XAxis = Vector3.cross(Vector3.axisPY(), zAxis).inplaceNormalize();
       const YAxis = Vector3.cross(zAxis, XAxis).inplaceNormalize();
       const rotation = Quaternion.fromRotationMatrix(
-        new Matrix3x3([
-          XAxis.x,
-          XAxis.y,
-          XAxis.z,
-          YAxis.x,
-          YAxis.y,
-          YAxis.z,
-          zAxis.x,
-          zAxis.y,
-          zAxis.z,
-        ]),
+        new Matrix3x3([XAxis.x, XAxis.y, XAxis.z, YAxis.x, YAxis.y, YAxis.z, zAxis.x, zAxis.y, zAxis.z])
       );
       if (!this._getCamera().parent) {
         this._getCamera().rotation = rotation;
@@ -122,7 +112,9 @@ export class FPSCameraModel extends BaseCameraModel implements AbstractCameraMod
         const scale = new Vector3();
         this._getCamera().worldMatrix.decompose(scale, null, pos);
         const newWorldMatrix = Matrix4x4.scaling(scale).rotateLeft(rotation).translateLeft(pos);
-        const newLocalMatrix = this._getCamera().parent ? newWorldMatrix.multiplyLeftAffine(Matrix4x4.inverseAffine(this._getCamera().parent.worldMatrix)) : newWorldMatrix;
+        const newLocalMatrix = this._getCamera().parent
+          ? newWorldMatrix.multiplyLeftAffine(Matrix4x4.inverseAffine(this._getCamera().parent.worldMatrix))
+          : newWorldMatrix;
         newLocalMatrix.decompose(scale, rotation, pos);
         this._getCamera().position = pos;
         this._getCamera().scaling = scale;
@@ -223,7 +215,9 @@ export class FPSCameraModel extends BaseCameraModel implements AbstractCameraMod
         this._getCamera().worldMatrix.decompose(scale, rotation, pos);
         pos.addBy(move);
         const newWorldMatrix = Matrix4x4.scaling(scale).rotateLeft(rotation).translateLeft(pos);
-        const newLocalMatrix = newWorldMatrix.multiplyLeftAffine(Matrix4x4.inverseAffine(this._getCamera().parent.worldMatrix));
+        const newLocalMatrix = newWorldMatrix.multiplyLeftAffine(
+          Matrix4x4.inverseAffine(this._getCamera().parent.worldMatrix)
+        );
         newLocalMatrix.decompose(scale, rotation, pos);
         if (scale.isNaN() || rotation.isNaN() || pos.isNaN()) {
           console.log(`Camera error 3: ${scale.toString()} ${rotation.toString()} ${pos.toString()}`);

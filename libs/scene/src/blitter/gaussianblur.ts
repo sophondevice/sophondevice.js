@@ -1,5 +1,5 @@
-import { ShaderType, BindGroup, PBShaderExp, PBInsideFunctionScope, PBGlobalScope } from "@sophon/device";
-import { Blitter, BlitType } from "./blitter";
+import { ShaderType, BindGroup, PBShaderExp, PBInsideFunctionScope, PBGlobalScope } from '@sophon/device';
+import { Blitter, BlitType } from './blitter';
 
 export class GaussianBlurBlitter extends Blitter {
   protected _phase: 'horizonal' | 'vertical';
@@ -61,9 +61,14 @@ export class GaussianBlurBlitter extends Blitter {
       if (!Number.isInteger(this._kernelSize) || this._kernelSize < 0 || (this._kernelSize & 1) === 0) {
         throw new Error(`GaussianBlurFilter.setupFilter() failed: invalid kernel size: ${this._kernelSize}`);
       }
-      scope.blurMultiplyVec = type === 'cube'
-        ? this._phase === 'horizonal' ? pb.vec3(1, 0, 0) : pb.vec3(0, 1, 0)
-        : this._phase === 'horizonal' ? pb.vec2(1, 0) : pb.vec2(0, 1);
+      scope.blurMultiplyVec =
+        type === 'cube'
+          ? this._phase === 'horizonal'
+            ? pb.vec3(1, 0, 0)
+            : pb.vec3(0, 1, 0)
+          : this._phase === 'horizonal'
+          ? pb.vec2(1, 0)
+          : pb.vec2(0, 1);
       scope.numBlurPixelsPerSide = pb.float((this._kernelSize + 1) / 2);
     }
   }
@@ -74,7 +79,13 @@ export class GaussianBlurBlitter extends Blitter {
       bindGroup.setValue('multiplier', this._logSpaceMultiplier);
     }
   }
-  filter(scope: PBInsideFunctionScope, type: BlitType, srcTex: PBShaderExp, srcUV: PBShaderExp, srcLayer: PBShaderExp): PBShaderExp {
+  filter(
+    scope: PBInsideFunctionScope,
+    type: BlitType,
+    srcTex: PBShaderExp,
+    srcUV: PBShaderExp,
+    srcLayer: PBShaderExp
+  ): PBShaderExp {
     const that = this;
     const pb = scope.$builder;
     scope.incrementalGaussian = pb.vec3();
@@ -87,27 +98,66 @@ export class GaussianBlurBlitter extends Blitter {
     if (that._logSpace) {
       scope.avgValue = pb.vec4(scope.incrementalGaussian.x);
     } else {
-      scope.avgValue = pb.mul(that.readTexel(scope, type, srcTex, srcUV, srcLayer), scope.incrementalGaussian.x);
+      scope.avgValue = pb.mul(
+        that.readTexel(scope, type, srcTex, srcUV, srcLayer),
+        scope.incrementalGaussian.x
+      );
     }
     scope.coefficientSum = pb.add(scope.coefficientSum, scope.incrementalGaussian.x);
-    scope.incrementalGaussian = pb.vec3(pb.mul(scope.incrementalGaussian.xy, scope.incrementalGaussian.yz), scope.incrementalGaussian.z);
+    scope.incrementalGaussian = pb.vec3(
+      pb.mul(scope.incrementalGaussian.xy, scope.incrementalGaussian.yz),
+      scope.incrementalGaussian.z
+    );
     scope.$for(pb.float('i'), 1, scope.numBlurPixelsPerSide, function () {
-      this.d1 = that.readTexel(scope, type, srcTex, pb.sub(srcUV, pb.mul(this.blurMultiplyVec, this.blurSize, this.i)), srcLayer);
-      this.d2 = that.readTexel(scope, type, srcTex, pb.add(srcUV, pb.mul(this.blurMultiplyVec, this.blurSize, this.i)), srcLayer);
+      this.d1 = that.readTexel(
+        scope,
+        type,
+        srcTex,
+        pb.sub(srcUV, pb.mul(this.blurMultiplyVec, this.blurSize, this.i)),
+        srcLayer
+      );
+      this.d2 = that.readTexel(
+        scope,
+        type,
+        srcTex,
+        pb.add(srcUV, pb.mul(this.blurMultiplyVec, this.blurSize, this.i)),
+        srcLayer
+      );
       if (that._logSpace) {
         if (that._phase === 'horizonal') {
-          this.avgValue = pb.add(this.avgValue, pb.mul(pb.exp(pb.min(this.minExpValue, pb.mul(pb.sub(this.d1, this.d0), this.multiplier))), this.incrementalGaussian.x));
-          this.avgValue = pb.add(this.avgValue, pb.mul(pb.exp(pb.min(this.minExpValue, pb.mul(pb.sub(this.d2, this.d0), this.multiplier))), this.incrementalGaussian.x));
+          this.avgValue = pb.add(
+            this.avgValue,
+            pb.mul(
+              pb.exp(pb.min(this.minExpValue, pb.mul(pb.sub(this.d1, this.d0), this.multiplier))),
+              this.incrementalGaussian.x
+            )
+          );
+          this.avgValue = pb.add(
+            this.avgValue,
+            pb.mul(
+              pb.exp(pb.min(this.minExpValue, pb.mul(pb.sub(this.d2, this.d0), this.multiplier))),
+              this.incrementalGaussian.x
+            )
+          );
         } else {
-          this.avgValue = pb.add(this.avgValue, pb.mul(pb.exp(pb.min(this.minExpValue, pb.sub(this.d1, this.d0))), this.incrementalGaussian.x));
-          this.avgValue = pb.add(this.avgValue, pb.mul(pb.exp(pb.min(this.minExpValue, pb.sub(this.d2, this.d0))), this.incrementalGaussian.x));
+          this.avgValue = pb.add(
+            this.avgValue,
+            pb.mul(pb.exp(pb.min(this.minExpValue, pb.sub(this.d1, this.d0))), this.incrementalGaussian.x)
+          );
+          this.avgValue = pb.add(
+            this.avgValue,
+            pb.mul(pb.exp(pb.min(this.minExpValue, pb.sub(this.d2, this.d0))), this.incrementalGaussian.x)
+          );
         }
       } else {
         this.avgValue = pb.add(this.avgValue, pb.mul(this.d1, this.incrementalGaussian.x));
         this.avgValue = pb.add(this.avgValue, pb.mul(this.d2, this.incrementalGaussian.x));
       }
       this.coefficientSum = pb.add(this.coefficientSum, pb.mul(this.incrementalGaussian.x, 2));
-      this.incrementalGaussian = pb.vec3(pb.mul(this.incrementalGaussian.xy, this.incrementalGaussian.yz), this.incrementalGaussian.z);
+      this.incrementalGaussian = pb.vec3(
+        pb.mul(this.incrementalGaussian.xy, this.incrementalGaussian.yz),
+        this.incrementalGaussian.z
+      );
     });
     scope.$l.outColor = pb.div(scope.avgValue, scope.coefficientSum);
     if (that._logSpace) {

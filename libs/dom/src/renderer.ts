@@ -1,5 +1,5 @@
 import { Matrix4x4, Vector3, Vector4, REventTarget } from '@sophon/base';
-import { 
+import {
   BindGroup,
   RenderStateSet,
   BlendFunc,
@@ -60,8 +60,17 @@ export class GUIRenderer extends REventTarget {
   constructor(device: Device) {
     super();
     this._device = device;
-    this._projectionMatrix = Matrix4x4.ortho(0, this._device.getDrawingBufferWidth(), 0, this._device.getDrawingBufferHeight(), 1, 100);
-    this._flipMatrix = Matrix4x4.translation(new Vector3(0, this._device.getDrawingBufferHeight(), 0)).scaleRight(new Vector3(1, -1, 1));
+    this._projectionMatrix = Matrix4x4.ortho(
+      0,
+      this._device.getDrawingBufferWidth(),
+      0,
+      this._device.getDrawingBufferHeight(),
+      1,
+      100
+    );
+    this._flipMatrix = Matrix4x4.translation(
+      new Vector3(0, this._device.getDrawingBufferHeight(), 0)
+    ).scaleRight(new Vector3(1, -1, 1));
     this._program = this.createProgram(false);
     this._programTexture = this.createProgram(true);
     this._bindGroup = this._device.createBindGroup(this._program.bindGroupLayouts[0]);
@@ -90,7 +99,15 @@ export class GUIRenderer extends REventTarget {
       const indexbuffer = this._device.createIndexBuffer(indexArray, { managed: true });
       this._primitiveBuffer[i].setIndexBuffer(indexbuffer);
       this._primitiveBuffer[i].primitiveType = PrimitiveType.TriangleList;
-      const buffer = this._device.createStructuredBuffer(makeVertexBufferType(GUIRenderer.VAO_BUFFER_SIZE * 4, 'position_f32x3', 'diffuse_f32x4', 'tex0_f32x2'), { usage: 'vertex', dynamic: true });
+      const buffer = this._device.createStructuredBuffer(
+        makeVertexBufferType(
+          GUIRenderer.VAO_BUFFER_SIZE * 4,
+          'position_f32x3',
+          'diffuse_f32x4',
+          'tex0_f32x2'
+        ),
+        { usage: 'vertex', dynamic: true }
+      );
       this._primitiveBuffer[i].setVertexBuffer(buffer);
     }
     this._drawPosition = 0;
@@ -125,7 +142,10 @@ export class GUIRenderer extends REventTarget {
     return true;
   }
   createTexture(width: number, height: number, color: RColor, linear: boolean): Texture2D {
-    const tex = this._device.createTexture2D(TextureFormat.RGBA8UNORM, width, height, { colorSpace: linear ? 'linear' : 'srgb', noMipmap: true });
+    const tex = this._device.createTexture2D(TextureFormat.RGBA8UNORM, width, height, {
+      colorSpace: linear ? 'linear' : 'srgb',
+      noMipmap: true
+    });
     if (color) {
       this.clearTexture(tex, color);
     }
@@ -150,7 +170,16 @@ export class GUIRenderer extends REventTarget {
     console.assert(texture.format === TextureFormat.RGBA8UNORM);
     texture.update(originValues, x, y, bitmap.width, bitmap.height);
   }
-  updateTextureWithCanvas(texture: Texture2D, ctx: CanvasRenderingContext2D, cvsOffsetX: number, cvsOffsetY: number, w: number, h: number, x: number, y: number): void {
+  updateTextureWithCanvas(
+    texture: Texture2D,
+    ctx: CanvasRenderingContext2D,
+    cvsOffsetX: number,
+    cvsOffsetY: number,
+    w: number,
+    h: number,
+    x: number,
+    y: number
+  ): void {
     texture.updateFromElement(ctx.canvas, x, y, cvsOffsetX, cvsOffsetY, w, h);
   }
   getTextureWidth(texture: Texture2D): number {
@@ -173,7 +202,10 @@ export class GUIRenderer extends REventTarget {
     if (tex?.disposed) {
       tex = null;
     }
-    if (tex !== this._currentTexture || this._drawPosition + this._drawCount === GUIRenderer.VAO_BUFFER_SIZE) {
+    if (
+      tex !== this._currentTexture ||
+      this._drawPosition + this._drawCount === GUIRenderer.VAO_BUFFER_SIZE
+    ) {
       this.flush();
       this._currentTexture = tex;
     }
@@ -197,7 +229,14 @@ export class GUIRenderer extends REventTarget {
   flush() {
     if (this._drawCount > 0) {
       const buffer = this._primitiveBuffer[this._activeBuffer];
-      buffer.getVertexBuffer('position').bufferSubData(this._drawPosition * 36 * this._vertexCache.BYTES_PER_ELEMENT, this._vertexCache, this._drawPosition * 36, this._drawCount * 36);
+      buffer
+        .getVertexBuffer('position')
+        .bufferSubData(
+          this._drawPosition * 36 * this._vertexCache.BYTES_PER_ELEMENT,
+          this._vertexCache,
+          this._drawPosition * 36,
+          this._drawCount * 36
+        );
       if (this._currentTexture) {
         this._device.setProgram(this._programTexture);
         this._bindGroupTexture.setTexture('tex', this._currentTexture, this._textureSampler);
@@ -242,7 +281,9 @@ export class GUIRenderer extends REventTarget {
     this._device.setViewport();
     this._device.setScissor();
     this._projectionMatrix.ortho(0, this.getDrawingBufferWidth(), 0, this.getDrawingBufferHeight(), 1, 100);
-    this._flipMatrix = Matrix4x4.translation(new Vector3(0, this.getDrawingBufferHeight(), 0)).scaleRight(new Vector3(1, -1, 1));
+    this._flipMatrix = Matrix4x4.translation(new Vector3(0, this.getDrawingBufferHeight(), 0)).scaleRight(
+      new Vector3(1, -1, 1)
+    );
     const mvpMatrix = Matrix4x4.multiply(this._projectionMatrix, this._flipMatrix);
     this._bindGroup.setValue('transform', { mvpMatrix });
     this._bindGroupTexture.setValue('transform', { mvpMatrix });
@@ -316,10 +357,13 @@ export class GUIRenderer extends REventTarget {
           } else {
             this.$l.color = this.$inputs.outDiffuse;
           }
-          this.$outputs.outColor = (pb.vec4(pb.pow(pb.mul(this.color.xyz, this.color.w), pb.vec3(1 / 2.2)), this.color.w));
+          this.$outputs.outColor = pb.vec4(
+            pb.pow(pb.mul(this.color.xyz, this.color.w), pb.vec3(1 / 2.2)),
+            this.color.w
+          );
         });
       }
-    })
+    });
   }
 }
 
@@ -337,7 +381,7 @@ function _createMouseEvent(type: string, src: PointerEvent | WheelEvent): RMouse
     src.ctrlKey,
     src.shiftKey,
     src.altKey,
-    src.metaKey,
+    src.metaKey
   );
 }
 function _createDragEvent(type: string, src: DragEvent): RDragEvent {
@@ -353,7 +397,7 @@ function _createDragEvent(type: string, src: DragEvent): RDragEvent {
     src.shiftKey,
     src.altKey,
     src.metaKey,
-    src.dataTransfer,
+    src.dataTransfer
   );
 }
 function _createKeyEvent(type: string, src: KeyboardEvent): RKeyEvent {
@@ -365,7 +409,7 @@ function _createKeyEvent(type: string, src: KeyboardEvent): RKeyEvent {
     src.ctrlKey,
     src.shiftKey,
     src.altKey,
-    src.metaKey,
+    src.metaKey
   );
 }
 
@@ -379,12 +423,12 @@ export function injectGUIEvents(gui: GUI, renderer: GUIRenderer): void {
     RMouseEvent.NAME_RENDERER_MOUSEDOWN,
     RMouseEvent.NAME_RENDERER_MOUSEUP,
     RMouseEvent.NAME_RENDERER_MOUSEMOVE,
-    RMouseEvent.NAME_RENDERER_MOUSEWHEEL,
+    RMouseEvent.NAME_RENDERER_MOUSEWHEEL
   ];
   const rendererDragEventNames = [
     RMouseEvent.NAME_RENDERER_DRAGENTER,
     RMouseEvent.NAME_RENDERER_DRAGOVER,
-    RMouseEvent.NAME_RENDERER_DRAGDROP,
+    RMouseEvent.NAME_RENDERER_DRAGDROP
   ];
   let captureId: number = null;
   for (let i = 0; i < mouseEventNames.length; i++) {
@@ -411,7 +455,7 @@ export function injectGUIEvents(gui: GUI, renderer: GUIRenderer): void {
   const rendererKeyEventNames = [
     RKeyEvent.NAME_RENDERER_KEYDOWN,
     RKeyEvent.NAME_RENDERER_KEYUP,
-    RKeyEvent.NAME_RENDERER_KEYPRESS,
+    RKeyEvent.NAME_RENDERER_KEYPRESS
   ];
   for (let i = 0; i < keyEventNames.length; i++) {
     canvas.addEventListener(keyEventNames[i], (evt: KeyboardEvent) => {

@@ -8,10 +8,14 @@ export abstract class RenderScheme {
   constructor(device: Device) {
     this._device = device;
     this._shadowMapFormat = device.getTextureCaps().supportHalfFloatColorBuffer
-      ? device.getDeviceType() === 'webgl' ? TextureFormat.RGBA16F : TextureFormat.R16F
+      ? device.getDeviceType() === 'webgl'
+        ? TextureFormat.RGBA16F
+        : TextureFormat.R16F
       : device.getTextureCaps().supportFloatColorBuffer
-        ? device.getDeviceType() === 'webgl' ? TextureFormat.RGBA32F : TextureFormat.R32F
-        : TextureFormat.RGBA8UNORM;
+      ? device.getDeviceType() === 'webgl'
+        ? TextureFormat.RGBA32F
+        : TextureFormat.R32F
+      : TextureFormat.RGBA8UNORM;
   }
   get device(): Device {
     return this._device;

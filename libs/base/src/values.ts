@@ -1,14 +1,14 @@
 export enum MouseButton {
   LEFT = 1 << 0,
   RIGHT = 1 << 1,
-  MIDDLE = 1 << 2,
+  MIDDLE = 1 << 2
 }
 
 export enum KeyMod {
   SHIFT = 1 << 0,
   ALT = 1 << 1,
   CTRL = 1 << 2,
-  META = 1 << 3,
+  META = 1 << 3
 }
 
 export enum Key {
@@ -103,5 +103,5 @@ export enum Key {
   NUMPAD_MUL = 106,
   NUMPAD_ADD = 107,
   NUMPAD_SUB = 108,
-  NUMPAD_DECIMAL = 110,
+  NUMPAD_DECIMAL = 110
 }

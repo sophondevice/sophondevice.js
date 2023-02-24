@@ -42,11 +42,11 @@ export class UILayout {
     this._parent = null;
     this._children = new List<UILayout>();
     this._iterator = null;
-    this.actualRect = {x: 0, y: 0, width: 0, height: 0};
-    this.clientRect = {x: 0, y: 0, width: 0, height: 0};
-    this.borderRect = {x: 0, y: 0, width: 0, height: 0};
+    this.actualRect = { x: 0, y: 0, width: 0, height: 0 };
+    this.clientRect = { x: 0, y: 0, width: 0, height: 0 };
+    this.borderRect = { x: 0, y: 0, width: 0, height: 0 };
     this.clippedRect = null;
-    this.scrollRect = {x: 0, y: 0, width: 0, height: 0};
+    this.scrollRect = { x: 0, y: 0, width: 0, height: 0 };
     this.desiredScrollX = 0;
     this.desiredScrollY = 0;
     this.actualScrollX = 0;
@@ -64,19 +64,19 @@ export class UILayout {
           width: number,
           widthMode: YGMeasureMode,
           height: number,
-          heightMode: YGMeasureMode,
+          heightMode: YGMeasureMode
         ): YGSize => {
           const rc = element._measureContentSize({
             x: 0,
             y: 0,
             width: 0,
-            height: 0,
+            height: 0
           });
           const size = new YGSize();
           size.width = rc.width;
           size.height = rc.height;
           return size;
-        },
+        }
       );
     }
   }
@@ -89,10 +89,12 @@ export class UILayout {
   appendChild(child: UILayout) {
     console.assert(
       this._children.length === this.node.getChildCount(),
-      'Failed to append child layout: child count mismatch');
+      'Failed to append child layout: child count mismatch'
+    );
     console.assert(
       child && !child._parent,
-      'Failed to append child layout: invalid child or child already has an parent');
+      'Failed to append child layout: invalid child or child already has an parent'
+    );
     child._parent = this;
     child._iterator = this._children.append(child);
     this.node.insertChild(child.node, this.node.getChildCount());
@@ -101,7 +103,8 @@ export class UILayout {
   removeChild(child: UILayout) {
     console.assert(
       this._children.length === this.node.getChildCount(),
-      'Failed to append child layout: child count mismatch');
+      'Failed to append child layout: child count mismatch'
+    );
     if (child._iterator && child._iterator.list === this._children) {
       this.node.removeChild(child.node);
       this.invalidateLayout();
@@ -113,13 +116,13 @@ export class UILayout {
   insertChild(child: UILayout, at: UILayout) {
     console.assert(
       this._children.length === this.node.getChildCount(),
-      'Failed to append child layout: child count mismatch');
+      'Failed to append child layout: child count mismatch'
+    );
     console.assert(
       child && !child._parent,
-      'Failed to append child layout: invalid child or child already has an parent');
-    console.assert(
-      at && at._parent === this,
-      'Failed to append child layout: invalid reference child');
+      'Failed to append child layout: invalid child or child already has an parent'
+    );
+    console.assert(at && at._parent === this, 'Failed to append child layout: invalid reference child');
     child._parent = this;
     child._iterator = this._children.insertAt(child, at._iterator);
     const index = this.node.node.getChildren().indexOf(at.node.node);
@@ -183,18 +186,18 @@ export class UILayout {
   }
   updateBorderColor(edge: number, val: RColor): void {
     switch (edge) {
-    case Yoga.EDGE_LEFT:
-      this.element._updateBorderLeftColor(val);
-      break;
-    case Yoga.EDGE_TOP:
-      this.element._updateBorderTopColor(val);
-      break;
-    case Yoga.EDGE_RIGHT:
-      this.element._updateBorderRightColor(val);
-      break;
-    case Yoga.EDGE_BOTTOM:
-      this.element._updateBorderBottomColor(val);
-      break;
+      case Yoga.EDGE_LEFT:
+        this.element._updateBorderLeftColor(val);
+        break;
+      case Yoga.EDGE_TOP:
+        this.element._updateBorderTopColor(val);
+        break;
+      case Yoga.EDGE_RIGHT:
+        this.element._updateBorderRightColor(val);
+        break;
+      case Yoga.EDGE_BOTTOM:
+        this.element._updateBorderBottomColor(val);
+        break;
     }
   }
   updateBackgroundColor(val: RColor): void {
@@ -230,10 +233,7 @@ export class UILayout {
     const ch = Math.max(0, rect.height - paddingTop - paddingBottom - borderTop - borderBottom);
     if (
       !markChanged &&
-      (cx !== clientRect.x ||
-        cy !== clientRect.y ||
-        cw !== clientRect.width ||
-        ch !== clientRect.height)
+      (cx !== clientRect.x || cy !== clientRect.y || cw !== clientRect.width || ch !== clientRect.height)
     ) {
       markChanged = true;
     }
@@ -249,10 +249,7 @@ export class UILayout {
     const bh = Math.max(0, rect.height - borderTop - borderBottom);
     if (
       !markChanged &&
-      (bx !== borderRect.x ||
-        by !== borderRect.y ||
-        bw !== borderRect.width ||
-        bh !== borderRect.height)
+      (bx !== borderRect.x || by !== borderRect.y || bw !== borderRect.width || bh !== borderRect.height)
     ) {
       markChanged = true;
     }
@@ -284,7 +281,7 @@ export class UILayout {
       x: minX,
       y: minY,
       width: maxX - minX,
-      height: maxY - minY,
+      height: maxY - minY
     };
     this.minScrollX = this.scrollRect.x;
     this.maxScrollX = this.scrollRect.x + this.scrollRect.width - clientRect.width;
@@ -315,19 +312,19 @@ export class UILayout {
       const y = Math.max(rcClient.y, this.clippedRect.y);
       const width = Math.max(
         0,
-        Math.min(this.clippedRect.x + this.clippedRect.width, rcClient.x + rcClient.width) - x,
+        Math.min(this.clippedRect.x + this.clippedRect.width, rcClient.x + rcClient.width) - x
       );
       const height = Math.max(
         0,
-        Math.min(this.clippedRect.y + this.clippedRect.height, rcClient.y + rcClient.height) - y,
+        Math.min(this.clippedRect.y + this.clippedRect.height, rcClient.y + rcClient.height) - y
       );
-      return {x, y, width, height};
+      return { x, y, width, height };
     } else {
       return rcClient;
     }
   }
   toAbsolute(v?: RCoord): RCoord {
-    v = v || {x: 0, y: 0};
+    v = v || { x: 0, y: 0 };
     let layout: UILayout = this;
     v.x += layout.actualRect.x;
     v.y += layout.actualRect.y;
@@ -339,8 +336,8 @@ export class UILayout {
   }
   clipToParent(parent: UILayout): UIRect {
     const parentRect: UIRect = parent.clipRectForChildren();
-    const vThis = this.toAbsolute({x: 0, y: 0});
-    const vParent = parent.toAbsolute({x: parentRect.x, y: parentRect.y});
+    const vThis = this.toAbsolute({ x: 0, y: 0 });
+    const vParent = parent.toAbsolute({ x: parentRect.x, y: parentRect.y });
     const x1This = vThis.x;
     const y1This = vThis.y;
     const x2This = x1This + this.actualRect.width;
@@ -357,7 +354,7 @@ export class UILayout {
       x: x1Clip - x1This,
       y: y1Clip - y1This,
       width: Math.max(0, x2Clip - x1Clip),
-      height: Math.max(0, y2Clip - y1Clip),
+      height: Math.max(0, y2Clip - y1Clip)
     };
   }
   calcLayoutScroll() {
@@ -411,7 +408,7 @@ export class UILayout {
         x: xClip.x,
         y: yClip.y,
         width: xClip.width,
-        height: yClip.height,
+        height: yClip.height
       };
     }
     if (

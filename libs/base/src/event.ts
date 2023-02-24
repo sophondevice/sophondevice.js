@@ -45,7 +45,7 @@ export class REvent {
     this.reset();
   }
   reset() {
-    this._state &= (REvent.BIT_CANBUBBLE | REvent.BIT_CANCELABLE);
+    this._state &= REvent.BIT_CANBUBBLE | REvent.BIT_CANCELABLE;
     this._phase = REvent.NONE;
     this._currentTarget = null;
     this._target = null;
@@ -105,9 +105,7 @@ export class REvent {
   }
   /** @internal */
   _setDefaultHandled(handled: boolean): void {
-    handled
-      ? this._setFlag(REvent.BIT_DEFAULT_HANDLED)
-      : this._clearFlag(REvent.BIT_DEFAULT_HANDLED);
+    handled ? this._setFlag(REvent.BIT_DEFAULT_HANDLED) : this._clearFlag(REvent.BIT_DEFAULT_HANDLED);
   }
   /** @internal */
   _setCanceled(prevented: boolean): void {
@@ -115,9 +113,7 @@ export class REvent {
   }
   /** @internal */
   _setPropagationStopped(stopped: boolean): void {
-    stopped
-      ? this._setFlag(REvent.BIT_PROPAGATION_STOPPED)
-      : this._clearFlag(REvent.BIT_PROPAGATION_STOPPED);
+    stopped ? this._setFlag(REvent.BIT_PROPAGATION_STOPPED) : this._clearFlag(REvent.BIT_PROPAGATION_STOPPED);
   }
   /** @internal */
   _isPropagationStopped(): boolean {
@@ -281,7 +277,12 @@ export class REventTarget {
     this._internalRemoveEventListener(this._defaultListeners, type, listener, options);
   }
   /** @internal */
-  _internalAddEventListener(listenerMap: EventListenerMap, type: string, listener: REventListener, options?: REventHandlerOptions): EventListenerMap {
+  _internalAddEventListener(
+    listenerMap: EventListenerMap,
+    type: string,
+    listener: REventListener,
+    options?: REventHandlerOptions
+  ): EventListenerMap {
     if (typeof type !== 'string') {
       return;
     }
@@ -292,7 +293,7 @@ export class REventTarget {
     const o: REventHandlerOptions = {
       capture: !!options?.capture,
       once: !!options?.once,
-      passive: !!options?.passive,
+      passive: !!options?.passive
     };
     let handlers = listenerMap[type];
     if (!handlers) {
@@ -307,7 +308,12 @@ export class REventTarget {
     return listenerMap;
   }
   /** @internal */
-  _internalRemoveEventListener(listenerMap: EventListenerMap, type: string, listener: REventListener, options?: REventHandlerOptions): void {
+  _internalRemoveEventListener(
+    listenerMap: EventListenerMap,
+    type: string,
+    listener: REventListener,
+    options?: REventHandlerOptions
+  ): void {
     if (typeof type !== 'string' || !listenerMap) {
       return;
     }
@@ -315,16 +321,13 @@ export class REventTarget {
     const o: REventHandlerOptions = {
       capture: !!options?.capture,
       once: !!options?.once,
-      passive: !!options?.passive,
+      passive: !!options?.passive
     };
     const handlers = listenerMap[type];
     if (handlers) {
       for (let i = 0; i < handlers.length; i++) {
         const handler = handlers[i];
-        if (
-          handler.handler.handleEvent === l.handleEvent &&
-          handler.options.capture === o.capture
-        ) {
+        if (handler.handler.handleEvent === l.handleEvent && handler.options.capture === o.capture) {
           handlers.splice(i, 1);
           break;
         }
@@ -364,9 +367,7 @@ export class REventTarget {
     if (eventPath) {
       for (let i = eventPath.length; i > 0; i--) {
         const currentTarget = eventPath[i - 1];
-        evt._setEventPhase(
-          currentTarget === evt.target ? REvent.AT_TARGET : REvent.CAPTURING_PHASE,
-        );
+        evt._setEventPhase(currentTarget === evt.target ? REvent.AT_TARGET : REvent.CAPTURING_PHASE);
         currentTarget._invokeLocalListeners(evt, true);
         if (evt._isPropagationStopped()) {
           break;
@@ -422,11 +423,13 @@ export class REventTarget {
     }
   };
   /** @internal */
-  _clearRemovedListeners(handlers: {
-    handler: REventHandlerObject;
-    options: REventHandlerOptions;
-    removed: boolean;
-  }[]) {
+  _clearRemovedListeners(
+    handlers: {
+      handler: REventHandlerObject;
+      options: REventHandlerOptions;
+      removed: boolean;
+    }[]
+  ) {
     for (let i = handlers.length - 1; i >= 0; i--) {
       if (handlers[i].removed) {
         handlers.splice(i, 1);
@@ -434,4 +437,3 @@ export class REventTarget {
     }
   }
 }
-

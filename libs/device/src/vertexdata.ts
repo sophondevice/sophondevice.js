@@ -1,4 +1,12 @@
-import { GPUResourceUsageFlags, StructuredBuffer, IndexBuffer, VertexStepMode, MAX_VERTEX_ATTRIBUTES, getVertexAttribByName, VertexSemantic } from './gpuobject';
+import {
+  GPUResourceUsageFlags,
+  StructuredBuffer,
+  IndexBuffer,
+  VertexStepMode,
+  MAX_VERTEX_ATTRIBUTES,
+  getVertexAttribByName,
+  VertexSemantic
+} from './gpuobject';
 import { PBArrayTypeInfo } from './builder/types';
 
 export class VertexData {
@@ -99,7 +107,12 @@ export class VertexData {
     return buffer;
   }
   /** @internal */
-  private internalSetVertexBuffer(loc: number, buffer: StructuredBuffer, offset?: number, stepMode?: VertexStepMode): StructuredBuffer {
+  private internalSetVertexBuffer(
+    loc: number,
+    buffer: StructuredBuffer,
+    offset?: number,
+    stepMode?: VertexStepMode
+  ): StructuredBuffer {
     if (loc < 0 || loc >= MAX_VERTEX_ATTRIBUTES) {
       throw new Error(`setVertexBuffer() failed: location out of bounds: ${loc}`);
     }
@@ -107,14 +120,11 @@ export class VertexData {
     offset = Number(offset) || 0;
     stepMode = stepMode || 'vertex';
     const old = this._vertexBuffers[loc];
-    if (!old
-      || old.buffer !== buffer
-      || old.offset !== offset
-      || old.stepMode !== stepMode) {
+    if (!old || old.buffer !== buffer || old.offset !== offset || old.stepMode !== stepMode) {
       this._vertexBuffers[loc] = {
         buffer: buffer,
         offset: offset,
-        stepMode: stepMode,
+        stepMode: stepMode
       };
       return buffer;
     }

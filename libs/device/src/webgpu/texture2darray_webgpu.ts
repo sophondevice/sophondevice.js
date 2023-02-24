@@ -1,4 +1,11 @@
-import { TextureTarget, TextureFormat, getTextureFormatBlockWidth, getTextureFormatBlockHeight, getTextureFormatBlockSize, linearTextureFormatToSRGB } from '../base_types';
+import {
+  TextureTarget,
+  TextureFormat,
+  getTextureFormatBlockWidth,
+  getTextureFormatBlockHeight,
+  getTextureFormatBlockSize,
+  linearTextureFormatToSRGB
+} from '../base_types';
 import { WebGPUBaseTexture } from './basetexture_webgpu';
 import { GPUResourceUsageFlags, TextureImageElement, Texture2DArray, GPUDataBuffer } from '../gpuobject';
 import type { TypedArray } from '@sophon/base';
@@ -14,7 +21,15 @@ export class WebGPUTexture2DArray extends WebGPUBaseTexture implements Texture2D
   init(): void {
     this.loadEmpty(this._format, this._width, this._height, this._depth, this._mipLevelCount);
   }
-  update(data: TypedArray, xOffset: number, yOffset: number, zOffset: number, width: number, height: number, depth: number): void {
+  update(
+    data: TypedArray,
+    xOffset: number,
+    yOffset: number,
+    zOffset: number,
+    width: number,
+    height: number,
+    depth: number
+  ): void {
     if (this._device.isContextLost()) {
       return;
     }
@@ -34,7 +49,7 @@ export class WebGPUTexture2DArray extends WebGPUBaseTexture implements Texture2D
     x: number,
     y: number,
     width: number,
-    height: number,
+    height: number
   ): void {
     if (this._device.isContextLost()) {
       return;
@@ -55,21 +70,37 @@ export class WebGPUTexture2DArray extends WebGPUBaseTexture implements Texture2D
       cvs.height = 0;
     }
   }
-  createEmpty(format: TextureFormat, width: number, height: number, depth: number, creationFlags?: number): void {
+  createEmpty(
+    format: TextureFormat,
+    width: number,
+    height: number,
+    depth: number,
+    creationFlags?: number
+  ): void {
     this._flags = Number(creationFlags) || 0;
-    format = (this._flags & GPUResourceUsageFlags.TF_LINEAR_COLOR_SPACE) ? format : linearTextureFormatToSRGB(format);
+    format =
+      this._flags & GPUResourceUsageFlags.TF_LINEAR_COLOR_SPACE ? format : linearTextureFormatToSRGB(format);
     this.loadEmpty(format, width, height, depth, 0);
   }
   createView(level?: number, face?: number, mipCount?: number): GPUTextureView {
-    return this._object ? this._device.gpuCreateTextureView(this._object, {
-      dimension: '2d',
-      baseMipLevel: level ?? 0,
-      mipLevelCount: mipCount || this._mipLevelCount - (level ?? 0),
-      baseArrayLayer: face ?? 0,
-      arrayLayerCount: 1,
-    }) : null;
+    return this._object
+      ? this._device.gpuCreateTextureView(this._object, {
+          dimension: '2d',
+          baseMipLevel: level ?? 0,
+          mipLevelCount: mipCount || this._mipLevelCount - (level ?? 0),
+          baseArrayLayer: face ?? 0,
+          arrayLayerCount: 1
+        })
+      : null;
   }
-  async readPixels(layer: number, x: number, y: number, w: number, h: number, buffer: TypedArray): Promise<void> {
+  async readPixels(
+    layer: number,
+    x: number,
+    y: number,
+    w: number,
+    h: number,
+    buffer: TypedArray
+  ): Promise<void> {
     const blockWidth = getTextureFormatBlockWidth(this.format);
     const blockHeight = getTextureFormatBlockHeight(this.format);
     const blockSize = getTextureFormatBlockSize(this.format);
@@ -77,17 +108,29 @@ export class WebGPUTexture2DArray extends WebGPUBaseTexture implements Texture2D
     const blocksPerCol = this.height / blockHeight;
     const imageSize = blocksPerRow * blocksPerCol * blockSize;
     if (buffer.byteLength < imageSize) {
-      throw new Error(`Texture2D.readPixels() failed: destination buffer size is ${buffer.byteLength}, should be at least ${imageSize}`);
+      throw new Error(
+        `Texture2D.readPixels() failed: destination buffer size is ${buffer.byteLength}, should be at least ${imageSize}`
+      );
     }
     const tmpBuffer = this._device.createBuffer(imageSize, { usage: 'read' });
     await this.copyPixelDataToBuffer(x, y, w, h, layer, 0, tmpBuffer);
-    await tmpBuffer.getBufferSubData(new Uint8Array(buffer.buffer, buffer.byteOffset, buffer.byteLength), 0, imageSize);
+    await tmpBuffer.getBufferSubData(
+      new Uint8Array(buffer.buffer, buffer.byteOffset, buffer.byteLength),
+      0,
+      imageSize
+    );
     tmpBuffer.dispose();
   }
   readPixelsToBuffer(layer: number, x: number, y: number, w: number, h: number, buffer: GPUDataBuffer): void {
     this.copyPixelDataToBuffer(x, y, w, h, layer, 0, buffer);
   }
-  private loadEmpty(format: TextureFormat, width: number, height: number, depth: number, numMipLevels: number): void {
+  private loadEmpty(
+    format: TextureFormat,
+    width: number,
+    height: number,
+    depth: number,
+    numMipLevels: number
+  ): void {
     this.allocInternal(format, width, height, depth, numMipLevels);
     if (this._mipLevelCount > 1 && !this._device.isContextLost()) {
       this.generateMipmaps();

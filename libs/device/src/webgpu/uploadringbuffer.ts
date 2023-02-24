@@ -49,18 +49,25 @@ export class UploadRingBuffer {
     this._defaultSize = defaultSize;
     this._unmappedBufferList = [];
   }
-  uploadBuffer(src: ArrayBuffer, dst: GPUBuffer, srcOffset: number, dstOffset: number, uploadSize: number, allowOverlap?: boolean): UploadBuffer {
+  uploadBuffer(
+    src: ArrayBuffer,
+    dst: GPUBuffer,
+    srcOffset: number,
+    dstOffset: number,
+    uploadSize: number,
+    allowOverlap?: boolean
+  ): UploadBuffer {
     const size = (uploadSize + 3) & ~3;
     const mappedBuffer = this.fetchBufferMapped(size, !!allowOverlap);
     if (src) {
-      const mappedRange = mappedBuffer.mappedRange;//mappedBuffer.buffer.getMappedRange(mappedBuffer.offset, size);
+      const mappedRange = mappedBuffer.mappedRange; //mappedBuffer.buffer.getMappedRange(mappedBuffer.offset, size);
       new Uint8Array(mappedRange, mappedBuffer.offset, size).set(new Uint8Array(src, srcOffset, uploadSize));
     }
     const upload = {
-      mappedBuffer: {...mappedBuffer},
+      mappedBuffer: { ...mappedBuffer },
       uploadSize: size,
       uploadBuffer: dst,
-      uploadOffset: dstOffset,
+      uploadOffset: dstOffset
     };
     mappedBuffer.offset += size;
     mappedBuffer.offset = (mappedBuffer.offset + 7) & ~7;
@@ -114,7 +121,7 @@ export class UploadRingBuffer {
     const buf = this._device.device.createBuffer({
       label: `StagingRingBuffer${this._bufferList.length}:${bufferSize}`,
       size: bufferSize,
-      usage: GPUBufferUsage.MAP_WRITE|GPUBufferUsage.COPY_SRC,
+      usage: GPUBufferUsage.MAP_WRITE | GPUBufferUsage.COPY_SRC,
       mappedAtCreation: true
     });
     this._bufferList.push({
@@ -122,8 +129,8 @@ export class UploadRingBuffer {
       size: bufferSize,
       offset: 0,
       used: true,
-      mappedRange: buf.getMappedRange(),
+      mappedRange: buf.getMappedRange()
     });
-    return this._bufferList[this._bufferList.length -1];
+    return this._bufferList[this._bufferList.length - 1];
   }
 }

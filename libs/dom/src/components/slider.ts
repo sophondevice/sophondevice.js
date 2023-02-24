@@ -1,12 +1,7 @@
 import { REvent } from '@sophon/base';
 import { RRectPrimitive } from '../primitive';
 import { RElement } from '../element';
-import {
-  RAttributeChangeEvent,
-  RMouseEvent,
-  RValueChangeEvent,
-  RElementLayoutEvent,
-} from '../events';
+import { RAttributeChangeEvent, RMouseEvent, RValueChangeEvent, RElementLayoutEvent } from '../events';
 import type { GUI } from '../gui';
 import type { IStyleSheet } from '../style';
 import type { UIRect } from '../layout';
@@ -77,22 +72,21 @@ export class Slider extends RElement {
           const freeSpace = clientRect.height - this.blockSize;
           this._blockRect.y = Math.max(
             clientRect.y,
-            Math.min(clientRect.y + freeSpace, this._lastRectY + my - this._lastY),
+            Math.min(clientRect.y + freeSpace, this._lastRectY + my - this._lastY)
           );
           ratio = (this._blockRect.y - clientRect.y) / freeSpace;
         } else {
           const freeSpace = clientRect.width - this.blockSize;
           this._blockRect.x = Math.max(
             clientRect.x,
-            Math.min(clientRect.x + freeSpace, this._lastRectX + mx - this._lastX),
+            Math.min(clientRect.x + freeSpace, this._lastRectX + mx - this._lastX)
           );
           ratio = (this._blockRect.x - clientRect.x) / freeSpace;
         }
-        const delta = this.stepValue * (Math.floor((this.rangeEnd - this.rangeStart) * ratio / this.stepValue));
+        const delta =
+          this.stepValue * Math.floor(((this.rangeEnd - this.rangeStart) * ratio) / this.stepValue);
         this.value = this.rangeStart + delta;
-        const blockPos = isVertical
-          ? this._blockRect.y - clientRect.y
-          : this._blockRect.x - clientRect.x;
+        const blockPos = isVertical ? this._blockRect.y - clientRect.y : this._blockRect.x - clientRect.x;
         if (blockPos !== this._blockPos) {
           this._blockPos = blockPos;
           this._invalidateContent();
@@ -182,9 +176,7 @@ export class Slider extends RElement {
     const clipper = this._getClipper(false);
     if (clipper) {
       const blockColor = this._blockColor;
-      const blockImage = this.blockImage
-        ? this._uiscene.imageManager.getImage(this.blockImage)
-        : null;
+      const blockImage = this.blockImage ? this._uiscene.imageManager.getImage(this.blockImage) : null;
       const uvMin = blockImage?.uvMin || null;
       const uvMax = blockImage?.uvMax || null;
       this._batchList.addPrimitive(
@@ -196,11 +188,11 @@ export class Slider extends RElement {
           uvMin?.x || 0,
           uvMin?.y || 0,
           uvMax?.x || 0,
-          uvMax?.y || 0,
+          uvMax?.y || 0
         ),
         clipper,
         blockImage?.texture || null,
-        blockColor,
+        blockColor
       );
     }
   }
@@ -240,7 +232,7 @@ export class Slider extends RElement {
       x: isVertical ? clientRect.x : clientRect.x + this._blockPos,
       y: isVertical ? clientRect.y + this._blockPos : clientRect.y,
       width: isVertical ? clientRect.width : blockSize,
-      height: isVertical ? blockSize : clientRect.height,
+      height: isVertical ? blockSize : clientRect.height
     };
     this._buildBlockVertexData();
   }
