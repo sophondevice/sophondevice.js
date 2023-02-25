@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { EDGE_MAX_VALUE, PACKING_LOGIC, IOption } from './maxrects-packer';
+import { EDGE_MAX_VALUE, PACKING_LOGIC } from './values';
 import { Rectangle, IRectangle } from './geom/Rectangle';
 import { Bin } from './abstract-bin';
+import type { IOption } from './maxrects-packer';
 
 export class MaxRectsBin<T extends IRectangle = Rectangle> extends Bin<T> {
   public freeRects: Rectangle[] = [];

@@ -1,8 +1,6 @@
 import { YGDirection } from './enums';
-import { YGFloatOptional } from './ygfloatoptional';
 import { YGCachedMeasurement } from './internal';
-import { YGFloatArrayEqual } from './utils';
-import { YGFloatIsUndefined } from './yoga';
+import { YGFloatArrayEqual, YGFloatIsUndefined, YGFloatOptional } from './utils';
 
 const kYGDefaultDimensionValues: () => [number, number] = function () {
   return [undefined, undefined];

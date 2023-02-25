@@ -11,10 +11,9 @@ import {
   YGUnit
 } from './enums';
 
-import { YGValueEqual, YGValueArrayEqual, cloneYGValueArray } from './utils';
+import { YGValueEqual, YGValueArrayEqual, cloneYGValueArray, YGFloatOptional } from './utils';
 
 import { YGValue } from './ygvalue';
-import { YGFloatOptional } from './ygfloatoptional';
 
 const kYGValueUndefined: () => YGValue = function () {
   return new YGValue(0, YGUnit.Undefined);

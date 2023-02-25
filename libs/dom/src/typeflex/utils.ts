@@ -1,11 +1,15 @@
-import { YGUnit, YGFlexDirection, YGDirection } from './enums';
-
-import { YGFloatOptional } from './ygfloatoptional';
-
-import { YGFloatIsUndefined, YGUndefined } from './yoga';
-
-import { YGNode } from './ygnode';
+import { YGUnit, YGEdge, YGFlexDirection, YGDirection } from './enums';
 import { YGValue } from './ygvalue';
+import type { YGNode } from './yoga';
+
+export const YGUndefined: number = undefined;
+export function YGFloatIsUndefined(value: number) {
+  if (value === undefined || isNaN(value)) {
+    return true;
+  }
+  return false;
+  // return value >= 10E8 || value <= -10E8;
+}
 
 export class YGCollectFlexItemsRowValues {
   public itemsOnLine = 0;
@@ -138,4 +142,138 @@ export function cloneYGValueArray(array: Array<YGValue>): Array<YGValue> {
     ret[i] = array[i].clone();
   }
   return ret;
+}
+
+export class YGFloatOptional {
+  private value_: number;
+  private isUndefined_: boolean;
+
+  constructor(value: number | YGFloatOptional = undefined) {
+    if (value instanceof YGFloatOptional) {
+      this.value_ = value.getValue();
+      this.isUndefined_ = value.isUndefined();
+      return;
+    }
+
+    if (YGFloatIsUndefined(value)) {
+      this.value_ = 0;
+      this.isUndefined_ = true;
+    } else {
+      this.value_ = value;
+      this.isUndefined_ = false;
+    }
+  }
+
+  clone(): YGFloatOptional {
+    return new YGFloatOptional(this.isUndefined_ ? undefined : this.value_);
+  }
+
+  getValue(): number {
+    if (this.isUndefined_) {
+      throw 'Tried to get value of an undefined YGFloatOptional';
+    }
+
+    return this.value_;
+  }
+
+  setValue(value: number) {
+    this.value_ = value;
+    this.isUndefined_ = false;
+  }
+
+  isUndefined(): boolean {
+    return this.isUndefined_;
+  }
+
+  add(op: YGFloatOptional): YGFloatOptional {
+    if (!this.isUndefined_ && !op.isUndefined()) {
+      return new YGFloatOptional(this.value_ + op.getValue());
+    }
+    return new YGFloatOptional();
+  }
+
+  isBigger(op: YGFloatOptional): boolean {
+    if (this.isUndefined_ || op.isUndefined()) {
+      return false;
+    }
+
+    return this.value_ > op.getValue();
+  }
+
+  isSmaller(op: YGFloatOptional): boolean {
+    if (this.isUndefined_ || op.isUndefined()) {
+      return false;
+    }
+
+    return this.value_ < op.getValue();
+  }
+
+  isBiggerEqual(op: YGFloatOptional): boolean {
+    return this.isEqual(op) ? true : this.isBigger(op);
+  }
+
+  isSmallerEqual(op: YGFloatOptional): boolean {
+    return this.isEqual(op) ? true : this.isSmaller(op);
+  }
+
+  isEqual(op: YGFloatOptional): boolean {
+    if (this.isUndefined_ == op.isUndefined()) {
+      return this.isUndefined_ ? true : this.value_ == op.getValue();
+    }
+    return false;
+  }
+
+  isDiff(op: YGFloatOptional): boolean {
+    return !this.isEqual(op);
+  }
+
+  isEqualValue(val: number): boolean {
+    if (YGFloatIsUndefined(val) == this.isUndefined_) {
+      return this.isUndefined_ || val == this.value_;
+    }
+    return false;
+  }
+
+  isDiffValue(val: number): boolean {
+    return !this.isEqualValue(val);
+  }
+}
+
+export const YGValueUndefined: () => YGValue = function () {
+  return new YGValue(YGUndefined, YGUnit.Undefined);
+};
+
+export const YGValueAuto: () => YGValue = function () {
+  return new YGValue(YGUndefined, YGUnit.Auto);
+};
+
+export const YGValueZero: () => YGValue = function () {
+  return new YGValue(0, YGUnit.Point);
+};
+
+export function YGComputedEdgeValue(edges: Array<YGValue>, edge: YGEdge, defaultValue: YGValue): YGValue {
+  if (edges[edge].unit != YGUnit.Undefined) {
+    return edges[edge];
+  }
+
+  if ((edge == YGEdge.Top || edge == YGEdge.Bottom) && edges[YGEdge.Vertical].unit != YGUnit.Undefined) {
+    return edges[YGEdge.Vertical];
+  }
+
+  if (
+    (edge == YGEdge.Left || edge == YGEdge.Right || edge == YGEdge.Start || edge == YGEdge.End) &&
+    edges[YGEdge.Horizontal].unit != YGUnit.Undefined
+  ) {
+    return edges[YGEdge.Horizontal];
+  }
+
+  if (edges[YGEdge.All].unit != YGUnit.Undefined) {
+    return edges[YGEdge.All];
+  }
+
+  if (edge == YGEdge.Start || edge == YGEdge.End) {
+    return YGValueUndefined();
+  }
+
+  return defaultValue;
 }

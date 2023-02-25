@@ -1,15 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { EDGE_MAX_VALUE, PACKING_LOGIC } from './values';
 import { Rectangle, IRectangle } from './geom/Rectangle';
 import { MaxRectsBin } from './maxrects-bin';
 import { OversizedElementBin } from './oversized-element-bin';
 import { Bin, IBin } from './abstract-bin';
-
-export const EDGE_MAX_VALUE = 4096;
-export const EDGE_MIN_VALUE = 128;
-export enum PACKING_LOGIC {
-  MAX_AREA = 0,
-  MAX_EDGE = 1
-}
 
 /**
  * Options for MaxRect Packer

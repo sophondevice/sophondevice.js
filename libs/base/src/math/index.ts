@@ -7,4 +7,3 @@ export * from './frustum';
 export * from './aabb';
 export * from './ray';
 export * from './sh';
-export * from './maxrects-packer';

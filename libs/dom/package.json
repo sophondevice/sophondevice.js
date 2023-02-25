@@ -38,7 +38,6 @@
   },
   "devDependencies": {
     "@babel/core": "^7.20.12",
-    "@babel/eslint-parser": "^7.19.1",
     "@babel/preset-env": "^7.20.2",
     "@rollup/plugin-babel": "^6.0.3",
     "@rollup/plugin-node-resolve": "^15.0.1",

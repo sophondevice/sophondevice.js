@@ -109,10 +109,10 @@ import {
   YGNodeNewWithConfig,
   YGNodeNew,
   YGNodeStyleSetPosition,
-  YGNodeGetInstanceCount
+  YGNodeGetInstanceCount,
+  YGNode
 } from './yoga';
 
-import { YGNode } from './ygnode';
 import { YGValue } from './ygvalue';
 import { YGConfig } from './ygconfig';
 import { YGFloatSanitize } from './utils';

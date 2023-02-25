@@ -3,7 +3,7 @@ import * as Yoga from './typeflex/api';
 import { YGSize } from './typeflex/yoga';
 import type { RNode } from './node';
 import type { RCoord, RColor } from './types';
-import type { YGNode } from './typeflex/ygnode';
+import type { YGNode } from './typeflex/yoga';
 import type { YGMeasureMode } from './typeflex/enums';
 
 export interface UIRect {
