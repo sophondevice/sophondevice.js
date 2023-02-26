@@ -616,6 +616,8 @@ export interface FrameBufferTextureAttachment {
 export interface FrameBufferOptions {
   colorAttachments?: FrameBufferTextureAttachment[];
   depthAttachment?: FrameBufferTextureAttachment;
+  sampleCount?: number;
+  ignoreDepthStencil?: boolean;
 }
 
 export interface UniformBufferLayout {

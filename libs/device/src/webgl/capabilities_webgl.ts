@@ -174,6 +174,7 @@ export class WebGLFramebufferCap implements FramebufferCaps {
   maxDrawBuffers: number;
   supportDrawBuffers: boolean;
   supportRenderMipmap: boolean;
+  supportMultisampledFramebuffer: boolean;
   constructor(gl: WebGLContext) {
     this._isWebGL2 = isWebGL2(gl);
     this._extDrawBuffers = null;
@@ -193,6 +194,7 @@ export class WebGLFramebufferCap implements FramebufferCaps {
           gl.getParameter(WebGLEnum.MAX_DRAW_BUFFERS)
         )
       : 1;
+    this.supportMultisampledFramebuffer = isWebGL2(gl);
   }
 }
 

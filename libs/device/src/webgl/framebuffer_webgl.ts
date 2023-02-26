@@ -1,15 +1,11 @@
 import { CubeFace } from '@sophon/base';
 import { WebGLGPUObject } from './gpuobject_webgl';
 import { WebGLEnum } from './webgl_enum';
-import {
-  BaseTexture,
-  FrameBufferTextureAttachment,
-  FrameBuffer,
-  FrameBufferOptions
-} from '../gpuobject';
+import { BaseTexture, FrameBufferTextureAttachment, FrameBuffer, FrameBufferOptions } from '../gpuobject';
 import { cubeMapFaceMap } from './constants_webgl';
 import type { WebGLDevice } from './device_webgl';
 import { hasStencilChannel } from '../base_types';
+import { WebGLTextureCap } from './capabilities_webgl';
 
 const STATUS_UNCHECKED = 0;
 const STATUS_OK = 1;
@@ -23,17 +19,25 @@ export class WebGLFrameBuffer
   private _scissor: [number, number, number, number];
   private _needBindBuffers: boolean;
   private _status: number;
+  private _statusAA: number;
   private _width: number;
   private _height: number;
   private _isMRT: boolean;
   private _drawBuffers: number[];
+  private _colorAttachmentsAA: WebGLRenderbuffer[];
+  private _depthAttachmentAA: WebGLRenderbuffer;
+  private _framebufferAA: WebGLFramebuffer;
   constructor(device: WebGLDevice, opt?: FrameBufferOptions) {
     super(device);
     this._object = null;
+    this._framebufferAA = null;
+    this._colorAttachmentsAA = null;
+    this._depthAttachmentAA = null;
     this._viewport = [0, 0, 0, 0];
     this._scissor = null;
     this._needBindBuffers = false;
     this._status = STATUS_UNCHECKED;
+    this._statusAA = STATUS_UNCHECKED;
     this._options = {
       colorAttachments: opt?.colorAttachments
         ? opt.colorAttachments.map((value) =>
@@ -48,7 +52,9 @@ export class WebGLFrameBuffer
             )
           )
         : null,
-      depthAttachment: opt?.depthAttachment ? Object.assign({}, opt.depthAttachment) : null
+      depthAttachment: opt?.depthAttachment ? Object.assign({}, opt.depthAttachment) : null,
+      sampleCount: opt?.sampleCount ?? 1,
+      ignoreDepthStencil: opt?.ignoreDepthStencil ?? false
     };
     this._width = 0;
     this._height = 0;
@@ -148,11 +154,14 @@ export class WebGLFrameBuffer
   }
   bind(): boolean {
     if (this._object) {
-      this._device.context.bindFramebuffer(WebGLEnum.FRAMEBUFFER, this._object);
+      this._device.context.bindFramebuffer(
+        WebGLEnum.FRAMEBUFFER,
+        this._options.sampleCount > 1 ? this._framebufferAA : this._object
+      );
       this._device.context._currentFramebuffer = this;
       if (this._needBindBuffers) {
         this._needBindBuffers = false;
-        if (!this._bindBuffers()) {
+        if (!this._bindBuffersAA() || !this._bindBuffers()) {
           this._device.context.bindFramebuffer(WebGLEnum.FRAMEBUFFER, null);
           this._device.context._currentFramebuffer = null;
           return false;
@@ -180,21 +189,66 @@ export class WebGLFrameBuffer
       if (drawBuffersExt) {
         drawBuffersExt.drawBuffers([WebGLEnum.BACK]);
       }
+      if (this._options.sampleCount > 1) {
+        const gl = this._device.context as WebGL2RenderingContext;
+        gl.bindFramebuffer(WebGLEnum.READ_FRAMEBUFFER, this._framebufferAA);
+        gl.bindFramebuffer(WebGLEnum.DRAW_FRAMEBUFFER, this._object);
+        let mask = 0;
+        if (this._options.colorAttachments.length > 0) {
+          mask |= WebGLEnum.COLOR_BUFFER_BIT;
+        }
+        if (this._options.depthAttachment?.texture) {
+          mask |= WebGLEnum.DEPTH_BUFFER_BIT;
+          if (hasStencilChannel(this._options.depthAttachment.texture.format)) {
+            mask |= WebGLEnum.STENCIL_BUFFER_BIT;
+          }
+        }
+        (this._device.context as WebGL2RenderingContext).blitFramebuffer(
+          0,
+          0,
+          this._width,
+          this._height,
+          0,
+          0,
+          this._width,
+          this._height,
+          mask,
+          WebGLEnum.NEAREST
+        );
+        gl.bindFramebuffer(WebGLEnum.READ_FRAMEBUFFER, null);
+        gl.bindFramebuffer(WebGLEnum.DRAW_FRAMEBUFFER, null);
+      }
     }
   }
   private _load(): void {
     if (this._device.isContextLost()) {
       return;
     }
-    this._object = this._device.context.createFramebuffer();
-    this._device.context.bindFramebuffer(WebGLEnum.FRAMEBUFFER, this._object);
-    if (!this._bindBuffers()) {
-      this.dispose();
-    }
+    do {
+      if (this._options.sampleCount > 1) {
+        this._framebufferAA = this._device.context.createFramebuffer();
+        this._device.context.bindFramebuffer(WebGLEnum.FRAMEBUFFER, this._framebufferAA);
+        this._colorAttachmentsAA = [];
+        this._depthAttachmentAA = null;
+        if (!this._bindBuffersAA()) {
+          this.dispose();
+          break;
+        }
+      }
+      this._object = this._device.context.createFramebuffer();
+      this._device.context.bindFramebuffer(WebGLEnum.FRAMEBUFFER, this._object);
+      if (!this._bindBuffers()) {
+        this.dispose();
+      }
+    } while (0);
     this._device.context.bindFramebuffer(WebGLEnum.FRAMEBUFFER, null);
     this._device.context._currentFramebuffer = null;
   }
-  private _bindAttachment(attachment: number, info: FrameBufferTextureAttachment): boolean {
+  private _bindAttachment(
+    attachment: number,
+    info: FrameBufferTextureAttachment,
+    attachmentAA?: WebGLRenderbuffer
+  ): boolean {
     if (info.texture) {
       if (info.texture.isTexture2D()) {
         this._device.context.framebufferTexture2D(
@@ -258,6 +312,65 @@ export class WebGLFrameBuffer
     }
     return this._status === STATUS_OK;
   }
+  private _createRenderbufferAA(texture: BaseTexture): WebGLRenderbuffer {
+    const renderBuffer = this._device.context.createRenderbuffer();
+    const formatInfo = (this.device.getTextureCaps() as WebGLTextureCap).getTextureFormatInfo(texture.format);
+    this._device.context.bindRenderbuffer(WebGLEnum.RENDERBUFFER, renderBuffer);
+    (this._device.context as WebGL2RenderingContext).renderbufferStorageMultisample(
+      WebGLEnum.RENDERBUFFER,
+      this._options.sampleCount,
+      formatInfo.glInternalFormat,
+      this._options.depthAttachment.texture.width,
+      this._options.depthAttachment.texture.height
+    );
+    return renderBuffer;
+  }
+  private _bindBuffersAA(): boolean {
+    if (this._options.sampleCount === 1) {
+      return true;
+    }
+    if (this._options.depthAttachment?.texture) {
+      let target: number;
+      if (hasStencilChannel(this._options.depthAttachment.texture.format)) {
+        target = WebGLEnum.DEPTH_STENCIL_ATTACHMENT;
+      } else {
+        target = WebGLEnum.DEPTH_ATTACHMENT;
+      }
+      if (!this._depthAttachmentAA) {
+        this._depthAttachmentAA = this._createRenderbufferAA(this._options.depthAttachment.texture);
+      }
+      this._device.context.framebufferRenderbuffer(
+        WebGLEnum.FRAMEBUFFER,
+        target,
+        WebGLEnum.RENDERBUFFER,
+        this._depthAttachmentAA
+      );
+    }
+    for (let i = 0; i < this._options.colorAttachments.length; i++) {
+      const opt = this._options.colorAttachments[i];
+      if (opt.texture) {
+        if (!this._colorAttachmentsAA[i]) {
+          this._colorAttachmentsAA[i] = this._createRenderbufferAA(this._options.colorAttachments[i].texture);
+        }
+        this._device.context.framebufferRenderbuffer(
+          WebGLEnum.FRAMEBUFFER,
+          WebGLEnum.COLOR_ATTACHMENT0 + i,
+          WebGLEnum.RENDERBUFFER,
+          this._colorAttachmentsAA[i]
+        );
+      }
+    }
+    if (this._statusAA === STATUS_UNCHECKED) {
+      const status = this._device.context.checkFramebufferStatus(WebGLEnum.FRAMEBUFFER);
+      if (status !== WebGLEnum.FRAMEBUFFER_COMPLETE) {
+        console.error(`Framebuffer not complete: ${status}`);
+        this._statusAA = STATUS_FAILED;
+      } else {
+        this._statusAA = STATUS_OK;
+      }
+    }
+    return this._statusAA === STATUS_OK;
+  }
   private _init(): void {
     this._width = 0;
     this._height = 0;
@@ -280,6 +393,15 @@ export class WebGLFrameBuffer
     }
     if (this._width === 0 || this._height === 0) {
       console.error('init frame buffer failed: can not create frame buffer with zero size');
+      return;
+    }
+    if (this._options.sampleCount !== 1 && this._options.sampleCount !== 4) {
+      console.error(`init frame buffer failed: invalid sample count value: ${this._options.sampleCount}`);
+      return;
+    }
+    if (this._options.sampleCount > 1 && !this._device.getFramebufferCaps().supportMultisampledFramebuffer) {
+      console.error('init frame buffer failed: webgl1 does not support multisampled frame buffer');
+      return;
     }
     this._load();
     this._viewport = [0, 0, this._width, this._height];

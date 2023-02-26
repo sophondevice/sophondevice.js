@@ -51,6 +51,7 @@ export interface FramebufferCaps {
   maxDrawBuffers: number;
   supportDrawBuffers: boolean;
   supportRenderMipmap: boolean;
+  supportMultisampledFramebuffer: boolean;
 }
 
 export interface MiscCaps {

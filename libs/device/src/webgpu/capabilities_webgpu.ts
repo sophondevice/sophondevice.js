@@ -28,10 +28,12 @@ export class WebGPUFramebufferCap implements FramebufferCaps {
   maxDrawBuffers: number;
   supportDrawBuffers: boolean;
   supportRenderMipmap: boolean;
+  supportMultisampledFramebuffer: boolean;
   constructor(device: WebGPUDevice) {
     this.maxDrawBuffers = 8;
     this.supportDrawBuffers = true;
     this.supportRenderMipmap = true;
+    this.supportMultisampledFramebuffer = true;
   }
 }
 
