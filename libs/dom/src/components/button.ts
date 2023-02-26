@@ -1,6 +1,6 @@
 import { RElement } from '../element';
 import type { GUI } from '../gui';
-import type { IStyleSheet } from '../style';
+import type { StyleSheet } from '../style';
 
 export class Button extends RElement {
   constructor(uiscene: GUI) {
@@ -13,7 +13,7 @@ export class Button extends RElement {
   /** @internal */
   _init() {}
   /** @internal */
-  _getDefaultStyleSheet(): IStyleSheet {
+  _getDefaultStyleSheet(): StyleSheet {
     const style = super._getDefaultStyleSheet();
     style.flexDirection = 'row';
     style.padding = '2';

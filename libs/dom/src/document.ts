@@ -3,7 +3,7 @@ import { RNodeList, RStaticNodeList } from './nodelist';
 import type { RElement } from './element';
 import type { RText } from './components/text';
 import type { GUI } from './gui';
-import type { IStyleSheet } from './style';
+import type { StyleSheet } from './style';
 
 export class RDocument extends RNode {
   /** @internal */
@@ -107,7 +107,7 @@ export class RDocument extends RNode {
     return this._uiscene.createTextNode();
   }
   /** @internal */
-  _getDefaultStyleSheet(): IStyleSheet {
+  _getDefaultStyleSheet(): StyleSheet {
     return {
       position: 'absolute',
       flexDirection: 'column',

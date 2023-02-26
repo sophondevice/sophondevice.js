@@ -1,18 +1,18 @@
 import { CubeFace } from '@sophon/base';
 import { WebGPUObject } from './gpuobject_webgpu';
-import { FrameBuffer, IFrameBufferOptions } from '../gpuobject';
+import { FrameBuffer, FrameBufferOptions } from '../gpuobject';
 import type { WebGPUDevice } from './device';
 import type { BaseTexture } from '../gpuobject';
 import type { WebGPUBaseTexture } from './basetexture_webgpu';
 
 export class WebGPUFrameBuffer extends WebGPUObject<unknown> implements FrameBuffer<unknown> {
-  private _options: IFrameBufferOptions;
+  private _options: FrameBufferOptions;
   private _viewport: number[];
   private _scissor: number[];
   private _width: number;
   private _height: number;
   private _bindFlag: number;
-  constructor(device: WebGPUDevice, opt?: IFrameBufferOptions) {
+  constructor(device: WebGPUDevice, opt?: FrameBufferOptions) {
     super(device);
     this._object = null;
     this._viewport = [0, 0, 0, 0];
@@ -28,7 +28,7 @@ export class WebGPUFrameBuffer extends WebGPUObject<unknown> implements FrameBuf
     this._bindFlag = 0;
     this._init();
   }
-  get options(): IFrameBufferOptions {
+  get options(): FrameBufferOptions {
     return this._options;
   }
   get bindFlag(): number {

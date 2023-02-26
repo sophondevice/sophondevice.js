@@ -606,16 +606,16 @@ export interface TextureMipmapData {
   mipDatas: TextureMipmapLevelData[][];
 }
 
-export interface IFrameBufferTextureAttachment {
+export interface FrameBufferTextureAttachment {
   texture?: BaseTexture;
   face?: number;
   layer?: number;
   level?: number;
 }
 
-export interface IFrameBufferOptions {
-  colorAttachments?: IFrameBufferTextureAttachment[];
-  depthAttachment?: IFrameBufferTextureAttachment;
+export interface FrameBufferOptions {
+  colorAttachments?: FrameBufferTextureAttachment[];
+  depthAttachment?: FrameBufferTextureAttachment;
 }
 
 export interface UniformBufferLayout {

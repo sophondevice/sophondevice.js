@@ -22,13 +22,13 @@ type TypedArrayConstructor<T extends TypedArray = any> = {
 };
 
 type UniformBlockArray = Int32Array | Uint32Array | Float32Array;
-export interface IAttributeSetter {
+export interface AttributeSetter {
   (value: WebGLGPUBuffer | number | Iterable<number>, offset?: number, stride?: number): void;
   location: number;
 }
 
 export type IUniformValue = number | Iterable<number> | [WebGLBaseTexture, WebGLSampler];
-export interface IUniformSetter {
+export interface UniformSetter {
   (value: IUniformValue): unknown;
 }
 
@@ -57,7 +57,7 @@ export class WebGLGPUProgram extends WebGLGPUObject<WebGLProgram> implements GPU
   private _vs: string;
   private _fs: string;
   private _unitCounter: number;
-  private _uniformSetters: { [name: string]: IUniformSetter };
+  private _uniformSetters: { [name: string]: UniformSetter };
   private _uniformInfo: ProgramUniformInfo[];
   private _blockInfo: { [name: string]: ProgramBlockInfo };
   private _bindGroupLayouts: BindGroupLayout[];

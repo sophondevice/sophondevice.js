@@ -24,7 +24,7 @@ export function getQueryString(name: string) {
   return new URL(window.location.toString()).searchParams.get(name) || null;
 }
 
-export interface ITestCase {
+export interface TestCase {
   caseName: string;
   times: number;
   execute: () => void;
@@ -57,7 +57,7 @@ function asyncWrapper(fn: Function, msg: HTMLElement, times: number) {
   };
 }
 
-export async function doTest(desc: string, cases: ITestCase[]) {
+export async function doTest(desc: string, cases: TestCase[]) {
   const title = document.getElementById('title');
   title.textContent = `${desc} - testing`;
   const table = document.getElementById('test-results');

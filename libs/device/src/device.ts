@@ -4,7 +4,7 @@ import { CPUTimer, ITimer } from './timer';
 import type { RenderStateSet } from './render_states';
 import type { VertexData } from './vertexdata';
 import {
-  IFrameBufferOptions,
+  FrameBufferOptions,
   SamplerOptions,
   TextureSampler,
   Texture2D,
@@ -71,7 +71,7 @@ export interface ShaderCaps {
   uniformBufferOffsetAlignment: number;
 }
 
-export interface ITextureFormatInfo {
+export interface TextureFormatInfo {
   filterable: boolean;
   renderable: boolean;
   compressed: boolean;
@@ -95,7 +95,7 @@ export interface TextureCaps {
   supportFloatColorBuffer: boolean;
   supportHalfFloatColorBuffer: boolean;
   supportFloatBlending: boolean;
-  getTextureFormatInfo(format: TextureFormat): ITextureFormatInfo;
+  getTextureFormatInfo(format: TextureFormat): TextureFormatInfo;
 }
 
 export type DeviceTypeWebGL = 'webgl' | 'webgl2';
@@ -332,7 +332,7 @@ export abstract class Device extends REventTarget {
     data?: TypedArray
   ): StructuredBuffer;
   abstract createVAO(vertexData: VertexData): VertexInputLayout;
-  abstract createFrameBuffer(options?: IFrameBufferOptions): FrameBuffer;
+  abstract createFrameBuffer(options?: FrameBufferOptions): FrameBuffer;
   // render related
   abstract setViewport(vp?: number[]): number[];
   abstract setViewport(x: number, y: number, w: number, h: number): void;

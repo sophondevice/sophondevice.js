@@ -1,5 +1,5 @@
 import { TextureAtlas } from './texture_atlas';
-import { AtlasManager, IAtlasInfo } from './atlas_manager';
+import { AtlasManager, AtlasInfo } from './atlas_manager';
 import type { GUIRenderer } from './renderer';
 
 export class ImageManager {
@@ -59,7 +59,7 @@ export class ImageManager {
     }
 
     let size = 10;
-    let atlasInfo: IAtlasInfo;
+    let atlasInfo: AtlasInfo;
     ctx.fillStyle = '#ffffff';
 
     // input

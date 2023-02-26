@@ -4,7 +4,7 @@ import { RCoord, RColor, GUIEventPathBuilder } from './types';
 import { RRectPrimitive, RPolygonPrimitive, RPrimitiveBatchList } from './primitive';
 import { RNodeList, RLiveNodeList } from './nodelist';
 import { UIRect, UILayout } from './layout';
-import { unescapeCSSString, ElementStyle, IStyleSheet } from './style';
+import { unescapeCSSString, ElementStyle, StyleSheet } from './style';
 import {
   RValueChangeEvent,
   RElementLayoutEvent,
@@ -36,7 +36,7 @@ const defaultCursor = 'default';
 const tmpUV1 = { x: 0, y: 0 };
 const tmpUV2 = { x: 0, y: 0 };
 
-export interface INodeVisitor {
+export interface NodeVisitor {
   beginTraverseNode(w: RNode);
   endTraverseNode(w: RNode);
   visitNode(w: RNode): void;
@@ -517,7 +517,7 @@ export class RNode extends REventTarget {
       this._uiscene.setCapture(null);
     }
   }
-  traverse(v: INodeVisitor, inverse?: boolean, render?: boolean) {
+  traverse(v: NodeVisitor, inverse?: boolean, render?: boolean) {
     v.beginTraverseNode(this);
     if (!this._isVisible()) {
       return;
@@ -617,7 +617,7 @@ export class RNode extends REventTarget {
     return this._fontColor || this.parentNode?._getCachedFontColor() || ElementStyle.defaultFontColor;
   }
   /** @internal */
-  _updatePseudoElementStyles(types: Map<string, { stylesheet: IStyleSheet; extra: unknown }[]>) {
+  _updatePseudoElementStyles(types: Map<string, { stylesheet: StyleSheet; extra: unknown }[]>) {
     for (const name of ['before', 'after']) {
       const info = types?.get(name);
       let pseudo: number;
@@ -871,8 +871,8 @@ export class RNode extends REventTarget {
     this._updateState();
   }
   /** @internal */
-  _getDefaultStyleSheet(): IStyleSheet {
-    const style = {} as IStyleSheet;
+  _getDefaultStyleSheet(): StyleSheet {
+    const style = {} as StyleSheet;
     style.flex = '0 1 auto';
     style.flexDirection = 'row';
     style.width = 'auto';

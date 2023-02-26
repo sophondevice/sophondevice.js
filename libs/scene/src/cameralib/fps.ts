@@ -1,7 +1,8 @@
 import { Vector3, Quaternion, Matrix3x3, Matrix4x4 } from '@sophon/base';
 import { BaseCameraModel } from './base';
 import type { AbstractCameraModel, IMouseEvent, IKeyEvent } from '../camera';
-export interface IFPSCameraModelOptions {
+
+export interface FPSCameraModelOptions {
   controlKeys?: {
     up: string;
     down: string;
@@ -16,7 +17,7 @@ export interface IFPSCameraModelOptions {
 
 export class FPSCameraModel extends BaseCameraModel implements AbstractCameraModel {
   /** @internal */
-  private options: IFPSCameraModelOptions;
+  private options: FPSCameraModelOptions;
   /** @internal */
   private mouseDown: boolean;
   /** @internal */
@@ -35,7 +36,7 @@ export class FPSCameraModel extends BaseCameraModel implements AbstractCameraMod
   private keyForward: boolean;
   /** @internal */
   private keyBackward: boolean;
-  constructor(options?: IFPSCameraModelOptions) {
+  constructor(options?: FPSCameraModelOptions) {
     super();
     this.options = Object.assign(
       {
@@ -168,7 +169,7 @@ export class FPSCameraModel extends BaseCameraModel implements AbstractCameraMod
         break;
     }
   }
-  setOptions(opt?: IFPSCameraModelOptions) {
+  setOptions(opt?: FPSCameraModelOptions) {
     opt && Object.assign(this.options, opt);
     this.reset();
   }

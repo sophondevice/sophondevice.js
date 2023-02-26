@@ -21,7 +21,7 @@ export const NORM_BITSHIFT = 10;
 
 type LayoutableType = PBPrimitiveTypeInfo | PBArrayTypeInfo | PBStructTypeInfo;
 
-export interface ILayoutableType {
+export interface Layoutable {
   getLayoutAlignment(layout: PBStructLayout): number;
   getLayoutSize(layout: PBStructLayout): number;
 }
@@ -542,7 +542,7 @@ export class PBVoidTypeInfo extends PBTypeInfo<null> {
     return null;
   }
 }
-export class PBPrimitiveTypeInfo extends PBTypeInfo<PrimitiveTypeDetail> implements ILayoutableType {
+export class PBPrimitiveTypeInfo extends PBTypeInfo<PrimitiveTypeDetail> implements Layoutable {
   /** @internal */
   private static cachedTypes: { [primitiveType: number]: PBPrimitiveTypeInfo } = {};
   /** @internal */
@@ -745,7 +745,7 @@ export class PBPrimitiveTypeInfo extends PBTypeInfo<PrimitiveTypeDetail> impleme
   }
 }
 
-export class PBStructTypeInfo extends PBTypeInfo<StructTypeDetail> implements ILayoutableType {
+export class PBStructTypeInfo extends PBTypeInfo<StructTypeDetail> implements Layoutable {
   constructor(
     name: string,
     layout: PBStructLayout,
@@ -938,7 +938,7 @@ export class PBStructTypeInfo extends PBTypeInfo<StructTypeDetail> implements IL
   }
 }
 
-export class PBArrayTypeInfo extends PBTypeInfo<ArrayTypeDetail> implements ILayoutableType {
+export class PBArrayTypeInfo extends PBTypeInfo<ArrayTypeDetail> implements Layoutable {
   constructor(elementType: PBPrimitiveTypeInfo | PBArrayTypeInfo | PBStructTypeInfo, dimension?: number) {
     super(PBTypeClass.ARRAY, {
       elementType: elementType,

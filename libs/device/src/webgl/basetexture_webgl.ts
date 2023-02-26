@@ -17,7 +17,7 @@ import { GPUResourceUsageFlags, SamplerOptions, BaseTexture } from '../gpuobject
 import { cubeMapFaceMap, textureTargetMap } from './constants_webgl';
 import { isWebGL2 } from './utils';
 import { WebGLEnum } from './webgl_enum';
-import type { WebGLTextureCap, ITextureFormatInfoWebGL } from './capabilities_webgl';
+import type { WebGLTextureCap, TextureFormatInfoWebGL } from './capabilities_webgl';
 import type { TextureSampler } from '../gpuobject';
 import type { WebGLTextureSampler } from './sampler_webgl';
 import type { WebGLDevice } from './device_webgl';
@@ -258,7 +258,7 @@ export abstract class WebGLBaseTexture extends WebGLGPUObject<WebGLTexture> {
     return Math.floor(Math.log2(Math.max(width, height))) + 1;
   }
   /** @internal */
-  protected _getSamplerOptions(params: ITextureFormatInfoWebGL, shadow: boolean): SamplerOptions {
+  protected _getSamplerOptions(params: TextureFormatInfoWebGL, shadow: boolean): SamplerOptions {
     const comparison = this.isDepth() && shadow;
     const filterable = params.filterable || comparison;
     const magFilter = filterable ? TextureFilter.Linear : TextureFilter.Nearest;

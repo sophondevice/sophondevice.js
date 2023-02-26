@@ -3,7 +3,7 @@ import { RRectPrimitive } from '../primitive';
 import { RNode } from '../node';
 import { RTextEvent, RAttributeChangeEvent } from '../events';
 import type { GUI } from '../gui';
-import type { IStyleSheet } from '../style';
+import type { StyleSheet } from '../style';
 import type { UIRect } from '../layout';
 
 export class RText extends RNode {
@@ -96,7 +96,7 @@ export class RText extends RNode {
     this.style.applyStyles(this._inlineStyle, true);
   }
   /** @internal */
-  _getDefaultStyleSheet(): IStyleSheet {
+  _getDefaultStyleSheet(): StyleSheet {
     const style = super._getDefaultStyleSheet();
     style.backgroundColor = 'transparent';
     style.flex = '0 0 auto';

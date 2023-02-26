@@ -3,7 +3,7 @@ import { RElementLayoutEvent, RTextEvent, RChangeEvent } from '../events';
 import { RNode } from '../node';
 import { RElement } from '../element';
 import type { GUI } from '../gui';
-import type { IStyleSheet } from '../style';
+import type { StyleSheet } from '../style';
 
 export class Option extends RElement {
   /** @internal */
@@ -17,7 +17,7 @@ export class Option extends RElement {
     return this._hiddenOption;
   }
   /** @internal */
-  _getDefaultStyleSheet(): IStyleSheet {
+  _getDefaultStyleSheet(): StyleSheet {
     const style = super._getDefaultStyleSheet();
     style.width = '0px';
     style.height = '0px';
@@ -119,7 +119,7 @@ export class Select extends RElement {
   /** @internal */
   _init(): void {}
   /** @internal */
-  _getDefaultStyleSheet(): IStyleSheet {
+  _getDefaultStyleSheet(): StyleSheet {
     const style = super._getDefaultStyleSheet();
     style.width = 'auto';
     style.height = 'auto';

@@ -28,7 +28,7 @@ import { WebGLFrameBuffer } from './framebuffer_webgl';
 import { WebGLDepthState, WebGLRenderStateSet } from './renderstate_webgl';
 import { GPUTimer } from './gpu_timer';
 import {
-  IFrameBufferOptions,
+  FrameBufferOptions,
   SamplerOptions,
   TextureSampler,
   Texture2D,
@@ -420,7 +420,7 @@ export class WebGLDevice extends Device {
   createVAO(vertexData: VertexData): VertexInputLayout {
     return new WebGLVertexInputLayout(this, vertexData);
   }
-  createFrameBuffer(options?: IFrameBufferOptions): FrameBuffer {
+  createFrameBuffer(options?: FrameBufferOptions): FrameBuffer {
     return new WebGLFrameBuffer(this, options);
   }
   setBindGroup(index: number, bindGroup: BindGroup, bindGroupOffsets?: Iterable<number>) {

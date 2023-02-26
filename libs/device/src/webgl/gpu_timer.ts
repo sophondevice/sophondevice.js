@@ -12,7 +12,7 @@ const enum QueryState {
   QUERY_STATE_FINISHED = 2
 }
 
-interface ITimerQuery {
+interface TimerQuery {
   createQuery: () => unknown;
   deleteQuery: (query: unknown) => void;
   isQuery: (query: unknown) => boolean;
@@ -27,7 +27,7 @@ export class GPUTimer implements ITimer {
   private _device: WebGLDevice;
   private _query: unknown;
   private _state: QueryState;
-  private _timerQuery: ITimerQuery;
+  private _timerQuery: TimerQuery;
   private _gpuTime: number;
   constructor(device: WebGLDevice) {
     this._device = device;

@@ -1,8 +1,8 @@
 import { TextureFormat } from '../base_types';
-import type { FramebufferCaps, ITextureFormatInfo, MiscCaps, ShaderCaps, TextureCaps } from '../device';
+import type { FramebufferCaps, TextureFormatInfo, MiscCaps, ShaderCaps, TextureCaps } from '../device';
 import type { WebGPUDevice } from './device';
 
-export interface ITextureParams {
+export interface TextureParams {
   gpuFormat: GPUTextureFormat;
   stride: number;
   filterable: boolean;
@@ -13,7 +13,7 @@ export interface ITextureParams {
   generateMipmap: boolean;
 }
 
-export interface ITextureFormatInfoWebGPU extends ITextureFormatInfo {
+export interface TextureFormatInfoWebGPU extends TextureFormatInfo {
   gpuSampleType: GPUTextureSampleType;
   filterable: boolean;
   renderable: boolean;
@@ -68,7 +68,7 @@ export class WebGPUShaderCap implements ShaderCaps {
   }
 }
 export class WebGPUTextureCap implements TextureCaps {
-  private _textureFormatInfos: { [format: number]: ITextureFormatInfoWebGPU };
+  private _textureFormatInfos: { [format: number]: TextureFormatInfoWebGPU };
   maxTextureSize: number;
   maxCubeTextureSize: number;
   npo2Mipmapping: boolean;
@@ -485,7 +485,7 @@ export class WebGPUTextureCap implements TextureCaps {
   calcMemoryUsage(format: TextureFormat, numPixels): number {
     return this._textureFormatInfos[format] ? this._textureFormatInfos[format].size * numPixels : 0;
   }
-  getTextureFormatInfo(format: TextureFormat): ITextureFormatInfoWebGPU {
+  getTextureFormatInfo(format: TextureFormat): TextureFormatInfoWebGPU {
     return this._textureFormatInfos[format];
   }
 }

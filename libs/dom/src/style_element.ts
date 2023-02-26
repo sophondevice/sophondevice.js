@@ -2,18 +2,18 @@ import { RElement } from './element';
 import { RTextContentChangeEvent } from './events';
 import type { GUI } from './gui';
 import type { RSelector } from './selector';
-import type { IStyleSheet } from './style';
+import type { StyleSheet } from './style';
 
 /** @internal */
-export interface IStyleDefiniation {
+export interface StyleDefiniation {
   selector: RSelector;
-  stylesheet: IStyleSheet;
+  stylesheet: StyleSheet;
   extra: unknown;
 }
 
 export class StyleElement extends RElement {
   /** @internal */
-  private _definitions: IStyleDefiniation[];
+  private _definitions: StyleDefiniation[];
   constructor(uiscene: GUI) {
     super(uiscene);
     this._definitions = [];
@@ -22,7 +22,7 @@ export class StyleElement extends RElement {
     });
   }
   /** @internal */
-  get definitions(): IStyleDefiniation[] {
+  get definitions(): StyleDefiniation[] {
     return this._definitions;
   }
   /** @internal */
@@ -33,8 +33,8 @@ export class StyleElement extends RElement {
     }
   }
   /** @internal */
-  _getDefaultStyleSheet(): IStyleSheet {
-    const style = {} as IStyleSheet;
+  _getDefaultStyleSheet(): StyleSheet {
+    const style = {} as StyleSheet;
     style.display = 'none';
     return style;
   }

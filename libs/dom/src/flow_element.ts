@@ -1,14 +1,14 @@
 import { RElement } from './element';
 import type { GUI } from './gui';
-import type { IStyleSheet } from './style';
+import type { StyleSheet } from './style';
 
 export class RFlowElement extends RElement {
   constructor(uiscene: GUI) {
     super(uiscene);
   }
   /** @internal */
-  _getDefaultStyleSheet(): IStyleSheet {
-    const style = {} as IStyleSheet;
+  _getDefaultStyleSheet(): StyleSheet {
+    const style = {} as StyleSheet;
     style.width = '100%';
     style.height = 'auto';
     style.flexDirection = 'column';

@@ -3,9 +3,9 @@ import { WebGLGPUObject } from './gpuobject_webgl';
 import { WebGLEnum } from './webgl_enum';
 import {
   BaseTexture,
-  IFrameBufferTextureAttachment,
+  FrameBufferTextureAttachment,
   FrameBuffer,
-  IFrameBufferOptions
+  FrameBufferOptions
 } from '../gpuobject';
 import { cubeMapFaceMap } from './constants_webgl';
 import type { WebGLDevice } from './device_webgl';
@@ -18,7 +18,7 @@ export class WebGLFrameBuffer
   extends WebGLGPUObject<WebGLFramebuffer>
   implements FrameBuffer<WebGLFramebuffer>
 {
-  private _options: IFrameBufferOptions;
+  private _options: FrameBufferOptions;
   private _viewport: number[];
   private _scissor: [number, number, number, number];
   private _needBindBuffers: boolean;
@@ -27,7 +27,7 @@ export class WebGLFrameBuffer
   private _height: number;
   private _isMRT: boolean;
   private _drawBuffers: number[];
-  constructor(device: WebGLDevice, opt?: IFrameBufferOptions) {
+  constructor(device: WebGLDevice, opt?: FrameBufferOptions) {
     super(device);
     this._object = null;
     this._viewport = [0, 0, 0, 0];
@@ -194,7 +194,7 @@ export class WebGLFrameBuffer
     this._device.context.bindFramebuffer(WebGLEnum.FRAMEBUFFER, null);
     this._device.context._currentFramebuffer = null;
   }
-  private _bindAttachment(attachment: number, info: IFrameBufferTextureAttachment): boolean {
+  private _bindAttachment(attachment: number, info: FrameBufferTextureAttachment): boolean {
     if (info.texture) {
       if (info.texture.isTexture2D()) {
         this._device.context.framebufferTexture2D(

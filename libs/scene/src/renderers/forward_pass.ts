@@ -1,5 +1,5 @@
 import { BlendFunc, RenderStateSet, ShaderType, PBGlobalScope, BindGroup } from '@sophon/device';
-import { IRenderQueueItem, RenderQueue } from '../render_queue';
+import { RenderQueueItem, RenderQueue } from '../render_queue';
 import { Camera } from '../camera';
 import { RenderPass } from './renderpass';
 import { ShaderLib } from '../materiallib';
@@ -140,7 +140,7 @@ export class ForwardRenderPass extends RenderPass {
   protected renderLightPass(
     camera: Camera,
     ctx: DrawContext,
-    items: IRenderQueueItem[],
+    items: RenderQueueItem[],
     lights: PunctualLight[],
     trans: boolean,
     blend: boolean,

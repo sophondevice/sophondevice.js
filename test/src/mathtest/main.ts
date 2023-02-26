@@ -1,12 +1,12 @@
 import { Vector2, Vector3, Vector4, Matrix3x3, Matrix4x4 } from '@sophon/base';
-import { ITestCase, doTest } from '../common';
+import { TestCase, doTest } from '../common';
 import { testVectorType, testMatrixType, testQuaternion, testXForm } from './vector';
 import { testPlane } from './plane';
 import { testFrustum } from './frustum';
 import { testAABB } from './aabb';
 import { testSH } from './sh';
 
-const testCases: ITestCase[] = [
+const testCases: TestCase[] = [
   {
     caseName: 'Vector2 test',
     times: 100,

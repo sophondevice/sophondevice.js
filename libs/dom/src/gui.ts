@@ -2,14 +2,14 @@ import { REvent, REventTarget, HttpRequest } from '@sophon/base';
 import * as Yoga from './typeflex/api';
 import { injectGUIEvents, GUIRenderer } from './renderer';
 import { RColor, GUIEventPathBuilder } from './types';
-import { GlyphManager, IGlyphInfo } from './glyph_manager';
+import { GlyphManager, GlyphInfo } from './glyph_manager';
 import { ImageManager } from './image_manager';
 import { GUIHitTestVisitor } from './hittest_visitor';
 import { UILayout, UIRect } from './layout';
 import { RNode } from './node';
 import { RText } from './components/text';
 import { RDocument } from './document';
-import { IStyleSheet, parseStyleSheet } from './style';
+import { StyleSheet, parseStyleSheet } from './style';
 import { RDOMTreeEvent, RMouseEvent, RDragEvent, RKeyEvent, RFocusEvent } from './events';
 import { RSelector, Rule } from './selector';
 import { DummyElement } from './dummy_element';
@@ -25,7 +25,7 @@ import type { Texture2D } from '@sophon/device';
 import type { Font } from './font';
 import type { RPrimitiveBatchList } from './primitive';
 
-interface IElementConstructor {
+interface ElementConstructor {
   new (gui: GUI, ...args: unknown[]): RElement;
 }
 
@@ -86,8 +86,8 @@ class DrawVisitor {
 
 export class ElementRegistry {
   /** @internal */
-  private _constructors: { [tagname: string]: IElementConstructor };
-  constructor(tags?: { [tagname: string]: IElementConstructor }) {
+  private _constructors: { [tagname: string]: ElementConstructor };
+  constructor(tags?: { [tagname: string]: ElementConstructor }) {
     this._constructors = {};
     if (tags) {
       for (const tag in tags) {
@@ -95,7 +95,7 @@ export class ElementRegistry {
       }
     }
   }
-  register(ctor: IElementConstructor, tagName: string) {
+  register(ctor: ElementConstructor, tagName: string) {
     console.assert(!!ctor, 'Failed to register element type with null constructor');
     console.assert(!!tagName, 'Failed to register element type with null tag name getter');
     if (typeof tagName === 'string') {
@@ -380,7 +380,7 @@ export class GUI extends REventTarget {
   /** @internal */
   protected _ruleListImported: {
     rule: Rule;
-    stylesheet: IStyleSheet;
+    stylesheet: StyleSheet;
     extra: unknown;
   }[];
   /** @internal */
@@ -840,7 +840,7 @@ export class GUI extends REventTarget {
         const processedElements: Set<RNode> = new Set();
         const ruleList: {
           rule: Rule;
-          stylesheet: IStyleSheet;
+          stylesheet: StyleSheet;
           extra: unknown;
         }[] = [...this._ruleListImported];
         for (const el of styleElements) {
@@ -855,7 +855,7 @@ export class GUI extends REventTarget {
           }
         }
         let allElements: RElement[] = null;
-        const pseudoMap: Map<RNode, Map<string, { stylesheet: IStyleSheet; extra: unknown }[]>> = new Map();
+        const pseudoMap: Map<RNode, Map<string, { stylesheet: StyleSheet; extra: unknown }[]>> = new Map();
         if (this._styleFullRefresh) {
           allElements = this._querySelectorAll(this._document, '*', true, true);
         }
@@ -868,10 +868,10 @@ export class GUI extends REventTarget {
           });
           for (const rule of ruleList) {
             rule.rule.resolve(this._styleRefreshList, true, true, (node: RNode, type: string) => {
-              const pseudoTypes: Map<string, { stylesheet: IStyleSheet; extra: unknown }[]> =
+              const pseudoTypes: Map<string, { stylesheet: StyleSheet; extra: unknown }[]> =
                 pseudoMap.get(node) || new Map();
               pseudoMap.set(node, pseudoTypes);
-              const styleList: { stylesheet: IStyleSheet; extra: unknown }[] = pseudoTypes.get(type) || [];
+              const styleList: { stylesheet: StyleSheet; extra: unknown }[] = pseudoTypes.get(type) || [];
               pseudoTypes.set(type, styleList);
               styleList.push({
                 stylesheet: rule.stylesheet,
@@ -1045,7 +1045,7 @@ export class GUI extends REventTarget {
     return this._glyphManager.getGlyphTexture(index);
   }
   /** @internal */
-  _getGlyphInfo(char: string, font: Font, color: RColor): IGlyphInfo {
+  _getGlyphInfo(char: string, font: Font, color: RColor): GlyphInfo {
     return this._glyphManager.getGlyphInfo(char, font, color);
   }
   /** @internal */
@@ -1132,10 +1132,10 @@ export class GUI extends REventTarget {
     }
   }
   /** @internal */
-  _parseStyleContent(content: string): { selector: RSelector; stylesheet: IStyleSheet; extra: unknown }[] {
+  _parseStyleContent(content: string): { selector: RSelector; stylesheet: StyleSheet; extra: unknown }[] {
     const result: {
       selector: RSelector;
-      stylesheet: IStyleSheet;
+      stylesheet: StyleSheet;
       extra: unknown;
     }[] = [];
     content = content

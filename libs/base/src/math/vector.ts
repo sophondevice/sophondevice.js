@@ -109,7 +109,7 @@ export class VectorBase extends IterableWrapper {
   }
 }
 
-export interface IVector2Like {
+export interface Vector2Like {
   x: number;
   y: number;
 }
@@ -181,16 +181,16 @@ export class Vector2 extends VectorBase {
     this._v[1] = y;
     return this.inplaceNormalize();
   }
-  subBy(other: IVector2Like) {
+  subBy(other: Vector2Like) {
     return Vector2.sub(this, other, this);
   }
-  addBy(other: IVector2Like) {
+  addBy(other: Vector2Like) {
     return Vector2.add(this, other, this);
   }
-  mulBy(other: IVector2Like) {
+  mulBy(other: Vector2Like) {
     return Vector2.mul(this, other, this);
   }
-  divBy(other: IVector2Like) {
+  divBy(other: Vector2Like) {
     return Vector2.div(this, other, this);
   }
   scaleBy(f: number) {
@@ -202,10 +202,10 @@ export class Vector2 extends VectorBase {
   inplaceInverse() {
     return Vector2.inverse(this, this);
   }
-  inplaceMin(other: IVector2Like) {
+  inplaceMin(other: Vector2Like) {
     return Vector2.min(this, other, this);
   }
-  inplaceMax(other: IVector2Like) {
+  inplaceMax(other: Vector2Like) {
     return Vector2.max(this, other, this);
   }
   inplaceAbs() {
@@ -229,79 +229,79 @@ export class Vector2 extends VectorBase {
   static axisNY(): Vector2 {
     return new Vector2(0, -1);
   }
-  static magnitudeSq(v: IVector2Like): number {
+  static magnitudeSq(v: Vector2Like): number {
     return v.x * v.x + v.y * v.y;
   }
-  static magnitude(v: IVector2Like): number {
+  static magnitude(v: Vector2Like): number {
     return Math.sqrt(v.x * v.x + v.y * v.y);
   }
-  static distance(v1: IVector2Like, v2: IVector2Like): number {
+  static distance(v1: Vector2Like, v2: Vector2Like): number {
     return Math.sqrt(this.distanceSq(v1, v2));
   }
-  static distanceSq(v1: IVector2Like, v2: IVector2Like): number {
+  static distanceSq(v1: Vector2Like, v2: Vector2Like): number {
     const dx = v1.x - v2.x;
     const dy = v1.y - v2.y;
     return dx * dx + dy * dy;
   }
-  static normalize(v: IVector2Like, result?: Vector2): Vector2 {
+  static normalize(v: Vector2Like, result?: Vector2): Vector2 {
     const len = Vector2.magnitude(v);
     const x = v.x / len;
     const y = v.y / len;
     return (result || new Vector2()).set(x, y);
   }
-  static inverse(v: IVector2Like, result?: Vector2): Vector2 {
+  static inverse(v: Vector2Like, result?: Vector2): Vector2 {
     const x = 1 / v.x;
     const y = 1 / v.y;
     return (result || new Vector2()).set(x, y);
   }
-  static sub(a: IVector2Like, b: IVector2Like, result?: Vector2): Vector2 {
+  static sub(a: Vector2Like, b: Vector2Like, result?: Vector2): Vector2 {
     const x = a.x - b.x;
     const y = a.y - b.y;
     return (result || new Vector2()).set(x, y);
   }
-  static add(a: IVector2Like, b: IVector2Like, result?: Vector2): Vector2 {
+  static add(a: Vector2Like, b: Vector2Like, result?: Vector2): Vector2 {
     const x = a.x + b.x;
     const y = a.y + b.y;
     return (result || new Vector2()).set(x, y);
   }
-  static mul(a: IVector2Like, b: IVector2Like, result?: Vector2): Vector2 {
+  static mul(a: Vector2Like, b: Vector2Like, result?: Vector2): Vector2 {
     const x = a.x * b.x;
     const y = a.y * b.y;
     return (result || new Vector2()).set(x, y);
   }
-  static div(a: IVector2Like, b: IVector2Like, result?: Vector2): Vector2 {
+  static div(a: Vector2Like, b: Vector2Like, result?: Vector2): Vector2 {
     const x = a.x / b.x;
     const y = a.y / b.y;
     return (result || new Vector2()).set(x, y);
   }
-  static scale(a: IVector2Like, b: number, result?: Vector2): Vector2 {
+  static scale(a: Vector2Like, b: number, result?: Vector2): Vector2 {
     const x = a.x * b;
     const y = a.y * b;
     return (result || new Vector2()).set(x, y);
   }
-  static min(a: IVector2Like, b: IVector2Like, result?: Vector2): Vector2 {
+  static min(a: Vector2Like, b: Vector2Like, result?: Vector2): Vector2 {
     const x = a.x < b.x ? a.x : b.x;
     const y = a.y < b.y ? a.y : b.y;
     return (result || new Vector2()).set(x, y);
   }
-  static max(a: IVector2Like, b: IVector2Like, result?: Vector2): Vector2 {
+  static max(a: Vector2Like, b: Vector2Like, result?: Vector2): Vector2 {
     const x = a.x > b.x ? a.x : b.x;
     const y = a.y > b.y ? a.y : b.y;
     return (result || new Vector2()).set(x, y);
   }
-  static abs(a: IVector2Like, result?: Vector2): Vector2 {
+  static abs(a: Vector2Like, result?: Vector2): Vector2 {
     const x = a.x < 0 ? -a.x : a.x;
     const y = a.y < 0 ? -a.y : a.y;
     return (result || new Vector2()).set(x, y);
   }
-  static dot(a: IVector2Like, b: IVector2Like): number {
+  static dot(a: Vector2Like, b: Vector2Like): number {
     return a.x * b.x + a.y * b.y;
   }
-  static cross(a: IVector2Like, b: IVector2Like): number {
+  static cross(a: Vector2Like, b: Vector2Like): number {
     return a.x * b.y - a.y * b.x;
   }
 }
-export interface IVector3Like {
+export interface Vector3Like {
   x: number;
   y: number;
   z: number;
@@ -390,22 +390,22 @@ export class Vector3 extends VectorBase {
     this._v[2] = z;
     return this.inplaceNormalize();
   }
-  subBy(other: IVector3Like): Vector3 {
+  subBy(other: Vector3Like): Vector3 {
     return Vector3.sub(this, other, this);
   }
-  addBy(other: IVector3Like): Vector3 {
+  addBy(other: Vector3Like): Vector3 {
     return Vector3.add(this, other, this);
   }
-  mulBy(other: IVector3Like): Vector3 {
+  mulBy(other: Vector3Like): Vector3 {
     return Vector3.mul(this, other, this);
   }
-  divBy(other: IVector3Like): Vector3 {
+  divBy(other: Vector3Like): Vector3 {
     return Vector3.div(this, other, this);
   }
   scaleBy(f: number): Vector3 {
     return Vector3.scale(this, f, this);
   }
-  crossBy(other: IVector3Like): Vector3 {
+  crossBy(other: Vector3Like): Vector3 {
     return Vector3.cross(this, other, this);
   }
   inplaceNormalize() {
@@ -414,10 +414,10 @@ export class Vector3 extends VectorBase {
   inplaceInverse() {
     return Vector3.inverse(this, this);
   }
-  inplaceMin(other: IVector3Like) {
+  inplaceMin(other: Vector3Like) {
     return Vector3.min(this, other, this);
   }
-  inplaceMax(other: IVector3Like) {
+  inplaceMax(other: Vector3Like) {
     return Vector3.max(this, other, this);
   }
   inplaceAbs() {
@@ -447,93 +447,93 @@ export class Vector3 extends VectorBase {
   static axisNZ(): Vector3 {
     return new Vector3(0, 0, -1);
   }
-  static magnitude(v: IVector3Like): number {
+  static magnitude(v: Vector3Like): number {
     return Math.sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
   }
-  static magnitudeSq(v: IVector3Like): number {
+  static magnitudeSq(v: Vector3Like): number {
     return v.x * v.x + v.y * v.y + v.z * v.z;
   }
-  static distance(v1: IVector3Like, v2: IVector3Like): number {
+  static distance(v1: Vector3Like, v2: Vector3Like): number {
     return Math.sqrt(this.distanceSq(v1, v2));
   }
-  static distanceSq(v1: IVector3Like, v2: IVector3Like): number {
+  static distanceSq(v1: Vector3Like, v2: Vector3Like): number {
     const dx = v1.x - v2.x;
     const dy = v1.y - v2.y;
     const dz = v1.z - v2.z;
     return dx * dx + dy * dy + dz * dz;
   }
-  static normalize(v: IVector3Like, result?: Vector3): Vector3 {
+  static normalize(v: Vector3Like, result?: Vector3): Vector3 {
     const len = Vector3.magnitude(v);
     const x = v.x / len;
     const y = v.y / len;
     const z = v.z / len;
     return (result || new Vector3()).set(x, y, z);
   }
-  static inverse(v: IVector3Like, result?: Vector3): Vector3 {
+  static inverse(v: Vector3Like, result?: Vector3): Vector3 {
     const x = 1 / v.x;
     const y = 1 / v.y;
     const z = 1 / v.z;
     return (result || new Vector3()).set(x, y, z);
   }
-  static sub(a: IVector3Like, b: IVector3Like, result?: Vector3): Vector3 {
+  static sub(a: Vector3Like, b: Vector3Like, result?: Vector3): Vector3 {
     const x = a.x - b.x;
     const y = a.y - b.y;
     const z = a.z - b.z;
     return (result || new Vector3()).set(x, y, z);
   }
-  static add(a: IVector3Like, b: IVector3Like, result?: Vector3): Vector3 {
+  static add(a: Vector3Like, b: Vector3Like, result?: Vector3): Vector3 {
     const x = a.x + b.x;
     const y = a.y + b.y;
     const z = a.z + b.z;
     return (result || new Vector3()).set(x, y, z);
   }
-  static mul(a: IVector3Like, b: IVector3Like, result?: Vector3): Vector3 {
+  static mul(a: Vector3Like, b: Vector3Like, result?: Vector3): Vector3 {
     const x = a.x * b.x;
     const y = a.y * b.y;
     const z = a.z * b.z;
     return (result || new Vector3()).set(x, y, z);
   }
-  static div(a: IVector3Like, b: IVector3Like, result?: Vector3): Vector3 {
+  static div(a: Vector3Like, b: Vector3Like, result?: Vector3): Vector3 {
     const x = a.x / b.x;
     const y = a.y / b.y;
     const z = a.z / b.z;
     return (result || new Vector3()).set(x, y, z);
   }
-  static scale(a: IVector3Like, b: number, result?: Vector3): Vector3 {
+  static scale(a: Vector3Like, b: number, result?: Vector3): Vector3 {
     const x = a.x * b;
     const y = a.y * b;
     const z = a.z * b;
     return (result || new Vector3()).set(x, y, z);
   }
-  static min(a: IVector3Like, b: IVector3Like, result?: Vector3): Vector3 {
+  static min(a: Vector3Like, b: Vector3Like, result?: Vector3): Vector3 {
     const x = a.x < b.x ? a.x : b.x;
     const y = a.y < b.y ? a.y : b.y;
     const z = a.z < b.z ? a.z : b.z;
     return (result || new Vector3()).set(x, y, z);
   }
-  static max(a: IVector3Like, b: IVector3Like, result?: Vector3): Vector3 {
+  static max(a: Vector3Like, b: Vector3Like, result?: Vector3): Vector3 {
     const x = a.x > b.x ? a.x : b.x;
     const y = a.y > b.y ? a.y : b.y;
     const z = a.z > b.z ? a.z : b.z;
     return (result || new Vector3()).set(x, y, z);
   }
-  static abs(a: IVector3Like, result?: Vector3): Vector3 {
+  static abs(a: Vector3Like, result?: Vector3): Vector3 {
     const x = a.x < 0 ? -a.x : a.x;
     const y = a.y < 0 ? -a.y : a.y;
     const z = a.z < 0 ? -a.z : a.z;
     return (result || new Vector3()).set(x, y, z);
   }
-  static dot(a: IVector3Like, b: IVector3Like): number {
+  static dot(a: Vector3Like, b: Vector3Like): number {
     return a.x * b.x + a.y * b.y + a.z * b.z;
   }
-  static cross(a: IVector3Like, b: IVector3Like, result?: Vector3): Vector3 {
+  static cross(a: Vector3Like, b: Vector3Like, result?: Vector3): Vector3 {
     const x = a.y * b.z - a.z * b.y;
     const y = a.z * b.x - a.x * b.z;
     const z = a.x * b.y - a.y * b.x;
     return (result || new Vector3()).set(x, y, z);
   }
 }
-export interface IVector4Like {
+export interface Vector4Like {
   x: number;
   y: number;
   z: number;
@@ -651,16 +651,16 @@ export class Vector4 extends VectorBase {
     this._v[3] = w;
     return this.inplaceNormalize();
   }
-  subBy(other: IVector4Like): Vector4 {
+  subBy(other: Vector4Like): Vector4 {
     return Vector4.sub(this, other, this);
   }
-  addBy(other: IVector4Like): Vector4 {
+  addBy(other: Vector4Like): Vector4 {
     return Vector4.add(this, other, this);
   }
-  mulBy(other: IVector4Like): Vector4 {
+  mulBy(other: Vector4Like): Vector4 {
     return Vector4.mul(this, other, this);
   }
-  divBy(other: IVector4Like): Vector4 {
+  divBy(other: Vector4Like): Vector4 {
     return Vector4.div(this, other, this);
   }
   scaleBy(f: number): Vector4 {
@@ -672,10 +672,10 @@ export class Vector4 extends VectorBase {
   inplaceInverse(): Vector4 {
     return Vector4.inverse(this, this);
   }
-  inplaceMin(other: IVector4Like) {
+  inplaceMin(other: Vector4Like) {
     return Vector4.min(this, other, this);
   }
-  inplaceMax(other: IVector4Like) {
+  inplaceMax(other: Vector4Like) {
     return Vector4.max(this, other, this);
   }
   inplaceAbs() {
@@ -711,13 +711,13 @@ export class Vector4 extends VectorBase {
   static axisNW(): Vector4 {
     return new Vector4(0, 0, 0, -1);
   }
-  static magnitude(v: IVector4Like): number {
+  static magnitude(v: Vector4Like): number {
     return Math.sqrt(v.x * v.x + v.y * v.y + v.z * v.z + v.w * v.w);
   }
-  static magnitudeSq(v: IVector4Like): number {
+  static magnitudeSq(v: Vector4Like): number {
     return v.x * v.x + v.y * v.y + v.z * v.z + v.w * v.w;
   }
-  static normalize(v: IVector4Like, result?: Vector4): Vector4 {
+  static normalize(v: Vector4Like, result?: Vector4): Vector4 {
     const len = Vector4.magnitude(v);
     const x = v.x / len;
     const y = v.y / len;
@@ -725,70 +725,70 @@ export class Vector4 extends VectorBase {
     const w = v.w / len;
     return (result || new Vector4()).set(x, y, z, w);
   }
-  static inverse(v: IVector4Like, result?: Vector4): Vector4 {
+  static inverse(v: Vector4Like, result?: Vector4): Vector4 {
     const x = 1 / v.x;
     const y = 1 / v.y;
     const z = 1 / v.z;
     const w = 1 / v.w;
     return (result || new Vector4()).set(x, y, z, w);
   }
-  static sub(a: IVector4Like, b: IVector4Like, result?: Vector4): Vector4 {
+  static sub(a: Vector4Like, b: Vector4Like, result?: Vector4): Vector4 {
     const x = a.x - b.x;
     const y = a.y - b.y;
     const z = a.z - b.z;
     const w = a.w - b.w;
     return (result || new Vector4()).set(x, y, z, w);
   }
-  static add(a: IVector4Like, b: IVector4Like, result?: Vector4): Vector4 {
+  static add(a: Vector4Like, b: Vector4Like, result?: Vector4): Vector4 {
     const x = a.x + b.x;
     const y = a.y + b.y;
     const z = a.z + b.z;
     const w = a.w + b.w;
     return (result || new Vector4()).set(x, y, z, w);
   }
-  static mul(a: IVector4Like, b: IVector4Like, result?: Vector4): Vector4 {
+  static mul(a: Vector4Like, b: Vector4Like, result?: Vector4): Vector4 {
     const x = a.x * b.x;
     const y = a.y * b.y;
     const z = a.z * b.z;
     const w = a.w * b.w;
     return (result || new Vector4()).set(x, y, z, w);
   }
-  static div(a: IVector4Like, b: IVector4Like, result?: Vector4): Vector4 {
+  static div(a: Vector4Like, b: Vector4Like, result?: Vector4): Vector4 {
     const x = a.x / b.x;
     const y = a.y / b.y;
     const z = a.z / b.z;
     const w = a.w / b.w;
     return (result || new Vector4()).set(x, y, z, w);
   }
-  static scale(a: IVector4Like, b: number, result?: Vector4): Vector4 {
+  static scale(a: Vector4Like, b: number, result?: Vector4): Vector4 {
     const x = a.x * b;
     const y = a.y * b;
     const z = a.z * b;
     const w = a.w * b;
     return (result || new Vector4()).set(x, y, z, w);
   }
-  static min(a: IVector4Like, b: IVector4Like, result?: Vector4): Vector4 {
+  static min(a: Vector4Like, b: Vector4Like, result?: Vector4): Vector4 {
     const x = a.x < b.x ? a.x : b.x;
     const y = a.y < b.y ? a.y : b.y;
     const z = a.z < b.z ? a.z : b.z;
     const w = a.w < b.w ? a.w : b.w;
     return (result || new Vector4()).set(x, y, z, w);
   }
-  static max(a: IVector4Like, b: IVector4Like, result?: Vector4): Vector4 {
+  static max(a: Vector4Like, b: Vector4Like, result?: Vector4): Vector4 {
     const x = a.x > b.x ? a.x : b.x;
     const y = a.y > b.y ? a.y : b.y;
     const z = a.z > b.z ? a.z : b.z;
     const w = a.w > b.w ? a.w : b.w;
     return (result || new Vector4()).set(x, y, z, w);
   }
-  static abs(a: IVector4Like, result?: Vector4): Vector4 {
+  static abs(a: Vector4Like, result?: Vector4): Vector4 {
     const x = a.x < 0 ? -a.x : a.x;
     const y = a.y < 0 ? -a.y : a.y;
     const z = a.z < 0 ? -a.z : a.z;
     const w = a.w < 0 ? -a.w : a.w;
     return (result || new Vector4()).set(x, y, z, w);
   }
-  static dot(a: IVector4Like, b: IVector4Like): number {
+  static dot(a: Vector4Like, b: Vector4Like): number {
     return a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
   }
 }
@@ -902,25 +902,25 @@ export class Quaternion extends VectorBase {
   inplaceConjugate(): Quaternion {
     return Quaternion.conjugate(this, this);
   }
-  multiplyRight(other: IVector4Like) {
+  multiplyRight(other: Vector4Like) {
     return Quaternion.multiply(this, other, this);
   }
-  multiplyLeft(other: IVector4Like) {
+  multiplyLeft(other: Vector4Like) {
     return Quaternion.multiply(other, this, this);
   }
-  slerpRight(other: IVector4Like, t: number) {
+  slerpRight(other: Vector4Like, t: number) {
     return Quaternion.slerp(this, other, t, this);
   }
-  slerpLeft(other: IVector4Like, t: number) {
+  slerpLeft(other: Vector4Like, t: number) {
     return Quaternion.slerp(other, this, t, this);
   }
-  unitVectorToUnitVector(from: IVector3Like, to: IVector3Like) {
+  unitVectorToUnitVector(from: Vector3Like, to: Vector3Like) {
     return Quaternion.unitVectorToUnitVector(from, to, this);
   }
   fromEulerAngle(a: number, b: number, c: number, order: 'XYZ' | 'YXZ' | 'ZXY' | 'ZYX' | 'YZX' | 'XZY') {
     return Quaternion.fromEulerAngle(a, b, c, order, this);
   }
-  fromAxisAngle(axis: IVector3Like, angle: number) {
+  fromAxisAngle(axis: Vector3Like, angle: number) {
     return Quaternion.fromAxisAngle(axis, angle, this);
   }
   fromRotationMatrix(matrix: Matrix3x3 | Matrix4x4) {
@@ -966,7 +966,7 @@ export class Quaternion extends VectorBase {
     const sinHalf = Math.sin(halfAngle);
     return new Vector4(x / sinHalf, y / sinHalf, z / sinHalf, 2 * halfAngle);
   }
-  transform(v: IVector3Like, result?: Vector3): Vector3 {
+  transform(v: Vector3Like, result?: Vector3): Vector3 {
     result = result || new Vector3();
     const x = this.x * 2;
     const y = this.y * 2;
@@ -989,10 +989,10 @@ export class Quaternion extends VectorBase {
   addBy(other: Quaternion): Quaternion {
     return Quaternion.add(this, other, this);
   }
-  static magnitude(q: IVector4Like): number {
+  static magnitude(q: Vector4Like): number {
     return Math.sqrt(q.x * q.x + q.y * q.y + q.z * q.z + q.w * q.w);
   }
-  static magnitudeSq(q: IVector4Like): number {
+  static magnitudeSq(q: Vector4Like): number {
     return q.x * q.x + q.y * q.y + q.z * q.z + q.w * q.w;
   }
   static add(q: Quaternion, other: Quaternion, result?: Quaternion): Quaternion {
@@ -1011,20 +1011,20 @@ export class Quaternion extends VectorBase {
     result.w = q.w * t;
     return result;
   }
-  static dot(a: IVector4Like, b: IVector4Like): number {
+  static dot(a: Vector4Like, b: Vector4Like): number {
     return a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
   }
   static identity(q?: Quaternion): Quaternion {
     return (q || new Quaternion()).set(0, 0, 0, 1);
   }
-  static normalize(q: IVector4Like, result?: Quaternion): Quaternion {
+  static normalize(q: Vector4Like, result?: Quaternion): Quaternion {
     const mag = Quaternion.magnitude(q);
     return (result || new Quaternion()).set(q.x / mag, q.y / mag, q.z / mag, q.w / mag);
   }
-  static conjugate(q: IVector4Like, result?: Quaternion): Quaternion {
+  static conjugate(q: Vector4Like, result?: Quaternion): Quaternion {
     return (result || new Quaternion()).set(-q.x, -q.y, -q.z, q.w);
   }
-  static multiply(a: IVector4Like, b: IVector4Like, result?: Quaternion): Quaternion {
+  static multiply(a: Vector4Like, b: Vector4Like, result?: Quaternion): Quaternion {
     result = result || new Quaternion();
     const x = a.x * b.w + a.w * b.x + a.y * b.z - a.z * b.y;
     const y = a.y * b.w + a.w * b.y + a.z * b.x - a.x * b.z;
@@ -1032,7 +1032,7 @@ export class Quaternion extends VectorBase {
     const w = a.w * b.w - a.x * b.x - a.y * b.y - a.z * b.z;
     return result.set(x, y, z, w);
   }
-  static slerp(a: IVector4Like, b: IVector4Like, t: number, result?: Quaternion): Quaternion {
+  static slerp(a: Vector4Like, b: Vector4Like, t: number, result?: Quaternion): Quaternion {
     result = result || new Quaternion();
     if (t <= 0) {
       return result.set(a.x, a.y, a.z, a.w);
@@ -1075,10 +1075,10 @@ export class Quaternion extends VectorBase {
       aw * ratioA + bw * ratioB
     );
   }
-  static angleBetween(a: IVector4Like, b: IVector4Like): number {
+  static angleBetween(a: Vector4Like, b: Vector4Like): number {
     return 2 * Math.acos(Math.abs(numberClamp(this.dot(a, b), -1, 1)));
   }
-  static unitVectorToUnitVector(from: IVector3Like, to: IVector3Like, result?: Quaternion): Quaternion {
+  static unitVectorToUnitVector(from: Vector3Like, to: Vector3Like, result?: Quaternion): Quaternion {
     // assume from and to are unit vectors
     result = result || new Quaternion();
     let r = Vector3.dot(from, to) + 1;
@@ -1157,7 +1157,7 @@ export class Quaternion extends VectorBase {
         );
     }
   }
-  static fromAxisAngle(axis: IVector3Like, angle: number, result?: Quaternion): Quaternion {
+  static fromAxisAngle(axis: Vector3Like, angle: number, result?: Quaternion): Quaternion {
     // assume axis is normalized
     result = result || new Quaternion();
     const halfAngle = angle / 2;
@@ -1304,7 +1304,7 @@ export class Matrix3x3 extends VectorBase {
   getRow(row: number, result?: Vector3): Vector3 {
     return (result || new Vector3()).set(this._v[row * 3], this._v[row * 3 + 1], this._v[row * 3 + 2]);
   }
-  setRow(row: number, v: IVector3Like) {
+  setRow(row: number, v: Vector3Like) {
     this._v[row * 3] = v.x;
     this._v[row * 3 + 1] = v.y;
     this._v[row * 3 + 2] = v.z;
@@ -1314,7 +1314,7 @@ export class Matrix3x3 extends VectorBase {
   getCol(col: number, result?: Vector3): Vector3 {
     return (result || new Vector3()).set(this._v[col], this._v[3 + col], this._v[6 + col]);
   }
-  setCol(col: number, v: IVector3Like) {
+  setCol(col: number, v: Vector3Like) {
     this._v[col] = v.x;
     this._v[3 + col] = v.y;
     this._v[6 + col] = v.z;
@@ -1452,7 +1452,7 @@ export class Matrix3x3 extends VectorBase {
     // TODO optimize?
     return this.inverse(matrix, result);
   }
-  static scaling(s: IVector3Like, result?: Matrix3x3): Matrix3x3 {
+  static scaling(s: Vector3Like, result?: Matrix3x3): Matrix3x3 {
     result = result || new Matrix3x3();
     const v = result.getArray();
     v[0] = s.x;
@@ -1518,7 +1518,7 @@ export class Matrix3x3 extends VectorBase {
     result.changeNotify();
     return result;
   }
-  static rotation(axis: IVector3Like, angle: number, result?: Matrix3x3): Matrix3x3 {
+  static rotation(axis: Vector3Like, angle: number, result?: Matrix3x3): Matrix3x3 {
     result = result || new Matrix3x3();
     const v = result.getArray();
     let x = axis.x;
@@ -1604,7 +1604,7 @@ export class Matrix3x3 extends VectorBase {
   identity() {
     return Matrix3x3.identity(this);
   }
-  scaling(s: IVector3Like) {
+  scaling(s: Vector3Like) {
     return Matrix3x3.scaling(s, this);
   }
   inplaceInverse() {
@@ -1637,10 +1637,10 @@ export class Matrix3x3 extends VectorBase {
   rotationZ(angle: number) {
     return Matrix3x3.rotationZ(angle, this);
   }
-  rotation(axis: IVector3Like, angle: number) {
+  rotation(axis: Vector3Like, angle: number) {
     return Matrix3x3.rotation(axis, angle, this);
   }
-  transform(point: IVector3Like, result?: Vector3): Vector3 {
+  transform(point: Vector3Like, result?: Vector3): Vector3 {
     result = result || new Vector3();
     const v = this.getArray();
     const px = point.x,
@@ -1652,19 +1652,19 @@ export class Matrix3x3 extends VectorBase {
       v[2] * px + v[5] * py + v[8] * pz
     );
   }
-  transformPoint(vec: IVector3Like, result?: Vector3): Vector3 {
+  transformPoint(vec: Vector3Like, result?: Vector3): Vector3 {
     return this.transform(vec, result);
   }
-  transformPointAffine(point: IVector3Like, result?: Vector3): Vector3 {
+  transformPointAffine(point: Vector3Like, result?: Vector3): Vector3 {
     return this.transform(point, result);
   }
-  transformVector(vec: IVector3Like, result?: Vector3): Vector3 {
+  transformVector(vec: Vector3Like, result?: Vector3): Vector3 {
     return this.transform(vec, result);
   }
-  transformVectorAffine(vec: IVector3Like, result?: Vector3): Vector3 {
+  transformVectorAffine(vec: Vector3Like, result?: Vector3): Vector3 {
     return this.transform(vec, result);
   }
-  transformAffine(vec: IVector4Like, result?: Vector3): Vector3 {
+  transformAffine(vec: Vector4Like, result?: Vector3): Vector3 {
     return this.transform(vec, result);
   }
   testRotationPart(epsl?: number) {
@@ -1853,7 +1853,7 @@ export class Matrix4x4 extends VectorBase {
   getRow3(row: number, result?: Vector3): Vector3 {
     return (result || new Vector3()).set(this._v[row * 4], this._v[row * 4 + 1], this._v[row * 4 + 2]);
   }
-  setRow(row: number, v: IVector4Like) {
+  setRow(row: number, v: Vector4Like) {
     this._v[row * 4] = v.x;
     this._v[row * 4 + 1] = v.y;
     this._v[row * 4 + 2] = v.z;
@@ -1864,7 +1864,7 @@ export class Matrix4x4 extends VectorBase {
   getCol(col: number, result?: Vector4): Vector4 {
     return (result || new Vector4()).set(this._v[col], this._v[4 + col], this._v[8 + col], this._v[12 + col]);
   }
-  setCol(col: number, v: IVector4Like) {
+  setCol(col: number, v: Vector4Like) {
     this._v[col] = v.x;
     this._v[4 + col] = v.y;
     this._v[8 + col] = v.z;
@@ -2306,7 +2306,7 @@ export class Matrix4x4 extends VectorBase {
     result.changeNotify();
     return result;
   }
-  static translation(t: IVector3Like, result?: Matrix4x4): Matrix4x4 {
+  static translation(t: Vector3Like, result?: Matrix4x4): Matrix4x4 {
     result = result || new Matrix4x4();
     const v = result.getArray();
     v[0] = 1;
@@ -2329,7 +2329,7 @@ export class Matrix4x4 extends VectorBase {
     result.changeNotify();
     return result;
   }
-  static scaling(s: IVector3Like, result?: Matrix4x4): Matrix4x4 {
+  static scaling(s: Vector3Like, result?: Matrix4x4): Matrix4x4 {
     result = result || new Matrix4x4();
     const v = result.getArray();
     v[0] = s.x;
@@ -2427,7 +2427,7 @@ export class Matrix4x4 extends VectorBase {
     result.changeNotify();
     return result;
   }
-  static rotation(axis: IVector3Like, angle: number, result?: Matrix4x4): Matrix4x4 {
+  static rotation(axis: Vector3Like, angle: number, result?: Matrix4x4): Matrix4x4 {
     result = result || new Matrix4x4();
     const v = result.getArray();
     let x = axis.x;
@@ -2463,7 +2463,7 @@ export class Matrix4x4 extends VectorBase {
     result.changeNotify();
     return result;
   }
-  static lookAt(eye: IVector3Like, target: IVector3Like, up: IVector3Like, result?: Matrix4x4): Matrix4x4 {
+  static lookAt(eye: Vector3Like, target: Vector3Like, up: Vector3Like, result?: Matrix4x4): Matrix4x4 {
     result = result || new Matrix4x4();
     const v = result.getArray();
     const zAxis = Vector3.normalize(Vector3.sub(eye, target));
@@ -2615,7 +2615,7 @@ export class Matrix4x4 extends VectorBase {
     result.changeNotify();
     return result;
   }
-  static translateRight(m: Matrix4x4, t: IVector3Like, result?: Matrix4x4): Matrix4x4 {
+  static translateRight(m: Matrix4x4, t: Vector3Like, result?: Matrix4x4): Matrix4x4 {
     result = result || new Matrix4x4();
     const v = result.getArray();
     const a = m.getArray();
@@ -2647,7 +2647,7 @@ export class Matrix4x4 extends VectorBase {
     result.changeNotify();
     return result;
   }
-  static translateLeft(m: Matrix4x4, t: IVector3Like, result?: Matrix4x4): Matrix4x4 {
+  static translateLeft(m: Matrix4x4, t: Vector3Like, result?: Matrix4x4): Matrix4x4 {
     result = result || new Matrix4x4();
     const v = result.getArray();
     const a = m.getArray();
@@ -2676,7 +2676,7 @@ export class Matrix4x4 extends VectorBase {
     result.changeNotify();
     return result;
   }
-  static scaleRight(m: Matrix4x4, s: IVector3Like, result?: Matrix4x4): Matrix4x4 {
+  static scaleRight(m: Matrix4x4, s: Vector3Like, result?: Matrix4x4): Matrix4x4 {
     result = result || new Matrix4x4();
     const v = result.getArray();
     const a = m.getArray();
@@ -2715,7 +2715,7 @@ export class Matrix4x4 extends VectorBase {
     result.changeNotify();
     return result;
   }
-  static scaleLeft(m: Matrix4x4, s: IVector3Like, result?: Matrix4x4): Matrix4x4 {
+  static scaleLeft(m: Matrix4x4, s: Vector3Like, result?: Matrix4x4): Matrix4x4 {
     result = result || new Matrix4x4();
     const v = result.getArray();
     const a = m.getArray();
@@ -2956,10 +2956,10 @@ export class Matrix4x4 extends VectorBase {
     }
     return this;
   }
-  translation(t: IVector3Like) {
+  translation(t: Vector3Like) {
     return Matrix4x4.translation(t, this);
   }
-  scaling(s: IVector3Like) {
+  scaling(s: Vector3Like) {
     return Matrix4x4.scaling(s, this);
   }
   inplaceInverse() {
@@ -2992,19 +2992,19 @@ export class Matrix4x4 extends VectorBase {
   rotationZ(angle: number) {
     return Matrix4x4.rotationZ(angle, this);
   }
-  rotation(axis: IVector3Like, angle: number) {
+  rotation(axis: Vector3Like, angle: number) {
     return Matrix4x4.rotation(axis, angle, this);
   }
-  translateRight(t: IVector3Like) {
+  translateRight(t: Vector3Like) {
     return Matrix4x4.translateRight(this, t, this);
   }
-  translateLeft(t: IVector3Like) {
+  translateLeft(t: Vector3Like) {
     return Matrix4x4.translateLeft(this, t, this);
   }
-  scaleRight(s: IVector3Like) {
+  scaleRight(s: Vector3Like) {
     return Matrix4x4.scaleRight(this, s, this);
   }
-  scaleLeft(s: IVector3Like) {
+  scaleLeft(s: Vector3Like) {
     return Matrix4x4.scaleLeft(this, s, this);
   }
   rotateRight(r: Matrix3x3 | Matrix4x4 | Quaternion) {
@@ -3013,10 +3013,10 @@ export class Matrix4x4 extends VectorBase {
   rotateLeft(r: Matrix3x3 | Matrix4x4 | Quaternion) {
     return Matrix4x4.rotateLeft(this, r, this);
   }
-  lookAt(eye: IVector3Like, target: IVector3Like, up: IVector3Like) {
+  lookAt(eye: Vector3Like, target: Vector3Like, up: Vector3Like) {
     return Matrix4x4.lookAt(eye, target, up, this);
   }
-  transformPoint(point: IVector3Like, result?: Vector4): Vector4 {
+  transformPoint(point: Vector3Like, result?: Vector4): Vector4 {
     result = result || new Vector4();
     const v = this.getArray();
     const px = point.x,
@@ -3029,7 +3029,7 @@ export class Matrix4x4 extends VectorBase {
       v[3] * px + v[7] * py + v[11] * pz + v[15]
     );
   }
-  transformPointAffine(point: IVector3Like, result?: Vector3): Vector3 {
+  transformPointAffine(point: Vector3Like, result?: Vector3): Vector3 {
     result = result || new Vector3();
     const v = this.getArray();
     const px = point.x;
@@ -3041,7 +3041,7 @@ export class Matrix4x4 extends VectorBase {
       v[2] * px + v[6] * py + v[10] * pz + v[14]
     );
   }
-  transformVector(vec: IVector3Like, result?: Vector4): Vector4 {
+  transformVector(vec: Vector3Like, result?: Vector4): Vector4 {
     result = result || new Vector4();
     const v = this.getArray();
     const vx = vec.x,
@@ -3054,7 +3054,7 @@ export class Matrix4x4 extends VectorBase {
       v[3] * vx + v[7] * vy + v[11] * vz
     );
   }
-  transformVectorAffine(vec: IVector3Like, result?: Vector3): Vector3 {
+  transformVectorAffine(vec: Vector3Like, result?: Vector3): Vector3 {
     result = result || new Vector3();
     const v = this.getArray();
     const vx = vec.x,
@@ -3066,7 +3066,7 @@ export class Matrix4x4 extends VectorBase {
       v[2] * vx + v[6] * vy + v[10] * vz
     );
   }
-  transform(vec: IVector4Like, result?: Vector4): Vector4 {
+  transform(vec: Vector4Like, result?: Vector4): Vector4 {
     result = result || new Vector4();
     const v = this.getArray();
     const vx = vec.x,
@@ -3080,7 +3080,7 @@ export class Matrix4x4 extends VectorBase {
       v[3] * vx + v[7] * vy + v[11] * vz + v[15] * vw
     );
   }
-  transformAffine(vec: IVector4Like, result?: Vector4): Vector4 {
+  transformAffine(vec: Vector4Like, result?: Vector4): Vector4 {
     result = result || new Vector4();
     const v = this.getArray();
     const vx = vec.x,

@@ -3,13 +3,13 @@ import { PrimitiveType, makeVertexBufferType, Device } from '@sophon/device';
 import { Primitive } from './primitive';
 import { BoundingBox } from './bounding_volume';
 
-export interface IShapeCreationOptions {
+export interface ShapeCreationOptions {
   needNormal?: boolean;
   needTangent?: boolean;
   needUV?: boolean;
 }
 
-export abstract class Shape<T extends IShapeCreationOptions = IShapeCreationOptions> extends Primitive {
+export abstract class Shape<T extends ShapeCreationOptions = ShapeCreationOptions> extends Primitive {
   /** @internal */
   protected _options: T;
   constructor(device: Device, options?: T) {
@@ -36,15 +36,15 @@ export abstract class Shape<T extends IShapeCreationOptions = IShapeCreationOpti
   protected abstract _create(): boolean;
 }
 
-export interface IPlaneCreationOptions extends IShapeCreationOptions {
+export interface PlaneCreationOptions extends ShapeCreationOptions {
   size?: number;
   sizeX?: number;
   sizeY?: number;
 }
 
-export class PlaneShape extends Shape<IPlaneCreationOptions> {
+export class PlaneShape extends Shape<PlaneCreationOptions> {
   size: Vector2;
-  constructor(device: Device, options?: IPlaneCreationOptions) {
+  constructor(device: Device, options?: PlaneCreationOptions) {
     super(device, options);
   }
   /** @internal */
@@ -100,7 +100,7 @@ export class PlaneShape extends Shape<IPlaneCreationOptions> {
   }
 }
 
-export interface IBoxCreationOptions extends IShapeCreationOptions {
+export interface BoxCreationOptions extends ShapeCreationOptions {
   size?: number;
   sizeX?: number;
   sizeY?: number;
@@ -110,8 +110,8 @@ export interface IBoxCreationOptions extends IShapeCreationOptions {
   pivotZ?: number;
 }
 
-export class BoxShape extends Shape<IBoxCreationOptions> {
-  constructor(device: Device, options?: IBoxCreationOptions) {
+export class BoxShape extends Shape<BoxCreationOptions> {
+  constructor(device: Device, options?: BoxCreationOptions) {
     super(device, options);
   }
   /** @internal */
@@ -252,8 +252,8 @@ export class BoxShape extends Shape<IBoxCreationOptions> {
   }
 }
 
-export class BoxFrameShape extends Shape<IBoxCreationOptions> {
-  constructor(device: Device, options?: IBoxCreationOptions) {
+export class BoxFrameShape extends Shape<BoxCreationOptions> {
+  constructor(device: Device, options?: BoxCreationOptions) {
     super(device, options);
   }
   /** @internal */
@@ -310,14 +310,14 @@ export class BoxFrameShape extends Shape<IBoxCreationOptions> {
   }
 }
 
-export interface ISphereCreationOptions extends IShapeCreationOptions {
+export interface SphereCreationOptions extends ShapeCreationOptions {
   radius?: number;
   verticalDetail?: number;
   horizonalDetail?: number;
 }
 
-export class SphereShape extends Shape<ISphereCreationOptions> {
-  constructor(device: Device, options?: ISphereCreationOptions) {
+export class SphereShape extends Shape<SphereCreationOptions> {
+  constructor(device: Device, options?: SphereCreationOptions) {
     super(device, options);
   }
   /** @internal */

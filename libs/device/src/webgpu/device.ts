@@ -1,7 +1,7 @@
 import { Vector4, TypedArray } from '@sophon/base';
 import { getTextureFormatBlockSize, PrimitiveType, TextureFormat } from '../base_types';
 import {
-  IFrameBufferOptions,
+  FrameBufferOptions,
   SamplerOptions,
   TextureSampler,
   Texture2D,
@@ -396,7 +396,7 @@ export class WebGPUDevice extends Device {
   createVAO(data: VertexData): VertexInputLayout {
     return new WebGPUVertexInputLayout(this, data);
   }
-  createFrameBuffer(options?: IFrameBufferOptions): FrameBuffer {
+  createFrameBuffer(options?: FrameBufferOptions): FrameBuffer {
     return new WebGPUFrameBuffer(this, options);
   }
   setBindGroup(index: number, bindGroup: BindGroup, dynamicOffsets?: Iterable<number>) {

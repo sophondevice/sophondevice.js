@@ -48,7 +48,7 @@ interface FilterInfo {
   numTypes?: number;
 }
 
-interface IPseudoElementCallback {
+interface PseudoElementCallback {
   (node: RNode, pseudoType: string): void;
 }
 
@@ -68,7 +68,7 @@ export class Rule {
     roots: RNode[],
     up: boolean,
     allowInternal: boolean,
-    pseudoElementCallback?: IPseudoElementCallback
+    pseudoElementCallback?: PseudoElementCallback
   ) {
     const allElements: Set<RNode> = new Set();
     roots.forEach((root) => {
@@ -184,7 +184,7 @@ export class Rule {
     targets: Set<RNode>,
     allowInternal: boolean,
     elementSet?: Set<RNode>,
-    pseudoElementCallback?: IPseudoElementCallback
+    pseudoElementCallback?: PseudoElementCallback
   ) {
     const prevIt = filter.getPrev();
     const lastFilter = prevIt.valid() ? prevIt.data : null;

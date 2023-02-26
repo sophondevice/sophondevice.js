@@ -9,16 +9,16 @@ export interface InstanceData {
   hash: string;
 }
 
-export interface IRenderQueueItem {
+export interface RenderQueueItem {
   drawable: Drawable;
   sortDistance: number;
   instanceData: InstanceData;
 }
 
 interface RenderItemList {
-  opaqueList: IRenderQueueItem[];
+  opaqueList: RenderQueueItem[];
   opaqueInstanceList: { [hash: string]: number };
-  transList: IRenderQueueItem[];
+  transList: RenderQueueItem[];
   transInstanceList: { [hash: string]: number };
 }
 

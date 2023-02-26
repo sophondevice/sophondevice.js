@@ -2,7 +2,7 @@ import { MaxRectsPacker } from './maxrects-packer';
 import type { GUIRenderer } from './renderer';
 import type { BaseTexture, Texture2D } from '@sophon/device';
 
-export interface IAtlasInfo {
+export interface AtlasInfo {
   atlasIndex: number;
   width: number;
   height: number;
@@ -32,7 +32,7 @@ export class AtlasManager {
   /** @internal */
   protected _atlasList: Texture2D[];
   /** @internal */
-  protected _atlasInfoMap: { [hash: string]: IAtlasInfo };
+  protected _atlasInfoMap: { [hash: string]: AtlasInfo };
   /** @internal */
   protected _atlasRestoreHandler: (tex: BaseTexture) => Promise<void>;
   constructor(
@@ -70,7 +70,7 @@ export class AtlasManager {
   getAtlasTexture(index: number): Texture2D {
     return this._atlasList[index];
   }
-  getAtlasInfo(key: string): IAtlasInfo {
+  getAtlasInfo(key: string): AtlasInfo {
     return this._atlasInfoMap[key] || null;
   }
   isEmpty(): boolean {
@@ -109,7 +109,7 @@ export class AtlasManager {
         x,
         y
       );
-      const info: IAtlasInfo = {
+      const info: AtlasInfo = {
         atlasIndex: this._packer.bins.length - 1,
         uMin: rc.x / (this._cacheWidth + this._cachePadding),
         vMin: rc.y / (this._cacheHeight + this._cachePadding),
@@ -122,11 +122,11 @@ export class AtlasManager {
       return info;
     }
   }
-  pushBitmap(key: string, bitmap: ImageData): IAtlasInfo {
+  pushBitmap(key: string, bitmap: ImageData): AtlasInfo {
     const rc = this._packer.add(bitmap.width, bitmap.height, null);
     if (rc) {
       this._updateAtlasTexture(this._packer.bins.length - 1, bitmap, rc.x, rc.y);
-      const info: IAtlasInfo = {
+      const info: AtlasInfo = {
         atlasIndex: this._packer.bins.length - 1,
         uMin: rc.x / (this._cacheWidth + this._cachePadding),
         vMin: rc.y / (this._cacheHeight + this._cachePadding),

@@ -3,7 +3,7 @@ import { RRectPrimitive } from '../primitive';
 import { RElement } from '../element';
 import { RAttributeChangeEvent, RMouseEvent, RValueChangeEvent, RElementLayoutEvent } from '../events';
 import type { GUI } from '../gui';
-import type { IStyleSheet } from '../style';
+import type { StyleSheet } from '../style';
 import type { UIRect } from '../layout';
 import type { RColor } from '../types';
 
@@ -239,7 +239,7 @@ export class Slider extends RElement {
   /** @internal */
   _init(): void {}
   /** @internal */
-  _getDefaultStyleSheet(): IStyleSheet {
+  _getDefaultStyleSheet(): StyleSheet {
     const style = super._getDefaultStyleSheet();
     style.padding = '0';
     style.backgroundColor = '#ffffff';

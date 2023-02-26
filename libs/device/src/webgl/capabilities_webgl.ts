@@ -1,9 +1,9 @@
 import { WebGLContext, TextureFormat } from '../base_types';
 import { WebGLEnum } from './webgl_enum';
 import { isWebGL2 } from './utils';
-import type { FramebufferCaps, MiscCaps, ShaderCaps, TextureCaps, ITextureFormatInfo } from '../device';
+import type { FramebufferCaps, MiscCaps, ShaderCaps, TextureCaps, TextureFormatInfo } from '../device';
 
-export interface ITextureParams {
+export interface TextureParams {
   target: number;
   format: number;
   internalFormat: number;
@@ -158,7 +158,7 @@ export interface ITextureParams {
  * ------------------------------------------------------------------------------------------------------
  *********************************************************************************************************************/
 
-export interface ITextureFormatInfoWebGL extends ITextureFormatInfo {
+export interface TextureFormatInfoWebGL extends TextureFormatInfo {
   glFormat: number;
   glInternalFormat: number;
   glType: number[];
@@ -274,7 +274,7 @@ export class WebGLTextureCap implements TextureCaps {
   private _extTextureFloatLinear: OES_texture_float_linear;
   private _extTextureHalfFloat: OES_texture_half_float;
   private _extTextureHalfFloatLinear: OES_texture_half_float_linear;
-  private _textureFormatInfos: { [format: number]: ITextureFormatInfoWebGL };
+  private _textureFormatInfos: { [format: number]: TextureFormatInfoWebGL };
   maxTextureSize: number;
   maxCubeTextureSize: number;
   npo2Mipmapping: boolean;
@@ -851,7 +851,7 @@ export class WebGLTextureCap implements TextureCaps {
         return 0;
     }
   }
-  getTextureFormatInfo(format: TextureFormat): ITextureFormatInfoWebGL {
+  getTextureFormatInfo(format: TextureFormat): TextureFormatInfoWebGL {
     return this._textureFormatInfos[format];
   }
 }

@@ -1,6 +1,6 @@
 import { Matrix4x4 } from '@sophon/base';
 import { GraphNode } from './graph_node';
-import { BoxFrameShape, BoxShape, IBoxCreationOptions, PlaneShape, SphereShape } from './shape';
+import { BoxFrameShape, BoxShape, BoxCreationOptions, PlaneShape, SphereShape } from './shape';
 import { LambertLightModel, StandardMaterial } from './materiallib';
 import { RenderPass } from './renderers';
 import type { Device, Texture2D } from '@sophon/device';
@@ -203,7 +203,7 @@ export class Mesh extends GraphNode implements BatchDrawable {
 }
 
 export class BoxMesh extends Mesh {
-  constructor(scene: Scene, options?: IBoxCreationOptions & { material?: Material }) {
+  constructor(scene: Scene, options?: BoxCreationOptions & { material?: Material }) {
     super(scene);
     this.primitive = new BoxShape(scene.device, options);
     this.material = options.material;

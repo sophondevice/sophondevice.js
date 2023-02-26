@@ -11,7 +11,7 @@ import {
   RChangeEvent
 } from '../events';
 import type { GUI } from '../gui';
-import type { IStyleSheet } from '../style';
+import type { StyleSheet } from '../style';
 import type { GUIRenderer } from '../renderer';
 
 export class Input extends RElement {
@@ -229,7 +229,7 @@ export class Input extends RElement {
   /** @internal */
   _init(): void {}
   /** @internal */
-  _getDefaultStyleSheet(): IStyleSheet {
+  _getDefaultStyleSheet(): StyleSheet {
     const style = super._getDefaultStyleSheet();
     style.width = '150px';
     style.height = 'auto';

@@ -1,4 +1,4 @@
-import { VectorBase, Vector3, IVector3Like, Vector4, Matrix4x4 } from './vector';
+import { VectorBase, Vector3, Vector3Like, Vector4, Matrix4x4 } from './vector';
 
 export class Plane extends VectorBase {
   /** @internal */
@@ -18,8 +18,8 @@ export class Plane extends VectorBase {
   constructor();
   constructor(a: number, b: number, c: number, d: number);
   constructor(other: Plane);
-  constructor(origin: IVector3Like, normal: IVector3Like);
-  constructor(p0: IVector3Like, p1: IVector3Like, p2: IVector3Like);
+  constructor(origin: Vector3Like, normal: Vector3Like);
+  constructor(p0: Vector3Like, p1: Vector3Like, p2: Vector3Like);
   constructor(arg0?: unknown, arg1?: unknown, arg2?: unknown, arg3?: unknown) {
     super(4);
     switch (arguments.length) {
@@ -36,11 +36,11 @@ export class Plane extends VectorBase {
         break;
       }
       case 2: {
-        this.initWithOriginNormal(arg0 as IVector3Like, arg1 as IVector3Like);
+        this.initWithOriginNormal(arg0 as Vector3Like, arg1 as Vector3Like);
         break;
       }
       case 3: {
-        this.initWithPoints(arg0 as IVector3Like, arg1 as IVector3Like, arg2 as IVector3Like);
+        this.initWithPoints(arg0 as Vector3Like, arg1 as Vector3Like, arg2 as Vector3Like);
         break;
       }
       case 4: {
@@ -139,18 +139,18 @@ export class Plane extends VectorBase {
     this.changeNotify();
     return this;
   }
-  initWithOriginNormal(origin: IVector3Like, normal: IVector3Like) {
+  initWithOriginNormal(origin: Vector3Like, normal: Vector3Like) {
     // assume normal is normalized
     return this.set(normal.x, normal.y, normal.z, -Vector3.dot(origin, normal));
   }
-  initWithPoints(p0: IVector3Like, p1: IVector3Like, p2: IVector3Like) {
+  initWithPoints(p0: Vector3Like, p1: Vector3Like, p2: Vector3Like) {
     const normal = Vector3.cross(Vector3.sub(p1, p0), Vector3.sub(p2, p0)).inplaceNormalize();
     return this.initWithOriginNormal(p0, normal);
   }
-  distanceToPoint(p: IVector3Like): number {
+  distanceToPoint(p: Vector3Like): number {
     return p.x * this._v[0] + p.y * this._v[1] + p.z * this._v[2] + this._v[3];
   }
-  nearestPointToPoint(p: IVector3Like, result?: Vector3): Vector3 {
+  nearestPointToPoint(p: Vector3Like, result?: Vector3): Vector3 {
     const d = this.distanceToPoint(p);
     return (result || new Vector3()).set(p.x - this._v[0] * d, p.y - this._v[1] * d, p.z - this._v[2] * d);
   }

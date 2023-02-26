@@ -27,7 +27,7 @@ export interface IKeyEvent {
   target: unknown;
 }
 
-export interface IFrameStamp {
+export interface FrameStamp {
   frameId: number;
   timestamp: number;
 }
@@ -66,7 +66,7 @@ export class Camera extends SceneNode {
   /** @internal */
   protected _invViewProjMatrix: Matrix4x4;
   /** @internal */
-  protected _framestamp: IFrameStamp;
+  protected _framestamp: FrameStamp;
   /** @internal */
   protected _xformDirty: boolean;
   /** @internal */
@@ -101,7 +101,7 @@ export class Camera extends SceneNode {
   get cameraTag(): number {
     return this._cameraTag;
   }
-  get framestamp(): IFrameStamp {
+  get framestamp(): FrameStamp {
     return this._framestamp;
   }
   get mouseInputSource(): CameraInputSource {

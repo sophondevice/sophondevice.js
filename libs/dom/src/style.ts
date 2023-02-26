@@ -197,12 +197,12 @@ const displayConstantMap = {
 };
 
 /** @internal */
-export function parseStyleSheet(styles: string, extra?: unknown): IStyleSheet {
+export function parseStyleSheet(styles: string, extra?: unknown): StyleSheet {
   const items = styles
     .split(';')
     .map((val) => val.trim())
     .filter((val) => !!val);
-  const ss = {} as IStyleSheet;
+  const ss = {} as StyleSheet;
   for (const item of items) {
     const kv = item.split(':').map((val) => val.trim());
     if (kv.length === 2) {
@@ -222,7 +222,7 @@ export function parseStyleSheet(styles: string, extra?: unknown): IStyleSheet {
 }
 
 /** @internal */
-export function serializeStyleSheet(styles: IStyleSheet): string {
+export function serializeStyleSheet(styles: StyleSheet): string {
   let s = '';
   for (const k in styles) {
     if (styles[k]) {
@@ -416,7 +416,7 @@ export function unescapeCSSString(input: string): string {
   return output;
 }
 /** @internal */
-export interface IStyleSheet {
+export interface StyleSheet {
   display?: string;
   position?: string;
   overflow?: string;
@@ -478,7 +478,7 @@ export interface IStyleSheet {
   pointerEvents?: string;
 }
 
-interface ILayout {
+interface NodeLayout {
   node: Yoga.Node;
   updateZIndex(): void;
   updateCursor(val: string): void;
@@ -496,15 +496,15 @@ interface ILayout {
 
 export class ElementStyle {
   /** @internal */
-  _layout: ILayout;
+  _layout: NodeLayout;
   /** @internal */
   _setNonInline: boolean;
   /** @internal */
-  _stylesheetInline: IStyleSheet;
+  _stylesheetInline: StyleSheet;
   /** @internal */
-  _stylesheet: IStyleSheet;
+  _stylesheet: StyleSheet;
   /** @internal */
-  constructor(layout: ILayout) {
+  constructor(layout: NodeLayout) {
     this._layout = layout;
     this._setNonInline = false;
     this._stylesheetInline = {};
@@ -1708,7 +1708,7 @@ export class ElementStyle {
     this._setNonInline = false;
   }
   /** @internal */
-  applyStyleSheet(stylesheet: IStyleSheet, inline: boolean) {
+  applyStyleSheet(stylesheet: StyleSheet, inline: boolean) {
     this._setNonInline = !inline;
     for (const k in stylesheet) {
       const v = stylesheet[k];

@@ -4,7 +4,7 @@ import { RColor } from './types';
 import { AtlasManager } from './atlas_manager';
 import type { Texture2D } from '@sophon/device';
 
-export interface IGlyphInfo {
+export interface GlyphInfo {
   atlasIndex: number;
   width: number;
   height: number;
@@ -26,7 +26,7 @@ export class GlyphManager extends AtlasManager {
   getGlyphTexture(index: number): Texture2D {
     return this.getAtlasTexture(index);
   }
-  getGlyphInfo(char: string, font: Font, color: RColor): IGlyphInfo {
+  getGlyphInfo(char: string, font: Font, color: RColor): GlyphInfo {
     if (!char || !font || !color) {
       return null;
     }
@@ -69,7 +69,7 @@ export class GlyphManager extends AtlasManager {
     return `${font.family}@${font.size}${clr}&${char}`;
   }
   /** @internal */
-  private _cacheGlyph(char: string, font: Font, color: RColor): IGlyphInfo {
+  private _cacheGlyph(char: string, font: Font, color: RColor): GlyphInfo {
     const bitmap = this._getGlyphBitmap(char, font, color) as ImageData;
     return this.pushBitmap(this._hash(char, font, color), bitmap);
   }

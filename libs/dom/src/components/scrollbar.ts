@@ -2,7 +2,7 @@ import { Button } from './button';
 import { Slider } from './slider';
 import { RMouseEvent } from '../events';
 import type { GUI } from '../gui';
-import type { IStyleSheet } from '../style';
+import type { StyleSheet } from '../style';
 
 export class ScrollBar extends Slider {
   /** @internal */
@@ -34,7 +34,7 @@ export class ScrollBar extends Slider {
   /** @internal */
   _init(): void {}
   /** @internal */
-  _getDefaultStyleSheet(): IStyleSheet {
+  _getDefaultStyleSheet(): StyleSheet {
     const style = super._getDefaultStyleSheet();
     style.overflow = 'visible';
     if (this.orientation === 'vertical') {

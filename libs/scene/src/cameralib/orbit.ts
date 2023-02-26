@@ -2,7 +2,7 @@ import { Vector3, Quaternion } from '@sophon/base';
 import { BaseCameraModel } from './base';
 import type { AbstractCameraModel, IMouseEvent } from '../camera';
 
-export interface IOrbitCameraModelOptions {
+export interface OrbitCameraModelOptions {
   distance?: number;
   damping?: number;
   zoomSpeed?: number;
@@ -11,7 +11,7 @@ export interface IOrbitCameraModelOptions {
 
 export class OrbitCameraModel extends BaseCameraModel implements AbstractCameraModel {
   /** @internal */
-  private options: IOrbitCameraModelOptions;
+  private options: OrbitCameraModelOptions;
   /** @internal */
   private mouseDown: boolean;
   /** @internal */
@@ -36,7 +36,7 @@ export class OrbitCameraModel extends BaseCameraModel implements AbstractCameraM
   private quat: Quaternion;
   /** @internal */
   private scale: number;
-  constructor(options?: IOrbitCameraModelOptions) {
+  constructor(options?: OrbitCameraModelOptions) {
     super();
     this.options = Object.assign(
       {
@@ -113,7 +113,7 @@ export class OrbitCameraModel extends BaseCameraModel implements AbstractCameraM
       mat.getRow3(0, this.xVector);
     }
   }
-  setOptions(opt?: IOrbitCameraModelOptions) {
+  setOptions(opt?: OrbitCameraModelOptions) {
     opt && Object.assign(this.options, opt);
     this.reset();
   }

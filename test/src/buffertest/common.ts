@@ -1,6 +1,6 @@
 // Common test utilities
 
-export interface ITestCase {
+export interface TestCase {
   caseName: string;
   times: number;
   execute: () => void;
