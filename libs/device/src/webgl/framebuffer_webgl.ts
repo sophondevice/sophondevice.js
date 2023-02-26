@@ -5,8 +5,7 @@ import {
   BaseTexture,
   IFrameBufferTextureAttachment,
   FrameBuffer,
-  IFrameBufferOptions,
-  GPUResourceUsageFlags
+  IFrameBufferOptions
 } from '../gpuobject';
 import { cubeMapFaceMap } from './constants_webgl';
 import type { WebGLDevice } from './device_webgl';
