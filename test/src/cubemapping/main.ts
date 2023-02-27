@@ -62,7 +62,8 @@ class MyRenderScheme extends ForwardRenderScheme {
       depthAttachment: {
         texture: this.depthAttachment
       },
-      sampleCount: device.getDeviceType() === 'webgl' ? 1 : 4
+      sampleCount: device.getDeviceType() === 'webgl' ? 1 : 4,
+      ignoreDepthStencil: false
     });
   }
   renderScene(scene: Scene, camera: Camera) {

@@ -3,9 +3,9 @@ import { WebGLGPUObject } from './gpuobject_webgl';
 import { WebGLEnum } from './webgl_enum';
 import { BaseTexture, FrameBufferTextureAttachment, FrameBuffer, FrameBufferOptions } from '../gpuobject';
 import { cubeMapFaceMap } from './constants_webgl';
-import type { WebGLDevice } from './device_webgl';
 import { hasStencilChannel } from '../base_types';
 import { WebGLTextureCap } from './capabilities_webgl';
+import type { WebGLDevice } from './device_webgl';
 
 const STATUS_UNCHECKED = 0;
 const STATUS_OK = 1;
@@ -18,12 +18,15 @@ export class WebGLFrameBuffer
   private _viewport: number[];
   private _scissor: [number, number, number, number];
   private _needBindBuffers: boolean;
+  private _drawTags: number;
+  private _lastDrawTag: number;
   private _status: number;
   private _statusAA: number;
   private _width: number;
   private _height: number;
   private _isMRT: boolean;
   private _drawBuffers: number[];
+  private _depthAttachmentTarget: number;
   private _colorAttachmentsAA: WebGLRenderbuffer[];
   private _depthAttachmentAA: WebGLRenderbuffer;
   private _framebufferAA: WebGLFramebuffer;
@@ -36,6 +39,8 @@ export class WebGLFrameBuffer
     this._viewport = [0, 0, 0, 0];
     this._scissor = null;
     this._needBindBuffers = false;
+    this._drawTags = 0;
+    this._lastDrawTag = -1;
     this._status = STATUS_UNCHECKED;
     this._statusAA = STATUS_UNCHECKED;
     this._options = {
@@ -52,17 +57,24 @@ export class WebGLFrameBuffer
             )
           )
         : null,
-      depthAttachment: opt?.depthAttachment ? Object.assign({}, opt.depthAttachment) : null,
+      depthAttachment: opt?.depthAttachment?.texture ? Object.assign({}, opt.depthAttachment) : null,
       sampleCount: opt?.sampleCount ?? 1,
       ignoreDepthStencil: opt?.ignoreDepthStencil ?? false
     };
     this._width = 0;
     this._height = 0;
-    this._drawBuffers = this._options.colorAttachments.map((val, index) =>
-      val.texture ? WebGLEnum.COLOR_ATTACHMENT0 + index : WebGLEnum.NONE
-    );
+    this._drawBuffers = this._options.colorAttachments.map((val, index) => WebGLEnum.COLOR_ATTACHMENT0 + index);
     this._isMRT = this._drawBuffers.length > 1;
+    if (this._options.depthAttachment) {
+      const format = this._options.depthAttachment.texture.format;
+      this._depthAttachmentTarget = hasStencilChannel(format) ? WebGLEnum.DEPTH_STENCIL_ATTACHMENT : WebGLEnum.DEPTH_ATTACHMENT;
+    } else {
+      this._depthAttachmentTarget = WebGLEnum.NONE;
+    }
     this._init();
+  }
+  tagDraw() {
+    this._drawTags++;
   }
   getViewport(): number[] {
     return this._viewport;
@@ -104,6 +116,20 @@ export class WebGLFrameBuffer
     if (this._object) {
       this._device.context.deleteFramebuffer(this._object);
       this._object = null;
+      if (this._colorAttachmentsAA) {
+        for (const rb of this._colorAttachmentsAA) {
+          this._device.context.deleteRenderbuffer(rb);
+        }
+        this._colorAttachmentsAA = null;
+      }
+      if (this._depthAttachmentAA) {
+        this._device.context.deleteRenderbuffer(this._depthAttachmentAA);
+        this._depthAttachmentAA = null;
+      }
+      if (this._framebufferAA) {
+        this._device.context.deleteFramebuffer(this._framebufferAA);
+        this._framebufferAA = null;
+      }
     }
   }
   setCubeTextureFace(index: number, face: CubeFace) {
@@ -112,6 +138,7 @@ export class WebGLFrameBuffer
       k.face = face;
       this._needBindBuffers = true;
       if (this._device.context._currentFramebuffer === this) {
+        this._updateMSAABuffer();
         this.bind();
       }
     }
@@ -122,6 +149,7 @@ export class WebGLFrameBuffer
       k.level = level;
       this._needBindBuffers = true;
       if (this._device.context._currentFramebuffer === this) {
+        this._updateMSAABuffer();
         this.bind();
       }
     }
@@ -132,6 +160,7 @@ export class WebGLFrameBuffer
       k.layer = layer;
       this._needBindBuffers = true;
       if (this._device.context._currentFramebuffer === this) {
+        this._updateMSAABuffer();
         this.bind();
       }
     }
@@ -142,6 +171,7 @@ export class WebGLFrameBuffer
       k.layer = layer;
       this._needBindBuffers = true;
       if (this._device.context._currentFramebuffer === this) {
+        this._updateMSAABuffer();
         this.bind();
       }
     }
@@ -154,11 +184,8 @@ export class WebGLFrameBuffer
   }
   bind(): boolean {
     if (this._object) {
-      this._device.context.bindFramebuffer(
-        WebGLEnum.FRAMEBUFFER,
-        this._options.sampleCount > 1 ? this._framebufferAA : this._object
-      );
       this._device.context._currentFramebuffer = this;
+      this._lastDrawTag = -1;
       if (this._needBindBuffers) {
         this._needBindBuffers = false;
         if (!this._bindBuffersAA() || !this._bindBuffers()) {
@@ -167,6 +194,7 @@ export class WebGLFrameBuffer
           return false;
         }
       }
+      this._device.context.bindFramebuffer(WebGLEnum.FRAMEBUFFER, this._framebufferAA || this._object);
       const drawBuffersExt = this._device.drawBuffersExt;
       if (drawBuffersExt) {
         drawBuffersExt.drawBuffers(this._drawBuffers);
@@ -181,6 +209,7 @@ export class WebGLFrameBuffer
   }
   unbind(): void {
     if (this._device.context._currentFramebuffer === this) {
+      this._updateMSAABuffer();
       this._device.context.bindFramebuffer(WebGLEnum.FRAMEBUFFER, null);
       this._device.context._currentFramebuffer = null;
       this._device.setViewport();
@@ -189,35 +218,31 @@ export class WebGLFrameBuffer
       if (drawBuffersExt) {
         drawBuffersExt.drawBuffers([WebGLEnum.BACK]);
       }
-      if (this._options.sampleCount > 1) {
-        const gl = this._device.context as WebGL2RenderingContext;
-        gl.bindFramebuffer(WebGLEnum.READ_FRAMEBUFFER, this._framebufferAA);
-        gl.bindFramebuffer(WebGLEnum.DRAW_FRAMEBUFFER, this._object);
-        let mask = 0;
-        if (this._options.colorAttachments.length > 0) {
-          mask |= WebGLEnum.COLOR_BUFFER_BIT;
+    }
+  }
+  private _updateMSAABuffer() {
+    if (this._options.sampleCount > 1 && this._lastDrawTag !== this._drawTags) {
+      const gl = this._device.context as WebGL2RenderingContext;
+      gl.bindFramebuffer(WebGLEnum.READ_FRAMEBUFFER, this._framebufferAA);
+      gl.bindFramebuffer(WebGLEnum.DRAW_FRAMEBUFFER, this._object);
+      for (let i = 0; i < this._drawBuffers.length; i++) {
+        for (let j = 0; j < this._drawBuffers.length; j++) {
+          this._drawBuffers[j] = j === i ? WebGLEnum.COLOR_ATTACHMENT0 + i : WebGLEnum.NONE;
         }
-        if (this._options.depthAttachment?.texture) {
-          mask |= WebGLEnum.DEPTH_BUFFER_BIT;
-          if (hasStencilChannel(this._options.depthAttachment.texture.format)) {
-            mask |= WebGLEnum.STENCIL_BUFFER_BIT;
-          }
-        }
-        (this._device.context as WebGL2RenderingContext).blitFramebuffer(
-          0,
-          0,
-          this._width,
-          this._height,
-          0,
-          0,
-          this._width,
-          this._height,
-          mask,
-          WebGLEnum.NEAREST
-        );
-        gl.bindFramebuffer(WebGLEnum.READ_FRAMEBUFFER, null);
-        gl.bindFramebuffer(WebGLEnum.DRAW_FRAMEBUFFER, null);
+        gl.readBuffer(this._drawBuffers[i]);
+        gl.drawBuffers(this._drawBuffers);
+        gl.blitFramebuffer(0, 0, this._width, this._height, 0, 0, this._width, this._height, WebGLEnum.COLOR_BUFFER_BIT, WebGLEnum.NEAREST);
       }
+      if (!this._options.ignoreDepthStencil && this._depthAttachmentTarget !== WebGLEnum.NONE) {
+        const mask = WebGLEnum.DEPTH_BUFFER_BIT | (this._depthAttachmentTarget === WebGLEnum.DEPTH_STENCIL_ATTACHMENT ? WebGLEnum.STENCIL_BUFFER_BIT : 0);
+        gl.blitFramebuffer(0, 0, this._width, this._height, 0, 0, this._width, this._height, mask, WebGLEnum.NEAREST);
+      }
+      for (let i = 0; i < this._drawBuffers.length; i++) {
+        this._drawBuffers[i] = WebGLEnum.COLOR_ATTACHMENT0 + i;
+      }
+      gl.bindFramebuffer(WebGLEnum.READ_FRAMEBUFFER, null);
+      gl.bindFramebuffer(WebGLEnum.DRAW_FRAMEBUFFER, null);
+      this._lastDrawTag = this._drawTags;
     }
   }
   private _load(): void {
@@ -227,7 +252,6 @@ export class WebGLFrameBuffer
     do {
       if (this._options.sampleCount > 1) {
         this._framebufferAA = this._device.context.createFramebuffer();
-        this._device.context.bindFramebuffer(WebGLEnum.FRAMEBUFFER, this._framebufferAA);
         this._colorAttachmentsAA = [];
         this._depthAttachmentAA = null;
         if (!this._bindBuffersAA()) {
@@ -241,14 +265,11 @@ export class WebGLFrameBuffer
         this.dispose();
       }
     } while (0);
+    this._lastDrawTag = -1;
     this._device.context.bindFramebuffer(WebGLEnum.FRAMEBUFFER, null);
     this._device.context._currentFramebuffer = null;
   }
-  private _bindAttachment(
-    attachment: number,
-    info: FrameBufferTextureAttachment,
-    attachmentAA?: WebGLRenderbuffer
-  ): boolean {
+  private _bindAttachment(attachment: number, info: FrameBufferTextureAttachment): boolean {
     if (info.texture) {
       if (info.texture.isTexture2D()) {
         this._device.context.framebufferTexture2D(
@@ -282,14 +303,12 @@ export class WebGLFrameBuffer
     return false;
   }
   private _bindBuffers(): boolean {
-    if (this._options.depthAttachment?.texture) {
-      let target: number;
-      if (hasStencilChannel(this._options.depthAttachment.texture.format)) {
-        target = WebGLEnum.DEPTH_STENCIL_ATTACHMENT;
-      } else {
-        target = WebGLEnum.DEPTH_ATTACHMENT;
-      }
-      if (!this._bindAttachment(target, this._options.depthAttachment)) {
+    if (!this._object) {
+      return false;
+    }
+    this._device.context.bindFramebuffer(WebGLEnum.FRAMEBUFFER, this._object);
+    if (this._depthAttachmentTarget !== WebGLEnum.NONE) {
+      if (!this._bindAttachment(this._depthAttachmentTarget, this._options.depthAttachment)) {
         return false;
       }
     }
@@ -326,22 +345,17 @@ export class WebGLFrameBuffer
     return renderBuffer;
   }
   private _bindBuffersAA(): boolean {
-    if (this._options.sampleCount === 1) {
+    if (!this._framebufferAA) {
       return true;
     }
-    if (this._options.depthAttachment?.texture) {
-      let target: number;
-      if (hasStencilChannel(this._options.depthAttachment.texture.format)) {
-        target = WebGLEnum.DEPTH_STENCIL_ATTACHMENT;
-      } else {
-        target = WebGLEnum.DEPTH_ATTACHMENT;
-      }
+    this._device.context.bindFramebuffer(WebGLEnum.FRAMEBUFFER, this._framebufferAA);
+    if (this._depthAttachmentTarget !== WebGLEnum.NONE) {
       if (!this._depthAttachmentAA) {
         this._depthAttachmentAA = this._createRenderbufferAA(this._options.depthAttachment.texture);
       }
       this._device.context.framebufferRenderbuffer(
         WebGLEnum.FRAMEBUFFER,
-        target,
+        this._depthAttachmentTarget,
         WebGLEnum.RENDERBUFFER,
         this._depthAttachmentAA
       );

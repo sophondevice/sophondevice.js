@@ -289,6 +289,7 @@ export class WebGLDevice extends Device {
         gl.clearStencil(clearStencil);
         gl.clear(colorFlag | depthFlag | stencilFlag);
       }
+      (gl._currentFramebuffer as WebGLFrameBuffer)?.tagDraw();
     }
   }
   // factory
@@ -702,6 +703,7 @@ export class WebGLDevice extends Device {
       } else {
         this.context.drawArrays(primitiveTypeMap[primitiveType], first, count);
       }
+      (this._context._currentFramebuffer as WebGLFrameBuffer)?.tagDraw();
     }
   }
   /** @internal */
@@ -743,6 +745,7 @@ export class WebGLDevice extends Device {
           numInstances
         );
       }
+      (this._context._currentFramebuffer as WebGLFrameBuffer)?.tagDraw();
     }
   }
   /** @internal */

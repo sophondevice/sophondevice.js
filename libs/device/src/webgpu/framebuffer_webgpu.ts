@@ -12,6 +12,8 @@ export class WebGPUFrameBuffer extends WebGPUObject<unknown> implements FrameBuf
   private _width: number;
   private _height: number;
   private _bindFlag: number;
+  private _msaaColorTextures: GPUTexture[];
+  private _msaaDepthTexture: GPUTexture;
   constructor(device: WebGPUDevice, opt?: FrameBufferOptions) {
     super(device);
     this._object = null;
@@ -21,11 +23,15 @@ export class WebGPUFrameBuffer extends WebGPUObject<unknown> implements FrameBuf
       colorAttachments: opt?.colorAttachments
         ? opt.colorAttachments.map((value) => Object.assign({ texture: null }, value))
         : null,
-      depthAttachment: opt?.depthAttachment ? Object.assign({}, opt.depthAttachment) : null
+      depthAttachment: opt?.depthAttachment ? Object.assign({}, opt.depthAttachment) : null,
+      sampleCount: opt?.sampleCount ?? 1,
+      ignoreDepthStencil: opt?.ignoreDepthStencil ?? false
     };
     this._width = 0;
     this._height = 0;
     this._bindFlag = 0;
+    this._msaaColorTextures = null;
+    this._msaaDepthTexture = null;
     this._init();
   }
   get options(): FrameBufferOptions {
@@ -69,6 +75,16 @@ export class WebGPUFrameBuffer extends WebGPUObject<unknown> implements FrameBuf
   }
   destroy() {
     this._object = null;
+    if (this._msaaColorTextures) {
+      for (const tex of this._msaaColorTextures) {
+        tex.destroy();
+      }
+      this._msaaColorTextures = null;
+    }
+    if (this._msaaDepthTexture) {
+      this._msaaDepthTexture.destroy();
+      this._msaaDepthTexture = null;
+    }
   }
   setCubeTextureFace(index: number, face: CubeFace) {
     if (this._options.colorAttachments[index].face !== face) {
@@ -99,6 +115,12 @@ export class WebGPUFrameBuffer extends WebGPUObject<unknown> implements FrameBuf
   }
   getColorAttachments(): BaseTexture[] {
     return this._options?.colorAttachments?.map((val) => val?.texture || null) || [];
+  }
+  getMSAADepthAttachment(): GPUTexture {
+    return this._msaaDepthTexture;
+  }
+  getMSAAColorAttacments(): GPUTexture[] {
+    return this._msaaColorTextures;
   }
   getColorFormats(): GPUTextureFormat[] {
     return this._options?.colorAttachments?.map(
@@ -137,6 +159,39 @@ export class WebGPUFrameBuffer extends WebGPUObject<unknown> implements FrameBuf
     if (this._width === 0 || this._height === 0) {
       console.error('init frame buffer failed: can not create frame buffer with zero size');
       return;
+    }
+    if (this._options.sampleCount > 1) {
+      this._msaaColorTextures = [];
+      for (const colorAttachment of this._options.colorAttachments) {
+        const msaaTexture = (this.device as WebGPUDevice).gpuCreateTexture({
+          size: {
+            width: this._width,
+            height: this._height,
+            depthOrArrayLayers: 1
+          },
+          format: (colorAttachment.texture as WebGPUBaseTexture).gpuFormat,
+          mipLevelCount: 1,
+          sampleCount: this._options.sampleCount,
+          dimension: '2d',
+          usage: GPUTextureUsage.COPY_SRC|GPUTextureUsage.RENDER_ATTACHMENT
+        });
+        this._msaaColorTextures.push(msaaTexture);
+      }
+      if (this._options.depthAttachment) {
+        const msaaDepthTexture = (this.device as WebGPUDevice).gpuCreateTexture({
+          size: {
+            width: this._width,
+            height: this._height,
+            depthOrArrayLayers: 1
+          },
+          format: (this._options.depthAttachment.texture as WebGPUBaseTexture).gpuFormat,
+          mipLevelCount: 1,
+          sampleCount: this._options.sampleCount,
+          dimension: '2d',
+          usage: GPUTextureUsage.COPY_SRC|GPUTextureUsage.RENDER_ATTACHMENT
+        });
+        this._msaaDepthTexture = msaaDepthTexture;
+      }
     }
     this._object = {};
   }

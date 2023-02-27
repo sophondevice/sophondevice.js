@@ -232,12 +232,12 @@ export class WebGPURenderPass {
           depthAttachmentTexture.isTexture2DArray() || depthAttachmentTexture.isTexture3D()
             ? attachment.layer
             : 0;
-        depthTextureView = depthAttachmentTexture.getView(attachment.level ?? 0, layer ?? 0, 1);
+        depthTextureView = depthAttachmentTexture.getView(0, layer ?? 0, 1);
       }
       this._frameBufferInfo = {
         colorFormats: colorAttachmentTextures.map((val) => val.gpuFormat),
         depthFormat: depthAttachmentTexture?.gpuFormat,
-        sampleCount: 1,
+        sampleCount: this._frameBuffer.options.sampleCount,
         hash: null
       };
       this._frameBufferInfo.hash = `${this._frameBufferInfo.colorFormats.join('-')}:${
@@ -256,18 +256,36 @@ export class WebGPURenderPass {
                 : tex.isTextureCube()
                 ? attachment.face
                 : 0;
-            return {
-              view: tex.getView(attachment.level ?? 0, layer ?? 0, 1),
-              loadOp: color ? 'clear' : 'load',
-              clearValue: color?.getArray(),
-              storeOp: 'store'
-            } as GPURenderPassColorAttachment;
+            if (this._frameBuffer.options.sampleCount === 1) {
+              return {
+                view: tex.getView(attachment.level ?? 0, layer ?? 0, 1),
+                loadOp: color ? 'clear' : 'load',
+                clearValue: color?.getArray(),
+                storeOp: 'store'
+              } as GPURenderPassColorAttachment;
+            } else {
+              const msaaTexture = this._frameBuffer.getMSAAColorAttacments()[index];
+              const msaaView = this._device.gpuCreateTextureView(msaaTexture, {
+                dimension: '2d',
+                baseMipLevel: attachment.level ?? 0,
+                mipLevelCount: 1,
+                baseArrayLayer: 0,
+                arrayLayerCount: 1
+              });
+              return {
+                view: msaaView,
+                resolveTarget: tex.getView(attachment.level ?? 0, layer ?? 0, 1),
+                loadOp: color ? 'clear' : 'load',
+                clearValue: color?.getArray(),
+                storeOp: 'store'
+              } as GPURenderPassColorAttachment;
+            }
           } else {
             return null;
           }
         }),
         depthStencilAttachment: depthAttachmentTexture
-          ? {
+          ? this._frameBuffer.options.sampleCount === 1 ? {
               view: depthTextureView,
               depthLoadOp: typeof depth === 'number' ? 'clear' : 'load',
               depthClearValue: depth,
@@ -277,6 +295,18 @@ export class WebGPURenderPass {
                   ? 'clear'
                   : 'load'
                 : undefined,
+              stencilClearValue: stencil,
+              stencilStoreOp: hasStencilChannel(depthAttachmentTexture.format) ? 'store' : undefined
+            } : {
+              view: this._frameBuffer.getMSAADepthAttachment().createView(),
+              depthLoadOp: typeof depth === 'number' ? 'clear' : 'load',
+              depthClearValue: depth,
+              depthStoreOp: 'store',
+              stencilLoadOp: hasStencilChannel(depthAttachmentTexture.format)
+              ? typeof stencil === 'number'
+                ? 'clear'
+                : 'load'
+              : undefined,
               stencilClearValue: stencil,
               stencilStoreOp: hasStencilChannel(depthAttachmentTexture.format) ? 'store' : undefined
             }
