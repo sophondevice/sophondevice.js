@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Vector3, Vector4, Matrix4x4, Quaternion, TypedArray } from '@sophon/base';
 import {
-  TextureFilter,
   PrimitiveType,
   FaceMode,
   getVertexBufferAttribTypeBySemantic,
@@ -50,7 +49,7 @@ import { ComponentType, GLTFAccessor } from './helpers';
 import { Interpolator, InterpolationMode, InterpolationTarget } from '../../../interpolator';
 import { AbstractModelLoader } from '../loader';
 import { BUILTIN_ASSET_TEXTURE_SHEEN_LUT } from '../../../values';
-import type { TextureWrapping } from '@sophon/device';
+import type { TextureWrapping, TextureFilter } from '@sophon/device';
 import type { AssetManager } from '../../assetmanager';
 import type { AnimationChannel, AnimationSampler, GlTf, Material, TextureInfo } from './gltf';
 
@@ -942,9 +941,9 @@ export class GLTFLoader extends AbstractModelLoader {
       }
       let wrapS: TextureWrapping = 'repeat';
       let wrapT: TextureWrapping = 'repeat';
-      let magFilter: TextureFilter = TextureFilter.Linear;
-      let minFilter: TextureFilter = TextureFilter.Linear;
-      let mipFilter: TextureFilter = TextureFilter.Linear;
+      let magFilter: TextureFilter = 'linear';
+      let minFilter: TextureFilter = 'linear';
+      let mipFilter: TextureFilter = 'linear';
       const samplerIndex: number = textureInfo.sampler;
       const sampler = gltf.samplers && gltf.samplers[samplerIndex];
       if (sampler) {
@@ -972,36 +971,36 @@ export class GLTFLoader extends AbstractModelLoader {
         }
         switch (sampler.magFilter) {
           case 0x2600: // gl.NEAREST
-            magFilter = TextureFilter.Nearest;
+            magFilter = 'nearest';
             break;
           case 0x2601: // gl.LINEAR
-            magFilter = TextureFilter.Linear;
+            magFilter = 'linear';
             break;
         }
         switch (sampler.minFilter) {
           case 0x2600: // gl.NEAREST
-            minFilter = TextureFilter.Nearest;
-            mipFilter = TextureFilter.None;
+            minFilter = 'nearest';
+            mipFilter = 'none';
             break;
           case 0x2601: // gl.LINEAR
-            minFilter = TextureFilter.Linear;
-            mipFilter = TextureFilter.None;
+            minFilter = 'linear';
+            mipFilter = 'none';
             break;
           case 0x2700: // gl.NEAREST_MIPMAP_NEAREST
-            minFilter = TextureFilter.Nearest;
-            mipFilter = TextureFilter.Nearest;
+            minFilter = 'nearest';
+            mipFilter = 'nearest';
             break;
           case 0x2701: // gl.LINEAR_MIPMAP_NEAREST
-            minFilter = TextureFilter.Linear;
-            mipFilter = TextureFilter.Nearest;
+            minFilter = 'linear';
+            mipFilter = 'nearest';
             break;
           case 0x2702: // gl.NEAREST_MIPMAP_LINEAR
-            minFilter = TextureFilter.Nearest;
-            mipFilter = TextureFilter.Linear;
+            minFilter = 'nearest';
+            mipFilter = 'linear';
             break;
           case 0x2703: // gl.LINEAR_MIPMAP_LINEAR
-            minFilter = TextureFilter.Linear;
-            mipFilter = TextureFilter.Linear;
+            minFilter = 'linear';
+            mipFilter = 'linear';
             break;
         }
       }
@@ -1149,51 +1148,41 @@ export class GLTFLoader extends AbstractModelLoader {
     let buffer = gltf._bufferCache[hash];
     if (!buffer) {
       let data = accessor.getTypedView(gltf);
-      let ctype: number;
       let typeMask: number;
       if (data instanceof Int8Array) {
-        ctype = ComponentType.BYTE;
         typeMask = I8_BITMASK;
       } else if (data instanceof Uint8Array) {
-        ctype = ComponentType.UBYTE;
         typeMask = U8_BITMASK;
       } else if (data instanceof Int16Array) {
-        ctype = ComponentType.SHORT;
         typeMask = I16_BITMASK;
       } else if (data instanceof Uint16Array) {
-        ctype = ComponentType.USHORT;
         typeMask = U16_BITMASK;
       } else if (data instanceof Int32Array) {
-        ctype = ComponentType.INT;
         typeMask = I32_BITMASK;
       } else if (data instanceof Uint32Array) {
-        ctype = ComponentType.UINT;
         typeMask = U32_BITMASK;
       } else if (data instanceof Float32Array) {
-        ctype = ComponentType.FLOAT;
         typeMask = F32_BITMASK;
       } else {
         throw new Error('invalid buffer data type');
       }
       const componentCount = accessor.getComponentCount(accessor.type);
-      if (semantic && ctype !== ComponentType.FLOAT) {
+      if (semantic && typeMask !== F32_BITMASK) {
         const floatData = new Float32Array(data.length);
         floatData.set(data);
-        ctype = ComponentType.FLOAT;
         typeMask = F32_BITMASK;
         data = floatData;
       }
       if (!semantic) {
-        if (ctype !== ComponentType.UBYTE && ctype !== ComponentType.USHORT && ctype !== ComponentType.UINT) {
-          throw new Error(`Invalid index buffer component type: ${ctype}`);
+        if (typeMask !== U8_BITMASK && typeMask !== U16_BITMASK && typeMask !== U32_BITMASK) {
+          throw new Error(`Invalid index buffer component type: ${typeMask}`);
         }
-        if (ctype === ComponentType.UINT && !gltf._manager.device.getMiscCaps().support32BitIndex) {
+        if (typeMask === U32_BITMASK && !gltf._manager.device.getMiscCaps().support32BitIndex) {
           throw new Error('Device does not support 32bit vertex index');
         }
-        if (ctype === ComponentType.UBYTE) {
+        if (typeMask === U8_BITMASK) {
           const uint16Data = new Uint16Array(data.length);
           uint16Data.set(data);
-          ctype = ComponentType.USHORT;
           typeMask = U16_BITMASK;
           data = uint16Data;
         }

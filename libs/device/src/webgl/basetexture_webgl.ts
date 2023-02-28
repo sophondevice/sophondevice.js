@@ -2,7 +2,6 @@ import { isPowerOf2 } from '@sophon/base';
 import { WebGLGPUObject } from './gpuobject_webgl';
 import { TextureCaps } from '../device';
 import {
-  TextureFilter,
   TextureFormat,
   isCompressedTextureFormat,
   isDepthTextureFormat,
@@ -259,14 +258,9 @@ export abstract class WebGLBaseTexture extends WebGLGPUObject<WebGLTexture> {
   protected _getSamplerOptions(params: TextureFormatInfoWebGL, shadow: boolean): SamplerOptions {
     const comparison = this.isDepth() && shadow;
     const filterable = params.filterable || comparison;
-    const magFilter = filterable ? TextureFilter.Linear : TextureFilter.Nearest;
-    const minFilter = filterable ? TextureFilter.Linear : TextureFilter.Nearest;
-    const mipFilter =
-      this._mipLevelCount > 1
-        ? filterable
-          ? TextureFilter.Linear
-          : TextureFilter.Nearest
-        : TextureFilter.None;
+    const magFilter = filterable ? 'linear' : 'nearest';
+    const minFilter = filterable ? 'linear' : 'nearest';
+    const mipFilter = this._mipLevelCount > 1 ? (filterable ? 'linear' : 'nearest') : 'none';
     return {
       addressU: 'clamp',
       addressV: 'clamp',

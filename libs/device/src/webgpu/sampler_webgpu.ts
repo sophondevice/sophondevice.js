@@ -1,6 +1,5 @@
 import { WebGPUObject } from './gpuobject_webgpu';
 import { textureWrappingMap, textureFilterMap, compareFuncMap } from './constants_webgpu';
-import { TextureFilter } from '../base_types';
 import type { SamplerOptions, TextureSampler } from '../gpuobject';
 import type { WebGPUDevice } from './device';
 
@@ -13,9 +12,9 @@ export class WebGPUTextureSampler extends WebGPUObject<GPUSampler> implements Te
         addressU: 'clamp',
         addressV: 'clamp',
         addressW: 'clamp',
-        magFilter: TextureFilter.Nearest,
-        minFilter: TextureFilter.Nearest,
-        mipFilter: TextureFilter.None,
+        magFilter: 'nearest',
+        minFilter: 'nearest',
+        mipFilter: 'none',
         lodMin: 0,
         lodMax: 32,
         compare: null,

@@ -6,7 +6,6 @@ import {
   PBShaderExp,
   Texture2D,
   BindGroup,
-  TextureFilter,
   TextureSampler,
   BaseTexture
 } from '@sophon/device';
@@ -73,14 +72,9 @@ export class TerrainLightModel extends LambertLightModel {
       this.optionChanged(!this._detailMaskMap || !tex);
       this._detailMaskMap = tex;
       this._detailMaskMapSampler = tex.device.createSampler({
-        magFilter: tex.isFilterable() ? TextureFilter.Linear : TextureFilter.Nearest,
-        minFilter: tex.isFilterable() ? TextureFilter.Linear : TextureFilter.Nearest,
-        mipFilter:
-          tex.mipLevelCount === 1
-            ? TextureFilter.None
-            : tex.isFilterable()
-            ? TextureFilter.Linear
-            : TextureFilter.Nearest
+        magFilter: tex.isFilterable() ? 'linear' : 'nearest',
+        minFilter: tex.isFilterable() ? 'linear' : 'nearest',
+        mipFilter: tex.mipLevelCount === 1 ? 'none' : tex.isFilterable() ? 'linear' : 'nearest'
       });
     }
   }
@@ -117,14 +111,9 @@ export class TerrainLightModel extends LambertLightModel {
       color.device.createSampler({
         addressU: 'repeat',
         addressV: 'repeat',
-        magFilter: color.isFilterable() ? TextureFilter.Linear : TextureFilter.Nearest,
-        minFilter: color.isFilterable() ? TextureFilter.Linear : TextureFilter.Nearest,
-        mipFilter:
-          color.mipLevelCount === 1
-            ? TextureFilter.None
-            : color.isFilterable()
-            ? TextureFilter.Linear
-            : TextureFilter.Nearest
+        magFilter: color.isFilterable() ? 'linear' : 'nearest',
+        minFilter: color.isFilterable() ? 'linear' : 'nearest',
+        mipFilter: color.mipLevelCount === 1 ? 'none' : color.isFilterable() ? 'linear' : 'nearest'
       })
     );
     this._detailScales.push(scale);

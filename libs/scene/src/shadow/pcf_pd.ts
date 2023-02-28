@@ -1,10 +1,4 @@
-import {
-  PBInsideFunctionScope,
-  PBShaderExp,
-  TextureFilter,
-  TextureFormat,
-  TextureSampler
-} from '@sophon/device';
+import { PBInsideFunctionScope, PBShaderExp, TextureFormat, TextureSampler } from '@sophon/device';
 import { ShadowImpl } from './shadow_impl';
 import { ShaderLib } from '../materiallib';
 import * as lib from '../renderers/shadowmap.shaderlib';

@@ -1,7 +1,6 @@
 import { WebGPUObject } from './gpuobject_webgpu';
 import { TextureCaps } from '../device';
 import {
-  TextureFilter,
   TextureFormat,
   isCompressedTextureFormat,
   isDepthTextureFormat,
@@ -561,14 +560,9 @@ export abstract class WebGPUBaseTexture<
   protected _getSamplerOptions(params: Partial<TextureFormatInfoWebGPU>, shadow: boolean): SamplerOptions {
     const comparison = this.isDepth() && shadow;
     const filterable = params.filterable || comparison;
-    const magFilter = filterable ? TextureFilter.Linear : TextureFilter.Nearest;
-    const minFilter = params.filterable ? TextureFilter.Linear : TextureFilter.Nearest;
-    const mipFilter =
-      this._mipLevelCount > 1
-        ? filterable
-          ? TextureFilter.Linear
-          : TextureFilter.Nearest
-        : TextureFilter.None;
+    const magFilter = filterable ? 'linear' : 'nearest';
+    const minFilter = params.filterable ? 'linear' : 'nearest';
+    const mipFilter = this._mipLevelCount > 1 ? (filterable ? 'linear' : 'nearest') : 'none';
     return {
       addressU: 'clamp',
       addressV: 'clamp',

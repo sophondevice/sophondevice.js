@@ -1,5 +1,5 @@
 import { Vector3, isPowerOf2, nextPowerOf2, HttpRequest } from '@sophon/base';
-import { TextureFilter, TextureFormat, Device, BaseTexture, Texture2D, GPUObject } from '@sophon/device';
+import { TextureFormat, Device, BaseTexture, Texture2D, GPUObject } from '@sophon/device';
 import { AssetHierarchyNode, AssetSkeleton, AssetSubMeshData, SharedModel } from './model';
 import { GLTFLoader } from './loaders/gltf/gltf_loader';
 import { WebImageLoader } from './loaders/image/webimage_loader';
@@ -219,12 +219,9 @@ export class AssetManager {
     } else {
       let tex = await loader.load(this, url, mimeType, data, srgb, noMipmap);
       if (texture) {
-        const magFilter =
-          tex.width !== texture.width || tex.height !== texture.height
-            ? TextureFilter.Linear
-            : TextureFilter.Nearest;
+        const magFilter = tex.width !== texture.width || tex.height !== texture.height ? 'linear' : 'nearest';
         const minFilter = magFilter;
-        const mipFilter = TextureFilter.None;
+        const mipFilter = 'none';
         const sampler = this.device.createSampler({
           addressU: 'clamp',
           addressV: 'clamp',
@@ -242,10 +239,9 @@ export class AssetManager {
       ) {
         const newWidth = !noMipmap && !isPowerOf2(tex.width) ? nextPowerOf2(tex.width) : tex.width;
         const newHeight = !noMipmap && !isPowerOf2(tex.height) ? nextPowerOf2(tex.height) : tex.height;
-        const magFilter =
-          newWidth !== tex.width || newHeight !== tex.height ? TextureFilter.Linear : TextureFilter.Nearest;
+        const magFilter = newWidth !== tex.width || newHeight !== tex.height ? 'linear' : 'nearest';
         const minFilter = magFilter;
-        const mipFilter = TextureFilter.None;
+        const mipFilter = 'none';
         const sampler = this.device.createSampler({
           addressU: 'clamp',
           addressV: 'clamp',

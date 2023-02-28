@@ -12,7 +12,6 @@ import {
   TextureFormat,
   makeVertexBufferType,
   TextureSampler,
-  TextureFilter,
   Geometry
 } from '@sophon/device';
 import { RMouseEvent, RDragEvent, RKeyEvent } from './events';
@@ -76,9 +75,9 @@ export class GUIRenderer extends REventTarget {
     this._bindGroup = this._device.createBindGroup(this._program.bindGroupLayouts[0]);
     this._bindGroupTexture = this._device.createBindGroup(this._programTexture.bindGroupLayouts[0]);
     this._textureSampler = this._device.createSampler({
-      magFilter: TextureFilter.Nearest,
-      minFilter: TextureFilter.Nearest,
-      mipFilter: TextureFilter.None
+      magFilter: 'nearest',
+      minFilter: 'nearest',
+      mipFilter: 'none'
     });
     this._renderStateSet = this.createStateSet();
     this._primitiveBuffer = [new Geometry(device), new Geometry(device)];

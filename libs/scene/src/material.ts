@@ -1,6 +1,5 @@
 import { Matrix4x4, List, ListIterator } from '@sophon/base';
 import {
-  TextureFilter,
   Geometry,
   BindGroup,
   GPUProgram,
@@ -432,9 +431,9 @@ export class Material {
       if (boneMatrices) {
         if (!Material._boneMatrixTextureSampler) {
           Material._boneMatrixTextureSampler = this.device.createSampler({
-            magFilter: TextureFilter.Nearest,
-            minFilter: TextureFilter.Nearest,
-            mipFilter: TextureFilter.None
+            magFilter: 'nearest',
+            minFilter: 'nearest',
+            mipFilter: 'none'
           });
         }
         bindGroup.setTexture('boneMatrices', boneMatrices, Material._boneMatrixTextureSampler);

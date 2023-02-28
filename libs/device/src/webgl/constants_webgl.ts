@@ -1,9 +1,9 @@
 import { CubeFace } from '@sophon/base';
-import { TextureFilter, PrimitiveType } from '../base_types';
+import { PrimitiveType } from '../base_types';
 import { PBPrimitiveType } from '../builder/types';
 import { WebGLEnum } from './webgl_enum';
 import { BlendEquation, BlendFunc, FaceMode, FaceWinding, StencilOp } from '../render_states';
-import type { TextureTarget, CompareFunc, TextureWrapping } from '../base_types';
+import type { TextureTarget, CompareFunc, TextureWrapping, TextureFilter } from '../base_types';
 
 export const blendEquationMap = {
   [BlendEquation.ADD]: WebGLEnum.FUNC_ADD,
@@ -180,9 +180,9 @@ export const cubeMapFaceMap = {
 
 export function textureMagFilterToWebGL(magFilter: TextureFilter) {
   switch (magFilter) {
-    case TextureFilter.Nearest:
+    case 'nearest':
       return WebGLEnum.NEAREST;
-    case TextureFilter.Linear:
+    case 'linear':
       return WebGLEnum.LINEAR;
     default:
       return WebGLEnum.NONE;
@@ -191,23 +191,23 @@ export function textureMagFilterToWebGL(magFilter: TextureFilter) {
 
 export function textureMinFilterToWebGL(minFilter: TextureFilter, mipFilter: TextureFilter) {
   switch (minFilter) {
-    case TextureFilter.Nearest:
+    case 'nearest':
       switch (mipFilter) {
-        case TextureFilter.None:
+        case 'none':
           return WebGLEnum.NEAREST;
-        case TextureFilter.Nearest:
+        case 'nearest':
           return WebGLEnum.NEAREST_MIPMAP_NEAREST;
-        case TextureFilter.Linear:
+        case 'linear':
           return WebGLEnum.NEAREST_MIPMAP_LINEAR;
       }
       break;
-    case TextureFilter.Linear:
+    case 'linear':
       switch (mipFilter) {
-        case TextureFilter.None:
+        case 'none':
           return WebGLEnum.LINEAR;
-        case TextureFilter.Nearest:
+        case 'nearest':
           return WebGLEnum.LINEAR_MIPMAP_NEAREST;
-        case TextureFilter.Linear:
+        case 'linear':
           return WebGLEnum.LINEAR_MIPMAP_LINEAR;
       }
       break;

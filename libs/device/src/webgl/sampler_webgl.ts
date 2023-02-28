@@ -1,6 +1,5 @@
 import { WebGLGPUObject } from './gpuobject_webgl';
 import { WebGLEnum } from './webgl_enum';
-import { TextureFilter } from '../base_types';
 import {
   textureTargetMap,
   textureWrappingMap,
@@ -25,9 +24,9 @@ export class WebGLTextureSampler
         addressU: 'clamp',
         addressV: 'clamp',
         addressW: 'clamp',
-        magFilter: TextureFilter.Nearest,
-        minFilter: TextureFilter.Nearest,
-        mipFilter: TextureFilter.None,
+        magFilter: 'nearest',
+        minFilter: 'nearest',
+        mipFilter: 'none',
         lodMin: 0,
         lodMax: 32,
         compare: null,

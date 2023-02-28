@@ -1,6 +1,6 @@
-import { TextureFormat, PrimitiveType, TextureFilter } from '../base_types';
+import { TextureFormat, PrimitiveType } from '../base_types';
 import { StencilOp, FaceWinding, FaceMode, BlendEquation, BlendFunc } from '../render_states';
-import type { CompareFunc, TextureWrapping } from '../base_types';
+import type { CompareFunc, TextureWrapping, TextureFilter } from '../base_types';
 
 export const textureWrappingMap: Record<TextureWrapping, GPUAddressMode> = {
   repeat: 'repeat',
@@ -8,9 +8,10 @@ export const textureWrappingMap: Record<TextureWrapping, GPUAddressMode> = {
   clamp: 'clamp-to-edge'
 };
 
-export const textureFilterMap: { [k: number]: GPUFilterMode } = {
-  [TextureFilter.Nearest]: 'nearest',
-  [TextureFilter.Linear]: 'linear'
+export const textureFilterMap: Record<TextureFilter, GPUFilterMode> = {
+  nearest: 'nearest',
+  linear: 'linear',
+  none: null
 };
 
 export const compareFuncMap: Record<CompareFunc, GPUCompareFunction> = {
