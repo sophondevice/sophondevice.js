@@ -1,13 +1,5 @@
 import { VectorBase, CubeFace, TypedArray } from '@sophon/base';
-import {
-  ShaderType,
-  PrimitiveType,
-  TextureTarget,
-  TextureFormat,
-  TextureWrapping,
-  TextureFilter,
-  CompareFunc
-} from './base_types';
+import { ShaderType, PrimitiveType, TextureFormat, TextureFilter } from './base_types';
 import {
   PBTypeInfo,
   PBArrayTypeInfo,
@@ -16,6 +8,7 @@ import {
   PBPrimitiveType
 } from './builder/types';
 import type { Device } from './device';
+import type { TextureTarget, CompareFunc, TextureWrapping } from './base_types';
 
 export type TextureImageElement = ImageBitmap | HTMLCanvasElement;
 

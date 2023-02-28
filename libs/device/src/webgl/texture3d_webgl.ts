@@ -1,4 +1,4 @@
-import { TextureTarget, TextureFormat, linearTextureFormatToSRGB } from '../base_types';
+import { TextureFormat, linearTextureFormatToSRGB } from '../base_types';
 import { textureTargetMap } from './constants_webgl';
 import { WebGLBaseTexture } from './basetexture_webgl';
 import { GPUResourceUsageFlags, Texture3D, GPUDataBuffer } from '../gpuobject';
@@ -11,7 +11,7 @@ export class WebGLTexture3D extends WebGLBaseTexture implements Texture3D<WebGLT
     if (!device.isWebGL2) {
       throw new Error('device does not support 3D texture');
     }
-    super(device, TextureTarget.Texture3D);
+    super(device, '3d');
   }
   get depth(): number {
     return this._depth;

@@ -1,48 +1,9 @@
 import type { TypedArray } from '@sophon/base';
 
 export type WebGLContext = WebGLRenderingContext | WebGL2RenderingContext;
-
-export enum TextureTarget {
-  Unknown = 0,
-  Texture2D = 1,
-  Texture3D = 2,
-  TextureCubemap = 3,
-  Texture2DArray = 4
-}
-
-export enum TextureOption {
-  GENERATE_MIPMAP = 1 << 0,
-  RENDERABLE = 1 << 1,
-  MAGFILTER_LINEAR = 1 << 2,
-  MINFILTER_LINEAR = 1 << 3,
-  MIPFILTER_LINEAR = 1 << 4,
-  REPEATABLE_U = 1 << 3,
-  REPEATABLE_V = 1 << 4
-}
-
-export enum CompareFunc {
-  Unknown = 0,
-  Always = 1,
-  LessEqual = 2,
-  GreaterEqual = 3,
-  Less = 4,
-  Greater = 5,
-  Equal = 6,
-  NotEqual = 7,
-  Never = 8
-}
-
-export enum CompareMode {
-  None = 0,
-  RefToTexture = 1
-}
-
-export enum TextureWrapping {
-  Unknown = 0,
-  Repeat,
-  MirroredRepeat,
-  ClampToEdge
-}
+export type TextureTarget = '2d' | '3d' | 'cube' | '2darray';
+export type CompareFunc = 'always' | 'le' | 'ge' | 'lt' | 'gt' | 'eq' | 'ne' | 'never';
+export type TextureWrapping = 'repeat' | 'mirrored-repeat' | 'clamp';
 
 export enum TextureFilter {
   Unknown = 0,

@@ -1,5 +1,5 @@
 import { Vector4 } from '@sophon/base';
-import { CompareFunc, PrimitiveType } from '../base_types';
+import { PrimitiveType } from '../base_types';
 import { ProgramBuilder } from '../builder';
 import { FaceMode, StencilOp } from '../render_states';
 import type { WebGPUProgram } from './gpuprogram_webgpu';
@@ -69,8 +69,8 @@ export class WebGPUClearQuad {
       .enableStencilTwoside(true)
       .setFrontOp(StencilOp.REPLACE, StencilOp.REPLACE, StencilOp.REPLACE)
       .setBackOp(StencilOp.REPLACE, StencilOp.REPLACE, StencilOp.REPLACE)
-      .setFrontCompareFunc(CompareFunc.Always)
-      .setBackCompareFunc(CompareFunc.Always);
+      .setFrontCompareFunc('always')
+      .setBackCompareFunc('always');
   }
   private static createClearQuadProgram(
     renderPass: WebGPURenderPass,

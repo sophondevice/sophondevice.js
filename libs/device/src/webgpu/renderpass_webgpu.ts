@@ -285,31 +285,33 @@ export class WebGPURenderPass {
           }
         }),
         depthStencilAttachment: depthAttachmentTexture
-          ? this._frameBuffer.options.sampleCount === 1 ? {
-              view: depthTextureView,
-              depthLoadOp: typeof depth === 'number' ? 'clear' : 'load',
-              depthClearValue: depth,
-              depthStoreOp: 'store',
-              stencilLoadOp: hasStencilChannel(depthAttachmentTexture.format)
-                ? typeof stencil === 'number'
-                  ? 'clear'
-                  : 'load'
-                : undefined,
-              stencilClearValue: stencil,
-              stencilStoreOp: hasStencilChannel(depthAttachmentTexture.format) ? 'store' : undefined
-            } : {
-              view: this._frameBuffer.getMSAADepthAttachment().createView(),
-              depthLoadOp: typeof depth === 'number' ? 'clear' : 'load',
-              depthClearValue: depth,
-              depthStoreOp: 'store',
-              stencilLoadOp: hasStencilChannel(depthAttachmentTexture.format)
-              ? typeof stencil === 'number'
-                ? 'clear'
-                : 'load'
-              : undefined,
-              stencilClearValue: stencil,
-              stencilStoreOp: hasStencilChannel(depthAttachmentTexture.format) ? 'store' : undefined
-            }
+          ? this._frameBuffer.options.sampleCount === 1
+            ? {
+                view: depthTextureView,
+                depthLoadOp: typeof depth === 'number' ? 'clear' : 'load',
+                depthClearValue: depth,
+                depthStoreOp: 'store',
+                stencilLoadOp: hasStencilChannel(depthAttachmentTexture.format)
+                  ? typeof stencil === 'number'
+                    ? 'clear'
+                    : 'load'
+                  : undefined,
+                stencilClearValue: stencil,
+                stencilStoreOp: hasStencilChannel(depthAttachmentTexture.format) ? 'store' : undefined
+              }
+            : {
+                view: this._frameBuffer.getMSAADepthAttachment().createView(),
+                depthLoadOp: typeof depth === 'number' ? 'clear' : 'load',
+                depthClearValue: depth,
+                depthStoreOp: 'store',
+                stencilLoadOp: hasStencilChannel(depthAttachmentTexture.format)
+                  ? typeof stencil === 'number'
+                    ? 'clear'
+                    : 'load'
+                  : undefined,
+                stencilClearValue: stencil,
+                stencilStoreOp: hasStencilChannel(depthAttachmentTexture.format) ? 'store' : undefined
+              }
           : undefined
       };
       this._renderPassEncoder = this._renderCommandEncoder.beginRenderPass(passDesc);

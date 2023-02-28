@@ -1,4 +1,3 @@
-import { WebGLContext, CompareFunc } from '../base_types';
 import { WebGLEnum } from './webgl_enum';
 import {
   ColorState,
@@ -25,6 +24,7 @@ import {
   compareFuncMap,
   compareFuncInvMap
 } from './constants_webgl';
+import type { WebGLContext, CompareFunc } from '../base_types';
 
 export abstract class WebGLRenderState {
   protected static _defaultState: WebGLRenderState;
@@ -206,7 +206,7 @@ export class WebGLDepthState extends WebGLRenderState implements DepthState {
     super();
     this.testEnabled = true;
     this.writeEnabled = true;
-    this.compareFunc = CompareFunc.LessEqual;
+    this.compareFunc = 'le';
   }
   get compareFunc(): CompareFunc {
     return compareFuncInvMap[this._compareFunc];
@@ -263,7 +263,7 @@ export class WebGLStencilState extends WebGLRenderState implements StencilState 
     this.failOp = this.failOpBack = StencilOp.KEEP;
     this.zFailOp = this.zFailOpBack = StencilOp.KEEP;
     this.passOp = this.passOpBack = StencilOp.KEEP;
-    this.func = this.funcBack = CompareFunc.Always;
+    this.func = this.funcBack = 'always';
     this.ref = 0;
     this.valueMask = this.valueMaskBack = 0xffffffff;
   }

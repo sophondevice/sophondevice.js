@@ -8,7 +8,6 @@ import {
   TextureCube,
   FaceMode,
   TextureFormat,
-  TextureTarget,
   PBInsideFunctionScope,
   TextureSampler,
   TextureCreationOptions
@@ -20,6 +19,7 @@ import { ESM } from './esm';
 import { VSM } from './vsm';
 import { PCFPD } from './pcf_pd';
 import { PCFOPT } from './pcf_opt';
+import type { TextureTarget } from '@sophon/device';
 import type { PointLight, PunctualLight, SpotLight } from '../light';
 import type { ShadowMapPass } from '../renderers';
 import type { Scene } from '../scene';
@@ -452,11 +452,11 @@ export class ShadowMapper {
       noMipmap: true
     };
     switch (target) {
-      case TextureTarget.Texture2D:
+      case '2d':
         return this._light.scene.device.createTexture2D(format, width, height, options);
-      case TextureTarget.TextureCubemap:
+      case 'cube':
         return this._light.scene.device.createCubeTexture(format, width, options);
-      case TextureTarget.Texture2DArray:
+      case '2darray':
         return this._light.scene.device.createTexture2DArray(format, width, height, depth, options);
       default:
         return null;
@@ -476,11 +476,7 @@ export class ShadowMapper {
         numCascades > 1 && !useTextureArray ? 2 * this._config.shadowMapSize : this._config.shadowMapSize;
       const shadowMapHeight =
         numCascades > 2 && !useTextureArray ? 2 * this._config.shadowMapSize : this._config.shadowMapSize;
-      const target = useTextureArray
-        ? TextureTarget.Texture2DArray
-        : this._light.isPointLight()
-        ? TextureTarget.TextureCubemap
-        : TextureTarget.Texture2D;
+      const target: TextureTarget = useTextureArray ? '2darray' : this._light.isPointLight() ? 'cube' : '2d';
       if (
         this.isTextureInvalid(this._colorAttachment, target, colorFormat, shadowMapWidth, shadowMapHeight)
       ) {
@@ -489,15 +485,7 @@ export class ShadowMapper {
         this._colorAttachment.dispose();
         this._colorAttachment = null;
       }
-      if (
-        this.isTextureInvalid(
-          this._depthAttachment,
-          TextureTarget.Texture2D,
-          depthFormat,
-          shadowMapWidth,
-          shadowMapHeight
-        )
-      ) {
+      if (this.isTextureInvalid(this._depthAttachment, '2d', depthFormat, shadowMapWidth, shadowMapHeight)) {
         this._framebuffer?.dispose();
         this._framebuffer = null;
         this._depthAttachment.dispose();

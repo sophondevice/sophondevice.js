@@ -2,11 +2,8 @@ import { isPowerOf2 } from '@sophon/base';
 import { WebGLGPUObject } from './gpuobject_webgl';
 import { TextureCaps } from '../device';
 import {
-  TextureTarget,
   TextureFilter,
-  TextureWrapping,
   TextureFormat,
-  CompareFunc,
   isCompressedTextureFormat,
   isDepthTextureFormat,
   isFloatTextureFormat,
@@ -21,6 +18,7 @@ import type { WebGLTextureCap, TextureFormatInfoWebGL } from './capabilities_web
 import type { TextureSampler } from '../gpuobject';
 import type { WebGLTextureSampler } from './sampler_webgl';
 import type { WebGLDevice } from './device_webgl';
+import type { TextureTarget } from '../base_types';
 
 export abstract class WebGLBaseTexture extends WebGLGPUObject<WebGLTexture> {
   protected _target: TextureTarget;
@@ -34,7 +32,7 @@ export abstract class WebGLBaseTexture extends WebGLGPUObject<WebGLTexture> {
   protected _sampler: WebGLTextureSampler;
   constructor(device: WebGLDevice, target?: TextureTarget) {
     super(device);
-    this._target = target || TextureTarget.Texture2D;
+    this._target = target || '2d';
     this._memCost = 0;
     this._flags = 0;
     this._width = 0;
@@ -269,18 +267,14 @@ export abstract class WebGLBaseTexture extends WebGLGPUObject<WebGLTexture> {
           ? TextureFilter.Linear
           : TextureFilter.Nearest
         : TextureFilter.None;
-    const addressU = TextureWrapping.ClampToEdge;
-    const addressV = TextureWrapping.ClampToEdge;
-    const addressW = TextureWrapping.ClampToEdge;
-    const compare = comparison ? CompareFunc.LessEqual : null;
     return {
-      addressU,
-      addressV,
-      addressW,
+      addressU: 'clamp',
+      addressV: 'clamp',
+      addressW: 'clamp',
       magFilter,
       minFilter,
       mipFilter,
-      compare
+      compare: comparison ? 'le' : null
     };
   }
 }

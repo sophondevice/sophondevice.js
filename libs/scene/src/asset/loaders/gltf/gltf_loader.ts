@@ -2,7 +2,6 @@
 import { Vector3, Vector4, Matrix4x4, Quaternion, TypedArray } from '@sophon/base';
 import {
   TextureFilter,
-  TextureWrapping,
   PrimitiveType,
   FaceMode,
   getVertexBufferAttribTypeBySemantic,
@@ -51,6 +50,7 @@ import { ComponentType, GLTFAccessor } from './helpers';
 import { Interpolator, InterpolationMode, InterpolationTarget } from '../../../interpolator';
 import { AbstractModelLoader } from '../loader';
 import { BUILTIN_ASSET_TEXTURE_SHEEN_LUT } from '../../../values';
+import type { TextureWrapping } from '@sophon/device';
 import type { AssetManager } from '../../assetmanager';
 import type { AnimationChannel, AnimationSampler, GlTf, Material, TextureInfo } from './gltf';
 
@@ -940,8 +940,8 @@ export class GLTFLoader extends AbstractModelLoader {
             : Vector3.zero();
         mt.transform = Matrix4x4.scaling(scale).multiplyLeft(rotation).translateLeft(translation);
       }
-      let wrapS: TextureWrapping = TextureWrapping.Repeat;
-      let wrapT: TextureWrapping = TextureWrapping.Repeat;
+      let wrapS: TextureWrapping = 'repeat';
+      let wrapT: TextureWrapping = 'repeat';
       let magFilter: TextureFilter = TextureFilter.Linear;
       let minFilter: TextureFilter = TextureFilter.Linear;
       let mipFilter: TextureFilter = TextureFilter.Linear;
@@ -950,24 +950,24 @@ export class GLTFLoader extends AbstractModelLoader {
       if (sampler) {
         switch (sampler.wrapS) {
           case 0x2901: // gl.REPEAT
-            wrapS = TextureWrapping.Repeat;
+            wrapS = 'repeat';
             break;
           case 0x8370: // gl.MIRRORED_REPEAT
-            wrapS = TextureWrapping.MirroredRepeat;
+            wrapS = 'mirrored-repeat';
             break;
           case 0x812f: // gl.CLAMP_TO_EDGE
-            wrapS = TextureWrapping.ClampToEdge;
+            wrapS = 'clamp';
             break;
         }
         switch (sampler.wrapT) {
           case 0x2901: // gl.REPEAT
-            wrapT = TextureWrapping.Repeat;
+            wrapT = 'repeat';
             break;
           case 0x8370: // gl.MIRRORED_REPEAT
-            wrapT = TextureWrapping.MirroredRepeat;
+            wrapT = 'mirrored-repeat';
             break;
           case 0x812f: // gl.CLAMP_TO_EDGE
-            wrapT = TextureWrapping.ClampToEdge;
+            wrapT = 'clamp';
             break;
         }
         switch (sampler.magFilter) {

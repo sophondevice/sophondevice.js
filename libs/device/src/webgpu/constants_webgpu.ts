@@ -1,10 +1,11 @@
-import { TextureFormat, PrimitiveType, TextureWrapping, TextureFilter, CompareFunc } from '../base_types';
+import { TextureFormat, PrimitiveType, TextureFilter } from '../base_types';
 import { StencilOp, FaceWinding, FaceMode, BlendEquation, BlendFunc } from '../render_states';
+import type { CompareFunc, TextureWrapping } from '../base_types';
 
-export const textureWrappingMap: { [k: number]: GPUAddressMode } = {
-  [TextureWrapping.Repeat]: 'repeat',
-  [TextureWrapping.MirroredRepeat]: 'mirror-repeat',
-  [TextureWrapping.ClampToEdge]: 'clamp-to-edge'
+export const textureWrappingMap: Record<TextureWrapping, GPUAddressMode> = {
+  repeat: 'repeat',
+  'mirrored-repeat': 'mirror-repeat',
+  clamp: 'clamp-to-edge'
 };
 
 export const textureFilterMap: { [k: number]: GPUFilterMode } = {
@@ -12,15 +13,15 @@ export const textureFilterMap: { [k: number]: GPUFilterMode } = {
   [TextureFilter.Linear]: 'linear'
 };
 
-export const compareFuncMap: { [k: number]: GPUCompareFunction } = {
-  [CompareFunc.Always]: 'always',
-  [CompareFunc.LessEqual]: 'less-equal',
-  [CompareFunc.GreaterEqual]: 'greater-equal',
-  [CompareFunc.Less]: 'less',
-  [CompareFunc.Greater]: 'greater',
-  [CompareFunc.Equal]: 'equal',
-  [CompareFunc.NotEqual]: 'not-equal',
-  [CompareFunc.Never]: 'never'
+export const compareFuncMap: Record<CompareFunc, GPUCompareFunction> = {
+  always: 'always',
+  le: 'less-equal',
+  ge: 'greater-equal',
+  lt: 'less',
+  gt: 'greater',
+  eq: 'equal',
+  ne: 'not-equal',
+  never: 'never'
 };
 
 export const stencilOpMap: { [k: number]: GPUStencilOperation } = {

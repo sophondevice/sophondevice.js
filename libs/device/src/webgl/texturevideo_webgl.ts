@@ -1,4 +1,4 @@
-import { TextureTarget, TextureFormat } from '../base_types';
+import { TextureFormat } from '../base_types';
 import { textureTargetMap } from './constants_webgl';
 import { WebGLBaseTexture } from './basetexture_webgl';
 import { GPUResourceUsageFlags, TextureVideo } from '../gpuobject';
@@ -9,7 +9,7 @@ export class WebGLTextureVideo extends WebGLBaseTexture implements TextureVideo<
   private _source: HTMLVideoElement;
   private _callbackId: number;
   constructor(device: WebGLDevice, source: HTMLVideoElement) {
-    super(device, TextureTarget.Texture2D);
+    super(device, '2d');
     this._source = null;
     this._callbackId = null;
     this._format = TextureFormat.Unknown;

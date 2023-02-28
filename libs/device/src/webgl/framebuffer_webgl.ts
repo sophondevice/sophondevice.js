@@ -63,11 +63,15 @@ export class WebGLFrameBuffer
     };
     this._width = 0;
     this._height = 0;
-    this._drawBuffers = this._options.colorAttachments.map((val, index) => WebGLEnum.COLOR_ATTACHMENT0 + index);
+    this._drawBuffers = this._options.colorAttachments.map(
+      (val, index) => WebGLEnum.COLOR_ATTACHMENT0 + index
+    );
     this._isMRT = this._drawBuffers.length > 1;
     if (this._options.depthAttachment) {
       const format = this._options.depthAttachment.texture.format;
-      this._depthAttachmentTarget = hasStencilChannel(format) ? WebGLEnum.DEPTH_STENCIL_ATTACHMENT : WebGLEnum.DEPTH_ATTACHMENT;
+      this._depthAttachmentTarget = hasStencilChannel(format)
+        ? WebGLEnum.DEPTH_STENCIL_ATTACHMENT
+        : WebGLEnum.DEPTH_ATTACHMENT;
     } else {
       this._depthAttachmentTarget = WebGLEnum.NONE;
     }
@@ -231,11 +235,37 @@ export class WebGLFrameBuffer
         }
         gl.readBuffer(this._drawBuffers[i]);
         gl.drawBuffers(this._drawBuffers);
-        gl.blitFramebuffer(0, 0, this._width, this._height, 0, 0, this._width, this._height, WebGLEnum.COLOR_BUFFER_BIT, WebGLEnum.NEAREST);
+        gl.blitFramebuffer(
+          0,
+          0,
+          this._width,
+          this._height,
+          0,
+          0,
+          this._width,
+          this._height,
+          WebGLEnum.COLOR_BUFFER_BIT,
+          WebGLEnum.NEAREST
+        );
       }
       if (!this._options.ignoreDepthStencil && this._depthAttachmentTarget !== WebGLEnum.NONE) {
-        const mask = WebGLEnum.DEPTH_BUFFER_BIT | (this._depthAttachmentTarget === WebGLEnum.DEPTH_STENCIL_ATTACHMENT ? WebGLEnum.STENCIL_BUFFER_BIT : 0);
-        gl.blitFramebuffer(0, 0, this._width, this._height, 0, 0, this._width, this._height, mask, WebGLEnum.NEAREST);
+        const mask =
+          WebGLEnum.DEPTH_BUFFER_BIT |
+          (this._depthAttachmentTarget === WebGLEnum.DEPTH_STENCIL_ATTACHMENT
+            ? WebGLEnum.STENCIL_BUFFER_BIT
+            : 0);
+        gl.blitFramebuffer(
+          0,
+          0,
+          this._width,
+          this._height,
+          0,
+          0,
+          this._width,
+          this._height,
+          mask,
+          WebGLEnum.NEAREST
+        );
       }
       for (let i = 0; i < this._drawBuffers.length; i++) {
         this._drawBuffers[i] = WebGLEnum.COLOR_ATTACHMENT0 + i;

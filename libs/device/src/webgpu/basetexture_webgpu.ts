@@ -1,16 +1,13 @@
 import { WebGPUObject } from './gpuobject_webgpu';
 import { TextureCaps } from '../device';
 import {
-  TextureTarget,
   TextureFilter,
-  TextureWrapping,
   TextureFormat,
   isCompressedTextureFormat,
   isDepthTextureFormat,
   isFloatTextureFormat,
   isIntegerTextureFormat,
   isSignedTextureFormat,
-  CompareFunc,
   getTextureFormatBlockWidth,
   getTextureFormatBlockHeight,
   getTextureFormatBlockSize
@@ -28,6 +25,7 @@ import type { TypedArray } from '@sophon/base';
 import type { WebGPUDevice } from './device';
 import type { WebGPUBuffer } from './buffer_webgpu';
 import type { WebGPUTextureCap, TextureFormatInfoWebGPU } from './capabilities_webgpu';
+import type { TextureTarget, CompareFunc } from '../base_types';
 
 export abstract class WebGPUBaseTexture<
   T extends GPUTexture | GPUExternalTexture = GPUTexture
@@ -49,9 +47,9 @@ export abstract class WebGPUBaseTexture<
   protected _mipLevelCount: number;
   protected _ringBuffer: UploadRingBuffer;
   protected _pendingUploads: (UploadTexture | UploadImage)[];
-  constructor(device: WebGPUDevice, target?: TextureTarget) {
+  constructor(device: WebGPUDevice, target: TextureTarget) {
     super(device);
-    this._target = target || TextureTarget.Texture2D;
+    this._target = target;
     this._flags = 0;
     this._width = 0;
     this._height = 0;
@@ -571,18 +569,14 @@ export abstract class WebGPUBaseTexture<
           ? TextureFilter.Linear
           : TextureFilter.Nearest
         : TextureFilter.None;
-    const addressU = TextureWrapping.ClampToEdge;
-    const addressV = TextureWrapping.ClampToEdge;
-    const addressW = TextureWrapping.ClampToEdge;
-    const compare = comparison ? CompareFunc.Less : null;
     return {
-      addressU,
-      addressV,
-      addressW,
+      addressU: 'clamp',
+      addressV: 'clamp',
+      addressW: 'clamp',
       magFilter,
       minFilter,
       mipFilter,
-      compare
+      compare: comparison ? 'lt' : null
     };
   }
   /** @internal */

@@ -1,4 +1,4 @@
-import { TextureTarget, TextureFormat, linearTextureFormatToSRGB } from '../base_types';
+import { TextureFormat, linearTextureFormatToSRGB } from '../base_types';
 import { textureTargetMap } from './constants_webgl';
 import { WebGLBaseTexture } from './basetexture_webgl';
 import {
@@ -14,7 +14,7 @@ import type { WebGLTextureCap } from './capabilities_webgl';
 
 export class WebGLTexture2D extends WebGLBaseTexture implements Texture2D<WebGLTexture> {
   constructor(device: WebGLDevice) {
-    super(device, TextureTarget.Texture2D);
+    super(device, '2d');
   }
   isTexture2D(): this is Texture2D {
     return true;

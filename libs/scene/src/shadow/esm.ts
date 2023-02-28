@@ -1,7 +1,6 @@
 import {
   Device,
   FrameBuffer,
-  TextureTarget,
   TextureFormat,
   PBShaderExp,
   PBInsideFunctionScope,
@@ -12,6 +11,7 @@ import { ShadowImpl } from './shadow_impl';
 import { GaussianBlurBlitter, BlitType } from '../blitter';
 import { computeShadowMapDepth, filterShadowESM } from '../renderers/shadowmap.shaderlib';
 import { ShaderLib } from '../materiallib';
+import type { TextureTarget } from '@sophon/device';
 import type { ShadowMapper, ShadowMapType, ShadowMode } from './shadowmapper';
 
 class BlurBlitter extends GaussianBlurBlitter {
@@ -197,11 +197,11 @@ export class ESM extends ShadowImpl {
       noMipmap: !mipmap
     };
     switch (target) {
-      case TextureTarget.Texture2D:
+      case '2d':
         return device.createTexture2D(format, width, height, options);
-      case TextureTarget.TextureCubemap:
+      case 'cube':
         return device.createCubeTexture(format, width, options);
-      case TextureTarget.Texture2DArray:
+      case '2darray':
         return device.createTexture2DArray(format, width, height, depth, options);
       default:
         return null;

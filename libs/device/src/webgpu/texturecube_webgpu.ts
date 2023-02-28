@@ -1,7 +1,6 @@
 import { CubeFace, TypedArray } from '@sophon/base';
 import {
   TextureFormat,
-  TextureTarget,
   linearTextureFormatToSRGB,
   getTextureFormatBlockWidth,
   getTextureFormatBlockHeight,
@@ -19,7 +18,7 @@ import type { WebGPUDevice } from './device';
 
 export class WebGPUTextureCube extends WebGPUBaseTexture implements TextureCube<GPUTexture> {
   constructor(device: WebGPUDevice) {
-    super(device, TextureTarget.TextureCubemap);
+    super(device, 'cube');
   }
   init(): void {
     this.loadEmpty(this._format, this._width, this._mipLevelCount);

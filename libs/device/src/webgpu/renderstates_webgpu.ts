@@ -1,4 +1,4 @@
-import { CompareFunc } from '../base_types';
+import type { CompareFunc } from '../base_types';
 import {
   ColorState,
   BlendEquation,
@@ -262,7 +262,7 @@ export class WebGPUDepthState extends WebGPURenderState implements DepthState {
     super();
     this._testEnabled = true;
     this._writeEnabled = true;
-    this._compareFunc = CompareFunc.LessEqual;
+    this._compareFunc = 'le';
   }
   get testEnabled(): boolean {
     return this._testEnabled;
@@ -333,7 +333,7 @@ export class WebGPUStencilState extends WebGPURenderState implements StencilStat
     this._failOp = this.failOpBack = StencilOp.KEEP;
     this._zFailOp = this.zFailOpBack = StencilOp.KEEP;
     this._passOp = this.passOpBack = StencilOp.KEEP;
-    this._func = this.funcBack = CompareFunc.Always;
+    this._func = this.funcBack = 'always';
     this._ref = 0;
     this._valueMask = this.valueMaskBack = 0xffffffff;
   }

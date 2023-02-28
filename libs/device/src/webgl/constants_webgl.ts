@@ -1,15 +1,9 @@
 import { CubeFace } from '@sophon/base';
-import {
-  CompareFunc,
-  TextureFilter,
-  TextureWrapping,
-  PrimitiveType,
-  TextureTarget,
-  CompareMode
-} from '../base_types';
+import { TextureFilter, PrimitiveType } from '../base_types';
 import { PBPrimitiveType } from '../builder/types';
 import { WebGLEnum } from './webgl_enum';
 import { BlendEquation, BlendFunc, FaceMode, FaceWinding, StencilOp } from '../render_states';
+import type { TextureTarget, CompareFunc, TextureWrapping } from '../base_types';
 
 export const blendEquationMap = {
   [BlendEquation.ADD]: WebGLEnum.FUNC_ADD,
@@ -107,34 +101,33 @@ export const stencilOpInvMap = {
   [WebGLEnum.INVERT]: StencilOp.INVERT
 };
 
-export const compareFuncMap = {
-  [CompareFunc.Unknown]: WebGLEnum.NONE,
-  [CompareFunc.Always]: WebGLEnum.ALWAYS,
-  [CompareFunc.LessEqual]: WebGLEnum.LEQUAL,
-  [CompareFunc.GreaterEqual]: WebGLEnum.GEQUAL,
-  [CompareFunc.Less]: WebGLEnum.LESS,
-  [CompareFunc.Greater]: WebGLEnum.GREATER,
-  [CompareFunc.Equal]: WebGLEnum.EQUAL,
-  [CompareFunc.NotEqual]: WebGLEnum.NOTEQUAL,
-  [CompareFunc.Never]: WebGLEnum.NEVER
+export const compareFuncMap: Record<CompareFunc, number> = {
+  always: WebGLEnum.ALWAYS,
+  le: WebGLEnum.LEQUAL,
+  ge: WebGLEnum.GEQUAL,
+  lt: WebGLEnum.LESS,
+  gt: WebGLEnum.GREATER,
+  eq: WebGLEnum.EQUAL,
+  ne: WebGLEnum.NOTEQUAL,
+  never: WebGLEnum.NEVER
 };
 
-export const compareFuncInvMap = {
-  [WebGLEnum.NONE]: CompareFunc.Unknown,
-  [WebGLEnum.ALWAYS]: CompareFunc.Always,
-  [WebGLEnum.LEQUAL]: CompareFunc.LessEqual,
-  [WebGLEnum.GEQUAL]: CompareFunc.GreaterEqual,
-  [WebGLEnum.LESS]: CompareFunc.Less,
-  [WebGLEnum.GREATER]: CompareFunc.Greater,
-  [WebGLEnum.EQUAL]: CompareFunc.Equal,
-  [WebGLEnum.NOTEQUAL]: CompareFunc.NotEqual,
-  [WebGLEnum.NEVER]: CompareFunc.Never
+export const compareFuncInvMap: Record<number, CompareFunc> = {
+  [WebGLEnum.NONE]: null,
+  [WebGLEnum.ALWAYS]: 'always',
+  [WebGLEnum.LEQUAL]: 'le',
+  [WebGLEnum.GEQUAL]: 'ge',
+  [WebGLEnum.LESS]: 'lt',
+  [WebGLEnum.GREATER]: 'gt',
+  [WebGLEnum.EQUAL]: 'eq',
+  [WebGLEnum.NOTEQUAL]: 'ne',
+  [WebGLEnum.NEVER]: 'never'
 };
 
-export const textureWrappingMap = {
-  [TextureWrapping.Repeat]: WebGLEnum.REPEAT,
-  [TextureWrapping.MirroredRepeat]: WebGLEnum.MIRRORED_REPEAT,
-  [TextureWrapping.ClampToEdge]: WebGLEnum.CLAMP_TO_EDGE
+export const textureWrappingMap: Record<TextureWrapping, number> = {
+  repeat: WebGLEnum.REPEAT,
+  'mirrored-repeat': WebGLEnum.MIRRORED_REPEAT,
+  clamp: WebGLEnum.CLAMP_TO_EDGE
 };
 
 export const typeMap = {
@@ -169,16 +162,11 @@ export const primitiveTypeMap = {
   [PrimitiveType.PointList]: WebGLEnum.POINTS
 };
 
-export const textureTargetMap = {
-  [TextureTarget.Texture2D]: WebGLEnum.TEXTURE_2D,
-  [TextureTarget.Texture3D]: WebGLEnum.TEXTURE_3D,
-  [TextureTarget.TextureCubemap]: WebGLEnum.TEXTURE_CUBE_MAP,
-  [TextureTarget.Texture2DArray]: WebGLEnum.TEXTURE_2D_ARRAY
-};
-
-export const CompareModeMap = {
-  [CompareMode.None]: WebGLEnum.NONE,
-  [CompareMode.RefToTexture]: WebGLEnum.COMPARE_REF_TO_TEXTURE
+export const textureTargetMap: Record<TextureTarget, number> = {
+  '2d': WebGLEnum.TEXTURE_2D,
+  '3d': WebGLEnum.TEXTURE_3D,
+  cube: WebGLEnum.TEXTURE_CUBE_MAP,
+  '2darray': WebGLEnum.TEXTURE_2D_ARRAY
 };
 
 export const cubeMapFaceMap = {

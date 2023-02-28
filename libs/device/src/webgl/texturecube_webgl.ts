@@ -1,5 +1,5 @@
 import { CubeFace, TypedArray } from '@sophon/base';
-import { TextureFormat, TextureTarget, linearTextureFormatToSRGB } from '../base_types';
+import { TextureFormat, linearTextureFormatToSRGB } from '../base_types';
 import { WebGLBaseTexture } from './basetexture_webgl';
 import { textureTargetMap, cubeMapFaceMap } from './constants_webgl';
 import {
@@ -14,7 +14,7 @@ import type { WebGLTextureCap } from './capabilities_webgl';
 
 export class WebGLTextureCube extends WebGLBaseTexture implements TextureCube<WebGLTexture> {
   constructor(device: WebGLDevice) {
-    super(device, TextureTarget.TextureCubemap);
+    super(device, 'cube');
   }
   init(): void {
     this.loadEmpty(this._format, this._width, this._mipLevelCount);

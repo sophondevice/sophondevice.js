@@ -1,6 +1,6 @@
 import { WebGPUObject } from './gpuobject_webgpu';
 import { textureWrappingMap, textureFilterMap, compareFuncMap } from './constants_webgpu';
-import { TextureWrapping, TextureFilter } from '../base_types';
+import { TextureFilter } from '../base_types';
 import type { SamplerOptions, TextureSampler } from '../gpuobject';
 import type { WebGPUDevice } from './device';
 
@@ -10,9 +10,9 @@ export class WebGPUTextureSampler extends WebGPUObject<GPUSampler> implements Te
     super(device);
     this._options = Object.assign(
       {
-        addressU: TextureWrapping.ClampToEdge,
-        addressV: TextureWrapping.ClampToEdge,
-        addressW: TextureWrapping.ClampToEdge,
+        addressU: 'clamp',
+        addressV: 'clamp',
+        addressW: 'clamp',
         magFilter: TextureFilter.Nearest,
         minFilter: TextureFilter.Nearest,
         mipFilter: TextureFilter.None,

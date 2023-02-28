@@ -173,7 +173,7 @@ export class WebGPUFrameBuffer extends WebGPUObject<unknown> implements FrameBuf
           mipLevelCount: 1,
           sampleCount: this._options.sampleCount,
           dimension: '2d',
-          usage: GPUTextureUsage.COPY_SRC|GPUTextureUsage.RENDER_ATTACHMENT
+          usage: GPUTextureUsage.COPY_SRC | GPUTextureUsage.RENDER_ATTACHMENT
         });
         this._msaaColorTextures.push(msaaTexture);
       }
@@ -188,7 +188,7 @@ export class WebGPUFrameBuffer extends WebGPUObject<unknown> implements FrameBuf
           mipLevelCount: 1,
           sampleCount: this._options.sampleCount,
           dimension: '2d',
-          usage: GPUTextureUsage.COPY_SRC|GPUTextureUsage.RENDER_ATTACHMENT
+          usage: GPUTextureUsage.COPY_SRC | GPUTextureUsage.RENDER_ATTACHMENT
         });
         this._msaaDepthTexture = msaaDepthTexture;
       }

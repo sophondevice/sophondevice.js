@@ -1,6 +1,6 @@
 import { WebGLGPUObject } from './gpuobject_webgl';
 import { WebGLEnum } from './webgl_enum';
-import { TextureWrapping, TextureFilter } from '../base_types';
+import { TextureFilter } from '../base_types';
 import {
   textureTargetMap,
   textureWrappingMap,
@@ -22,9 +22,9 @@ export class WebGLTextureSampler
     super(device);
     this._options = Object.assign(
       {
-        addressU: TextureWrapping.ClampToEdge,
-        addressV: TextureWrapping.ClampToEdge,
-        addressW: TextureWrapping.ClampToEdge,
+        addressU: 'clamp',
+        addressV: 'clamp',
+        addressW: 'clamp',
         magFilter: TextureFilter.Nearest,
         minFilter: TextureFilter.Nearest,
         mipFilter: TextureFilter.None,

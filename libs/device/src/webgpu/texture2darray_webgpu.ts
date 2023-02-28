@@ -1,5 +1,4 @@
 import {
-  TextureTarget,
   TextureFormat,
   getTextureFormatBlockWidth,
   getTextureFormatBlockHeight,
@@ -13,7 +12,7 @@ import type { WebGPUDevice } from './device';
 
 export class WebGPUTexture2DArray extends WebGPUBaseTexture implements Texture2DArray<GPUTexture> {
   constructor(device: WebGPUDevice) {
-    super(device, TextureTarget.Texture2DArray);
+    super(device, '2darray');
   }
   isTexture2DArray(): this is Texture2DArray {
     return true;

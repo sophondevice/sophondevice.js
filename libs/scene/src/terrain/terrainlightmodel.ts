@@ -6,7 +6,6 @@ import {
   PBShaderExp,
   Texture2D,
   BindGroup,
-  TextureWrapping,
   TextureFilter,
   TextureSampler,
   BaseTexture
@@ -116,8 +115,8 @@ export class TerrainLightModel extends LambertLightModel {
     this._detailColorMaps.push(color);
     this._detailColorMapSamplers.push(
       color.device.createSampler({
-        addressU: TextureWrapping.Repeat,
-        addressV: TextureWrapping.Repeat,
+        addressU: 'repeat',
+        addressV: 'repeat',
         magFilter: color.isFilterable() ? TextureFilter.Linear : TextureFilter.Nearest,
         minFilter: color.isFilterable() ? TextureFilter.Linear : TextureFilter.Nearest,
         mipFilter:

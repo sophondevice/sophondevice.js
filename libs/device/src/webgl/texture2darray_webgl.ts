@@ -1,4 +1,4 @@
-import { TextureTarget, TextureFormat, linearTextureFormatToSRGB } from '../base_types';
+import { TextureFormat, linearTextureFormatToSRGB } from '../base_types';
 import { textureTargetMap } from './constants_webgl';
 import { WebGLBaseTexture } from './basetexture_webgl';
 import { GPUResourceUsageFlags, TextureImageElement, Texture2DArray, GPUDataBuffer } from '../gpuobject';
@@ -11,7 +11,7 @@ export class WebGLTexture2DArray extends WebGLBaseTexture implements Texture2DAr
     if (!device.isWebGL2) {
       throw new Error('device does not support 2d texture array');
     }
-    super(device, TextureTarget.Texture2DArray);
+    super(device, '2darray');
   }
   isTexture2DArray(): this is Texture2DArray {
     return true;

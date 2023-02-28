@@ -1,5 +1,4 @@
 import {
-  TextureTarget,
   TextureFormat,
   getTextureFormatBlockWidth,
   getTextureFormatBlockHeight,
@@ -13,7 +12,7 @@ import type { WebGPUDevice } from './device';
 
 export class WebGPUTexture3D extends WebGPUBaseTexture implements Texture3D<GPUTexture> {
   constructor(device: WebGPUDevice) {
-    super(device, TextureTarget.Texture2D);
+    super(device, '3d');
   }
   isTexture3D(): this is Texture3D {
     return true;

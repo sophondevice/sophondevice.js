@@ -3,7 +3,6 @@ import {
   BindGroup,
   ShaderType,
   FrameBuffer,
-  TextureTarget,
   TextureFormat,
   PBShaderExp,
   PBInsideFunctionScope,
@@ -15,6 +14,7 @@ import { ShadowImpl } from './shadow_impl';
 import { Blitter, BlitType } from '../blitter';
 import { ShaderLib } from '../materiallib';
 import { computeShadowMapDepth, filterShadowVSM } from '../renderers/shadowmap.shaderlib';
+import type { TextureTarget } from '@sophon/device';
 import type { ShadowMapper, ShadowMapType, ShadowMode } from './shadowmapper';
 
 export class VSMBlitter extends Blitter {
@@ -287,11 +287,11 @@ export class VSM extends ShadowImpl {
       noMipmap: !mipmap
     };
     switch (target) {
-      case TextureTarget.Texture2D:
+      case '2d':
         return device.createTexture2D(format, width, height, options);
-      case TextureTarget.TextureCubemap:
+      case 'cube':
         return device.createCubeTexture(format, width, options);
-      case TextureTarget.Texture2DArray:
+      case '2darray':
         return device.createTexture2DArray(format, width, height, depth, options);
       default:
         return null;

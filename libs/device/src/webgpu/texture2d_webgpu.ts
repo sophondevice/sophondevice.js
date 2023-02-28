@@ -1,5 +1,4 @@
 import {
-  TextureTarget,
   TextureFormat,
   linearTextureFormatToSRGB,
   getTextureFormatBlockWidth,
@@ -19,7 +18,7 @@ import type { WebGPUDevice } from './device';
 
 export class WebGPUTexture2D extends WebGPUBaseTexture implements Texture2D<GPUTexture> {
   constructor(device: WebGPUDevice) {
-    super(device, TextureTarget.Texture2D);
+    super(device, '2d');
   }
   isTexture2D(): this is Texture2D {
     return true;

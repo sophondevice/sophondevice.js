@@ -1,13 +1,5 @@
 import { Vector3, isPowerOf2, nextPowerOf2, HttpRequest } from '@sophon/base';
-import {
-  TextureFilter,
-  TextureWrapping,
-  TextureFormat,
-  Device,
-  BaseTexture,
-  Texture2D,
-  GPUObject
-} from '@sophon/device';
+import { TextureFilter, TextureFormat, Device, BaseTexture, Texture2D, GPUObject } from '@sophon/device';
 import { AssetHierarchyNode, AssetSkeleton, AssetSubMeshData, SharedModel } from './model';
 import { GLTFLoader } from './loaders/gltf/gltf_loader';
 import { WebImageLoader } from './loaders/image/webimage_loader';
@@ -234,8 +226,8 @@ export class AssetManager {
         const minFilter = magFilter;
         const mipFilter = TextureFilter.None;
         const sampler = this.device.createSampler({
-          addressU: TextureWrapping.ClampToEdge,
-          addressV: TextureWrapping.ClampToEdge,
+          addressU: 'clamp',
+          addressV: 'clamp',
           magFilter,
           minFilter,
           mipFilter
@@ -255,8 +247,8 @@ export class AssetManager {
         const minFilter = magFilter;
         const mipFilter = TextureFilter.None;
         const sampler = this.device.createSampler({
-          addressU: TextureWrapping.ClampToEdge,
-          addressV: TextureWrapping.ClampToEdge,
+          addressU: 'clamp',
+          addressV: 'clamp',
           magFilter,
           minFilter,
           mipFilter
