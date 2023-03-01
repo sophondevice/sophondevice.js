@@ -442,6 +442,38 @@ export abstract class Device extends REventTarget {
   ): VertexAttribFormat {
     return getVertexAttribFormat(semantic, dataType, componentCount);
   }
+  createInterleavedVertexBuffer(
+    attribFormats: VertexAttribFormat[],
+    data: TypedArray,
+    options?: BufferCreationOptions
+  ): StructuredBuffer {
+    if (options && options.usage && options.usage !== 'vertex') {
+      console.error(`createVertexBuffer() failed: options.usage must be 'vertex' or not set`);
+      return null;
+    }
+    let size = 0;
+    for (const format of attribFormats) {
+      size += getVertexFormatSize(format);
+    }
+    const vertexBufferType = makeVertexBufferType((data.byteLength / size) >> 0, ...attribFormats);
+    const opt = Object.assign(
+      {
+        usage: 'vertex',
+        dynamic: false,
+        managed: true,
+        storage: false
+      },
+      options || {}
+    );
+    if (opt.storage) {
+      opt.dynamic = false;
+      opt.managed = false;
+    }
+    if (opt.dynamic) {
+      opt.managed = false;
+    }
+    return this.createStructuredBuffer(vertexBufferType, opt, data);
+  }
   createVertexBuffer(
     attribFormat: VertexAttribFormat,
     data: TypedArray,
