@@ -9,7 +9,7 @@ export class HttpRequest {
   private _headers: Record<string, string>;
   constructor() {
     this._urlResolver = null;
-    this._crossOrigin = 'anonymous';
+    this._crossOrigin = '';
     this._headers = {};
   }
   get urlResolver(): (url: string) => string {
@@ -61,10 +61,7 @@ export class HttpRequest {
     return response.arrayBuffer();
   }
   async requestBlob(url: string): Promise<Blob> {
-    const response = await this.request(url);
-    if (!response.ok) {
-      throw new Error(`Asset download failed: ${url}`);
-    }
-    return response.blob();
+    const arrayBuffer = await this.requestArrayBuffer(url);
+    return new Blob([arrayBuffer]);
   }
 }

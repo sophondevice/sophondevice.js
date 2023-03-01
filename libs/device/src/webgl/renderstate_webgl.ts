@@ -1,11 +1,8 @@
 import { WebGLEnum } from './webgl_enum';
 import {
   ColorState,
-  BlendEquation,
-  BlendFunc,
   BlendingState,
   FaceMode,
-  FaceWinding,
   RasterizerState,
   DepthState,
   StencilOp,
@@ -25,6 +22,7 @@ import {
   compareFuncInvMap
 } from './constants_webgl';
 import type { WebGLContext, CompareFunc } from '../base_types';
+import type { BlendEquation, BlendFunc } from '../render_states';
 
 export abstract class WebGLRenderState {
   protected static _defaultState: WebGLRenderState;
@@ -84,12 +82,12 @@ export class WebGLBlendingState extends WebGLRenderState implements BlendingStat
   constructor() {
     super();
     this.enabled = false;
-    this.srcBlendRGB = BlendFunc.ONE;
-    this.dstBlendRGB = BlendFunc.ZERO;
-    this.srcBlendAlpha = BlendFunc.ONE;
-    this.dstBlendAlpha = BlendFunc.ZERO;
-    this.rgbEquation = BlendEquation.ADD;
-    this.alphaEquation = BlendEquation.ADD;
+    this.srcBlendRGB = 'one';
+    this.dstBlendRGB = 'zero';
+    this.srcBlendAlpha = 'one';
+    this.dstBlendAlpha = 'zero';
+    this.rgbEquation = 'add';
+    this.alphaEquation = 'add';
   }
   get srcBlendRGB(): BlendFunc {
     return blendFuncInvMap[this._srcBlendRGB];

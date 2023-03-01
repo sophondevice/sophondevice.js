@@ -1,11 +1,8 @@
 import type { CompareFunc } from '../base_types';
 import {
   ColorState,
-  BlendEquation,
-  BlendFunc,
   BlendingState,
   FaceMode,
-  FaceWinding,
   RasterizerState,
   DepthState,
   StencilOp,
@@ -13,6 +10,7 @@ import {
   RenderStateSet
 } from '../render_states';
 import type { WebGPUDevice } from './device';
+import type { BlendEquation, BlendFunc } from '../render_states';
 
 export abstract class WebGPURenderState {
   protected static _defaultState: WebGPURenderState;
@@ -125,12 +123,12 @@ export class WebGPUBlendingState extends WebGPURenderState implements BlendingSt
   constructor() {
     super();
     this._enabled = false;
-    this._srcBlendRGB = BlendFunc.ONE;
-    this._dstBlendRGB = BlendFunc.ZERO;
-    this._srcBlendAlpha = BlendFunc.ONE;
-    this._dstBlendAlpha = BlendFunc.ZERO;
-    this._rgbEquation = BlendEquation.ADD;
-    this._alphaEquation = BlendEquation.ADD;
+    this._srcBlendRGB = 'one';
+    this._dstBlendRGB = 'zero';
+    this._srcBlendAlpha = 'one';
+    this._dstBlendAlpha = 'zero';
+    this._rgbEquation = 'add';
+    this._alphaEquation = 'add';
   }
   get enabled(): boolean {
     return this._enabled;

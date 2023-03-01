@@ -4,18 +4,7 @@ import {
   PrimitiveType,
   FaceMode,
   getVertexBufferAttribTypeBySemantic,
-  I8_BITMASK,
-  U8_BITMASK,
-  I16_BITMASK,
-  U16_BITMASK,
-  I32_BITMASK,
-  U32_BITMASK,
-  F32_BITMASK,
-  makePrimitiveType,
   VertexSemantic,
-  PBStructTypeInfo,
-  PBArrayTypeInfo,
-  PBPrimitiveTypeInfo,
   GPUDataBuffer,
   Texture2D,
   IndexBuffer,
@@ -1148,62 +1137,36 @@ export class GLTFLoader extends AbstractModelLoader {
     let buffer = gltf._bufferCache[hash];
     if (!buffer) {
       let data = accessor.getTypedView(gltf);
-      let typeMask: number;
-      if (data instanceof Int8Array) {
-        typeMask = I8_BITMASK;
-      } else if (data instanceof Uint8Array) {
-        typeMask = U8_BITMASK;
-      } else if (data instanceof Int16Array) {
-        typeMask = I16_BITMASK;
-      } else if (data instanceof Uint16Array) {
-        typeMask = U16_BITMASK;
-      } else if (data instanceof Int32Array) {
-        typeMask = I32_BITMASK;
-      } else if (data instanceof Uint32Array) {
-        typeMask = U32_BITMASK;
-      } else if (data instanceof Float32Array) {
-        typeMask = F32_BITMASK;
-      } else {
-        throw new Error('invalid buffer data type');
-      }
-      const componentCount = accessor.getComponentCount(accessor.type);
-      if (semantic && typeMask !== F32_BITMASK) {
+      if (semantic && !(data instanceof Float32Array)) {
         const floatData = new Float32Array(data.length);
         floatData.set(data);
-        typeMask = F32_BITMASK;
         data = floatData;
       }
+      const componentCount = accessor.getComponentCount(accessor.type);
       if (!semantic) {
-        if (typeMask !== U8_BITMASK && typeMask !== U16_BITMASK && typeMask !== U32_BITMASK) {
-          throw new Error(`Invalid index buffer component type: ${typeMask}`);
+        if (
+          !(data instanceof Uint8Array) &&
+          !(data instanceof Uint16Array) &&
+          !(data instanceof Uint32Array)
+        ) {
+          console.error('Invalid index buffer component type');
+          return;
         }
-        if (typeMask === U32_BITMASK && !gltf._manager.device.getMiscCaps().support32BitIndex) {
-          throw new Error('Device does not support 32bit vertex index');
+        if (data instanceof Uint32Array && !gltf._manager.device.getMiscCaps().support32BitIndex) {
+          console.error('Device does not support 32bit vertex index');
+          return;
         }
-        if (typeMask === U8_BITMASK) {
+        if (data instanceof Uint8Array) {
           const uint16Data = new Uint16Array(data.length);
           uint16Data.set(data);
-          typeMask = U16_BITMASK;
           data = uint16Data;
         }
       }
       if (!semantic) {
         buffer = gltf._manager.device.createIndexBuffer(data as Uint16Array | Uint32Array, { managed: true });
       } else {
-        const bufferType = new PBStructTypeInfo(null, 'packed', [
-          {
-            name: semantic,
-            type: new PBArrayTypeInfo(
-              PBPrimitiveTypeInfo.getCachedTypeInfo(makePrimitiveType(typeMask, 1, componentCount, 0)),
-              data.length / componentCount
-            )
-          }
-        ]);
-        buffer = gltf._manager.device.createStructuredBuffer(
-          bufferType,
-          { usage: 'vertex', managed: true },
-          data
-        );
+        const attribFormat = gltf._manager.device.getVertexAttribFormat(semantic, 'f32', componentCount);
+        buffer = gltf._manager.device.createVertexBuffer(attribFormat, data);
       }
       gltf._bufferCache[hash] = buffer;
     }

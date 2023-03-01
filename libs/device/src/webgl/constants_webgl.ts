@@ -2,59 +2,60 @@ import { CubeFace } from '@sophon/base';
 import { PrimitiveType } from '../base_types';
 import { PBPrimitiveType } from '../builder/types';
 import { WebGLEnum } from './webgl_enum';
-import { BlendEquation, BlendFunc, FaceMode, FaceWinding, StencilOp } from '../render_states';
+import { FaceMode, FaceWinding, StencilOp } from '../render_states';
 import type { TextureTarget, CompareFunc, TextureWrapping, TextureFilter } from '../base_types';
+import type { BlendEquation, BlendFunc } from '../render_states';
 
-export const blendEquationMap = {
-  [BlendEquation.ADD]: WebGLEnum.FUNC_ADD,
-  [BlendEquation.SUBTRACT]: WebGLEnum.FUNC_SUBTRACT,
-  [BlendEquation.REVERSE_SUBTRACT]: WebGLEnum.FUNC_REVERSE_SUBTRACT,
-  [BlendEquation.MAX]: WebGLEnum.FUNC_MAX,
-  [BlendEquation.MIN]: WebGLEnum.FUNC_MIN
+export const blendEquationMap: Record<BlendEquation, number> = {
+  add: WebGLEnum.FUNC_ADD,
+  subtract: WebGLEnum.FUNC_SUBTRACT,
+  'reverse-subtract': WebGLEnum.FUNC_REVERSE_SUBTRACT,
+  max: WebGLEnum.FUNC_MAX,
+  min: WebGLEnum.FUNC_MIN
 };
 
-export const blendEquationInvMap = {
-  [WebGLEnum.FUNC_ADD]: BlendEquation.ADD,
-  [WebGLEnum.FUNC_SUBTRACT]: BlendEquation.SUBTRACT,
-  [WebGLEnum.FUNC_REVERSE_SUBTRACT]: BlendEquation.REVERSE_SUBTRACT,
-  [WebGLEnum.FUNC_MAX]: BlendEquation.MAX,
-  [WebGLEnum.FUNC_MIN]: BlendEquation.MIN
+export const blendEquationInvMap: Record<number, BlendEquation> = {
+  [WebGLEnum.FUNC_ADD]: 'add',
+  [WebGLEnum.FUNC_SUBTRACT]: 'subtract',
+  [WebGLEnum.FUNC_REVERSE_SUBTRACT]: 'reverse-subtract',
+  [WebGLEnum.FUNC_MAX]: 'max',
+  [WebGLEnum.FUNC_MIN]: 'min'
 };
 
-export const blendFuncMap = {
-  [BlendFunc.ZERO]: WebGLEnum.ZERO,
-  [BlendFunc.ONE]: WebGLEnum.ONE,
-  [BlendFunc.SRC_ALPHA]: WebGLEnum.SRC_ALPHA,
-  [BlendFunc.INV_SRC_ALPHA]: WebGLEnum.ONE_MINUS_SRC_ALPHA,
-  [BlendFunc.SRC_ALPHA_SATURATE]: WebGLEnum.BLEND,
-  [BlendFunc.DST_ALPHA]: WebGLEnum.DST_ALPHA,
-  [BlendFunc.INV_DST_ALPHA]: WebGLEnum.ONE_MINUS_DST_ALPHA,
-  [BlendFunc.SRC_COLOR]: WebGLEnum.SRC_COLOR,
-  [BlendFunc.INV_SRC_COLOR]: WebGLEnum.ONE_MINUS_SRC_COLOR,
-  [BlendFunc.DST_COLOR]: WebGLEnum.DST_COLOR,
-  [BlendFunc.INV_DST_COLOR]: WebGLEnum.ONE_MINUS_DST_COLOR,
-  [BlendFunc.CONSTANT_COLOR]: WebGLEnum.CONSTANT_COLOR,
-  [BlendFunc.INV_CONSTANT_COLOR]: WebGLEnum.ONE_MINUS_CONSTANT_COLOR,
-  [BlendFunc.CONSTANT_ALPHA]: WebGLEnum.CONSTANT_ALPHA,
-  [BlendFunc.INV_CONSTANT_ALPHA]: WebGLEnum.ONE_MINUS_CONSTANT_ALPHA
+export const blendFuncMap: Record<BlendFunc, number> = {
+  zero: WebGLEnum.ZERO,
+  one: WebGLEnum.ONE,
+  'src-alpha': WebGLEnum.SRC_ALPHA,
+  'inv-src-alpha': WebGLEnum.ONE_MINUS_SRC_ALPHA,
+  'src-alpha-saturate': WebGLEnum.BLEND,
+  'dst-alpha': WebGLEnum.DST_ALPHA,
+  'inv-dst-alpha': WebGLEnum.ONE_MINUS_DST_ALPHA,
+  'src-color': WebGLEnum.SRC_COLOR,
+  'inv-src-color': WebGLEnum.ONE_MINUS_SRC_COLOR,
+  'dst-color': WebGLEnum.DST_COLOR,
+  'inv-dst-color': WebGLEnum.ONE_MINUS_DST_COLOR,
+  'const-color': WebGLEnum.CONSTANT_COLOR,
+  'inv-const-color': WebGLEnum.ONE_MINUS_CONSTANT_COLOR,
+  'const-alpha': WebGLEnum.CONSTANT_ALPHA,
+  'inv-const-alpha': WebGLEnum.ONE_MINUS_CONSTANT_ALPHA
 };
 
-export const blendFuncInvMap = {
-  [WebGLEnum.ZERO]: BlendFunc.ZERO,
-  [WebGLEnum.ONE]: BlendFunc.ONE,
-  [WebGLEnum.SRC_ALPHA]: BlendFunc.SRC_ALPHA,
-  [WebGLEnum.ONE_MINUS_SRC_ALPHA]: BlendFunc.INV_SRC_ALPHA,
-  [WebGLEnum.SRC_ALPHA_SATURATE]: BlendFunc.SRC_ALPHA_SATURATE,
-  [WebGLEnum.DST_ALPHA]: BlendFunc.DST_ALPHA,
-  [WebGLEnum.ONE_MINUS_DST_ALPHA]: BlendFunc.INV_DST_ALPHA,
-  [WebGLEnum.SRC_COLOR]: BlendFunc.SRC_COLOR,
-  [WebGLEnum.ONE_MINUS_SRC_COLOR]: BlendFunc.INV_SRC_COLOR,
-  [WebGLEnum.DST_COLOR]: BlendFunc.DST_COLOR,
-  [WebGLEnum.ONE_MINUS_DST_COLOR]: BlendFunc.INV_DST_COLOR,
-  [WebGLEnum.CONSTANT_COLOR]: BlendFunc.CONSTANT_COLOR,
-  [WebGLEnum.ONE_MINUS_CONSTANT_COLOR]: BlendFunc.INV_CONSTANT_COLOR,
-  [WebGLEnum.CONSTANT_ALPHA]: BlendFunc.CONSTANT_ALPHA,
-  [WebGLEnum.ONE_MINUS_CONSTANT_ALPHA]: BlendFunc.INV_CONSTANT_ALPHA
+export const blendFuncInvMap: Record<number, BlendFunc> = {
+  [WebGLEnum.ZERO]: 'zero',
+  [WebGLEnum.ONE]: 'one',
+  [WebGLEnum.SRC_ALPHA]: 'src-alpha',
+  [WebGLEnum.ONE_MINUS_SRC_ALPHA]: 'inv-src-alpha',
+  [WebGLEnum.SRC_ALPHA_SATURATE]: 'src-alpha-saturate',
+  [WebGLEnum.DST_ALPHA]: 'dst-alpha',
+  [WebGLEnum.ONE_MINUS_DST_ALPHA]: 'inv-dst-alpha',
+  [WebGLEnum.SRC_COLOR]: 'src-color',
+  [WebGLEnum.ONE_MINUS_SRC_COLOR]: 'inv-src-color',
+  [WebGLEnum.DST_COLOR]: 'dst-color',
+  [WebGLEnum.ONE_MINUS_DST_COLOR]: 'inv-dst-color',
+  [WebGLEnum.CONSTANT_COLOR]: 'const-color',
+  [WebGLEnum.ONE_MINUS_CONSTANT_COLOR]: 'inv-const-color',
+  [WebGLEnum.CONSTANT_ALPHA]: 'const-alpha',
+  [WebGLEnum.ONE_MINUS_CONSTANT_ALPHA]: 'inv-const-alpha'
 };
 
 export const faceModeMap = {

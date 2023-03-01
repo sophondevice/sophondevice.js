@@ -79,20 +79,9 @@ export class PlaneShape extends Shape<PlaneCreationOptions> {
     const normals: number[] = needNormal ? [] : null;
     const uvs: number[] = needUV ? [] : null;
     this._createArrays(vertices, normals, uvs, indices, sizeX, sizeY);
-    this.createAndSetVertexBuffer(
-      makeVertexBufferType(vertices.length / 3, 'position_f32x3'),
-      new Float32Array(vertices)
-    );
-    normals &&
-      this.createAndSetVertexBuffer(
-        makeVertexBufferType(normals.length / 3, 'normal_f32x3'),
-        new Float32Array(normals)
-      );
-    uvs &&
-      this.createAndSetVertexBuffer(
-        makeVertexBufferType(uvs.length / 2, 'tex0_f32x2'),
-        new Float32Array(uvs)
-      );
+    this.createAndSetVertexBuffer('position_f32x3', new Float32Array(vertices));
+    normals && this.createAndSetVertexBuffer('normal_f32x3', new Float32Array(normals));
+    uvs && this.createAndSetVertexBuffer('tex0_f32x2', new Float32Array(uvs));
     this.createAndSetIndexBuffer(new Uint16Array(indices));
     this.setBoundingVolume(new BoundingBox(new Vector3(0, 0, 0), new Vector3(sizeX, 0, sizeY)));
     this.indexCount = indices.length;
@@ -231,20 +220,9 @@ export class BoxShape extends Shape<BoxCreationOptions> {
     const normals: number[] = needNormal ? [] : null;
     const uvs: number[] = needUV ? [] : null;
     this._createArrays(vertices, normals, uvs, indices, minx, miny, minz, maxx, maxy, maxz);
-    this.createAndSetVertexBuffer(
-      makeVertexBufferType(vertices.length / 3, 'position_f32x3'),
-      new Float32Array(vertices)
-    );
-    normals &&
-      this.createAndSetVertexBuffer(
-        makeVertexBufferType(normals.length / 3, 'normal_f32x3'),
-        new Float32Array(normals)
-      );
-    uvs &&
-      this.createAndSetVertexBuffer(
-        makeVertexBufferType(uvs.length / 2, 'tex0_f32x2'),
-        new Float32Array(uvs)
-      );
+    this.createAndSetVertexBuffer('position_f32x3', new Float32Array(vertices));
+    normals && this.createAndSetVertexBuffer('normal_f32x3', new Float32Array(normals));
+    uvs && this.createAndSetVertexBuffer('tex0_f32x2', new Float32Array(uvs));
     this.createAndSetIndexBuffer(new Uint16Array(indices));
     this.setBoundingVolume(new BoundingBox(new Vector3(minx, miny, minz), new Vector3(maxx, maxy, maxz)));
     this.indexCount = indices.length;
@@ -299,10 +277,7 @@ export class BoxFrameShape extends Shape<BoxCreationOptions> {
     const vertices: number[] = [];
     const indices: number[] = [];
     this._createArrays(vertices, indices, minx, miny, minz, maxx, maxy, maxz);
-    this.createAndSetVertexBuffer(
-      makeVertexBufferType(vertices.length / 3, 'position_f32x3'),
-      new Float32Array(vertices)
-    );
+    this.createAndSetVertexBuffer('position_f32x3', new Float32Array(vertices));
     this.createAndSetIndexBuffer(new Uint16Array(indices));
     this.setBoundingVolume(new BoundingBox(new Vector3(minx, miny, minz), new Vector3(maxx, maxy, maxz)));
     this.indexCount = indices.length;
@@ -366,17 +341,9 @@ export class SphereShape extends Shape<SphereCreationOptions> {
       indices.push(indices[indices.length - 1]);
       indices.push((i + 1) * (horizonalDetail + 1));
     }
-    this.createAndSetVertexBuffer(
-      makeVertexBufferType(vertices.length / 3, 'position_f32x3'),
-      new Float32Array(vertices)
-    );
-    normals?.length > 0 &&
-      this.createAndSetVertexBuffer(
-        makeVertexBufferType(normals.length / 3, 'normal_f32x3'),
-        new Float32Array(normals)
-      );
-    uv?.length > 0 &&
-      this.createAndSetVertexBuffer(makeVertexBufferType(uv.length / 2, 'tex0_f32x2'), new Float32Array(uv));
+    this.createAndSetVertexBuffer('position_f32x3', new Float32Array(vertices));
+    normals?.length > 0 && this.createAndSetVertexBuffer('normal_f32x3', new Float32Array(normals));
+    uv?.length > 0 && this.createAndSetVertexBuffer('tex0_f32x2', new Float32Array(uv));
 
     this.createAndSetIndexBuffer(new Uint32Array(indices));
     this.setBoundingVolume(

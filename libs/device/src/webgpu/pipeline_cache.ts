@@ -7,7 +7,7 @@ import {
   blendFuncMap
 } from './constants_webgpu';
 import { PrimitiveType } from '../base_types';
-import { StencilOp, BlendEquation, BlendFunc } from '../render_states';
+import { StencilOp } from '../render_states';
 import * as rs from './renderstates_webgpu';
 import { typeU16 } from '../builder';
 import type { WebGPUVertexInputLayout } from './vertexinputlayout_webgpu';
@@ -15,6 +15,7 @@ import type { WebGPUProgram } from './gpuprogram_webgpu';
 import type { WebGPUDevice } from './device';
 import type { WebGPURenderStateSet } from './renderstates_webgpu';
 import type { CompareFunc } from '../base_types';
+import type { BlendEquation, BlendFunc } from '../render_states';
 
 const stencilFormats = ['stencil8', 'depth24plus-stencil8', 'depth24unorm-stencil8', 'depth32float-stencil8'];
 const depthFormats = [

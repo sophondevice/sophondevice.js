@@ -8,31 +8,23 @@ export interface ColorState {
   setColorMask(r: boolean, g: boolean, b: boolean, a: boolean): this;
 }
 
-export enum BlendEquation {
-  ADD = 1,
-  SUBTRACT,
-  REVERSE_SUBTRACT,
-  MIN,
-  MAX
-}
-
-export enum BlendFunc {
-  ZERO = 1,
-  ONE,
-  SRC_ALPHA,
-  INV_SRC_ALPHA,
-  SRC_ALPHA_SATURATE,
-  DST_ALPHA,
-  INV_DST_ALPHA,
-  SRC_COLOR,
-  INV_SRC_COLOR,
-  DST_COLOR,
-  INV_DST_COLOR,
-  CONSTANT_COLOR,
-  INV_CONSTANT_COLOR,
-  CONSTANT_ALPHA,
-  INV_CONSTANT_ALPHA
-}
+export type BlendEquation = 'add' | 'subtract' | 'reverse-subtract' | 'min' | 'max';
+export type BlendFunc =
+  | 'zero'
+  | 'one'
+  | 'src-alpha'
+  | 'inv-src-alpha'
+  | 'src-alpha-saturate'
+  | 'dst-alpha'
+  | 'inv-dst-alpha'
+  | 'src-color'
+  | 'inv-src-color'
+  | 'dst-color'
+  | 'inv-dst-color'
+  | 'const-color'
+  | 'inv-const-color'
+  | 'const-alpha'
+  | 'inv-const-alpha';
 
 export interface BlendingState {
   enabled: boolean;

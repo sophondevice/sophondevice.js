@@ -1,4 +1,4 @@
-import { RenderStateSet, BlendFunc, BindGroup, PBGlobalScope } from '@sophon/device';
+import { RenderStateSet, BindGroup, PBGlobalScope } from '@sophon/device';
 import { RenderQueue } from '../render_queue';
 import { Camera } from '../camera';
 import { RenderPass } from './renderpass';
@@ -18,12 +18,9 @@ export class ForwardMultiRenderPass extends RenderPass {
   constructor(renderScheme: RenderScheme, name: string) {
     super(renderScheme, name);
     this._overriddenState = renderScheme.device.createRenderStateSet();
-    this._overriddenState.useBlendingState().enable(true).setBlendFunc(BlendFunc.ONE, BlendFunc.ONE);
+    this._overriddenState.useBlendingState().enable(true).setBlendFunc('one', 'one');
     this._overriddenStateTrans = renderScheme.device.createRenderStateSet();
-    this._overriddenStateTrans
-      .useBlendingState()
-      .enable(true)
-      .setBlendFunc(BlendFunc.ONE, BlendFunc.INV_SRC_ALPHA);
+    this._overriddenStateTrans.useBlendingState().enable(true).setBlendFunc('one', 'inv-src-alpha');
     this._overriddenStateTrans.useDepthState().enableTest(true).enableWrite(false);
     this._currentLight = null;
   }

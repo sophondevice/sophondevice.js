@@ -1,6 +1,7 @@
 import { TextureFormat, PrimitiveType } from '../base_types';
-import { StencilOp, FaceWinding, FaceMode, BlendEquation, BlendFunc } from '../render_states';
+import { StencilOp, FaceWinding, FaceMode } from '../render_states';
 import type { CompareFunc, TextureWrapping, TextureFilter } from '../base_types';
+import type { BlendEquation, BlendFunc } from '../render_states';
 
 export const textureWrappingMap: Record<TextureWrapping, GPUAddressMode> = {
   repeat: 'repeat',
@@ -55,30 +56,30 @@ export const faceModeMap: { [k: number]: GPUCullMode } = {
   [FaceMode.NONE]: 'none'
 };
 
-export const blendEquationMap: { [k: number]: GPUBlendOperation } = {
-  [BlendEquation.ADD]: 'add',
-  [BlendEquation.SUBTRACT]: 'subtract',
-  [BlendEquation.REVERSE_SUBTRACT]: 'reverse-subtract',
-  [BlendEquation.MIN]: 'min',
-  [BlendEquation.MAX]: 'max'
+export const blendEquationMap: Record<BlendEquation, GPUBlendOperation> = {
+  add: 'add',
+  subtract: 'subtract',
+  'reverse-subtract': 'reverse-subtract',
+  min: 'min',
+  max: 'max'
 };
 
-export const blendFuncMap: { [k: number]: GPUBlendFactor } = {
-  [BlendFunc.CONSTANT_COLOR]: 'constant',
-  [BlendFunc.CONSTANT_ALPHA]: 'constant',
-  [BlendFunc.DST_COLOR]: 'dst',
-  [BlendFunc.DST_ALPHA]: 'dst-alpha',
-  [BlendFunc.INV_CONSTANT_COLOR]: 'one-minus-constant',
-  [BlendFunc.INV_CONSTANT_ALPHA]: 'one-minus-constant',
-  [BlendFunc.INV_DST_COLOR]: 'one-minus-dst',
-  [BlendFunc.INV_DST_ALPHA]: 'one-minus-dst-alpha',
-  [BlendFunc.SRC_COLOR]: 'src',
-  [BlendFunc.SRC_ALPHA]: 'src-alpha',
-  [BlendFunc.INV_SRC_COLOR]: 'one-minus-src',
-  [BlendFunc.INV_SRC_ALPHA]: 'one-minus-src-alpha',
-  [BlendFunc.SRC_ALPHA_SATURATE]: 'src-alpha-saturated',
-  [BlendFunc.ONE]: 'one',
-  [BlendFunc.ZERO]: 'zero'
+export const blendFuncMap: Record<BlendFunc, GPUBlendFactor> = {
+  'const-color': 'constant',
+  'const-alpha': 'constant',
+  'dst-color': 'dst',
+  'dst-alpha': 'dst-alpha',
+  'inv-const-color': 'one-minus-constant',
+  'inv-const-alpha': 'one-minus-constant',
+  'inv-dst-color': 'one-minus-dst',
+  'inv-dst-alpha': 'one-minus-dst-alpha',
+  'src-color': 'src',
+  'src-alpha': 'src-alpha',
+  'inv-src-color': 'one-minus-src',
+  'inv-src-alpha': 'one-minus-src-alpha',
+  'src-alpha-saturate': 'src-alpha-saturated',
+  one: 'one',
+  zero: 'zero'
 };
 
 export const vertexFormatToHash: { [fmt: string]: string } = {

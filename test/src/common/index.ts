@@ -3,7 +3,6 @@ import {
   makeVertexBufferType,
   PrimitiveType,
   FaceMode,
-  BlendFunc,
   TextureCube,
   Texture2D,
   RenderStateSet,
@@ -784,7 +783,7 @@ export class TextureView {
     this._renderStates = this._device.createRenderStateSet();
     this._renderStates.useRasterizerState().setCullMode(FaceMode.NONE);
     this._renderStates.useDepthState().enableTest(false).enableWrite(false);
-    this._renderStates.useBlendingState().enable(true).setBlendFunc(BlendFunc.ONE, BlendFunc.INV_SRC_ALPHA);
+    this._renderStates.useBlendingState().enable(true).setBlendFunc('one', 'inv-src-alpha');
     this._program = this.createDefaultShader(false, false);
     this._programNonFilterable = this.createDefaultShader(false, true);
     this._programDepth = this.createDefaultShader(true, false);

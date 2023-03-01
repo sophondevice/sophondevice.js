@@ -1,9 +1,9 @@
 import { Matrix4x4 } from '@sophon/base';
-import { BlendFunc, Device, BindGroup, GPUProgram, PBGlobalScope, ProgramBuilder } from '@sophon/device';
 import { Material } from '../material';
 import { ShaderLib } from './shaderlib';
 import { forwardComputeLighting } from '../renderers/forward.shaderlib';
 import * as values from '../values';
+import type { Device, BindGroup, GPUProgram, PBGlobalScope, ProgramBuilder } from '@sophon/device';
 import type { LightModel } from './lightmodel';
 import type { DrawContext } from '../drawable';
 import type { ShadowMapPass } from '../renderers';
@@ -71,10 +71,7 @@ export class StandardMaterial<T extends LightModel = LightModel> extends Materia
       this._alphaBlend = !!val;
       const blending = this._alphaBlend || this._opacity < 1;
       if (blending && !this._renderStateSet.blendingState?.enabled) {
-        this._renderStateSet
-          .useBlendingState()
-          .enable(true)
-          .setBlendFunc(BlendFunc.ONE, BlendFunc.INV_SRC_ALPHA);
+        this._renderStateSet.useBlendingState().enable(true).setBlendFunc('one', 'inv-src-alpha');
       } else if (this._renderStateSet.blendingState?.enabled && !blending) {
         this._renderStateSet.defaultBlendingState();
       }
@@ -100,10 +97,7 @@ export class StandardMaterial<T extends LightModel = LightModel> extends Materia
       this._opacity = val;
       const blending = this._alphaBlend || this._opacity < 1;
       if (blending && !this._renderStateSet.blendingState?.enabled) {
-        this._renderStateSet
-          .useBlendingState()
-          .enable(true)
-          .setBlendFunc(BlendFunc.ONE, BlendFunc.INV_SRC_ALPHA);
+        this._renderStateSet.useBlendingState().enable(true).setBlendFunc('one', 'inv-src-alpha');
       } else if (this._renderStateSet.blendingState?.enabled && !blending) {
         this._renderStateSet.defaultBlendingState();
       }

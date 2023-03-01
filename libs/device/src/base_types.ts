@@ -5,6 +5,19 @@ export type TextureTarget = '2d' | '3d' | 'cube' | '2darray';
 export type CompareFunc = 'always' | 'le' | 'ge' | 'lt' | 'gt' | 'eq' | 'ne' | 'never';
 export type TextureWrapping = 'repeat' | 'mirrored-repeat' | 'clamp';
 export type TextureFilter = 'none' | 'nearest' | 'linear';
+export type DataType =
+  | 'u8'
+  | 'u8norm'
+  | 'i8'
+  | 'i8norm'
+  | 'u16'
+  | 'u16norm'
+  | 'i16'
+  | 'i16norm'
+  | 'u32'
+  | 'i32'
+  | 'f16'
+  | 'f32';
 
 const RED_SHIFT = 0;
 const GREEN_SHIFT = 1;

@@ -5,7 +5,8 @@ import {
   IndexBuffer,
   VertexStepMode,
   VertexSemantic,
-  getVertexAttribByName
+  getVertexAttribByName,
+  VertexAttribFormat
 } from './gpuobject';
 import { VertexData } from './vertexdata';
 import type { TypedArray } from '@sophon/base';
@@ -65,18 +66,11 @@ export class Geometry {
     return this._vertexData.getVertexBuffer(semantic);
   }
   createAndSetVertexBuffer(
-    structureType: PBStructTypeInfo,
+    format: VertexAttribFormat,
     data: TypedArray,
     stepMode?: VertexStepMode
   ): StructuredBuffer {
-    const buffer = this._device.createStructuredBuffer(
-      structureType,
-      {
-        usage: 'vertex',
-        managed: true
-      },
-      data
-    );
+    const buffer = this._device.createVertexBuffer(format, data);
     const ret = this._vertexData.setVertexBuffer(buffer, stepMode);
     this._vaoDirty = !!ret;
     return ret;

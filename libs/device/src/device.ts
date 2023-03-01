@@ -27,9 +27,15 @@ import {
   TextureCreationOptions,
   BufferCreationOptions,
   GPUResourceUsageFlags,
-  BufferUsage
+  BufferUsage,
+  VertexSemantic,
+  VertexAttribFormat,
+  makeVertexBufferType,
+  getVertexFormatSize,
+  getVertexAttribFormat
 } from './gpuobject';
 import { PBStructTypeInfo, ProgramBuilder } from './builder';
+import type { DataType } from './base_types';
 
 interface GPUObjectList {
   textures: BaseTexture[];
@@ -428,6 +434,42 @@ export abstract class Device extends REventTarget {
     this._frameEndEvent.reset();
     this.dispatchEvent(this._frameEndEvent);
     this.onEndFrame();
+  }
+  getVertexAttribFormat(
+    semantic: VertexSemantic,
+    dataType: DataType,
+    componentCount: number
+  ): VertexAttribFormat {
+    return getVertexAttribFormat(semantic, dataType, componentCount);
+  }
+  createVertexBuffer(
+    attribFormat: VertexAttribFormat,
+    data: TypedArray,
+    options?: BufferCreationOptions
+  ): StructuredBuffer {
+    if (options && options.usage && options.usage !== 'vertex') {
+      console.error(`createVertexBuffer() failed: options.usage must be 'vertex' or not set`);
+      return null;
+    }
+    const count = getVertexFormatSize(attribFormat);
+    const vertexBufferType = makeVertexBufferType((data.byteLength / count) >> 0, attribFormat);
+    const opt = Object.assign(
+      {
+        usage: 'vertex',
+        dynamic: false,
+        managed: true,
+        storage: false
+      },
+      options || {}
+    );
+    if (opt.storage) {
+      opt.dynamic = false;
+      opt.managed = false;
+    }
+    if (opt.dynamic) {
+      opt.managed = false;
+    }
+    return this.createStructuredBuffer(vertexBufferType, opt, data);
   }
   draw(primitiveType: PrimitiveType, first: number, count: number): void {
     this._frameInfo.drawCalls++;
