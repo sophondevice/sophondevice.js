@@ -20,11 +20,8 @@ export class VertexData {
   private _indexBuffer: IndexBuffer;
   /** @internal */
   private _drawOffset: number;
-  /** @internal */
-  private _tag: number;
   constructor() {
     this._vertexBuffers = [];
-    this._tag = 0;
     for (let i = 0; i < MAX_VERTEX_ATTRIBUTES; i++) {
       this._vertexBuffers.push(null);
     }
@@ -38,12 +35,6 @@ export class VertexData {
     newVertexData._drawOffset = this._drawOffset;
     return newVertexData;
   }
-  updateTag() {
-    this._tag++;
-  }
-  getTag(): number {
-    return this._tag;
-  }
   get vertexBuffers() {
     return this._vertexBuffers;
   }
@@ -56,7 +47,6 @@ export class VertexData {
   setDrawOffset(offset: number) {
     if (offset !== this._drawOffset) {
       this._drawOffset = offset;
-      this.updateTag();
     }
   }
   getVertexBuffer(semantic: VertexSemantic): StructuredBuffer {
@@ -94,15 +84,11 @@ export class VertexData {
         removed = true;
       }
     }
-    if (removed) {
-      this.updateTag();
-    }
     return removed;
   }
   setIndexBuffer(buffer: IndexBuffer): IndexBuffer {
     if (buffer !== this._indexBuffer) {
       this._indexBuffer = buffer || null;
-      this.updateTag();
     }
     return buffer;
   }
@@ -116,7 +102,6 @@ export class VertexData {
     if (loc < 0 || loc >= MAX_VERTEX_ATTRIBUTES) {
       throw new Error(`setVertexBuffer() failed: location out of bounds: ${loc}`);
     }
-    this.updateTag();
     offset = Number(offset) || 0;
     stepMode = stepMode || 'vertex';
     const old = this._vertexBuffers[loc];

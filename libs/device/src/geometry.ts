@@ -1,4 +1,5 @@
-import {
+import { VertexData } from './vertexdata';
+import type {
   VertexInputLayout,
   StructuredBuffer,
   IndexBuffer,
@@ -6,7 +7,6 @@ import {
   VertexSemantic,
   VertexAttribFormat
 } from './gpuobject';
-import { VertexData } from './vertexdata';
 import type { TypedArray } from '@sophon/base';
 import type { Device } from './device';
 import type { PrimitiveType } from './base_types';
