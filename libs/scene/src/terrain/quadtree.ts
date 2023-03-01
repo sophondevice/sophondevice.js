@@ -142,7 +142,7 @@ export class Quadtree {
     this._heightField = null;
     this._rootNode = null;
     this._primitiveCount = 0;
-    this._primitiveType = PrimitiveType.TriangleStrip;
+    this._primitiveType = 'triangle-strip';
     this._patches = [];
   }
   get normalMap(): Texture2D {
@@ -234,7 +234,7 @@ export class Quadtree {
     const lineIndices = this.line(indices);
     this._indicesWireframe = device.createIndexBuffer(lineIndices, { managed: true });
     this._primitiveCount = indices.length - 2;
-    this._primitiveType = PrimitiveType.TriangleStrip;
+    this._primitiveType = 'triangle-strip';
     this._rootNode = new QuadtreeNode();
     const normals = this._heightField.computeNormalVectors();
     const normalMapBytes = new Uint8Array((normals.length / 3) * 4);

@@ -2,7 +2,6 @@ import { Vector4, TypedArray } from '@sophon/base';
 import {
   TextureFormat,
   WebGLContext,
-  PrimitiveType,
   hasAlphaChannel,
   hasRedChannel,
   hasGreenChannel,
@@ -73,6 +72,7 @@ import { WebGLStructuredBuffer } from './structuredbuffer_webgl';
 import { PBStructTypeInfo, typeU16 } from '../builder';
 import type { ITimer } from '../timer';
 import type { VertexData } from '../vertexdata';
+import type { PrimitiveType } from '../base_types';
 
 declare global {
   interface WebGLRenderingContext {

@@ -7,7 +7,6 @@ import {
   PBStructTypeInfo,
   StructuredBuffer,
   BindGroup,
-  PrimitiveType
 } from '@sophon/device';
 import { GUIRenderer, GUI, RElement } from '@sophon/dom';
 
@@ -176,7 +175,7 @@ import { GUIRenderer, GUI, RElement } from '@sophon/dom';
     particleBindGroups.push(bindGroup);
 
     const primitive = new Geometry(viewer.device);
-    primitive.primitiveType = PrimitiveType.TriangleList;
+    primitive.primitiveType = 'triangle-list';
     primitive.setVertexBuffer(spriteVertexBuffer, 'vertex');
     primitive.setVertexBuffer(particleBuffers[i], 'instance');
     primitive.indexCount = 3;

@@ -1,8 +1,7 @@
 import { CubeFace } from '@sophon/base';
-import { PrimitiveType } from '../base_types';
 import { PBPrimitiveType } from '../builder/types';
 import { WebGLEnum } from './webgl_enum';
-import type { TextureTarget, CompareFunc, TextureWrapping, TextureFilter } from '../base_types';
+import type { TextureTarget, CompareFunc, TextureWrapping, TextureFilter, PrimitiveType } from '../base_types';
 import type { BlendEquation, BlendFunc, FaceMode, FaceWinding, StencilOp } from '../render_states';
 
 export const blendEquationMap: Record<BlendEquation, number> = {
@@ -153,13 +152,13 @@ export const typeMap = {
   [PBPrimitiveType.U32VEC4]: WebGLEnum.UNSIGNED_INT_VEC4
 };
 
-export const primitiveTypeMap = {
-  [PrimitiveType.TriangleList]: WebGLEnum.TRIANGLES,
-  [PrimitiveType.TriangleStrip]: WebGLEnum.TRIANGLE_STRIP,
-  [PrimitiveType.TriangleFan]: WebGLEnum.TRIANGLE_FAN,
-  [PrimitiveType.LineList]: WebGLEnum.LINES,
-  [PrimitiveType.LineStrip]: WebGLEnum.LINE_STRIP,
-  [PrimitiveType.PointList]: WebGLEnum.POINTS
+export const primitiveTypeMap: Record<PrimitiveType, number> = {
+  'triangle-list': WebGLEnum.TRIANGLES,
+  'triangle-strip': WebGLEnum.TRIANGLE_STRIP,
+  'triangle-fan': WebGLEnum.TRIANGLE_FAN,
+  'line-list': WebGLEnum.LINES,
+  'line-strip': WebGLEnum.LINE_STRIP,
+  'point-list': WebGLEnum.POINTS
 };
 
 export const textureTargetMap: Record<TextureTarget, number> = {

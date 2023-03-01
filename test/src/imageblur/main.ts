@@ -1,5 +1,5 @@
 import { REvent, Vector4 } from '@sophon/base';
-import { Viewer, ProgramBuilder, TextureFormat, PrimitiveType } from '@sophon/device';
+import { Viewer, ProgramBuilder, TextureFormat } from '@sophon/device';
 import { AssetManager } from '@sophon/scene';
 import { GUI, GUIRenderer, ScrollBar, RValueChangeEvent, RElement } from '@sophon/dom';
 
@@ -200,7 +200,7 @@ import { GUI, GUIRenderer, ScrollBar, RValueChangeEvent, RElement } from '@sopho
     viewer.device.setBindGroup(0, resultBindGroup);
     viewer.device.setBindGroup(1, null);
     viewer.device.setVertexData(null);
-    viewer.device.draw(PrimitiveType.TriangleList, 0, 6);
+    viewer.device.draw('triangle-list', 0, 6);
   });
 
   viewer.device.runLoop((device) => gui.render());

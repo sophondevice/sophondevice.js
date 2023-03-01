@@ -1,4 +1,3 @@
-import { PrimitiveType } from '../base_types';
 import { WebGLGPUObject } from './gpuobject_webgl';
 import { WebGLEnum } from './webgl_enum';
 import {
@@ -11,6 +10,7 @@ import {
 } from '../gpuobject';
 import { VertexData } from '../vertexdata';
 import { typeMap } from './constants_webgl';
+import type { PrimitiveType } from '../base_types';
 import type { WebGLDevice } from './device_webgl';
 
 export class WebGLVertexInputLayout

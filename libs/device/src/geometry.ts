@@ -1,17 +1,15 @@
-import { PrimitiveType } from './base_types';
 import {
   VertexInputLayout,
   StructuredBuffer,
   IndexBuffer,
   VertexStepMode,
   VertexSemantic,
-  getVertexAttribByName,
   VertexAttribFormat
 } from './gpuobject';
 import { VertexData } from './vertexdata';
 import type { TypedArray } from '@sophon/base';
-import type { PBStructTypeInfo } from './builder';
 import type { Device } from './device';
+import type { PrimitiveType } from './base_types';
 
 export class Geometry {
   /** @internal */
@@ -33,7 +31,7 @@ export class Geometry {
     this._device = device;
     this._vao = null;
     this._vertexData = new VertexData();
-    this._primitiveType = PrimitiveType.TriangleList;
+    this._primitiveType = 'triangle-list';
     this._indexStart = 0;
     this._indexCount = 0;
     this._vaoDirty = false;
@@ -122,6 +120,5 @@ export class Geometry {
     this._vertexData = null;
     this._indexCount = 0;
     this._indexStart = 0;
-    this._primitiveType = PrimitiveType.Unknown;
   }
 }

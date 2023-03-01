@@ -6,10 +6,10 @@ import {
   blendEquationMap,
   blendFuncMap
 } from './constants_webgpu';
-import { PrimitiveType } from '../base_types';
 import { StencilOp } from '../render_states';
 import * as rs from './renderstates_webgpu';
 import { typeU16 } from '../builder';
+import type { PrimitiveType } from '../base_types';
 import type { WebGPUVertexInputLayout } from './vertexinputlayout_webgpu';
 import type { WebGPUProgram } from './gpuprogram_webgpu';
 import type { WebGPUDevice } from './device';

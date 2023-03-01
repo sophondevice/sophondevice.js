@@ -1,5 +1,5 @@
-import { TextureFormat, PrimitiveType } from '../base_types';
-import type { CompareFunc, TextureWrapping, TextureFilter } from '../base_types';
+import { TextureFormat } from '../base_types';
+import type { CompareFunc, TextureWrapping, TextureFilter, PrimitiveType } from '../base_types';
 import type { BlendEquation, BlendFunc, FaceMode, FaceWinding, StencilOp } from '../render_states';
 
 export const textureWrappingMap: Record<TextureWrapping, GPUAddressMode> = {
@@ -36,12 +36,13 @@ export const stencilOpMap: Record<StencilOp, GPUStencilOperation> = {
   'decr-wrap': 'decrement-wrap'
 };
 
-export const primitiveTypeMap: { [k: number]: GPUPrimitiveTopology } = {
-  [PrimitiveType.TriangleList]: 'triangle-list',
-  [PrimitiveType.TriangleStrip]: 'triangle-strip',
-  [PrimitiveType.LineList]: 'line-list',
-  [PrimitiveType.LineStrip]: 'line-strip',
-  [PrimitiveType.PointList]: 'point-list'
+export const primitiveTypeMap: Record<PrimitiveType, GPUPrimitiveTopology> = {
+  'triangle-list': 'triangle-list',
+  'triangle-strip': 'triangle-strip',
+  'triangle-fan': null,
+  'line-list': 'line-list',
+  'line-strip': 'line-strip',
+  'point-list': 'point-list'
 };
 
 export const faceWindingMap: Record<FaceWinding, GPUFrontFace> = {

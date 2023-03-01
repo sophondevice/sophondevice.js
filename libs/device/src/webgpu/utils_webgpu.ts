@@ -1,5 +1,4 @@
 import { Vector4 } from '@sophon/base';
-import { PrimitiveType } from '../base_types';
 import { ProgramBuilder } from '../builder';
 import type { WebGPUProgram } from './gpuprogram_webgpu';
 import type { WebGPUBaseTexture } from './basetexture_webgpu';
@@ -45,7 +44,7 @@ export class WebGPUClearQuad {
       this._clearStateSet,
       [this._clearBindGroup],
       null,
-      PrimitiveType.TriangleStrip,
+      'triangle-strip',
       0,
       4,
       1
@@ -206,7 +205,7 @@ export class WebGPUMipmapGenerator {
       this._mipmapGenerationProgram,
       null,
       this._mipmapGenerationStateSet,
-      PrimitiveType.TriangleStrip,
+      'triangle-strip',
       this._frameBufferInfo
     );
     if (pipeline) {

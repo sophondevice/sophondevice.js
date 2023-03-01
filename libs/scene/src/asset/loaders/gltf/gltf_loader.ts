@@ -1037,23 +1037,23 @@ export class GLTFLoader extends AbstractModelLoader {
   private _primitiveType(type: number): PrimitiveType {
     switch (type) {
       case 0: // GL_POINTS
-        return PrimitiveType.PointList;
+        return 'point-list';
       case 1: // GL_LINES
-        return PrimitiveType.LineList;
+        return 'line-list';
       /* FIXME:
       case 2: // GL_LINE_LOOP
         return PrimitiveType.LineLoop;
       */
       case 3: // GL_LINE_STRIP
-        return PrimitiveType.LineStrip;
+        return 'line-strip';
       case 4: // GL_TRIANGLES
-        return PrimitiveType.TriangleList;
+        return 'triangle-list';
       case 5: // GL_TRIANGLE_STRIP
-        return PrimitiveType.TriangleStrip;
+        return 'triangle-strip';
       case 6: // GL_TRIANGLE_FAN
-        return PrimitiveType.TriangleFan;
+        return 'triangle-fan';
       default:
-        return PrimitiveType.Unknown;
+        return null;
     }
   }
   /** @internal */

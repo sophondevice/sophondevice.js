@@ -4,7 +4,6 @@ import {
   GPUDataBuffer,
   makeVertexBufferType,
   PBStructTypeInfo,
-  PrimitiveType,
   StructuredBuffer
 } from '@sophon/device';
 import { BoundingBox } from '../bounding_volume';
@@ -199,14 +198,14 @@ export class TerrainPatch {
     this._geometry.setIndexBuffer(this._quadtree.getIndices());
     this._geometry.indexStart = 0;
     this._geometry.indexCount = this._quadtree.getIndices().length;
-    this._geometry.primitiveType = PrimitiveType.TriangleStrip;
+    this._geometry.primitiveType = 'triangle-strip';
     this._geometryLines.setVertexBuffer(baseVertices);
     this._geometryLines.setVertexBuffer(normalArray);
     this._geometryLines.setVertexBuffer(heightArray);
     this._geometryLines.setIndexBuffer(this._quadtree.getIndicesWireframe());
     this._geometryLines.indexStart = 0;
     this._geometryLines.indexCount = this._quadtree.getIndicesWireframe().length;
-    this._geometryLines.primitiveType = PrimitiveType.LineList;
+    this._geometryLines.primitiveType = 'line-list';
   }
   getOffsetScale(terrain: Terrain, ctx: DrawContext): StructuredBuffer {
     if (!this._offsetScale) {

@@ -1,5 +1,5 @@
 import { AABB, TypedArray, Vector3, Matrix4x4, Ray } from '@sophon/base';
-import { PrimitiveType } from '@sophon/device';
+import type { PrimitiveType } from '@sophon/device';
 
 interface PrimitivesInfo {
   vertices: Vector3[];
@@ -246,11 +246,11 @@ export class AABBTree {
       ? this._primitivesInfo.indices.length
       : this._primitivesInfo.vertices.length;
     switch (this._primitivesInfo.primitiveType) {
-      case PrimitiveType.TriangleList:
+      case 'triangle-list':
         return Math.floor(numIndices / 3);
-      case PrimitiveType.TriangleStrip:
+      case 'triangle-strip':
         return numIndices - 2;
-      case PrimitiveType.TriangleFan:
+      case 'triangle-fan':
         return numIndices - 2;
       default:
         return 0;
@@ -337,19 +337,19 @@ export class AABBTree {
     let v0: number, v1: number, v2: number;
     out = out || [0, 0, 0];
     switch (this._primitivesInfo.primitiveType) {
-      case PrimitiveType.TriangleList:
+      case 'triangle-list':
         v0 = n * 3;
         v1 = v0 + 1;
         v2 = v0 + 2;
         break;
-      case PrimitiveType.TriangleStrip: {
+      case 'triangle-strip': {
         const r = n % 2;
         v0 = n + r;
         v1 = n - r + 1;
         v2 = n + 2;
         break;
       }
-      case PrimitiveType.TriangleFan:
+      case 'triangle-fan':
         v0 = 0;
         v1 = n + 1;
         v2 = n + 2;

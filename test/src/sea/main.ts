@@ -1,5 +1,5 @@
 import { Vector4, REvent } from '@sophon/base';
-import { Viewer, DeviceType, makeVertexBufferType, Geometry, PrimitiveType } from '@sophon/device';
+import { Viewer, DeviceType, makeVertexBufferType, Geometry } from '@sophon/device';
 import * as dom from '@sophon/dom';
 import * as common from '../common';
 import { createSeaProgram } from './program';
@@ -25,7 +25,7 @@ import { createSeaProgram } from './program';
   rect.setVertexBuffer(vb);
   rect.indexStart = 0;
   rect.indexCount = 4;
-  rect.primitiveType = PrimitiveType.TriangleStrip;
+  rect.primitiveType = 'triangle-strip';
   const program = createSeaProgram(viewer.device);
   const bindGroup = viewer.device.createBindGroup(program.bindGroupLayouts[0]);
 

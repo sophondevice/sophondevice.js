@@ -1,7 +1,6 @@
 import {
   isDepthTextureFormat,
   makeVertexBufferType,
-  PrimitiveType,
   TextureCube,
   Texture2D,
   RenderStateSet,
@@ -778,7 +777,7 @@ export class TextureView {
     this._rect.setVertexBuffer(vb);
     this._rect.indexStart = 0;
     this._rect.indexCount = 4;
-    this._rect.primitiveType = PrimitiveType.TriangleStrip;
+    this._rect.primitiveType = 'triangle-strip';
     this._renderStates = this._device.createRenderStateSet();
     this._renderStates.useRasterizerState().setCullMode('none');
     this._renderStates.useDepthState().enableTest(false).enableWrite(false);

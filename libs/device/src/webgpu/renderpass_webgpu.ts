@@ -1,5 +1,5 @@
 import { Vector4 } from '@sophon/base';
-import { hasStencilChannel, PrimitiveType } from '../base_types';
+import { hasStencilChannel } from '../base_types';
 import { WebGPUProgram } from './gpuprogram_webgpu';
 import { WebGPURenderStateSet } from './renderstates_webgpu';
 import { WebGPUBindGroup } from './bindgroup_webgpu';
@@ -12,6 +12,7 @@ import type { WebGPUFrameBuffer } from './framebuffer_webgpu';
 import type { WebGPUVertexInputLayout } from './vertexinputlayout_webgpu';
 import type { WebGPUIndexBuffer } from './indexbuffer_webgpu';
 import type { FrameBufferInfo } from './pipeline_cache';
+import type { PrimitiveType } from '../base_types';
 
 const VALIDATION_NEED_NEW_PASS = 1 << 0;
 const VALIDATION_NEED_GENERATE_MIPMAP = 1 << 1;

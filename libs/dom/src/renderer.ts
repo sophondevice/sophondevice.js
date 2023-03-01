@@ -6,7 +6,6 @@ import {
   Device,
   Texture2D,
   GPUProgram,
-  PrimitiveType,
   TextureFormat,
   TextureSampler,
   Geometry
@@ -94,7 +93,7 @@ export class GUIRenderer extends REventTarget {
     for (let i = 0; i < 2; i++) {
       const indexbuffer = this._device.createIndexBuffer(indexArray, { managed: true });
       this._primitiveBuffer[i].setIndexBuffer(indexbuffer);
-      this._primitiveBuffer[i].primitiveType = PrimitiveType.TriangleList;
+      this._primitiveBuffer[i].primitiveType = 'triangle-list';
       const buffer = this._device.createInterleavedVertexBuffer(['position_f32x3', 'diffuse_f32x4', 'tex0_f32x2'], new Float32Array(GUIRenderer.VAO_BUFFER_SIZE * 4 * 9), { dynamic: true });
       this._primitiveBuffer[i].setVertexBuffer(buffer);
     }

@@ -1212,15 +1212,7 @@ export function encodePixelToArray(
   }
 }
 
-export enum PrimitiveType {
-  Unknown = -1,
-  TriangleList = 0,
-  TriangleStrip = 1,
-  TriangleFan = 2,
-  LineList = 3,
-  LineStrip = 4,
-  PointList = 5
-}
+export type PrimitiveType = 'triangle-list'|'triangle-strip'|'triangle-fan'|'line-list'|'line-strip'|'point-list';
 
 export enum ShaderType {
   Vertex = 1 << 0,

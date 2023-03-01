@@ -1,7 +1,7 @@
 import { Vector4 } from '@sophon/base';
-import { PrimitiveType } from '../base_types';
 import { WebGPURenderPass } from './renderpass_webgpu';
 import { WebGPUComputePass } from './computepass_webgpu';
+import type { PrimitiveType } from '../base_types';
 import type { WebGPUDevice } from './device';
 import type { WebGPUProgram } from './gpuprogram_webgpu';
 import type { WebGPUVertexInputLayout } from './vertexinputlayout_webgpu';

@@ -1,6 +1,5 @@
 import { CubeFace } from '@sophon/base';
 import {
-  PrimitiveType,
   RenderStateSet,
   makeVertexBufferType,
   Device,
@@ -235,7 +234,7 @@ function getBlitPrimitive2D(device: Device): Primitive {
     blitPrimitive2D.setVertexBuffer(vb);
     blitPrimitive2D.indexCount = 4;
     blitPrimitive2D.indexStart = 0;
-    blitPrimitive2D.primitiveType = PrimitiveType.TriangleStrip;
+    blitPrimitive2D.primitiveType = 'triangle-strip';
   }
   return blitPrimitive2D;
 }

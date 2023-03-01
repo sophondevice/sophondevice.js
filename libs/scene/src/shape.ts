@@ -1,7 +1,7 @@
 import { Vector2, Vector3 } from '@sophon/base';
-import { PrimitiveType, makeVertexBufferType, Device } from '@sophon/device';
 import { Primitive } from './primitive';
 import { BoundingBox } from './bounding_volume';
+import type { Device } from '@sophon/device';
 
 export interface ShapeCreationOptions {
   needNormal?: boolean;
@@ -66,7 +66,7 @@ export class PlaneShape extends Shape<PlaneCreationOptions> {
     vertices?.push(0, 0, sizeY, sizeX, 0, sizeY, sizeX, 0, 0, 0, 0, 0);
     indices?.push(0, 1, 2, 0, 2, 3);
     normals?.push(0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0);
-    this.primitiveType = PrimitiveType.TriangleList;
+    this.primitiveType = 'triangle-list';
   }
   /** @internal */
   protected _create(): boolean {
@@ -197,7 +197,7 @@ export class BoxShape extends Shape<BoxCreationOptions> {
         ...bottomFaceNormal
       );
     needUV && uvs && uvs.push(...uv, ...uv, ...uv, ...uv, ...uv, ...uv);
-    this.primitiveType = PrimitiveType.TriangleList;
+    this.primitiveType = 'triangle-list';
   }
   /** @internal */
   protected _create(): boolean {
@@ -258,7 +258,7 @@ export class BoxFrameShape extends Shape<BoxCreationOptions> {
     const bottomFacePos = [minx, miny, maxz, minx, miny, minz, maxx, miny, minz, maxx, miny, maxz];
     indices && indices.push(0, 1, 1, 2, 2, 3, 3, 0, 0, 5, 1, 4, 2, 7, 3, 6, 6, 5, 5, 4, 4, 7, 7, 6);
     vertices && vertices.push(...topFacePos, ...bottomFacePos);
-    this.primitiveType = PrimitiveType.LineList;
+    this.primitiveType = 'line-list';
   }
   /** @internal */
   protected _create(): boolean {
@@ -349,7 +349,7 @@ export class SphereShape extends Shape<SphereCreationOptions> {
     this.setBoundingVolume(
       new BoundingBox(new Vector3(-radius, -radius, -radius), new Vector3(radius, radius, radius))
     );
-    this.primitiveType = PrimitiveType.TriangleStrip;
+    this.primitiveType = 'triangle-strip';
     this.indexCount = indices.length;
     return true;
   }
