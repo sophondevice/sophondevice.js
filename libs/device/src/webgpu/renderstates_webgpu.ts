@@ -4,12 +4,11 @@ import {
   BlendingState,
   RasterizerState,
   DepthState,
-  StencilOp,
   StencilState,
   RenderStateSet
 } from '../render_states';
 import type { WebGPUDevice } from './device';
-import type { BlendEquation, BlendFunc, FaceMode } from '../render_states';
+import type { BlendEquation, BlendFunc, FaceMode, StencilOp } from '../render_states';
 
 export abstract class WebGPURenderState {
   protected static _defaultState: WebGPURenderState;
@@ -327,9 +326,9 @@ export class WebGPUStencilState extends WebGPURenderState implements StencilStat
     this._enabled = false;
     this._enableTwoSided = false;
     this._writeMask = this.writeMaskBack = 0xffffffff;
-    this._failOp = this.failOpBack = StencilOp.KEEP;
-    this._zFailOp = this.zFailOpBack = StencilOp.KEEP;
-    this._passOp = this.passOpBack = StencilOp.KEEP;
+    this._failOp = this.failOpBack = 'keep';
+    this._zFailOp = this.zFailOpBack = 'keep';
+    this._passOp = this.passOpBack = 'keep';
     this._func = this.funcBack = 'always';
     this._ref = 0;
     this._valueMask = this.valueMaskBack = 0xffffffff;

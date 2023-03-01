@@ -42,11 +42,7 @@ export interface BlendingState {
 }
 
 export type FaceMode = 'none'|'front'|'back';
-
-export enum FaceWinding {
-  CW = 1,
-  CCW
-}
+export type FaceWinding = 'cw'|'ccw';
 
 export interface RasterizerState {
   cullMode: FaceMode;
@@ -62,16 +58,7 @@ export interface DepthState {
   setCompareFunc(func: CompareFunc): this;
 }
 
-export enum StencilOp {
-  KEEP = 1,
-  ZERO,
-  REPLACE,
-  INCR,
-  INCR_WRAP,
-  DECR,
-  DECR_WRAP,
-  INVERT
-}
+export type StencilOp = 'keep'|'zero'|'replace'|'incr'|'incr-wrap'|'decr'|'decr-wrap'|'invert';
 
 export interface StencilState {
   enabled: boolean;

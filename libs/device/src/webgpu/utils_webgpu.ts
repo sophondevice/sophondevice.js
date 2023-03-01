@@ -1,7 +1,6 @@
 import { Vector4 } from '@sophon/base';
 import { PrimitiveType } from '../base_types';
 import { ProgramBuilder } from '../builder';
-import { StencilOp } from '../render_states';
 import type { WebGPUProgram } from './gpuprogram_webgpu';
 import type { WebGPUBaseTexture } from './basetexture_webgpu';
 import type { WebGPUBindGroup } from './bindgroup_webgpu';
@@ -67,8 +66,8 @@ export class WebGPUClearQuad {
       .useStencilState()
       .enable(false)
       .enableStencilTwoside(true)
-      .setFrontOp(StencilOp.REPLACE, StencilOp.REPLACE, StencilOp.REPLACE)
-      .setBackOp(StencilOp.REPLACE, StencilOp.REPLACE, StencilOp.REPLACE)
+      .setFrontOp('replace', 'replace', 'replace')
+      .setBackOp('replace', 'replace', 'replace')
       .setFrontCompareFunc('always')
       .setBackCompareFunc('always');
   }

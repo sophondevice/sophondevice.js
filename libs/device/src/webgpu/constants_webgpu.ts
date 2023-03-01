@@ -1,7 +1,6 @@
 import { TextureFormat, PrimitiveType } from '../base_types';
-import { StencilOp, FaceWinding } from '../render_states';
 import type { CompareFunc, TextureWrapping, TextureFilter } from '../base_types';
-import type { BlendEquation, BlendFunc, FaceMode } from '../render_states';
+import type { BlendEquation, BlendFunc, FaceMode, FaceWinding, StencilOp } from '../render_states';
 
 export const textureWrappingMap: Record<TextureWrapping, GPUAddressMode> = {
   repeat: 'repeat',
@@ -26,15 +25,15 @@ export const compareFuncMap: Record<CompareFunc, GPUCompareFunction> = {
   never: 'never'
 };
 
-export const stencilOpMap: { [k: number]: GPUStencilOperation } = {
-  [StencilOp.KEEP]: 'keep',
-  [StencilOp.REPLACE]: 'replace',
-  [StencilOp.ZERO]: 'zero',
-  [StencilOp.INVERT]: 'invert',
-  [StencilOp.INCR]: 'increment-clamp',
-  [StencilOp.DECR]: 'decrement-clamp',
-  [StencilOp.INCR_WRAP]: 'increment-wrap',
-  [StencilOp.DECR_WRAP]: 'decrement-wrap'
+export const stencilOpMap: Record<StencilOp, GPUStencilOperation> = {
+  'keep': 'keep',
+  'replace': 'replace',
+  'zero': 'zero',
+  'invert': 'invert',
+  'incr': 'increment-clamp',
+  'decr': 'decrement-clamp',
+  'incr-wrap': 'increment-wrap',
+  'decr-wrap': 'decrement-wrap'
 };
 
 export const primitiveTypeMap: { [k: number]: GPUPrimitiveTopology } = {
@@ -45,9 +44,9 @@ export const primitiveTypeMap: { [k: number]: GPUPrimitiveTopology } = {
   [PrimitiveType.PointList]: 'point-list'
 };
 
-export const faceWindingMap: { [k: number]: GPUFrontFace } = {
-  [FaceWinding.CCW]: 'ccw',
-  [FaceWinding.CW]: 'cw'
+export const faceWindingMap: Record<FaceWinding, GPUFrontFace> = {
+  'ccw': 'ccw',
+  'cw': 'cw'
 };
 
 export const faceModeMap: Record<FaceMode, GPUCullMode> = {

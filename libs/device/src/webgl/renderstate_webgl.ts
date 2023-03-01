@@ -4,7 +4,6 @@ import {
   BlendingState,
   RasterizerState,
   DepthState,
-  StencilOp,
   StencilState,
   RenderStateSet
 } from '../render_states';
@@ -21,7 +20,7 @@ import {
   compareFuncInvMap
 } from './constants_webgl';
 import type { WebGLContext, CompareFunc } from '../base_types';
-import type { BlendEquation, BlendFunc, FaceMode } from '../render_states';
+import type { BlendEquation, BlendFunc, FaceMode, StencilOp } from '../render_states';
 
 export abstract class WebGLRenderState {
   protected static _defaultState: WebGLRenderState;
@@ -257,9 +256,9 @@ export class WebGLStencilState extends WebGLRenderState implements StencilState 
     this.enabled = false;
     this.enableTwoSided = false;
     this.writeMask = this.writeMaskBack = 0xffffffff;
-    this.failOp = this.failOpBack = StencilOp.KEEP;
-    this.zFailOp = this.zFailOpBack = StencilOp.KEEP;
-    this.passOp = this.passOpBack = StencilOp.KEEP;
+    this.failOp = this.failOpBack = 'keep';
+    this.zFailOp = this.zFailOpBack = 'keep';
+    this.passOp = this.passOpBack = 'keep';
     this.func = this.funcBack = 'always';
     this.ref = 0;
     this.valueMask = this.valueMaskBack = 0xffffffff;

@@ -2,9 +2,8 @@ import { CubeFace } from '@sophon/base';
 import { PrimitiveType } from '../base_types';
 import { PBPrimitiveType } from '../builder/types';
 import { WebGLEnum } from './webgl_enum';
-import { FaceWinding, StencilOp } from '../render_states';
 import type { TextureTarget, CompareFunc, TextureWrapping, TextureFilter } from '../base_types';
-import type { BlendEquation, BlendFunc, FaceMode } from '../render_states';
+import type { BlendEquation, BlendFunc, FaceMode, FaceWinding, StencilOp } from '../render_states';
 
 export const blendEquationMap: Record<BlendEquation, number> = {
   add: WebGLEnum.FUNC_ADD,
@@ -70,36 +69,36 @@ export const faceModeInvMap: Record<number, FaceMode> = {
   [WebGLEnum.BACK]: 'back'
 };
 
-export const faceWindingMap = {
-  [FaceWinding.CW]: WebGLEnum.CW,
-  [FaceWinding.CCW]: WebGLEnum.CCW
+export const faceWindingMap: Record<FaceWinding, number> = {
+  'cw': WebGLEnum.CW,
+  'ccw': WebGLEnum.CCW
 };
 
-export const faceWindingInvMap = {
-  [WebGLEnum.CW]: [FaceWinding.CW],
-  [WebGLEnum.CCW]: [FaceWinding.CCW]
+export const faceWindingInvMap: Record<number, FaceWinding> = {
+  [WebGLEnum.CW]: 'cw',
+  [WebGLEnum.CCW]: 'ccw'
 };
 
-export const stencilOpMap = {
-  [StencilOp.KEEP]: WebGLEnum.KEEP,
-  [StencilOp.ZERO]: WebGLEnum.ZERO,
-  [StencilOp.REPLACE]: WebGLEnum.REPLACE,
-  [StencilOp.INCR]: WebGLEnum.INCR,
-  [StencilOp.INCR_WRAP]: WebGLEnum.INCR_WRAP,
-  [StencilOp.DECR]: WebGLEnum.DECR,
-  [StencilOp.DECR_WRAP]: WebGLEnum.DECR_WRAP,
-  [StencilOp.INVERT]: WebGLEnum.INVERT
+export const stencilOpMap: Record<StencilOp, number> = {
+  'keep': WebGLEnum.KEEP,
+  'zero': WebGLEnum.ZERO,
+  'replace': WebGLEnum.REPLACE,
+  'incr': WebGLEnum.INCR,
+  'incr-wrap': WebGLEnum.INCR_WRAP,
+  'decr': WebGLEnum.DECR,
+  'decr-wrap': WebGLEnum.DECR_WRAP,
+  'invert': WebGLEnum.INVERT
 };
 
-export const stencilOpInvMap = {
-  [WebGLEnum.KEEP]: StencilOp.KEEP,
-  [WebGLEnum.ZERO]: StencilOp.ZERO,
-  [WebGLEnum.REPLACE]: StencilOp.REPLACE,
-  [WebGLEnum.INCR]: StencilOp.INCR,
-  [WebGLEnum.INCR_WRAP]: StencilOp.INCR_WRAP,
-  [WebGLEnum.DECR]: StencilOp.DECR,
-  [WebGLEnum.DECR_WRAP]: StencilOp.DECR_WRAP,
-  [WebGLEnum.INVERT]: StencilOp.INVERT
+export const stencilOpInvMap: Record<number, StencilOp> = {
+  [WebGLEnum.KEEP]: 'keep',
+  [WebGLEnum.ZERO]: 'zero',
+  [WebGLEnum.REPLACE]: 'replace',
+  [WebGLEnum.INCR]: 'incr',
+  [WebGLEnum.INCR_WRAP]: 'incr-wrap',
+  [WebGLEnum.DECR]: 'decr',
+  [WebGLEnum.DECR_WRAP]: 'decr-wrap',
+  [WebGLEnum.INVERT]: 'invert'
 };
 
 export const compareFuncMap: Record<CompareFunc, number> = {
