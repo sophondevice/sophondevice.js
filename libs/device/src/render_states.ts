@@ -41,11 +41,7 @@ export interface BlendingState {
   setBlendEquation(rgb: BlendEquation, alpha: BlendEquation): this;
 }
 
-export enum FaceMode {
-  NONE = 1,
-  FRONT,
-  BACK
-}
+export type FaceMode = 'none'|'front'|'back';
 
 export enum FaceWinding {
   CW = 1,

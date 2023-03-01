@@ -1,6 +1,5 @@
 import { REvent, Vector3 } from '@sophon/base';
 import {
-  FaceMode,
   GPUObject,
   PBStructTypeInfo,
   RenderStateSet,
@@ -62,7 +61,7 @@ export class Terrain extends GraphNode implements Drawable {
     this._viewPoint = null;
     this._castShadow = false;
     this._overridenStateSet = scene.device.createRenderStateSet();
-    this._overridenStateSet.useRasterizerState().setCullMode(FaceMode.NONE);
+    this._overridenStateSet.useRasterizerState().setCullMode('none');
     this._updateFunc = (evt: REvent) => this.frameUpdate((evt as Scene.TickEvent).camera);
     this.addEventListener('attached', () => {
       scene.addEventListener('tick', this._updateFunc);

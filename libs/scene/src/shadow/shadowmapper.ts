@@ -6,7 +6,6 @@ import {
   Texture2D,
   Texture2DArray,
   TextureCube,
-  FaceMode,
   TextureFormat,
   PBInsideFunctionScope,
   TextureSampler,
@@ -119,7 +118,7 @@ export class ShadowMapper {
     this._depthClampEnabled = false;
     this._lightCameras = new WeakMap();
     this._cullFrontFaceRenderStates = this._light.scene.device.createRenderStateSet();
-    this._cullFrontFaceRenderStates.useRasterizerState().setCullMode(FaceMode.FRONT);
+    this._cullFrontFaceRenderStates.useRasterizerState().setCullMode('front');
     this._depthBias = [new Vector4(), new Vector4(), new Vector4(), new Vector4()];
     this._depthBiasScale = Vector4.one();
     this._shadowMode = 'none';

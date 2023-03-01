@@ -4,7 +4,6 @@ import {
   PBGlobalScope,
   BindGroup,
   RenderStateSet,
-  FaceMode,
   TextureFormat,
   PBInsideFunctionScope
 } from '@sophon/device';
@@ -107,7 +106,7 @@ export class ShadowMapPass extends RenderPass {
     this._currentLight = null;
     this._splitLambda = 0.5;
     this._cullFrontFaceRenderStates = renderScheme.device.createRenderStateSet();
-    this._cullFrontFaceRenderStates.useRasterizerState().setCullMode(FaceMode.FRONT);
+    this._cullFrontFaceRenderStates.useRasterizerState().setCullMode('front');
     this._mainPass = null;
     this._lightCameras = new WeakMap();
     this._blurFilterH = new BlurBlitter('horizonal', 5, 4, 1 / 1024);

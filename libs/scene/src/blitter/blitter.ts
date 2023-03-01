@@ -2,7 +2,6 @@ import { CubeFace } from '@sophon/base';
 import {
   PrimitiveType,
   RenderStateSet,
-  FaceMode,
   makeVertexBufferType,
   Device,
   BaseTexture,
@@ -260,7 +259,7 @@ function getBlitRenderStateSet(device: Device): RenderStateSet {
   if (!blitRenderStates) {
     blitRenderStates = device.createRenderStateSet();
     blitRenderStates.useDepthState().enableTest(false).enableWrite(false);
-    blitRenderStates.useRasterizerState().setCullMode(FaceMode.NONE);
+    blitRenderStates.useRasterizerState().setCullMode('none');
   }
   return blitRenderStates;
 }

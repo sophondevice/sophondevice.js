@@ -2,7 +2,6 @@ import { WebGLEnum } from './webgl_enum';
 import {
   ColorState,
   BlendingState,
-  FaceMode,
   RasterizerState,
   DepthState,
   StencilOp,
@@ -22,7 +21,7 @@ import {
   compareFuncInvMap
 } from './constants_webgl';
 import type { WebGLContext, CompareFunc } from '../base_types';
-import type { BlendEquation, BlendFunc } from '../render_states';
+import type { BlendEquation, BlendFunc, FaceMode } from '../render_states';
 
 export abstract class WebGLRenderState {
   protected static _defaultState: WebGLRenderState;
@@ -172,7 +171,7 @@ export class WebGLRasterizerState extends WebGLRenderState implements Rasterizer
   private _cullMode: number;
   constructor() {
     super();
-    this.cullMode = FaceMode.BACK;
+    this.cullMode = 'back';
   }
   get cullMode(): FaceMode {
     return faceModeInvMap[this._cullMode];
@@ -185,7 +184,7 @@ export class WebGLRasterizerState extends WebGLRenderState implements Rasterizer
     return this;
   }
   protected _apply(gl: WebGLContext) {
-    if (this.cullMode == FaceMode.NONE) {
+    if (this.cullMode == 'none') {
       gl.disable(WebGLEnum.CULL_FACE);
     } else {
       gl.enable(WebGLEnum.CULL_FACE);

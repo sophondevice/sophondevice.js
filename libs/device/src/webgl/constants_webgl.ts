@@ -2,9 +2,9 @@ import { CubeFace } from '@sophon/base';
 import { PrimitiveType } from '../base_types';
 import { PBPrimitiveType } from '../builder/types';
 import { WebGLEnum } from './webgl_enum';
-import { FaceMode, FaceWinding, StencilOp } from '../render_states';
+import { FaceWinding, StencilOp } from '../render_states';
 import type { TextureTarget, CompareFunc, TextureWrapping, TextureFilter } from '../base_types';
-import type { BlendEquation, BlendFunc } from '../render_states';
+import type { BlendEquation, BlendFunc, FaceMode } from '../render_states';
 
 export const blendEquationMap: Record<BlendEquation, number> = {
   add: WebGLEnum.FUNC_ADD,
@@ -58,16 +58,16 @@ export const blendFuncInvMap: Record<number, BlendFunc> = {
   [WebGLEnum.ONE_MINUS_CONSTANT_ALPHA]: 'inv-const-alpha'
 };
 
-export const faceModeMap = {
-  [FaceMode.NONE]: WebGLEnum.NONE,
-  [FaceMode.FRONT]: WebGLEnum.FRONT,
-  [FaceMode.BACK]: WebGLEnum.BACK
+export const faceModeMap: Record<FaceMode, number> = {
+  'none': WebGLEnum.NONE,
+  'front': WebGLEnum.FRONT,
+  'back': WebGLEnum.BACK
 };
 
-export const faceModeInvMap = {
-  [WebGLEnum.NONE]: [FaceMode.NONE],
-  [WebGLEnum.FRONT]: [FaceMode.FRONT],
-  [WebGLEnum.BACK]: [FaceMode.BACK]
+export const faceModeInvMap: Record<number, FaceMode> = {
+  [WebGLEnum.NONE]: 'none',
+  [WebGLEnum.FRONT]: 'front',
+  [WebGLEnum.BACK]: 'back'
 };
 
 export const faceWindingMap = {

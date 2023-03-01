@@ -2,7 +2,6 @@ import { Matrix4x4, Vector3, Vector4, REventTarget } from '@sophon/base';
 import {
   BindGroup,
   RenderStateSet,
-  FaceMode,
   ProgramBuilder,
   Device,
   Texture2D,
@@ -318,7 +317,7 @@ export class GUIRenderer extends REventTarget {
     const rs = this._device.createRenderStateSet();
     rs.useBlendingState().enable(true).setBlendFunc('one', 'inv-src-alpha');
     rs.useDepthState().enableTest(false).enableWrite(false);
-    rs.useRasterizerState().setCullMode(FaceMode.NONE);
+    rs.useRasterizerState().setCullMode('none');
     return rs;
   }
   /** @internal */

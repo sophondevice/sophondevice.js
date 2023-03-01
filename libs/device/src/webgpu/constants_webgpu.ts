@@ -1,7 +1,7 @@
 import { TextureFormat, PrimitiveType } from '../base_types';
-import { StencilOp, FaceWinding, FaceMode } from '../render_states';
+import { StencilOp, FaceWinding } from '../render_states';
 import type { CompareFunc, TextureWrapping, TextureFilter } from '../base_types';
-import type { BlendEquation, BlendFunc } from '../render_states';
+import type { BlendEquation, BlendFunc, FaceMode } from '../render_states';
 
 export const textureWrappingMap: Record<TextureWrapping, GPUAddressMode> = {
   repeat: 'repeat',
@@ -50,10 +50,10 @@ export const faceWindingMap: { [k: number]: GPUFrontFace } = {
   [FaceWinding.CW]: 'cw'
 };
 
-export const faceModeMap: { [k: number]: GPUCullMode } = {
-  [FaceMode.BACK]: 'back',
-  [FaceMode.FRONT]: 'front',
-  [FaceMode.NONE]: 'none'
+export const faceModeMap: Record<FaceMode, GPUCullMode> = {
+  'back': 'back',
+  'front': 'front',
+  'none': 'none'
 };
 
 export const blendEquationMap: Record<BlendEquation, GPUBlendOperation> = {

@@ -1,7 +1,7 @@
 import { Vector4 } from '@sophon/base';
 import { PrimitiveType } from '../base_types';
 import { ProgramBuilder } from '../builder';
-import { FaceMode, StencilOp } from '../render_states';
+import { StencilOp } from '../render_states';
 import type { WebGPUProgram } from './gpuprogram_webgpu';
 import type { WebGPUBaseTexture } from './basetexture_webgpu';
 import type { WebGPUBindGroup } from './bindgroup_webgpu';
@@ -62,7 +62,7 @@ export class WebGPUClearQuad {
       .createBindGroup(this._clearPrograms[0].bindGroupLayouts[0]) as WebGPUBindGroup;
     this._clearStateSet = renderPass.getDevice().createRenderStateSet() as WebGPURenderStateSet;
     this._clearStateSet.useDepthState().enableTest(false);
-    this._clearStateSet.useRasterizerState().setCullMode(FaceMode.NONE);
+    this._clearStateSet.useRasterizerState().setCullMode('none');
     this._clearStateSet
       .useStencilState()
       .enable(false)
@@ -301,6 +301,6 @@ export class WebGPUMipmapGenerator {
     }) as WebGPUProgram;
     this._mipmapGenerationStateSet = device.createRenderStateSet() as WebGPURenderStateSet;
     this._mipmapGenerationStateSet.useDepthState().enableTest(false).enableWrite(false);
-    this._mipmapGenerationStateSet.useRasterizerState().setCullMode(FaceMode.NONE);
+    this._mipmapGenerationStateSet.useRasterizerState().setCullMode('none');
   }
 }

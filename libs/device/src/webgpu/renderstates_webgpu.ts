@@ -2,7 +2,6 @@ import type { CompareFunc } from '../base_types';
 import {
   ColorState,
   BlendingState,
-  FaceMode,
   RasterizerState,
   DepthState,
   StencilOp,
@@ -10,7 +9,7 @@ import {
   RenderStateSet
 } from '../render_states';
 import type { WebGPUDevice } from './device';
-import type { BlendEquation, BlendFunc } from '../render_states';
+import type { BlendEquation, BlendFunc, FaceMode } from '../render_states';
 
 export abstract class WebGPURenderState {
   protected static _defaultState: WebGPURenderState;
@@ -231,7 +230,7 @@ export class WebGPURasterizerState extends WebGPURenderState implements Rasteriz
   private _cullMode: FaceMode;
   constructor() {
     super();
-    this._cullMode = FaceMode.BACK;
+    this._cullMode = 'back';
   }
   get cullMode(): FaceMode {
     return this._cullMode;

@@ -2,7 +2,6 @@
 import { Vector3, Vector4, Matrix4x4, Quaternion, TypedArray } from '@sophon/base';
 import {
   PrimitiveType,
-  FaceMode,
   getVertexBufferAttribTypeBySemantic,
   VertexSemantic,
   GPUDataBuffer,
@@ -515,7 +514,7 @@ export class GLTFLoader extends AbstractModelLoader {
       }
       if (assetMaterial.common.doubleSided) {
         const rasterizerState = unlitMaterial.stateSet.useRasterizerState();
-        rasterizerState.setCullMode(FaceMode.NONE);
+        rasterizerState.setCullMode('none');
       }
       unlitMaterial.vertexNormal = !!assetMaterial.common.vertexNormal;
       return unlitMaterial;
@@ -584,7 +583,7 @@ export class GLTFLoader extends AbstractModelLoader {
       }
       if (assetPBRMaterial.common.doubleSided) {
         const rasterizerState = pbrMaterial.stateSet.useRasterizerState();
-        rasterizerState.setCullMode(FaceMode.NONE);
+        rasterizerState.setCullMode('none');
       }
       pbrMaterial.vertexNormal = !!assetMaterial.common.vertexNormal;
       return pbrMaterial;
@@ -722,7 +721,7 @@ export class GLTFLoader extends AbstractModelLoader {
       }
       if (assetPBRMaterial.common.doubleSided) {
         const rasterizerState = pbrMaterial.stateSet.useRasterizerState();
-        rasterizerState.setCullMode(FaceMode.NONE);
+        rasterizerState.setCullMode('none');
       }
       pbrMaterial.vertexNormal = !!assetMaterial.common.vertexNormal;
       return pbrMaterial;

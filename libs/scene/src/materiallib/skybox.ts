@@ -1,5 +1,4 @@
 import {
-  FaceMode,
   Device,
   TextureCube,
   BindGroup,
@@ -18,7 +17,7 @@ export class SkyboxMaterial extends Material {
   private _skySampler: TextureSampler;
   constructor(device: Device) {
     super(device);
-    this._renderStateSet.useRasterizerState().setCullMode(FaceMode.NONE);
+    this._renderStateSet.useRasterizerState().setCullMode('none');
     this._skyCubemap = null;
     this._skySampler = null;
   }
