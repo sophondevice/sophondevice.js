@@ -1,4 +1,4 @@
-import { PBInsideFunctionScope, PBShaderExp, TextureFormat, TextureSampler } from '@sophon/device';
+import type { PBInsideFunctionScope, PBShaderExp, TextureFormat, TextureSampler } from '@sophon/device';
 import type { ShadowMapper, ShadowMapType, ShadowMode } from './shadowmapper';
 
 export abstract class ShadowImpl {

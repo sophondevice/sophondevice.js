@@ -1,6 +1,5 @@
 import { Vector4, TypedArray } from '@sophon/base';
 import {
-  TextureFormat,
   WebGLContext,
   hasAlphaChannel,
   hasRedChannel,
@@ -72,7 +71,7 @@ import { WebGLStructuredBuffer } from './structuredbuffer_webgl';
 import { PBStructTypeInfo, typeU16 } from '../builder';
 import type { ITimer } from '../timer';
 import type { VertexData } from '../vertexdata';
-import type { PrimitiveType } from '../base_types';
+import type { PrimitiveType, TextureFormat } from '../base_types';
 
 declare global {
   interface WebGLRenderingContext {
@@ -542,7 +541,7 @@ export class WebGLDevice extends Device {
   async readPixels(x: number, y: number, w: number, h: number, buffer: TypedArray): Promise<void> {
     const fb = this.getFramebuffer();
     const colorAttachment = fb ? fb.getColorAttachments()[0] : null;
-    const format = colorAttachment ? colorAttachment.format : TextureFormat.RGBA8UNORM;
+    const format = colorAttachment ? colorAttachment.format : 'rgba8unorm';
     let glFormat: number = WebGLEnum.NONE;
     let glType: number = WebGLEnum.NONE;
     const r = hasRedChannel(format);
@@ -606,7 +605,7 @@ export class WebGLDevice extends Device {
   readPixelsToBuffer(x: number, y: number, w: number, h: number, buffer: GPUDataBuffer): void {
     const fb = this.getFramebuffer();
     const colorAttachment = fb ? fb.getColorAttachments()[0] : null;
-    const format = colorAttachment ? colorAttachment.format : TextureFormat.RGBA8UNORM;
+    const format = colorAttachment ? colorAttachment.format : 'rgba8unorm';
     let glFormat: number = WebGLEnum.NONE;
     let glType: number = WebGLEnum.NONE;
     if (!isWebGL2(this.context)) {

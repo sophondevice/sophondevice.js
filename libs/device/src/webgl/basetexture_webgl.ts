@@ -2,7 +2,6 @@ import { isPowerOf2 } from '@sophon/base';
 import { WebGLGPUObject } from './gpuobject_webgl';
 import { TextureCaps } from '../device';
 import {
-  TextureFormat,
   isCompressedTextureFormat,
   isDepthTextureFormat,
   isFloatTextureFormat,
@@ -17,7 +16,7 @@ import type { WebGLTextureCap, TextureFormatInfoWebGL } from './capabilities_web
 import type { TextureSampler } from '../gpuobject';
 import type { WebGLTextureSampler } from './sampler_webgl';
 import type { WebGLDevice } from './device_webgl';
-import type { TextureTarget } from '../base_types';
+import type { TextureTarget, TextureFormat } from '../base_types';
 
 export abstract class WebGLBaseTexture extends WebGLGPUObject<WebGLTexture> {
   protected _target: TextureTarget;
@@ -37,7 +36,7 @@ export abstract class WebGLBaseTexture extends WebGLGPUObject<WebGLTexture> {
     this._width = 0;
     this._height = 0;
     this._depth = 1;
-    this._format = TextureFormat.Unknown;
+    this._format = 'unknown';
     this._mipLevelCount = 0;
     this._sampler = null;
   }

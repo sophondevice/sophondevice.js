@@ -7,7 +7,6 @@ import {
   TextureCube,
   Texture2D,
   Device,
-  TextureFormat,
   PBInsideFunctionScope,
   PBShaderExp
 } from '@sophon/device';
@@ -47,10 +46,10 @@ class MyRenderScheme extends ForwardRenderScheme {
         ? new ForwardMultiRenderPass(this, 'cubemap')
         : new ForwardRenderPass(this, 'cubemap');
     this.cubemapRenderCamera = new Map();
-    this.colorAttachment = device.createCubeTexture(TextureFormat.RGBA8UNORM, 512, {
+    this.colorAttachment = device.createCubeTexture('rgba8unorm', 512, {
       colorSpace: 'linear'
     });
-    this.depthAttachment = device.createTexture2D(TextureFormat.D24S8, 512, 512, {
+    this.depthAttachment = device.createTexture2D('d24s8', 512, 512, {
       noMipmap: true
     });
     this.fb = device.createFrameBuffer({

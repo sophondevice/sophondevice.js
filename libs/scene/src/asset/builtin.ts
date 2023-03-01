@@ -1,6 +1,6 @@
 import { Vector2, Vector3, Vector4, Matrix3x3 } from '@sophon/base';
-import { TextureFormat, Texture2D, BaseTexture, Device } from '@sophon/device';
 import { BUILTIN_ASSET_TEXTURE_SHEEN_LUT } from '../values';
+import type { Texture2D, BaseTexture, Device } from '@sophon/device';
 
 const data = [
   0x28ff, 0x3ba9, 0x4891, 0x2f2b, 0x3b1a, 0x434a, 0x31c9, 0x3a8e, 0x3e0f, 0x33d9, 0x3a0a, 0x38f7, 0x34e4,
@@ -1116,7 +1116,7 @@ export function getSheenLutLoader(textureSize: number): (device: Device) => Prom
   }
 
   async function createSheenLUT(device: Device): Promise<Texture2D> {
-    const tex = device.createTexture2D(TextureFormat.RGBA8UNORM, textureSize, textureSize, {
+    const tex = device.createTexture2D('rgba8unorm', textureSize, textureSize, {
       colorSpace: 'linear'
     });
     const image = new Uint8Array(textureSize * textureSize * 4);
@@ -1309,7 +1309,7 @@ export function getSheenLutLoader(textureSize: number): (device: Device) => Prom
 
   async function createSheenLUT2(device: Device): Promise<Texture2D> {
     const texSize = 64;
-    const tex = device.createTexture2D(TextureFormat.RGBA16F, texSize, texSize, { colorSpace: 'linear' });
+    const tex = device.createTexture2D('rgba16f', texSize, texSize, { colorSpace: 'linear' });
     const image = new Uint16Array(textureSize * textureSize * 4);
     const one = encodeF16(1);
     for (let i = 0; i < texSize * texSize; i++) {
@@ -1329,7 +1329,7 @@ export function getSheenLutLoader(textureSize: number): (device: Device) => Prom
       if (!texture.isTexture2D()) {
         throw new Error('can not reload sheen lut texture: invalid texture type');
       }
-      if (texture.format !== TextureFormat.RGBA16F) {
+      if (texture.format !== 'rgba16f') {
         throw new Error('can not reload sheen lut texture: invalid texture format');
       }
       if (texture.width !== textureSize || texture.height !== textureSize) {
@@ -1338,7 +1338,7 @@ export function getSheenLutLoader(textureSize: number): (device: Device) => Prom
     }
     const tex =
       (texture as Texture2D) ||
-      device.createTexture2D(TextureFormat.RGBA16F, textureSize, textureSize, { colorSpace: 'linear' });
+      device.createTexture2D('rgba16f', textureSize, textureSize, { colorSpace: 'linear' });
     const image = new Uint16Array(textureSize * textureSize * 4);
     let p = 0;
     const one = encodeF16(1);

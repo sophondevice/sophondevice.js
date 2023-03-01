@@ -1,4 +1,4 @@
-import { Device, FrameBuffer, TextureFormat } from '@sophon/device';
+import type { Device, FrameBuffer, TextureFormat } from '@sophon/device';
 import type { Camera } from '../camera';
 import type { Scene } from '../scene';
 
@@ -9,13 +9,13 @@ export abstract class RenderScheme {
     this._device = device;
     this._shadowMapFormat = device.getTextureCaps().supportHalfFloatColorBuffer
       ? device.getDeviceType() === 'webgl'
-        ? TextureFormat.RGBA16F
-        : TextureFormat.R16F
+        ? 'rgba16f'
+        : 'r16f'
       : device.getTextureCaps().supportFloatColorBuffer
       ? device.getDeviceType() === 'webgl'
-        ? TextureFormat.RGBA32F
-        : TextureFormat.R32F
-      : TextureFormat.RGBA8UNORM;
+        ? 'rgba32f'
+        : 'r32f'
+      : 'rgba8unorm';
   }
   get device(): Device {
     return this._device;

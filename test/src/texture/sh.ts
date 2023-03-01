@@ -110,7 +110,7 @@ function directionFromCubemapTexel(face: number, u: number, v: number): Vector3 
 export async function projectCubemapCPU(input: TextureCube): Promise<Vector3[]> {
   if (
     !input ||
-    (input.format !== TextureFormat.RGBA8UNORM && input.format !== TextureFormat.RGBA8UNORM_SRGB)
+    (input.format !== 'rgba8unorm' && input.format !== 'rgba8unorm-srgb')
   ) {
     throw new Error(`cubemap must be rgba8unorm format`);
   }
@@ -127,7 +127,7 @@ export async function projectCubemapCPU(input: TextureCube): Promise<Vector3[]> 
       let radianceR = input_face[texel * 4 + 0] / 255;
       let radianceG = input_face[texel * 4 + 1] / 255;
       let radianceB = input_face[texel * 4 + 2] / 255;
-      if (input.format === TextureFormat.RGBA8UNORM_SRGB) {
+      if (input.format === 'rgba8unorm-srgb') {
         radianceR = Math.pow(radianceR, 2.2);
         radianceG = Math.pow(radianceG, 2.2);
         radianceB = Math.pow(radianceB, 2.2);

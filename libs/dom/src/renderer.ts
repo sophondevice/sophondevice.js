@@ -6,7 +6,6 @@ import {
   Device,
   Texture2D,
   GPUProgram,
-  TextureFormat,
   TextureSampler,
   Geometry
 } from '@sophon/device';
@@ -129,7 +128,7 @@ export class GUIRenderer extends REventTarget {
     return true;
   }
   createTexture(width: number, height: number, color: RColor, linear: boolean): Texture2D {
-    const tex = this._device.createTexture2D(TextureFormat.RGBA8UNORM, width, height, {
+    const tex = this._device.createTexture2D('rgba8unorm', width, height, {
       colorSpace: linear ? 'linear' : 'srgb',
       noMipmap: true
     });
@@ -154,7 +153,7 @@ export class GUIRenderer extends REventTarget {
   }
   updateTextureWithImage(texture: Texture2D, bitmap: ImageData, x: number, y: number): void {
     const originValues = new Uint8Array(bitmap.data.buffer);
-    console.assert(texture.format === TextureFormat.RGBA8UNORM);
+    console.assert(texture.format === 'rgba8unorm');
     texture.update(originValues, x, y, bitmap.width, bitmap.height);
   }
   updateTextureWithCanvas(

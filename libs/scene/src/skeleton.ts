@@ -1,6 +1,6 @@
 import { Matrix4x4, Vector3, nextPowerOf2 } from '@sophon/base';
-import { Texture2D, TextureFormat, Device } from '@sophon/device';
 import { SkinnedBoundingBox } from './animation';
+import type { Texture2D, Device } from '@sophon/device';
 import type { SceneNode } from './scene_node';
 
 const tmpV0 = new Vector3();
@@ -85,7 +85,7 @@ export class Skeleton {
   /** @internal */
   private _createJointTexture(device: Device) {
     const textureWidth = nextPowerOf2(Math.max(4, Math.ceil(Math.sqrt(this._joints.length * 4))));
-    this._jointTexture = device.createTexture2D(TextureFormat.RGBA32F, textureWidth, textureWidth, {
+    this._jointTexture = device.createTexture2D('rgba32f', textureWidth, textureWidth, {
       colorSpace: 'linear',
       noMipmap: true
     });

@@ -1,5 +1,4 @@
 import { REventTarget, REvent, Vector4, TypedArray } from '@sophon/base';
-import { TextureFormat } from './base_types';
 import { CPUTimer, ITimer } from './timer';
 import type { RenderStateSet } from './render_states';
 import type { VertexData } from './vertexdata';
@@ -35,7 +34,7 @@ import {
   getVertexAttribFormat
 } from './gpuobject';
 import { PBStructTypeInfo, ProgramBuilder } from './builder';
-import type { DataType, PrimitiveType } from './base_types';
+import type { DataType, PrimitiveType, TextureFormat } from './base_types';
 
 interface GPUObjectList {
   textures: BaseTexture[];

@@ -1,5 +1,4 @@
 import {
-  TextureFormat,
   getTextureFormatBlockWidth,
   getTextureFormatBlockHeight,
   getTextureFormatBlockSize,
@@ -8,6 +7,7 @@ import {
 import { WebGPUBaseTexture } from './basetexture_webgpu';
 import { GPUResourceUsageFlags, TextureImageElement, Texture3D, GPUDataBuffer } from '../gpuobject';
 import type { TypedArray } from '@sophon/base';
+import type { TextureFormat } from '../base_types';
 import type { WebGPUDevice } from './device';
 
 export class WebGPUTexture3D extends WebGPUBaseTexture implements Texture3D<GPUTexture> {

@@ -1,4 +1,4 @@
-import { TextureFormat } from '../base_types';
+import type { TextureFormat } from '../base_types';
 import type { CompareFunc, TextureWrapping, TextureFilter, PrimitiveType } from '../base_types';
 import type { BlendEquation, BlendFunc, FaceMode, FaceWinding, StencilOp } from '../render_states';
 
@@ -113,51 +113,52 @@ export const vertexFormatToHash: { [fmt: string]: string } = {
   snorm8x4: 'r'
 };
 
-export const textureFormatMap: { [fmt: number]: GPUTextureFormat } = {
-  [TextureFormat.RGBA8UNORM]: 'rgba8unorm',
-  [TextureFormat.RGBA8SNORM]: 'rgba8snorm',
-  [TextureFormat.BGRA8UNORM]: 'bgra8unorm',
-  [TextureFormat.DXT1]: 'bc1-rgba-unorm',
-  [TextureFormat.DXT3]: 'bc2-rgba-unorm',
-  [TextureFormat.DXT5]: 'bc3-rgba-unorm',
-  [TextureFormat.DXT1_SRGB]: 'bc1-rgba-unorm-srgb',
-  [TextureFormat.DXT3_SRGB]: 'bc2-rgba-unorm-srgb',
-  [TextureFormat.DXT5_SRGB]: 'bc3-rgba-unorm-srgb',
-  [TextureFormat.R8UNORM]: 'r8unorm',
-  [TextureFormat.R8SNORM]: 'r8snorm',
-  [TextureFormat.R16F]: 'r16float',
-  [TextureFormat.R32F]: 'r32float',
-  [TextureFormat.R8UI]: 'r8uint',
-  [TextureFormat.R8I]: 'r8sint',
-  [TextureFormat.R16UI]: 'r16uint',
-  [TextureFormat.R16I]: 'r16sint',
-  [TextureFormat.R32UI]: 'r32uint',
-  [TextureFormat.R32I]: 'r32sint',
-  [TextureFormat.RG8UNORM]: 'rg8unorm',
-  [TextureFormat.RG8SNORM]: 'rg8snorm',
-  [TextureFormat.RG16F]: 'rg16float',
-  [TextureFormat.RG32F]: 'rg32float',
-  [TextureFormat.RG8UI]: 'rg8uint',
-  [TextureFormat.RG8I]: 'rg8sint',
-  [TextureFormat.RG16UI]: 'rg16uint',
-  [TextureFormat.RG16I]: 'rg16sint',
-  [TextureFormat.RG32UI]: 'rg32uint',
-  [TextureFormat.RG32I]: 'rg32sint',
-  [TextureFormat.RGBA8UNORM_SRGB]: 'rgba8unorm-srgb',
-  [TextureFormat.BGRA8UNORM_SRGB]: 'bgra8unorm-srgb',
-  [TextureFormat.RGBA16F]: 'rgba16float',
-  [TextureFormat.RGBA32F]: 'rgba32float',
-  [TextureFormat.RGBA8UI]: 'rgba8uint',
-  [TextureFormat.RGBA8I]: 'rgba8sint',
-  [TextureFormat.RGBA16UI]: 'rgba16uint',
-  [TextureFormat.RGBA16I]: 'rgba16sint',
-  [TextureFormat.RGBA32UI]: 'rgba32uint',
-  [TextureFormat.RGBA32I]: 'rgba32sint',
-  [TextureFormat.D16]: 'depth16unorm',
-  [TextureFormat.D24]: 'depth24plus',
-  [TextureFormat.D32F]: 'depth32float',
-  [TextureFormat.D32FS8]: 'depth32float-stencil8',
-  [TextureFormat.D24S8]: 'depth24plus-stencil8'
+export const textureFormatMap: Record<TextureFormat, GPUTextureFormat> = {
+  ['unknown']: null,
+  ['rgba8unorm']: 'rgba8unorm',
+  ['rgba8snorm']: 'rgba8snorm',
+  ['bgra8unorm']: 'bgra8unorm',
+  ['dxt1']: 'bc1-rgba-unorm',
+  ['dxt3']: 'bc2-rgba-unorm',
+  ['dxt5']: 'bc3-rgba-unorm',
+  ['dxt1-srgb']: 'bc1-rgba-unorm-srgb',
+  ['dxt3-srgb']: 'bc2-rgba-unorm-srgb',
+  ['dxt5-srgb']: 'bc3-rgba-unorm-srgb',
+  ['r8unorm']: 'r8unorm',
+  ['r8snorm']: 'r8snorm',
+  ['r16f']: 'r16float',
+  ['r32f']: 'r32float',
+  ['r8ui']: 'r8uint',
+  ['r8i']: 'r8sint',
+  ['r16ui']: 'r16uint',
+  ['r16i']: 'r16sint',
+  ['r32ui']: 'r32uint',
+  ['r32i']: 'r32sint',
+  ['rg8unorm']: 'rg8unorm',
+  ['rg8snorm']: 'rg8snorm',
+  ['rg16f']: 'rg16float',
+  ['rg32f']: 'rg32float',
+  ['rg8ui']: 'rg8uint',
+  ['rg8i']: 'rg8sint',
+  ['rg16ui']: 'rg16uint',
+  ['rg16i']: 'rg16sint',
+  ['rg32ui']: 'rg32uint',
+  ['rg32i']: 'rg32sint',
+  ['rgba8unorm-srgb']: 'rgba8unorm-srgb',
+  ['bgra8unorm-srgb']: 'bgra8unorm-srgb',
+  ['rgba16f']: 'rgba16float',
+  ['rgba32f']: 'rgba32float',
+  ['rgba8ui']: 'rgba8uint',
+  ['rgba8i']: 'rgba8sint',
+  ['rgba16ui']: 'rgba16uint',
+  ['rgba16i']: 'rgba16sint',
+  ['rgba32ui']: 'rgba32uint',
+  ['rgba32i']: 'rgba32sint',
+  ['d16']: 'depth16unorm',
+  ['d24']: 'depth24plus',
+  ['d32f']: 'depth32float',
+  ['d32fs8']: 'depth32float-stencil8',
+  ['d24s8']: 'depth24plus-stencil8'
 };
 
 function zip<K = string>(keys: string[], values: K[]): { [k: string]: K } {
@@ -171,7 +172,7 @@ function zip<K = string>(keys: string[], values: K[]): { [k: string]: K } {
 
 export const textureFormatInvMap = zip<TextureFormat>(
   Object.values(textureFormatMap),
-  Object.keys(textureFormatMap).map((val) => Number(val))
+  Object.keys(textureFormatMap) as TextureFormat[]
 );
 
 export const hashToVertexFormat: { [hash: string]: string } = zip(

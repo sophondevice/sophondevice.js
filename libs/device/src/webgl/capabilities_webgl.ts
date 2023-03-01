@@ -1,6 +1,6 @@
-import { WebGLContext, TextureFormat } from '../base_types';
 import { WebGLEnum } from './webgl_enum';
 import { isWebGL2 } from './utils';
+import type { WebGLContext, TextureFormat } from '../base_types';
 import type { FramebufferCaps, MiscCaps, ShaderCaps, TextureCaps, TextureFormatInfo } from '../device';
 
 export interface TextureParams {
@@ -276,7 +276,7 @@ export class WebGLTextureCap implements TextureCaps {
   private _extTextureFloatLinear: OES_texture_float_linear;
   private _extTextureHalfFloat: OES_texture_half_float;
   private _extTextureHalfFloatLinear: OES_texture_half_float_linear;
-  private _textureFormatInfos: { [format: number]: TextureFormatInfoWebGL };
+  private _textureFormatInfos: Record<TextureFormat, TextureFormatInfoWebGL>;
   maxTextureSize: number;
   maxCubeTextureSize: number;
   npo2Mipmapping: boolean;
@@ -363,7 +363,7 @@ export class WebGLTextureCap implements TextureCaps {
       this.npo2Repeating = false;
     }
     this._textureFormatInfos = {
-      [TextureFormat.RGBA8UNORM]: {
+      'rgba8unorm': {
         glFormat: gl.RGBA,
         glInternalFormat: this._isWebGL2 ? (gl as WebGL2RenderingContext).RGBA8 : gl.RGBA,
         glType: [gl.UNSIGNED_BYTE, gl.UNSIGNED_SHORT_4_4_4_4, gl.UNSIGNED_SHORT_5_5_5_1],
@@ -371,9 +371,9 @@ export class WebGLTextureCap implements TextureCaps {
         renderable: true,
         compressed: false
       }
-    };
+    } as Record<TextureFormat, TextureFormatInfoWebGL>;
     if (this.supportS3TC) {
-      this._textureFormatInfos[TextureFormat.DXT1] = {
+      this._textureFormatInfos['dxt1'] = {
         glFormat: gl.NONE,
         glInternalFormat: this._extS3TC.COMPRESSED_RGB_S3TC_DXT1_EXT,
         glType: [gl.NONE],
@@ -381,7 +381,7 @@ export class WebGLTextureCap implements TextureCaps {
         renderable: false,
         compressed: true
       };
-      this._textureFormatInfos[TextureFormat.DXT3] = {
+      this._textureFormatInfos['dxt3'] = {
         glFormat: gl.NONE,
         glInternalFormat: this._extS3TC.COMPRESSED_RGBA_S3TC_DXT3_EXT,
         glType: [gl.NONE],
@@ -389,7 +389,7 @@ export class WebGLTextureCap implements TextureCaps {
         renderable: false,
         compressed: true
       };
-      this._textureFormatInfos[TextureFormat.DXT5] = {
+      this._textureFormatInfos['dxt5'] = {
         glFormat: gl.NONE,
         glInternalFormat: this._extS3TC.COMPRESSED_RGBA_S3TC_DXT5_EXT,
         glType: [gl.NONE],
@@ -399,7 +399,7 @@ export class WebGLTextureCap implements TextureCaps {
       };
     }
     if (this.supportS3TCSRGB) {
-      this._textureFormatInfos[TextureFormat.DXT1_SRGB] = {
+      this._textureFormatInfos['dxt1-srgb'] = {
         glFormat: gl.NONE,
         glInternalFormat: this._extS3TCSRGB.COMPRESSED_SRGB_S3TC_DXT1_EXT,
         glType: [gl.NONE],
@@ -407,7 +407,7 @@ export class WebGLTextureCap implements TextureCaps {
         renderable: false,
         compressed: true
       };
-      this._textureFormatInfos[TextureFormat.DXT3_SRGB] = {
+      this._textureFormatInfos['dxt3-srgb'] = {
         glFormat: gl.NONE,
         glInternalFormat: this._extS3TCSRGB.COMPRESSED_SRGB_ALPHA_S3TC_DXT3_EXT,
         glType: [gl.NONE],
@@ -415,7 +415,7 @@ export class WebGLTextureCap implements TextureCaps {
         renderable: false,
         compressed: true
       };
-      this._textureFormatInfos[TextureFormat.DXT5_SRGB] = {
+      this._textureFormatInfos['dxt5-srgb'] = {
         glFormat: gl.NONE,
         glInternalFormat: this._extS3TCSRGB.COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT,
         glType: [gl.NONE],
@@ -425,7 +425,7 @@ export class WebGLTextureCap implements TextureCaps {
       };
     }
     if (isWebGL2(gl)) {
-      this._textureFormatInfos[TextureFormat.R8UNORM] = {
+      this._textureFormatInfos['r8unorm'] = {
         glFormat: gl.RED,
         glInternalFormat: gl.R8,
         glType: [gl.UNSIGNED_BYTE],
@@ -433,7 +433,7 @@ export class WebGLTextureCap implements TextureCaps {
         renderable: true,
         compressed: false
       };
-      this._textureFormatInfos[TextureFormat.R8SNORM] = {
+      this._textureFormatInfos['r8snorm'] = {
         glFormat: gl.RED,
         glInternalFormat: gl.R8_SNORM,
         glType: [gl.BYTE],
@@ -441,7 +441,7 @@ export class WebGLTextureCap implements TextureCaps {
         renderable: false,
         compressed: false
       };
-      this._textureFormatInfos[TextureFormat.R16F] = {
+      this._textureFormatInfos['r16f'] = {
         glFormat: gl.RED,
         glInternalFormat: gl.R16F,
         glType: [gl.HALF_FLOAT, gl.FLOAT],
@@ -449,7 +449,7 @@ export class WebGLTextureCap implements TextureCaps {
         renderable: this.supportHalfFloatColorBuffer,
         compressed: false
       };
-      this._textureFormatInfos[TextureFormat.R32F] = {
+      this._textureFormatInfos['r32f'] = {
         glFormat: gl.RED,
         glInternalFormat: gl.R32F,
         glType: [gl.FLOAT],
@@ -457,7 +457,7 @@ export class WebGLTextureCap implements TextureCaps {
         renderable: this.supportFloatColorBuffer,
         compressed: false
       };
-      this._textureFormatInfos[TextureFormat.R8UI] = {
+      this._textureFormatInfos['r8ui'] = {
         glFormat: gl.RED_INTEGER,
         glInternalFormat: gl.R8UI,
         glType: [gl.UNSIGNED_BYTE],
@@ -465,7 +465,7 @@ export class WebGLTextureCap implements TextureCaps {
         renderable: true,
         compressed: false
       };
-      this._textureFormatInfos[TextureFormat.R8I] = {
+      this._textureFormatInfos['r8i'] = {
         glFormat: gl.RED_INTEGER,
         glInternalFormat: gl.R8I,
         glType: [gl.BYTE],
@@ -473,7 +473,7 @@ export class WebGLTextureCap implements TextureCaps {
         renderable: true,
         compressed: false
       };
-      this._textureFormatInfos[TextureFormat.R16UI] = {
+      this._textureFormatInfos['r16ui'] = {
         glFormat: gl.RED_INTEGER,
         glInternalFormat: gl.R16UI,
         glType: [gl.UNSIGNED_SHORT],
@@ -481,7 +481,7 @@ export class WebGLTextureCap implements TextureCaps {
         renderable: true,
         compressed: false
       };
-      this._textureFormatInfos[TextureFormat.R16I] = {
+      this._textureFormatInfos['r16i'] = {
         glFormat: gl.RED_INTEGER,
         glInternalFormat: gl.R16I,
         glType: [gl.SHORT],
@@ -489,7 +489,7 @@ export class WebGLTextureCap implements TextureCaps {
         renderable: true,
         compressed: false
       };
-      this._textureFormatInfos[TextureFormat.R32UI] = {
+      this._textureFormatInfos['r32ui'] = {
         glFormat: gl.RED_INTEGER,
         glInternalFormat: gl.R32UI,
         glType: [gl.UNSIGNED_INT],
@@ -497,7 +497,7 @@ export class WebGLTextureCap implements TextureCaps {
         renderable: true,
         compressed: false
       };
-      this._textureFormatInfos[TextureFormat.R32I] = {
+      this._textureFormatInfos['r32i'] = {
         glFormat: gl.RED_INTEGER,
         glInternalFormat: gl.R32I,
         glType: [gl.INT],
@@ -505,7 +505,7 @@ export class WebGLTextureCap implements TextureCaps {
         renderable: true,
         compressed: false
       };
-      this._textureFormatInfos[TextureFormat.RG8UNORM] = {
+      this._textureFormatInfos['rg8unorm'] = {
         glFormat: gl.RG,
         glInternalFormat: gl.RG8,
         glType: [gl.UNSIGNED_BYTE],
@@ -513,7 +513,7 @@ export class WebGLTextureCap implements TextureCaps {
         renderable: true,
         compressed: false
       };
-      this._textureFormatInfos[TextureFormat.RG8SNORM] = {
+      this._textureFormatInfos['rg8snorm'] = {
         glFormat: gl.RG,
         glInternalFormat: gl.RG8_SNORM,
         glType: [gl.BYTE],
@@ -521,7 +521,7 @@ export class WebGLTextureCap implements TextureCaps {
         renderable: false,
         compressed: false
       };
-      this._textureFormatInfos[TextureFormat.RG16F] = {
+      this._textureFormatInfos['rg16f'] = {
         glFormat: gl.RG,
         glInternalFormat: gl.RG16F,
         glType: [gl.HALF_FLOAT, gl.FLOAT],
@@ -529,7 +529,7 @@ export class WebGLTextureCap implements TextureCaps {
         renderable: this.supportHalfFloatColorBuffer,
         compressed: false
       };
-      this._textureFormatInfos[TextureFormat.RG32F] = {
+      this._textureFormatInfos['rg32f'] = {
         glFormat: gl.RG,
         glInternalFormat: gl.RG32F,
         glType: [gl.FLOAT],
@@ -537,7 +537,7 @@ export class WebGLTextureCap implements TextureCaps {
         renderable: this.supportFloatColorBuffer,
         compressed: false
       };
-      this._textureFormatInfos[TextureFormat.RG8UI] = {
+      this._textureFormatInfos['rg8ui'] = {
         glFormat: gl.RG,
         glInternalFormat: gl.RG8UI,
         glType: [gl.UNSIGNED_BYTE],
@@ -545,7 +545,7 @@ export class WebGLTextureCap implements TextureCaps {
         renderable: true,
         compressed: false
       };
-      this._textureFormatInfos[TextureFormat.RG8I] = {
+      this._textureFormatInfos['rg8i'] = {
         glFormat: gl.RG,
         glInternalFormat: gl.RG8I,
         glType: [gl.BYTE],
@@ -553,7 +553,7 @@ export class WebGLTextureCap implements TextureCaps {
         renderable: true,
         compressed: false
       };
-      this._textureFormatInfos[TextureFormat.RG16UI] = {
+      this._textureFormatInfos['rg16ui'] = {
         glFormat: gl.RG,
         glInternalFormat: gl.RG16UI,
         glType: [gl.UNSIGNED_SHORT],
@@ -561,7 +561,7 @@ export class WebGLTextureCap implements TextureCaps {
         renderable: true,
         compressed: false
       };
-      this._textureFormatInfos[TextureFormat.RG16I] = {
+      this._textureFormatInfos['rg16i'] = {
         glFormat: gl.RG,
         glInternalFormat: gl.RG16I,
         glType: [gl.SHORT],
@@ -569,7 +569,7 @@ export class WebGLTextureCap implements TextureCaps {
         renderable: true,
         compressed: false
       };
-      this._textureFormatInfos[TextureFormat.RG32UI] = {
+      this._textureFormatInfos['rg32ui'] = {
         glFormat: gl.RG,
         glInternalFormat: gl.RG32UI,
         glType: [gl.UNSIGNED_INT],
@@ -577,7 +577,7 @@ export class WebGLTextureCap implements TextureCaps {
         renderable: true,
         compressed: false
       };
-      this._textureFormatInfos[TextureFormat.RG32I] = {
+      this._textureFormatInfos['rg32i'] = {
         glFormat: gl.RG,
         glInternalFormat: gl.RG32I,
         glType: [gl.INT],
@@ -585,7 +585,7 @@ export class WebGLTextureCap implements TextureCaps {
         renderable: true,
         compressed: false
       };
-      this._textureFormatInfos[TextureFormat.RGBA8UNORM_SRGB] = {
+      this._textureFormatInfos['rgba8unorm-srgb'] = {
         glFormat: gl.RGBA,
         glInternalFormat: gl.SRGB8_ALPHA8,
         glType: [gl.UNSIGNED_BYTE],
@@ -593,7 +593,7 @@ export class WebGLTextureCap implements TextureCaps {
         renderable: true,
         compressed: false
       };
-      this._textureFormatInfos[TextureFormat.RGBA8SNORM] = {
+      this._textureFormatInfos['rgba8snorm'] = {
         glFormat: gl.RGBA,
         glInternalFormat: gl.RGBA8_SNORM,
         glType: [gl.BYTE],
@@ -601,7 +601,7 @@ export class WebGLTextureCap implements TextureCaps {
         renderable: false,
         compressed: false
       };
-      this._textureFormatInfos[TextureFormat.RGBA16F] = {
+      this._textureFormatInfos['rgba16f'] = {
         glFormat: gl.RGBA,
         glInternalFormat: gl.RGBA16F,
         glType: [gl.HALF_FLOAT, gl.FLOAT],
@@ -609,7 +609,7 @@ export class WebGLTextureCap implements TextureCaps {
         renderable: this.supportHalfFloatColorBuffer,
         compressed: false
       };
-      this._textureFormatInfos[TextureFormat.RGBA32F] = {
+      this._textureFormatInfos['rgba32f'] = {
         glFormat: gl.RGBA,
         glInternalFormat: gl.RGBA32F,
         glType: [gl.FLOAT],
@@ -617,7 +617,7 @@ export class WebGLTextureCap implements TextureCaps {
         renderable: this.supportFloatColorBuffer,
         compressed: false
       };
-      this._textureFormatInfos[TextureFormat.RGBA8UI] = {
+      this._textureFormatInfos['rgba8ui'] = {
         glFormat: gl.RGBA_INTEGER,
         glInternalFormat: gl.RGBA8UI,
         glType: [gl.UNSIGNED_BYTE],
@@ -625,7 +625,7 @@ export class WebGLTextureCap implements TextureCaps {
         renderable: true,
         compressed: false
       };
-      this._textureFormatInfos[TextureFormat.RGBA8I] = {
+      this._textureFormatInfos['rgba8i'] = {
         glFormat: gl.RGBA_INTEGER,
         glInternalFormat: gl.RGBA8I,
         glType: [gl.BYTE],
@@ -633,7 +633,7 @@ export class WebGLTextureCap implements TextureCaps {
         renderable: true,
         compressed: false
       };
-      this._textureFormatInfos[TextureFormat.RGBA16UI] = {
+      this._textureFormatInfos['rgba16ui'] = {
         glFormat: gl.RGBA_INTEGER,
         glInternalFormat: gl.RGBA16UI,
         glType: [gl.UNSIGNED_SHORT],
@@ -641,7 +641,7 @@ export class WebGLTextureCap implements TextureCaps {
         renderable: true,
         compressed: false
       };
-      this._textureFormatInfos[TextureFormat.RGBA16I] = {
+      this._textureFormatInfos['rgba16i'] = {
         glFormat: gl.RGBA_INTEGER,
         glInternalFormat: gl.RGBA16I,
         glType: [gl.SHORT],
@@ -649,7 +649,7 @@ export class WebGLTextureCap implements TextureCaps {
         renderable: true,
         compressed: false
       };
-      this._textureFormatInfos[TextureFormat.RGBA32UI] = {
+      this._textureFormatInfos['rgba32ui'] = {
         glFormat: gl.RGBA_INTEGER,
         glInternalFormat: gl.RGBA32UI,
         glType: [gl.UNSIGNED_INT],
@@ -657,7 +657,7 @@ export class WebGLTextureCap implements TextureCaps {
         renderable: true,
         compressed: false
       };
-      this._textureFormatInfos[TextureFormat.RGBA32I] = {
+      this._textureFormatInfos['rgba32i'] = {
         glFormat: gl.RGBA_INTEGER,
         glInternalFormat: gl.RGBA32I,
         glType: [gl.INT],
@@ -665,7 +665,7 @@ export class WebGLTextureCap implements TextureCaps {
         renderable: true,
         compressed: false
       };
-      this._textureFormatInfos[TextureFormat.D16] = {
+      this._textureFormatInfos['d16'] = {
         glFormat: gl.DEPTH_COMPONENT,
         glInternalFormat: gl.DEPTH_COMPONENT16,
         glType: [gl.UNSIGNED_SHORT, gl.UNSIGNED_INT],
@@ -673,7 +673,7 @@ export class WebGLTextureCap implements TextureCaps {
         renderable: true,
         compressed: false
       };
-      this._textureFormatInfos[TextureFormat.D24] = {
+      this._textureFormatInfos['d24'] = {
         glFormat: gl.DEPTH_COMPONENT,
         glInternalFormat: gl.DEPTH_COMPONENT24,
         glType: [gl.UNSIGNED_INT],
@@ -681,7 +681,7 @@ export class WebGLTextureCap implements TextureCaps {
         renderable: true,
         compressed: false
       };
-      this._textureFormatInfos[TextureFormat.D32F] = {
+      this._textureFormatInfos['d32f'] = {
         glFormat: gl.DEPTH_COMPONENT,
         glInternalFormat: gl.DEPTH_COMPONENT32F,
         glType: [gl.FLOAT],
@@ -689,7 +689,7 @@ export class WebGLTextureCap implements TextureCaps {
         renderable: true,
         compressed: false
       };
-      this._textureFormatInfos[TextureFormat.D24S8] = {
+      this._textureFormatInfos['d24s8'] = {
         glFormat: gl.DEPTH_STENCIL,
         glInternalFormat: gl.DEPTH24_STENCIL8,
         glType: [gl.UNSIGNED_INT_24_8],
@@ -697,7 +697,7 @@ export class WebGLTextureCap implements TextureCaps {
         renderable: true,
         compressed: false
       };
-      this._textureFormatInfos[TextureFormat.D32FS8] = {
+      this._textureFormatInfos['d32fs8'] = {
         glFormat: gl.DEPTH_STENCIL,
         glInternalFormat: gl.DEPTH32F_STENCIL8,
         glType: [gl.FLOAT_32_UNSIGNED_INT_24_8_REV],
@@ -707,7 +707,7 @@ export class WebGLTextureCap implements TextureCaps {
       };
     } else {
       if (this.supportFloatTexture) {
-        this._textureFormatInfos[TextureFormat.RGBA32F] = {
+        this._textureFormatInfos['rgba32f'] = {
           glFormat: gl.RGBA,
           glInternalFormat: gl.RGBA,
           glType: [gl.FLOAT, gl.UNSIGNED_BYTE, gl.UNSIGNED_SHORT_4_4_4_4, gl.UNSIGNED_SHORT_5_5_5_1],
@@ -717,7 +717,7 @@ export class WebGLTextureCap implements TextureCaps {
         };
       }
       if (this.supportHalfFloatTexture) {
-        this._textureFormatInfos[TextureFormat.RGBA16F] = {
+        this._textureFormatInfos['rgba16f'] = {
           glFormat: gl.RGBA,
           glInternalFormat: gl.RGBA,
           glType: [
@@ -732,7 +732,7 @@ export class WebGLTextureCap implements TextureCaps {
         };
       }
       if (this.supportSRGBTexture) {
-        this._textureFormatInfos[TextureFormat.RGBA8UNORM_SRGB] = {
+        this._textureFormatInfos['rgba8unorm-srgb'] = {
           glFormat: this._extSRGB.SRGB_ALPHA_EXT,
           glInternalFormat: this._extSRGB.SRGB_ALPHA_EXT,
           glType: [gl.UNSIGNED_BYTE],
@@ -742,7 +742,7 @@ export class WebGLTextureCap implements TextureCaps {
         };
       }
       if (this.supportDepthTexture) {
-        this._textureFormatInfos[TextureFormat.D16] = {
+        this._textureFormatInfos['d16'] = {
           glFormat: gl.DEPTH_COMPONENT,
           glInternalFormat: gl.DEPTH_COMPONENT,
           glType: [gl.UNSIGNED_SHORT],
@@ -750,7 +750,7 @@ export class WebGLTextureCap implements TextureCaps {
           renderable: true,
           compressed: false
         };
-        this._textureFormatInfos[TextureFormat.D24] = {
+        this._textureFormatInfos['d24'] = {
           glFormat: gl.DEPTH_COMPONENT,
           glInternalFormat: gl.DEPTH_COMPONENT,
           glType: [gl.UNSIGNED_INT],
@@ -758,7 +758,7 @@ export class WebGLTextureCap implements TextureCaps {
           renderable: true,
           compressed: false
         };
-        this._textureFormatInfos[TextureFormat.D24S8] = {
+        this._textureFormatInfos['d24s8'] = {
           glFormat: gl.DEPTH_STENCIL,
           glInternalFormat: gl.DEPTH_STENCIL,
           glType: [this._extDepthTexture.UNSIGNED_INT_24_8_WEBGL],
@@ -771,83 +771,83 @@ export class WebGLTextureCap implements TextureCaps {
   }
   calcMemoryUsage(format: TextureFormat, type: number, numPixels): number {
     switch (format) {
-      case TextureFormat.D16:
-      case TextureFormat.D24:
-      case TextureFormat.D24S8:
-      case TextureFormat.D32F:
+      case 'd16':
+      case 'd24':
+      case 'd24s8':
+      case 'd32f':
         switch (type) {
           case WebGLEnum.UNSIGNED_SHORT:
             return numPixels * 2;
           default:
             return numPixels * 4;
         }
-      case TextureFormat.D32FS8:
+      case 'd32fs8':
         return numPixels * 8;
-      case TextureFormat.DXT1:
-      case TextureFormat.DXT1_SRGB:
+      case 'dxt1':
+      case 'dxt1-srgb':
         return numPixels / 2;
-      case TextureFormat.DXT3:
-      case TextureFormat.DXT3_SRGB:
-      case TextureFormat.DXT5:
-      case TextureFormat.DXT5_SRGB:
+      case 'dxt3':
+      case 'dxt3-srgb':
+      case 'dxt5':
+      case 'dxt5-srgb':
         return numPixels;
-      case TextureFormat.R16F:
+      case 'r16f':
         switch (type) {
           case WebGLEnum.HALF_FLOAT:
             return numPixels * 2;
           default:
             return numPixels * 4;
         }
-      case TextureFormat.R16I:
-      case TextureFormat.R16UI:
+      case 'r16i':
+      case 'r16ui':
         return numPixels * 2;
-      case TextureFormat.R32F:
-      case TextureFormat.R32I:
-      case TextureFormat.R32UI:
+      case 'r32f':
+      case 'r32i':
+      case 'r32ui':
         return numPixels * 4;
-      case TextureFormat.R8UNORM:
-      case TextureFormat.R8SNORM:
-      case TextureFormat.R8I:
-      case TextureFormat.R8UI:
+      case 'r8unorm':
+      case 'r8snorm':
+      case 'r8i':
+      case 'r8ui':
         return numPixels;
-      case TextureFormat.RG16F:
+      case 'rg16f':
         switch (type) {
           case WebGLEnum.HALF_FLOAT:
             return numPixels * 4;
           default:
             return numPixels * 8;
         }
-      case TextureFormat.RG16I:
-      case TextureFormat.RG16UI:
+      case 'rg16i':
+      case 'rg16ui':
         return numPixels * 4;
-      case TextureFormat.RG32F:
-      case TextureFormat.RG32I:
-      case TextureFormat.RG32UI:
+      case 'rg32f':
+      case 'rg32i':
+      case 'rg32ui':
         return numPixels * 8;
-      case TextureFormat.RG8UNORM:
-      case TextureFormat.RG8SNORM:
-      case TextureFormat.RG8I:
-      case TextureFormat.RG8UI:
+      case 'rg8unorm':
+      case 'rg8snorm':
+      case 'rg8i':
+      case 'rg8ui':
         return numPixels * 2;
-      case TextureFormat.RGBA16F:
+      case 'rgba16f':
         switch (type) {
           case WebGLEnum.HALF_FLOAT:
             return numPixels * 8;
           default:
             return numPixels * 16;
         }
-      case TextureFormat.RGBA16I:
-      case TextureFormat.RGBA16UI:
+      case 'rgba16i':
+      case 'rgba16ui':
         return numPixels * 8;
-      case TextureFormat.RGBA32F:
-      case TextureFormat.RGBA32I:
-      case TextureFormat.RGBA32UI:
+      case 'rgba32f':
+      case 'rgba32i':
+      case 'rgba32ui':
         return numPixels * 16;
-      case TextureFormat.RGBA8UNORM:
-      case TextureFormat.RGBA8UNORM_SRGB:
-      case TextureFormat.RGBA8SNORM:
-      case TextureFormat.RGBA8I:
-      case TextureFormat.RGBA8UI:
+      case 'rgba8unorm':
+      case 'rgba8unorm-srgb':
+      case 'rgba8snorm':
+      case 'rgba8i':
+      case 'rgba8ui':
         return numPixels * 4;
       default:
         return 0;

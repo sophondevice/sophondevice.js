@@ -1,4 +1,4 @@
-import { TextureFormat, TextureMipmapLevelData, TextureMipmapData } from '@sophon/device';
+import type { TextureFormat, TextureMipmapLevelData, TextureMipmapData } from '@sophon/device';
 import type { TypedArray } from '@sophon/base';
 
 const DDSHeaderSize = 31; // in DWORD
@@ -370,7 +370,7 @@ const legacyDDSMap: {
   pf: DDSPixelFormat;
 }[] = [
   {
-    format: TextureFormat.DXT1,
+    format: 'dxt1',
     convertFlags: 0,
     pf: {
       dwFlags: DDPF_FOURCC,
@@ -378,7 +378,7 @@ const legacyDDSMap: {
     }
   },
   {
-    format: TextureFormat.DXT3,
+    format: 'dxt3',
     convertFlags: 0,
     pf: {
       dwFlags: DDPF_FOURCC,
@@ -386,7 +386,7 @@ const legacyDDSMap: {
     }
   },
   {
-    format: TextureFormat.DXT5,
+    format: 'dxt5',
     convertFlags: 0,
     pf: {
       dwFlags: DDPF_FOURCC,
@@ -394,7 +394,7 @@ const legacyDDSMap: {
     }
   },
   {
-    format: TextureFormat.BGRA8UNORM,
+    format: 'bgra8unorm',
     convertFlags: DDSConvert.RGB_SWIZZLE,
     pf: {
       dwFlags: DDPF_RGB | DDPF_ALPHAPIXELS,
@@ -406,7 +406,7 @@ const legacyDDSMap: {
     }
   },
   {
-    format: TextureFormat.BGRA8UNORM,
+    format: 'bgra8unorm',
     convertFlags: DDSConvert.RGB_SWIZZLE | DDSConvert.ALPHA_ONE,
     pf: {
       dwFlags: DDPF_RGB,
@@ -417,7 +417,7 @@ const legacyDDSMap: {
     }
   },
   {
-    format: TextureFormat.RGBA8UNORM,
+    format: 'rgba8unorm',
     convertFlags: 0,
     pf: {
       dwFlags: DDPF_RGB | DDPF_ALPHAPIXELS,
@@ -429,7 +429,7 @@ const legacyDDSMap: {
     }
   },
   {
-    format: TextureFormat.RGBA8UNORM,
+    format: 'rgba8unorm',
     convertFlags: DDSConvert.ALPHA_ONE,
     pf: {
       dwFlags: DDPF_RGB,
@@ -440,7 +440,7 @@ const legacyDDSMap: {
     }
   },
   {
-    format: TextureFormat.R16F,
+    format: 'r16f',
     convertFlags: 0,
     pf: {
       dwFlags: DDPF_FOURCC,
@@ -448,7 +448,7 @@ const legacyDDSMap: {
     }
   },
   {
-    format: TextureFormat.R16F,
+    format: 'r16f',
     convertFlags: 0,
     pf: {
       dwFlags: DDPF_FOURCC,
@@ -456,7 +456,7 @@ const legacyDDSMap: {
     }
   },
   {
-    format: TextureFormat.RG16F,
+    format: 'rg16f',
     convertFlags: 0,
     pf: {
       dwFlags: DDPF_FOURCC,
@@ -464,7 +464,7 @@ const legacyDDSMap: {
     }
   },
   {
-    format: TextureFormat.RG16F,
+    format: 'rg16f',
     convertFlags: 0,
     pf: {
       dwFlags: DDPF_FOURCC,
@@ -472,7 +472,7 @@ const legacyDDSMap: {
     }
   },
   {
-    format: TextureFormat.RGBA16F,
+    format: 'rgba16f',
     convertFlags: 0,
     pf: {
       dwFlags: DDPF_FOURCC,
@@ -480,7 +480,7 @@ const legacyDDSMap: {
     }
   },
   {
-    format: TextureFormat.RGBA16F,
+    format: 'rgba16f',
     convertFlags: 0,
     pf: {
       dwFlags: DDPF_FOURCC,
@@ -488,7 +488,7 @@ const legacyDDSMap: {
     }
   },
   {
-    format: TextureFormat.R32F,
+    format: 'r32f',
     convertFlags: 0,
     pf: {
       dwFlags: DDPF_FOURCC,
@@ -496,7 +496,7 @@ const legacyDDSMap: {
     }
   },
   {
-    format: TextureFormat.R32F,
+    format: 'r32f',
     convertFlags: 0,
     pf: {
       dwFlags: DDPF_FOURCC,
@@ -504,7 +504,7 @@ const legacyDDSMap: {
     }
   },
   {
-    format: TextureFormat.RG32F,
+    format: 'rg32f',
     convertFlags: 0,
     pf: {
       dwFlags: DDPF_FOURCC,
@@ -512,7 +512,7 @@ const legacyDDSMap: {
     }
   },
   {
-    format: TextureFormat.RG32F,
+    format: 'rg32f',
     convertFlags: 0,
     pf: {
       dwFlags: DDPF_FOURCC,
@@ -520,7 +520,7 @@ const legacyDDSMap: {
     }
   },
   {
-    format: TextureFormat.RGBA32F,
+    format: 'rgba32f',
     convertFlags: 0,
     pf: {
       dwFlags: DDPF_FOURCC,
@@ -528,7 +528,7 @@ const legacyDDSMap: {
     }
   },
   {
-    format: TextureFormat.RGBA32F,
+    format: 'rgba32f',
     convertFlags: 0,
     pf: {
       dwFlags: DDPF_FOURCC,
@@ -583,9 +583,9 @@ function getMetaDataFromHeader(header: DDSHeader, metaData?: DDSMetaData): DDSMe
     return null;
   }
   metaData.isCompressed =
-    metaData.format === TextureFormat.DXT1 ||
-    metaData.format === TextureFormat.DXT3 ||
-    metaData.format === TextureFormat.DXT5;
+    metaData.format === 'dxt1' ||
+    metaData.format === 'dxt3' ||
+    metaData.format === 'dxt5';
   metaData.dataOffset = header.ddsHeaderDX10 ? 37 * 4 : 32 * 4;
   metaData.width = header.dwWidth;
   metaData.height = header.dwHeight;
@@ -611,25 +611,25 @@ function getMipmapData(
   dataOffset: number
 ): TypedArray {
   switch (format) {
-    case TextureFormat.R16F:
+    case 'r16f':
       return new Uint16Array(dds, dataOffset, width * height);
-    case TextureFormat.RG16F:
+    case 'rg16f':
       return new Uint16Array(dds, dataOffset, width * height * 2);
-    case TextureFormat.R32F:
+    case 'r32f':
       return new Float32Array(dds, dataOffset, width * height);
-    case TextureFormat.RGBA8UNORM:
-    case TextureFormat.BGRA8UNORM:
+    case 'rgba8unorm':
+    case 'bgra8unorm':
       return new Uint8Array(dds, dataOffset, width * height * 4);
-    case TextureFormat.RGBA16F:
+    case 'rgba16f':
       return new Uint16Array(dds, dataOffset, width * height * 4);
-    case TextureFormat.RG32F:
+    case 'rg32f':
       return new Float32Array(dds, dataOffset, width * height * 2);
-    case TextureFormat.RGBA32F:
+    case 'rgba32f':
       return new Float32Array(dds, dataOffset, width * height * 4);
-    case TextureFormat.DXT1:
+    case 'dxt1':
       return new Uint8Array(dds, dataOffset, (((Math.max(4, width) / 4) * Math.max(4, height)) / 4) * 8);
-    case TextureFormat.DXT3:
-    case TextureFormat.DXT5:
+    case 'dxt3':
+    case 'dxt5':
       return new Uint8Array(dds, dataOffset, (((Math.max(4, width) / 4) * Math.max(4, height)) / 4) * 16);
     default:
       return null;

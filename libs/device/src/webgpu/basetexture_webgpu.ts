@@ -1,7 +1,6 @@
 import { WebGPUObject } from './gpuobject_webgpu';
 import { TextureCaps } from '../device';
 import {
-  TextureFormat,
   isCompressedTextureFormat,
   isDepthTextureFormat,
   isFloatTextureFormat,
@@ -24,7 +23,7 @@ import type { TypedArray } from '@sophon/base';
 import type { WebGPUDevice } from './device';
 import type { WebGPUBuffer } from './buffer_webgpu';
 import type { WebGPUTextureCap, TextureFormatInfoWebGPU } from './capabilities_webgpu';
-import type { TextureTarget, CompareFunc } from '../base_types';
+import type { TextureTarget, TextureFormat } from '../base_types';
 
 export abstract class WebGPUBaseTexture<
   T extends GPUTexture | GPUExternalTexture = GPUTexture
@@ -55,7 +54,7 @@ export abstract class WebGPUBaseTexture<
     this._depth = 0;
     this._renderable = false;
     this._fb = false;
-    this._format = TextureFormat.Unknown;
+    this._format = 'unknown';
     this._gpuFormat = null;
     this._mipLevelCount = 0;
     this._memCost = 0;

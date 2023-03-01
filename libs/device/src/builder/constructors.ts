@@ -1,4 +1,3 @@
-import { TextureFormat } from '../base_types';
 import { PBShaderExp, ShaderTypeFunc, makeConstructor } from './base';
 import * as typeinfo from './types';
 import * as AST from './ast';
@@ -6,22 +5,22 @@ import * as errors from './errors';
 import type { ProgramBuilder } from './programbuilder';
 
 const StorageTextureFormatMap = {
-  rgba8unorm: TextureFormat.RGBA8UNORM,
-  rgba8snorm: TextureFormat.RGBA8SNORM,
-  rgba8uint: TextureFormat.RGBA8UI,
-  rgba8sint: TextureFormat.RGBA8I,
-  rgba16uint: TextureFormat.RGBA16UI,
-  rgba16sint: TextureFormat.RGBA16I,
-  rgba16float: TextureFormat.RGBA16F,
-  r32float: TextureFormat.R32F,
-  r32uint: TextureFormat.R32UI,
-  r32sint: TextureFormat.R32I,
-  rg32float: TextureFormat.RG32F,
-  rg32uint: TextureFormat.RG32UI,
-  rg32sint: TextureFormat.RG32I,
-  rgba32float: TextureFormat.RGBA32F,
-  rgba32uint: TextureFormat.RGBA32UI,
-  rgba32sint: TextureFormat.RGBA32I
+  rgba8unorm: 'rgba8unorm',
+  rgba8snorm: 'rgba8snorm',
+  rgba8uint: 'rgba8ui',
+  rgba8sint: 'rgba8i',
+  rgba16uint: 'rgba16ui',
+  rgba16sint: 'rgba16i',
+  rgba16float: 'rgba16f',
+  r32float: 'r32f',
+  r32uint: 'r32ui',
+  r32sint: 'r32i',
+  rg32float: 'rg32f',
+  rg32uint: 'rg32ui',
+  rg32sint: 'rg32i',
+  rgba32float: 'rgba32f',
+  rgba32uint: 'rgba32ui',
+  rgba32sint: 'rgba32i'
 };
 
 export type StorageTextureConstructor = {

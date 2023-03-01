@@ -12,8 +12,8 @@ export class SSM extends ShadowImpl {
   }
   isSupported(shadowMapper: ShadowMapper): boolean {
     return (
-      this.getShadowMapColorFormat(shadowMapper) !== TextureFormat.Unknown &&
-      this.getShadowMapDepthFormat(shadowMapper) !== TextureFormat.Unknown
+      this.getShadowMapColorFormat(shadowMapper) !== 'unknown' &&
+      this.getShadowMapDepthFormat(shadowMapper) !== 'unknown'
     );
   }
   resourceDirty(): boolean {
@@ -50,24 +50,24 @@ export class SSM extends ShadowImpl {
   }
   getShadowMapColorFormat(shadowMapper: ShadowMapper): TextureFormat {
     if (this.useNativeShadowMap(shadowMapper)) {
-      return TextureFormat.RGBA8UNORM;
+      return 'rgba8unorm';
     } else {
       const device = shadowMapper.light.scene.device;
       return device.getTextureCaps().supportHalfFloatColorBuffer
         ? device.getDeviceType() === 'webgl'
-          ? TextureFormat.RGBA16F
-          : TextureFormat.R16F
+          ? 'rgba16f'
+          : 'r16f'
         : device.getTextureCaps().supportFloatColorBuffer
         ? device.getDeviceType() === 'webgl'
-          ? TextureFormat.RGBA32F
-          : TextureFormat.R32F
-        : TextureFormat.RGBA8UNORM;
+          ? 'rgba32f'
+          : 'r32f'
+        : 'rgba8unorm';
     }
   }
   getShadowMapDepthFormat(shadowMapper: ShadowMapper): TextureFormat {
     return shadowMapper.light.scene.device.getDeviceType() === 'webgl'
-      ? TextureFormat.D24S8
-      : TextureFormat.D32F;
+      ? 'd24s8'
+      : 'd32f';
   }
   computeShadowMapDepth(shadowMapper: ShadowMapper, scope: PBInsideFunctionScope): PBShaderExp {
     if (this.useNativeShadowMap(shadowMapper)) {
@@ -100,7 +100,7 @@ export class SSM extends ShadowImpl {
         );
         depth = pb.min(pb.div(pb.neg(lightSpacePos.z), scope.global.light.positionRange.w), 1);
       }
-      return shadowMapper.shadowMap.format === TextureFormat.RGBA8UNORM
+      return shadowMapper.shadowMap.format === 'rgba8unorm'
         ? lib.encodeNormalizedFloatToRGBA(depth)
         : pb.vec4(depth, 0, 0, 1);
     }
@@ -121,7 +121,7 @@ export class SSM extends ShadowImpl {
         funcNameComputeShadowCSM,
         [pb.vec4('shadowVertex'), pb.float('NdotL'), pb.int('split')],
         function () {
-          const floatDepthTexture = shadowMapper.shadowMap.format !== TextureFormat.RGBA8UNORM;
+          const floatDepthTexture = shadowMapper.shadowMap.format !== 'rgba8unorm';
           this.$l.shadowCoord = pb.div(this.shadowVertex.xyz, this.shadowVertex.w);
           this.$l.shadowCoord = pb.add(pb.mul(this.shadowCoord.xyz, 0.5), 0.5);
           this.$l.inShadow = pb.all(
@@ -194,7 +194,7 @@ export class SSM extends ShadowImpl {
         funcNameComputeShadow,
         [pb.vec4('shadowVertex'), pb.float('NdotL')],
         function () {
-          const floatDepthTexture = shadowMapper.shadowMap.format !== TextureFormat.RGBA8UNORM;
+          const floatDepthTexture = shadowMapper.shadowMap.format !== 'rgba8unorm';
           if (shadowMapper.light.isPointLight()) {
             if (that.useNativeShadowMap(shadowMapper)) {
               this.$l.nearFar =

@@ -1,5 +1,5 @@
-import { TextureFormat } from '../base_types';
 import { DeviceType } from '../device';
+import type { TextureFormat } from '../base_types';
 import type { UniformBufferLayout } from '../gpuobject';
 
 export const F16_BITMASK = 1;
@@ -359,24 +359,24 @@ const textureTypeMapWGSL = {
 };
 
 const storageTexelFormatMap = {
-  [TextureFormat.RGBA8UNORM]: 'rgba8unorm',
-  [TextureFormat.RGBA8SNORM]: 'rgba8snorm',
-  [TextureFormat.BGRA8UNORM]: 'bgra8unorm',
-  [TextureFormat.RGBA8UI]: 'rgba8uint',
-  [TextureFormat.RGBA8I]: 'rgba8sint',
-  [TextureFormat.RGBA16UI]: 'rgba16uint',
-  [TextureFormat.RGBA16I]: 'rgba16sint',
-  [TextureFormat.RGBA16F]: 'rgba16float',
-  [TextureFormat.R32F]: 'r32float',
-  [TextureFormat.R32UI]: 'r32uint',
-  [TextureFormat.R32I]: 'r32sint',
-  [TextureFormat.RG32F]: 'rg32float',
-  [TextureFormat.RG32UI]: 'rg32uint',
-  [TextureFormat.RG32I]: 'rg32sint',
-  [TextureFormat.RGBA32F]: 'rgba32float',
-  [TextureFormat.RGBA32UI]: 'rgba32uint',
-  [TextureFormat.RGBA32I]: 'rgba32sint'
-};
+  'rgba8unorm': 'rgba8unorm',
+  'rgba8snorm': 'rgba8snorm',
+  'bgra8unorm': 'bgra8unorm',
+  'rgba8ui': 'rgba8uint',
+  'rgba8i': 'rgba8sint',
+  'rgba16ui': 'rgba16uint',
+  'rgba16i': 'rgba16sint',
+  'rgba16f': 'rgba16float',
+  'r32f': 'r32float',
+  'r32ui': 'r32uint',
+  'r32i': 'r32sint',
+  'rg32f': 'rg32float',
+  'rg32ui': 'rg32uint',
+  'rg32i': 'rg32sint',
+  'rgba32f': 'rgba32float',
+  'rgba32ui': 'rgba32uint',
+  'rgba32i': 'rgba32sint'
+} as const;
 
 export enum PBSamplerAccessMode {
   UNKNOWN = 0,
@@ -1353,275 +1353,275 @@ export const typeITexMultisampled2D = new PBTextureTypeInfo(PBTextureType.ITEX_M
 export const typeUTexMultisampled2D = new PBTextureTypeInfo(PBTextureType.UTEX_MULTISAMPLED_2D);
 export const typeTexStorage1D_rgba8unorm = new PBTextureTypeInfo(
   PBTextureType.TEX_STORAGE_1D,
-  TextureFormat.RGBA8UNORM
+  'rgba8unorm'
 );
 export const typeTexStorage1D_rgba8snorm = new PBTextureTypeInfo(
   PBTextureType.TEX_STORAGE_1D,
-  TextureFormat.RGBA8SNORM
+  'rgba8snorm'
 );
 export const typeTexStorage1D_bgra8unorm = new PBTextureTypeInfo(
   PBTextureType.TEX_STORAGE_1D,
-  TextureFormat.BGRA8UNORM
+  'rgba8unorm'
 );
 export const typeTexStorage1D_rgba8uint = new PBTextureTypeInfo(
   PBTextureType.TEX_STORAGE_1D,
-  TextureFormat.RGBA8UI
+  'rgba8ui'
 );
 export const typeTexStorage1D_rgba8sint = new PBTextureTypeInfo(
   PBTextureType.TEX_STORAGE_1D,
-  TextureFormat.RGBA8I
+  'rgba8i'
 );
 export const typeTexStorage1D_rgba16uint = new PBTextureTypeInfo(
   PBTextureType.TEX_STORAGE_1D,
-  TextureFormat.RGBA16UI
+  'rgba16ui'
 );
 export const typeTexStorage1D_rgba16sint = new PBTextureTypeInfo(
   PBTextureType.TEX_STORAGE_1D,
-  TextureFormat.RGBA16I
+  'rgba16i'
 );
 export const typeTexStorage1D_rgba16float = new PBTextureTypeInfo(
   PBTextureType.TEX_STORAGE_1D,
-  TextureFormat.RGBA16F
+  'rgba16f'
 );
 export const typeTexStorage1D_rgba32uint = new PBTextureTypeInfo(
   PBTextureType.TEX_STORAGE_1D,
-  TextureFormat.RGBA32UI
+  'rgba32ui'
 );
 export const typeTexStorage1D_rgba32sint = new PBTextureTypeInfo(
   PBTextureType.TEX_STORAGE_1D,
-  TextureFormat.RGBA32I
+  'rgba32i'
 );
 export const typeTexStorage1D_rgba32float = new PBTextureTypeInfo(
   PBTextureType.TEX_STORAGE_1D,
-  TextureFormat.RGBA32F
+  'rgba32f'
 );
 export const typeTexStorage1D_rg32uint = new PBTextureTypeInfo(
   PBTextureType.TEX_STORAGE_1D,
-  TextureFormat.RG32UI
+  'rg32ui'
 );
 export const typeTexStorage1D_rg32sint = new PBTextureTypeInfo(
   PBTextureType.TEX_STORAGE_1D,
-  TextureFormat.RG32I
+  'rg32i'
 );
 export const typeTexStorage1D_rg32float = new PBTextureTypeInfo(
   PBTextureType.TEX_STORAGE_1D,
-  TextureFormat.RG32F
+  'rg32f'
 );
 export const typeTexStorage1D_r32uint = new PBTextureTypeInfo(
   PBTextureType.TEX_STORAGE_1D,
-  TextureFormat.R32UI
+  'r32ui'
 );
 export const typeTexStorage1D_r32sint = new PBTextureTypeInfo(
   PBTextureType.TEX_STORAGE_1D,
-  TextureFormat.R32I
+  'r32i'
 );
 export const typeTexStorage1D_r32float = new PBTextureTypeInfo(
   PBTextureType.TEX_STORAGE_1D,
-  TextureFormat.R32F
+  'r32f'
 );
 export const typeTexStorage2D_rgba8unorm = new PBTextureTypeInfo(
   PBTextureType.TEX_STORAGE_2D,
-  TextureFormat.RGBA8UNORM
+  'rgba8unorm'
 );
 export const typeTexStorage2D_rgba8snorm = new PBTextureTypeInfo(
   PBTextureType.TEX_STORAGE_2D,
-  TextureFormat.RGBA8SNORM
+  'rgba8snorm'
 );
 export const typeTexStorage2D_bgra8unorm = new PBTextureTypeInfo(
   PBTextureType.TEX_STORAGE_2D,
-  TextureFormat.BGRA8UNORM
+  'bgra8unorm'
 );
 export const typeTexStorage2D_rgba8uint = new PBTextureTypeInfo(
   PBTextureType.TEX_STORAGE_2D,
-  TextureFormat.RGBA8UI
+  'rgba8ui'
 );
 export const typeTexStorage2D_rgba8sint = new PBTextureTypeInfo(
   PBTextureType.TEX_STORAGE_2D,
-  TextureFormat.RGBA8I
+  'rgba8i'
 );
 export const typeTexStorage2D_rgba16uint = new PBTextureTypeInfo(
   PBTextureType.TEX_STORAGE_2D,
-  TextureFormat.RGBA16UI
+  'rgba16ui'
 );
 export const typeTexStorage2D_rgba16sint = new PBTextureTypeInfo(
   PBTextureType.TEX_STORAGE_2D,
-  TextureFormat.RGBA16I
+  'rgba16i'
 );
 export const typeTexStorage2D_rgba16float = new PBTextureTypeInfo(
   PBTextureType.TEX_STORAGE_2D,
-  TextureFormat.RGBA16F
+  'rgba16f'
 );
 export const typeTexStorage2D_rgba32uint = new PBTextureTypeInfo(
   PBTextureType.TEX_STORAGE_2D,
-  TextureFormat.RGBA32UI
+  'rgba32ui'
 );
 export const typeTexStorage2D_rgba32sint = new PBTextureTypeInfo(
   PBTextureType.TEX_STORAGE_2D,
-  TextureFormat.RGBA32I
+  'rgba32i'
 );
 export const typeTexStorage2D_rgba32float = new PBTextureTypeInfo(
   PBTextureType.TEX_STORAGE_2D,
-  TextureFormat.RGBA32F
+  'rgba32f'
 );
 export const typeTexStorage2D_rg32uint = new PBTextureTypeInfo(
   PBTextureType.TEX_STORAGE_2D,
-  TextureFormat.RG32UI
+  'rg32ui'
 );
 export const typeTexStorage2D_rg32sint = new PBTextureTypeInfo(
   PBTextureType.TEX_STORAGE_2D,
-  TextureFormat.RG32I
+  'rg32i'
 );
 export const typeTexStorage2D_rg32float = new PBTextureTypeInfo(
   PBTextureType.TEX_STORAGE_2D,
-  TextureFormat.RG32F
+  'rg32f'
 );
 export const typeTexStorage2D_r32uint = new PBTextureTypeInfo(
   PBTextureType.TEX_STORAGE_2D,
-  TextureFormat.R32UI
+  'r32ui'
 );
 export const typeTexStorage2D_r32sint = new PBTextureTypeInfo(
   PBTextureType.TEX_STORAGE_2D,
-  TextureFormat.R32I
+  'r32i'
 );
 export const typeTexStorage2D_r32float = new PBTextureTypeInfo(
   PBTextureType.TEX_STORAGE_2D,
-  TextureFormat.R32F
+  'r32f'
 );
 export const typeTexStorage2DArray_rgba8unorm = new PBTextureTypeInfo(
   PBTextureType.TEX_STORAGE_2D_ARRAY,
-  TextureFormat.RGBA8UNORM
+  'rgba8unorm'
 );
 export const typeTexStorage2DArray_rgba8snorm = new PBTextureTypeInfo(
   PBTextureType.TEX_STORAGE_2D_ARRAY,
-  TextureFormat.RGBA8SNORM
+  'rgba8snorm'
 );
 export const typeTexStorage2DArray_bgra8unorm = new PBTextureTypeInfo(
   PBTextureType.TEX_STORAGE_2D_ARRAY,
-  TextureFormat.BGRA8UNORM
+  'bgra8unorm'
 );
 export const typeTexStorage2DArray_rgba8uint = new PBTextureTypeInfo(
   PBTextureType.TEX_STORAGE_2D_ARRAY,
-  TextureFormat.RGBA8UI
+  'rgba8ui'
 );
 export const typeTexStorage2DArray_rgba8sint = new PBTextureTypeInfo(
   PBTextureType.TEX_STORAGE_2D_ARRAY,
-  TextureFormat.RGBA8I
+  'rgba8i'
 );
 export const typeTexStorage2DArray_rgba16uint = new PBTextureTypeInfo(
   PBTextureType.TEX_STORAGE_2D_ARRAY,
-  TextureFormat.RGBA16UI
+  'rgba16ui'
 );
 export const typeTexStorage2DArray_rgba16sint = new PBTextureTypeInfo(
   PBTextureType.TEX_STORAGE_2D_ARRAY,
-  TextureFormat.RGBA16I
+  'rgba16i'
 );
 export const typeTexStorage2DArray_rgba16float = new PBTextureTypeInfo(
   PBTextureType.TEX_STORAGE_2D_ARRAY,
-  TextureFormat.RGBA16F
+  'rgba16f'
 );
 export const typeTexStorage2DArray_rgba32uint = new PBTextureTypeInfo(
   PBTextureType.TEX_STORAGE_2D_ARRAY,
-  TextureFormat.RGBA32UI
+  'rgba32ui'
 );
 export const typeTexStorage2DArray_rgba32sint = new PBTextureTypeInfo(
   PBTextureType.TEX_STORAGE_2D_ARRAY,
-  TextureFormat.RGBA32I
+  'rgba32i'
 );
 export const typeTexStorage2DArray_rgba32float = new PBTextureTypeInfo(
   PBTextureType.TEX_STORAGE_2D_ARRAY,
-  TextureFormat.RGBA32F
+  'rgba32f'
 );
 export const typeTexStorage2DArray_rg32uint = new PBTextureTypeInfo(
   PBTextureType.TEX_STORAGE_2D_ARRAY,
-  TextureFormat.RG32UI
+  'rg32ui'
 );
 export const typeTexStorage2DArray_rg32sint = new PBTextureTypeInfo(
   PBTextureType.TEX_STORAGE_2D_ARRAY,
-  TextureFormat.RG32I
+  'rg32i'
 );
 export const typeTexStorage2DArray_rg32float = new PBTextureTypeInfo(
   PBTextureType.TEX_STORAGE_2D_ARRAY,
-  TextureFormat.RG32F
+  'rg32f'
 );
 export const typeTexStorage2DArray_r32uint = new PBTextureTypeInfo(
   PBTextureType.TEX_STORAGE_2D_ARRAY,
-  TextureFormat.R32UI
+  'r32ui'
 );
 export const typeTexStorage2DArray_r32sint = new PBTextureTypeInfo(
   PBTextureType.TEX_STORAGE_2D_ARRAY,
-  TextureFormat.R32I
+  'r32i'
 );
 export const typeTexStorage2DArray_r32float = new PBTextureTypeInfo(
   PBTextureType.TEX_STORAGE_2D_ARRAY,
-  TextureFormat.R32F
+  'r32f'
 );
 export const typeTexStorage3D_rgba8unorm = new PBTextureTypeInfo(
   PBTextureType.TEX_STORAGE_3D,
-  TextureFormat.RGBA8UNORM
+  'rgba8unorm'
 );
 export const typeTexStorage3D_rgba8snorm = new PBTextureTypeInfo(
   PBTextureType.TEX_STORAGE_3D,
-  TextureFormat.RGBA8SNORM
+  'rgba8snorm'
 );
 export const typeTexStorage3D_bgra8unorm = new PBTextureTypeInfo(
   PBTextureType.TEX_STORAGE_3D,
-  TextureFormat.BGRA8UNORM
+  'bgra8unorm'
 );
 export const typeTexStorage3D_rgba8uint = new PBTextureTypeInfo(
   PBTextureType.TEX_STORAGE_3D,
-  TextureFormat.RGBA8UI
+  'rgba8ui'
 );
 export const typeTexStorage3D_rgba8sint = new PBTextureTypeInfo(
   PBTextureType.TEX_STORAGE_3D,
-  TextureFormat.RGBA8I
+  'rgba8i'
 );
 export const typeTexStorage3D_rgba16uint = new PBTextureTypeInfo(
   PBTextureType.TEX_STORAGE_3D,
-  TextureFormat.RGBA16UI
+  'rgba16ui'
 );
 export const typeTexStorage3D_rgba16sint = new PBTextureTypeInfo(
   PBTextureType.TEX_STORAGE_3D,
-  TextureFormat.RGBA16I
+  'rgba16i'
 );
 export const typeTexStorage3D_rgba16float = new PBTextureTypeInfo(
   PBTextureType.TEX_STORAGE_3D,
-  TextureFormat.RGBA16F
+  'rgba16f'
 );
 export const typeTexStorage3D_rgba32uint = new PBTextureTypeInfo(
   PBTextureType.TEX_STORAGE_3D,
-  TextureFormat.RGBA32UI
+  'rgba32ui'
 );
 export const typeTexStorage3D_rgba32sint = new PBTextureTypeInfo(
   PBTextureType.TEX_STORAGE_3D,
-  TextureFormat.RGBA32I
+  'rgba32i'
 );
 export const typeTexStorage3D_rgba32float = new PBTextureTypeInfo(
   PBTextureType.TEX_STORAGE_3D,
-  TextureFormat.RGBA32F
+  'rgba32f'
 );
 export const typeTexStorage3D_rg32uint = new PBTextureTypeInfo(
   PBTextureType.TEX_STORAGE_3D,
-  TextureFormat.RG32UI
+  'rg32ui'
 );
 export const typeTexStorage3D_rg32sint = new PBTextureTypeInfo(
   PBTextureType.TEX_STORAGE_3D,
-  TextureFormat.RG32I
+  'rg32i'
 );
 export const typeTexStorage3D_rg32float = new PBTextureTypeInfo(
   PBTextureType.TEX_STORAGE_3D,
-  TextureFormat.RG32F
+  'rg32f'
 );
 export const typeTexStorage3D_r32uint = new PBTextureTypeInfo(
   PBTextureType.TEX_STORAGE_3D,
-  TextureFormat.R32UI
+  'r32ui'
 );
 export const typeTexStorage3D_r32sint = new PBTextureTypeInfo(
   PBTextureType.TEX_STORAGE_3D,
-  TextureFormat.R32I
+  'r32i'
 );
 export const typeTexStorage3D_r32float = new PBTextureTypeInfo(
   PBTextureType.TEX_STORAGE_3D,
-  TextureFormat.R32F
+  'r32f'
 );
 export const typeTexDepth2D = new PBTextureTypeInfo(PBTextureType.TEX_DEPTH_2D);
 export const typeTexDepth2DArray = new PBTextureTypeInfo(PBTextureType.TEX_DEPTH_2D_ARRAY);

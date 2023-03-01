@@ -1,4 +1,4 @@
-import { TextureFormat } from '../base_types';
+import type { TextureFormat } from '../base_types';
 import type { FramebufferCaps, TextureFormatInfo, MiscCaps, ShaderCaps, TextureCaps } from '../device';
 import type { WebGPUDevice } from './device';
 
@@ -70,7 +70,7 @@ export class WebGPUShaderCap implements ShaderCaps {
   }
 }
 export class WebGPUTextureCap implements TextureCaps {
-  private _textureFormatInfos: { [format: number]: TextureFormatInfoWebGPU };
+  private _textureFormatInfos: Record<TextureFormat, TextureFormatInfoWebGPU>;
   maxTextureSize: number;
   maxCubeTextureSize: number;
   npo2Mipmapping: boolean;
@@ -90,7 +90,7 @@ export class WebGPUTextureCap implements TextureCaps {
   supportFloatBlending: boolean;
   constructor(device: WebGPUDevice) {
     this._textureFormatInfos = {
-      [TextureFormat.RGBA8UNORM]: {
+      ['rgba8unorm']: {
         gpuSampleType: 'float',
         filterable: true,
         renderable: true,
@@ -98,7 +98,7 @@ export class WebGPUTextureCap implements TextureCaps {
         writable: true,
         size: 4
       },
-      [TextureFormat.RGBA8SNORM]: {
+      ['rgba8snorm']: {
         gpuSampleType: 'float',
         filterable: true,
         renderable: false,
@@ -106,7 +106,7 @@ export class WebGPUTextureCap implements TextureCaps {
         writable: true,
         size: 4
       },
-      [TextureFormat.BGRA8UNORM]: {
+      ['bgra8unorm']: {
         gpuSampleType: 'float',
         filterable: true,
         renderable: true,
@@ -114,9 +114,9 @@ export class WebGPUTextureCap implements TextureCaps {
         writable: false, // TODO: require "bgra8unorm-storage" feature
         size: 4
       }
-    };
+    } as Record<TextureFormat, TextureFormatInfoWebGPU>;
     if (this.supportS3TC) {
-      this._textureFormatInfos[TextureFormat.DXT1] = {
+      this._textureFormatInfos['dxt1'] = {
         gpuSampleType: 'float',
         filterable: true,
         renderable: false,
@@ -126,7 +126,7 @@ export class WebGPUTextureCap implements TextureCaps {
         blockWidth: 4,
         blockHeight: 4
       };
-      this._textureFormatInfos[TextureFormat.DXT3] = {
+      this._textureFormatInfos['dxt3'] = {
         gpuSampleType: 'float',
         filterable: true,
         renderable: false,
@@ -136,7 +136,7 @@ export class WebGPUTextureCap implements TextureCaps {
         blockWidth: 4,
         blockHeight: 4
       };
-      this._textureFormatInfos[TextureFormat.DXT5] = {
+      this._textureFormatInfos['dxt5'] = {
         gpuSampleType: 'float',
         filterable: true,
         renderable: false,
@@ -148,7 +148,7 @@ export class WebGPUTextureCap implements TextureCaps {
       };
     }
     if (this.supportS3TCSRGB) {
-      this._textureFormatInfos[TextureFormat.DXT1_SRGB] = {
+      this._textureFormatInfos['dxt1-srgb'] = {
         gpuSampleType: 'float',
         filterable: true,
         renderable: false,
@@ -158,7 +158,7 @@ export class WebGPUTextureCap implements TextureCaps {
         blockWidth: 4,
         blockHeight: 4
       };
-      this._textureFormatInfos[TextureFormat.DXT3_SRGB] = {
+      this._textureFormatInfos['dxt3-srgb'] = {
         gpuSampleType: 'float',
         filterable: true,
         renderable: false,
@@ -168,7 +168,7 @@ export class WebGPUTextureCap implements TextureCaps {
         blockWidth: 4,
         blockHeight: 4
       };
-      this._textureFormatInfos[TextureFormat.DXT5_SRGB] = {
+      this._textureFormatInfos['dxt5-srgb'] = {
         gpuSampleType: 'float',
         filterable: true,
         renderable: false,
@@ -179,7 +179,7 @@ export class WebGPUTextureCap implements TextureCaps {
         blockHeight: 4
       };
     }
-    this._textureFormatInfos[TextureFormat.R8UNORM] = {
+    this._textureFormatInfos['r8unorm'] = {
       gpuSampleType: 'float',
       filterable: true,
       renderable: true,
@@ -187,7 +187,7 @@ export class WebGPUTextureCap implements TextureCaps {
       writable: false,
       size: 1
     };
-    (this._textureFormatInfos[TextureFormat.R8SNORM] = {
+    (this._textureFormatInfos['r8snorm'] = {
       gpuSampleType: 'float',
       filterable: true,
       renderable: false,
@@ -195,7 +195,7 @@ export class WebGPUTextureCap implements TextureCaps {
       writable: false,
       size: 1
     }),
-      (this._textureFormatInfos[TextureFormat.R16F] = {
+      (this._textureFormatInfos['r16f'] = {
         gpuSampleType: 'float',
         filterable: true,
         renderable: true,
@@ -203,7 +203,7 @@ export class WebGPUTextureCap implements TextureCaps {
         writable: false,
         size: 2
       });
-    this._textureFormatInfos[TextureFormat.R32F] = {
+    this._textureFormatInfos['r32f'] = {
       gpuSampleType: 'unfilterable-float',
       filterable: false,
       renderable: true,
@@ -211,7 +211,7 @@ export class WebGPUTextureCap implements TextureCaps {
       writable: true,
       size: 4
     };
-    this._textureFormatInfos[TextureFormat.R8UI] = {
+    this._textureFormatInfos['r8ui'] = {
       gpuSampleType: 'uint',
       filterable: false,
       renderable: true,
@@ -219,7 +219,7 @@ export class WebGPUTextureCap implements TextureCaps {
       writable: false,
       size: 1
     };
-    this._textureFormatInfos[TextureFormat.R8I] = {
+    this._textureFormatInfos['r8i'] = {
       gpuSampleType: 'sint',
       filterable: false,
       renderable: true,
@@ -227,7 +227,7 @@ export class WebGPUTextureCap implements TextureCaps {
       writable: false,
       size: 1
     };
-    this._textureFormatInfos[TextureFormat.R16UI] = {
+    this._textureFormatInfos['r16ui'] = {
       gpuSampleType: 'uint',
       filterable: false,
       renderable: true,
@@ -235,7 +235,7 @@ export class WebGPUTextureCap implements TextureCaps {
       writable: false,
       size: 2
     };
-    this._textureFormatInfos[TextureFormat.R16I] = {
+    this._textureFormatInfos['r16i'] = {
       gpuSampleType: 'sint',
       filterable: false,
       renderable: true,
@@ -243,7 +243,7 @@ export class WebGPUTextureCap implements TextureCaps {
       writable: false,
       size: 2
     };
-    this._textureFormatInfos[TextureFormat.R32UI] = {
+    this._textureFormatInfos['r32ui'] = {
       gpuSampleType: 'uint',
       filterable: false,
       renderable: true,
@@ -251,7 +251,7 @@ export class WebGPUTextureCap implements TextureCaps {
       writable: true,
       size: 4
     };
-    this._textureFormatInfos[TextureFormat.R32I] = {
+    this._textureFormatInfos['r32i'] = {
       gpuSampleType: 'sint',
       filterable: false,
       renderable: true,
@@ -259,7 +259,7 @@ export class WebGPUTextureCap implements TextureCaps {
       writable: true,
       size: 4
     };
-    this._textureFormatInfos[TextureFormat.RG8UNORM] = {
+    this._textureFormatInfos['rg8unorm'] = {
       gpuSampleType: 'float',
       filterable: true,
       renderable: true,
@@ -267,7 +267,7 @@ export class WebGPUTextureCap implements TextureCaps {
       writable: false,
       size: 2
     };
-    this._textureFormatInfos[TextureFormat.RG8SNORM] = {
+    this._textureFormatInfos['rg8snorm'] = {
       gpuSampleType: 'float',
       filterable: true,
       renderable: false,
@@ -275,7 +275,7 @@ export class WebGPUTextureCap implements TextureCaps {
       writable: false,
       size: 2
     };
-    this._textureFormatInfos[TextureFormat.RG16F] = {
+    this._textureFormatInfos['rg16f'] = {
       gpuSampleType: 'float',
       filterable: true,
       renderable: true,
@@ -283,7 +283,7 @@ export class WebGPUTextureCap implements TextureCaps {
       writable: false,
       size: 4
     };
-    this._textureFormatInfos[TextureFormat.RG32F] = {
+    this._textureFormatInfos['rg32f'] = {
       gpuSampleType: 'unfilterable-float',
       filterable: false,
       renderable: true,
@@ -291,7 +291,7 @@ export class WebGPUTextureCap implements TextureCaps {
       writable: true,
       size: 8
     };
-    this._textureFormatInfos[TextureFormat.RG8UI] = {
+    this._textureFormatInfos['rg8ui'] = {
       gpuSampleType: 'uint',
       filterable: false,
       renderable: true,
@@ -299,7 +299,7 @@ export class WebGPUTextureCap implements TextureCaps {
       writable: false,
       size: 2
     };
-    this._textureFormatInfos[TextureFormat.RG8I] = {
+    this._textureFormatInfos['rg8i'] = {
       gpuSampleType: 'sint',
       filterable: false,
       renderable: true,
@@ -307,7 +307,7 @@ export class WebGPUTextureCap implements TextureCaps {
       writable: false,
       size: 2
     };
-    this._textureFormatInfos[TextureFormat.RG16UI] = {
+    this._textureFormatInfos['rg16ui'] = {
       gpuSampleType: 'uint',
       filterable: false,
       renderable: true,
@@ -315,7 +315,7 @@ export class WebGPUTextureCap implements TextureCaps {
       writable: false,
       size: 4
     };
-    this._textureFormatInfos[TextureFormat.RG16I] = {
+    this._textureFormatInfos['rg16i'] = {
       gpuSampleType: 'sint',
       filterable: false,
       renderable: true,
@@ -323,7 +323,7 @@ export class WebGPUTextureCap implements TextureCaps {
       writable: false,
       size: 4
     };
-    this._textureFormatInfos[TextureFormat.RG32UI] = {
+    this._textureFormatInfos['rg32ui'] = {
       gpuSampleType: 'uint',
       filterable: false,
       renderable: true,
@@ -331,7 +331,7 @@ export class WebGPUTextureCap implements TextureCaps {
       writable: true,
       size: 8
     };
-    this._textureFormatInfos[TextureFormat.RG32I] = {
+    this._textureFormatInfos['rg32i'] = {
       gpuSampleType: 'sint',
       filterable: false,
       renderable: true,
@@ -339,7 +339,7 @@ export class WebGPUTextureCap implements TextureCaps {
       writable: true,
       size: 8
     };
-    this._textureFormatInfos[TextureFormat.RGBA8UNORM_SRGB] = {
+    this._textureFormatInfos['rgba8unorm-srgb'] = {
       gpuSampleType: 'float',
       filterable: true,
       renderable: true,
@@ -347,7 +347,7 @@ export class WebGPUTextureCap implements TextureCaps {
       writable: false,
       size: 4
     };
-    this._textureFormatInfos[TextureFormat.BGRA8UNORM_SRGB] = {
+    this._textureFormatInfos['bgra8unorm-srgb'] = {
       gpuSampleType: 'float',
       filterable: true,
       renderable: true,
@@ -355,7 +355,7 @@ export class WebGPUTextureCap implements TextureCaps {
       writable: false,
       size: 4
     };
-    this._textureFormatInfos[TextureFormat.RGBA16F] = {
+    this._textureFormatInfos['rgba16f'] = {
       gpuSampleType: 'float',
       filterable: true,
       renderable: true,
@@ -363,7 +363,7 @@ export class WebGPUTextureCap implements TextureCaps {
       writable: true,
       size: 8
     };
-    this._textureFormatInfos[TextureFormat.RGBA32F] = {
+    this._textureFormatInfos['rgba32f'] = {
       gpuSampleType: 'unfilterable-float',
       filterable: false,
       renderable: true,
@@ -371,7 +371,7 @@ export class WebGPUTextureCap implements TextureCaps {
       writable: true,
       size: 16
     };
-    this._textureFormatInfos[TextureFormat.RGBA8UI] = {
+    this._textureFormatInfos['rgba8ui'] = {
       gpuSampleType: 'uint',
       filterable: false,
       renderable: true,
@@ -379,7 +379,7 @@ export class WebGPUTextureCap implements TextureCaps {
       writable: true,
       size: 4
     };
-    this._textureFormatInfos[TextureFormat.RGBA8I] = {
+    this._textureFormatInfos['rgba8i'] = {
       gpuSampleType: 'sint',
       filterable: false,
       renderable: true,
@@ -387,7 +387,7 @@ export class WebGPUTextureCap implements TextureCaps {
       writable: true,
       size: 4
     };
-    this._textureFormatInfos[TextureFormat.RGBA16UI] = {
+    this._textureFormatInfos['rgba16ui'] = {
       gpuSampleType: 'uint',
       filterable: false,
       renderable: true,
@@ -395,7 +395,7 @@ export class WebGPUTextureCap implements TextureCaps {
       writable: true,
       size: 8
     };
-    this._textureFormatInfos[TextureFormat.RGBA16I] = {
+    this._textureFormatInfos['rgba16i'] = {
       gpuSampleType: 'sint',
       filterable: false,
       renderable: true,
@@ -403,7 +403,7 @@ export class WebGPUTextureCap implements TextureCaps {
       writable: true,
       size: 8
     };
-    this._textureFormatInfos[TextureFormat.RGBA32UI] = {
+    this._textureFormatInfos['rgba32ui'] = {
       gpuSampleType: 'uint',
       filterable: false,
       renderable: true,
@@ -411,7 +411,7 @@ export class WebGPUTextureCap implements TextureCaps {
       writable: true,
       size: 16
     };
-    this._textureFormatInfos[TextureFormat.RGBA32I] = {
+    this._textureFormatInfos['rgba32i'] = {
       gpuSampleType: 'sint',
       filterable: false,
       renderable: true,
@@ -419,7 +419,7 @@ export class WebGPUTextureCap implements TextureCaps {
       writable: true,
       size: 16
     };
-    this._textureFormatInfos[TextureFormat.D16] = {
+    this._textureFormatInfos['d16'] = {
       gpuSampleType: 'depth',
       filterable: false,
       renderable: true,
@@ -427,7 +427,7 @@ export class WebGPUTextureCap implements TextureCaps {
       writable: false,
       size: 2
     };
-    this._textureFormatInfos[TextureFormat.D24] = {
+    this._textureFormatInfos['d24'] = {
       gpuSampleType: 'depth',
       filterable: false,
       renderable: true,
@@ -435,7 +435,7 @@ export class WebGPUTextureCap implements TextureCaps {
       writable: false,
       size: 4
     };
-    this._textureFormatInfos[TextureFormat.D32F] = {
+    this._textureFormatInfos['d32f'] = {
       gpuSampleType: 'depth',
       filterable: false,
       renderable: true,
@@ -443,7 +443,7 @@ export class WebGPUTextureCap implements TextureCaps {
       writable: false,
       size: 4
     };
-    this._textureFormatInfos[TextureFormat.D32FS8] = {
+    this._textureFormatInfos['d32fs8'] = {
       gpuSampleType: 'depth',
       filterable: false,
       renderable: true,
@@ -451,7 +451,7 @@ export class WebGPUTextureCap implements TextureCaps {
       writable: false,
       size: 8
     };
-    this._textureFormatInfos[TextureFormat.D24S8] = {
+    this._textureFormatInfos['d24s8'] = {
       gpuSampleType: 'depth',
       filterable: false,
       renderable: true,
@@ -465,14 +465,14 @@ export class WebGPUTextureCap implements TextureCaps {
     this.supportSRGBTexture = true;
     this.supportFloatTexture = true;
     this.supportLinearFloatTexture =
-      this._textureFormatInfos[TextureFormat.R32F].filterable &&
-      this._textureFormatInfos[TextureFormat.RG32F].filterable &&
-      this._textureFormatInfos[TextureFormat.RGBA32F].filterable;
+      this._textureFormatInfos['r32f'].filterable &&
+      this._textureFormatInfos['rg32f'].filterable &&
+      this._textureFormatInfos['rgba32f'].filterable;
     this.supportHalfFloatTexture = true;
     this.supportLinearHalfFloatTexture =
-      this._textureFormatInfos[TextureFormat.R16F].filterable &&
-      this._textureFormatInfos[TextureFormat.RG16F].filterable &&
-      this._textureFormatInfos[TextureFormat.RGBA16F].filterable;
+      this._textureFormatInfos['r16f'].filterable &&
+      this._textureFormatInfos['rg16f'].filterable &&
+      this._textureFormatInfos['rgba16f'].filterable;
     this.supportFloatColorBuffer = true;
     this.supportHalfFloatColorBuffer = true;
     this.supportFloatBlending = true;

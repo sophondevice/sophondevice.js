@@ -281,11 +281,11 @@ export class ESM extends ShadowImpl {
       this._blitterH.blurSize = this._blurSize / shadowMapper.getColorAttachment().width;
       this._blitterH.kernelSize = this._kernelSize;
       this._blitterH.logSpace = this._logSpace;
-      this._blitterH.packFloat = shadowMapper.getColorAttachment().format === TextureFormat.RGBA8UNORM;
+      this._blitterH.packFloat = shadowMapper.getColorAttachment().format === 'rgba8unorm';
       this._blitterV.blurSize = this._blurSize / shadowMapper.getColorAttachment().height;
       this._blitterV.kernelSize = this._kernelSize;
       this._blitterV.logSpace = this._logSpace;
-      this._blitterV.packFloat = shadowMapper.getColorAttachment().format === TextureFormat.RGBA8UNORM;
+      this._blitterV.packFloat = shadowMapper.getColorAttachment().format === 'rgba8unorm';
       this._blitterH.blit(shadowMapper.getColorAttachment() as any, this._blurFramebuffer as any);
       this._blitterV.blit(this._blurMap as any, this._blurFramebuffer2 as any);
     }
@@ -298,8 +298,8 @@ export class ESM extends ShadowImpl {
   }
   isSupported(shadowMapper: ShadowMapper): boolean {
     return (
-      this.getShadowMapColorFormat(shadowMapper) !== TextureFormat.Unknown &&
-      this.getShadowMapDepthFormat(shadowMapper) !== TextureFormat.Unknown
+      this.getShadowMapColorFormat(shadowMapper) !== 'unknown' &&
+      this.getShadowMapDepthFormat(shadowMapper) !== 'unknown'
     );
   }
   getShaderHash(): string {
@@ -309,16 +309,16 @@ export class ESM extends ShadowImpl {
     const device = shadowMapper.light.scene.device;
     return device.getTextureCaps().supportHalfFloatColorBuffer
       ? device.getDeviceType() === 'webgl'
-        ? TextureFormat.RGBA16F
-        : TextureFormat.R16F
+        ? 'rgba16f'
+        : 'r16f'
       : device.getTextureCaps().supportFloatColorBuffer
       ? device.getDeviceType() === 'webgl'
-        ? TextureFormat.RGBA32F
-        : TextureFormat.R32F
-      : TextureFormat.RGBA8UNORM;
+        ? 'rgba32f'
+        : 'r32f'
+      : 'rgba8unorm';
   }
   getShadowMapDepthFormat(shadowMapper: ShadowMapper): TextureFormat {
-    return TextureFormat.D24S8;
+    return 'd24s8';
   }
   computeShadowMapDepth(shadowMapper: ShadowMapper, scope: PBInsideFunctionScope): PBShaderExp {
     return computeShadowMapDepth(scope, shadowMapper.shadowMap.format);

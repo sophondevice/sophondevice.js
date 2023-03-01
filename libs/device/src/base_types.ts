@@ -93,7 +93,7 @@ export function makeTextureFormat(
   blockWidth: number,
   blockHeight: number,
   blockSize: number
-): TextureFormat {
+): number {
   const compressionBits = compression << COMPRESSED_FORMAT_SHIFT;
   const colorBits =
     (r ? RED_BITMASK : 0) | (g ? GREEN_BITMASK : 0) | (b ? BLUE_BITMASK : 0) | (a ? ALPHA_BITMASK : 0);
@@ -118,9 +118,11 @@ export function makeTextureFormat(
   );
 }
 
-export enum TextureFormat {
-  Unknown = 0,
-  R8UNORM = makeTextureFormat(
+export type TextureFormat = 'unknown'|'r8unorm'|'r8snorm'|'r16f'|'r32f'|'r8ui'|'r8i'|'r16ui'|'r16i'|'r32ui'|'r32i'|'rg8unorm'|'rg8snorm'|'rg16f'|'rg32f'|'rg8ui'|'rg8i'|'rg16ui'|'rg16i'|'rg32ui'|'rg32i'|'rgba8unorm'|'rgba8unorm-srgb'|'rgba8snorm'|'bgra8unorm'|'bgra8unorm-srgb'|'rgba16f'|'rgba32f'|'rgba8ui'|'rgba8i'|'rgba16ui'|'rgba16i'|'rgba32ui'|'rgba32i'|'d16'|'d24'|'d32f'|'d24s8'|'d32fs8'|'dxt1'|'dxt1-srgb'|'dxt3'|'dxt3-srgb'|'dxt5'|'dxt5-srgb';
+
+const textureFormatMap: Record<TextureFormat, number> = {
+  'unknown': 0,
+  'r8unorm': makeTextureFormat(
     0,
     true,
     false,
@@ -137,7 +139,7 @@ export enum TextureFormat {
     1,
     1
   ),
-  R8SNORM = makeTextureFormat(
+  'r8snorm': makeTextureFormat(
     0,
     true,
     false,
@@ -154,7 +156,7 @@ export enum TextureFormat {
     1,
     1
   ),
-  R16F = makeTextureFormat(
+  'r16f': makeTextureFormat(
     0,
     true,
     false,
@@ -171,7 +173,7 @@ export enum TextureFormat {
     1,
     2
   ),
-  R32F = makeTextureFormat(
+  'r32f': makeTextureFormat(
     0,
     true,
     false,
@@ -188,7 +190,7 @@ export enum TextureFormat {
     1,
     4
   ),
-  R8UI = makeTextureFormat(
+  'r8ui': makeTextureFormat(
     0,
     true,
     false,
@@ -205,7 +207,7 @@ export enum TextureFormat {
     1,
     1
   ),
-  R8I = makeTextureFormat(
+  'r8i': makeTextureFormat(
     0,
     true,
     false,
@@ -222,7 +224,7 @@ export enum TextureFormat {
     1,
     1
   ),
-  R16UI = makeTextureFormat(
+  'r16ui': makeTextureFormat(
     0,
     true,
     false,
@@ -239,7 +241,7 @@ export enum TextureFormat {
     1,
     2
   ),
-  R16I = makeTextureFormat(
+  'r16i': makeTextureFormat(
     0,
     true,
     false,
@@ -256,7 +258,7 @@ export enum TextureFormat {
     1,
     2
   ),
-  R32UI = makeTextureFormat(
+  'r32ui': makeTextureFormat(
     0,
     true,
     false,
@@ -273,7 +275,7 @@ export enum TextureFormat {
     1,
     4
   ),
-  R32I = makeTextureFormat(
+  'r32i': makeTextureFormat(
     0,
     true,
     false,
@@ -290,7 +292,7 @@ export enum TextureFormat {
     1,
     4
   ),
-  RG8UNORM = makeTextureFormat(
+  'rg8unorm': makeTextureFormat(
     0,
     true,
     true,
@@ -307,7 +309,7 @@ export enum TextureFormat {
     1,
     2
   ),
-  RG8SNORM = makeTextureFormat(
+  'rg8snorm': makeTextureFormat(
     0,
     true,
     true,
@@ -324,7 +326,7 @@ export enum TextureFormat {
     1,
     2
   ),
-  RG16F = makeTextureFormat(
+  'rg16f': makeTextureFormat(
     0,
     true,
     true,
@@ -341,7 +343,7 @@ export enum TextureFormat {
     1,
     4
   ),
-  RG32F = makeTextureFormat(
+  'rg32f': makeTextureFormat(
     0,
     true,
     true,
@@ -358,7 +360,7 @@ export enum TextureFormat {
     1,
     8
   ),
-  RG8UI = makeTextureFormat(
+  'rg8ui': makeTextureFormat(
     0,
     true,
     true,
@@ -375,7 +377,7 @@ export enum TextureFormat {
     1,
     2
   ),
-  RG8I = makeTextureFormat(
+  'rg8i': makeTextureFormat(
     0,
     true,
     true,
@@ -392,7 +394,7 @@ export enum TextureFormat {
     1,
     2
   ),
-  RG16UI = makeTextureFormat(
+  'rg16ui': makeTextureFormat(
     0,
     true,
     true,
@@ -409,7 +411,7 @@ export enum TextureFormat {
     1,
     4
   ),
-  RG16I = makeTextureFormat(
+  'rg16i': makeTextureFormat(
     0,
     true,
     true,
@@ -426,7 +428,7 @@ export enum TextureFormat {
     1,
     4
   ),
-  RG32UI = makeTextureFormat(
+  'rg32ui': makeTextureFormat(
     0,
     true,
     true,
@@ -443,7 +445,7 @@ export enum TextureFormat {
     1,
     8
   ),
-  RG32I = makeTextureFormat(
+  'rg32i': makeTextureFormat(
     0,
     true,
     true,
@@ -460,7 +462,7 @@ export enum TextureFormat {
     1,
     8
   ),
-  RGBA8UNORM = makeTextureFormat(
+  'rgba8unorm': makeTextureFormat(
     0,
     true,
     true,
@@ -477,7 +479,7 @@ export enum TextureFormat {
     1,
     4
   ),
-  RGBA8UNORM_SRGB = makeTextureFormat(
+  'rgba8unorm-srgb': makeTextureFormat(
     0,
     true,
     true,
@@ -494,7 +496,7 @@ export enum TextureFormat {
     1,
     4
   ),
-  RGBA8SNORM = makeTextureFormat(
+  'rgba8snorm': makeTextureFormat(
     0,
     true,
     true,
@@ -511,7 +513,7 @@ export enum TextureFormat {
     1,
     4
   ),
-  BGRA8UNORM = makeTextureFormat(
+  'bgra8unorm': makeTextureFormat(
     0,
     true,
     true,
@@ -528,7 +530,7 @@ export enum TextureFormat {
     1,
     4
   ),
-  BGRA8UNORM_SRGB = makeTextureFormat(
+  'bgra8unorm-srgb': makeTextureFormat(
     0,
     true,
     true,
@@ -545,7 +547,7 @@ export enum TextureFormat {
     1,
     4
   ),
-  RGBA16F = makeTextureFormat(
+  'rgba16f': makeTextureFormat(
     0,
     true,
     true,
@@ -562,7 +564,7 @@ export enum TextureFormat {
     1,
     8
   ),
-  RGBA32F = makeTextureFormat(
+  'rgba32f': makeTextureFormat(
     0,
     true,
     true,
@@ -579,7 +581,7 @@ export enum TextureFormat {
     1,
     16
   ),
-  RGBA8UI = makeTextureFormat(
+  'rgba8ui': makeTextureFormat(
     0,
     true,
     true,
@@ -596,7 +598,7 @@ export enum TextureFormat {
     1,
     4
   ),
-  RGBA8I = makeTextureFormat(
+  'rgba8i': makeTextureFormat(
     0,
     true,
     true,
@@ -613,7 +615,7 @@ export enum TextureFormat {
     1,
     4
   ),
-  RGBA16UI = makeTextureFormat(
+  'rgba16ui': makeTextureFormat(
     0,
     true,
     true,
@@ -630,7 +632,7 @@ export enum TextureFormat {
     1,
     8
   ),
-  RGBA16I = makeTextureFormat(
+  'rgba16i': makeTextureFormat(
     0,
     true,
     true,
@@ -647,7 +649,7 @@ export enum TextureFormat {
     1,
     8
   ),
-  RGBA32UI = makeTextureFormat(
+  'rgba32ui': makeTextureFormat(
     0,
     true,
     true,
@@ -664,7 +666,7 @@ export enum TextureFormat {
     1,
     16
   ),
-  RGBA32I = makeTextureFormat(
+  'rgba32i': makeTextureFormat(
     0,
     true,
     true,
@@ -681,7 +683,7 @@ export enum TextureFormat {
     1,
     16
   ),
-  D16 = makeTextureFormat(
+  'd16': makeTextureFormat(
     0,
     false,
     false,
@@ -698,7 +700,7 @@ export enum TextureFormat {
     1,
     2
   ),
-  D24 = makeTextureFormat(
+  'd24': makeTextureFormat(
     0,
     false,
     false,
@@ -715,7 +717,7 @@ export enum TextureFormat {
     0,
     0
   ),
-  D32F = makeTextureFormat(
+  'd32f': makeTextureFormat(
     0,
     false,
     false,
@@ -732,7 +734,7 @@ export enum TextureFormat {
     1,
     4
   ),
-  D24S8 = makeTextureFormat(
+  'd24s8': makeTextureFormat(
     0,
     false,
     false,
@@ -749,7 +751,7 @@ export enum TextureFormat {
     1,
     4
   ),
-  D32FS8 = makeTextureFormat(
+  'd32fs8': makeTextureFormat(
     0,
     false,
     false,
@@ -767,7 +769,7 @@ export enum TextureFormat {
     5
   ),
   // compressed texture formats
-  DXT1 = makeTextureFormat(
+  'dxt1': makeTextureFormat(
     COMPRESSION_FORMAT_BC1,
     true,
     true,
@@ -784,7 +786,7 @@ export enum TextureFormat {
     4,
     8
   ),
-  DXT1_SRGB = makeTextureFormat(
+  'dxt1-srgb': makeTextureFormat(
     COMPRESSION_FORMAT_BC1,
     true,
     true,
@@ -801,7 +803,7 @@ export enum TextureFormat {
     4,
     8
   ),
-  DXT3 = makeTextureFormat(
+  'dxt3': makeTextureFormat(
     COMPRESSION_FORMAT_BC2,
     true,
     true,
@@ -818,7 +820,7 @@ export enum TextureFormat {
     4,
     16
   ),
-  DXT3_SRGB = makeTextureFormat(
+  'dxt3-srgb': makeTextureFormat(
     COMPRESSION_FORMAT_BC2,
     true,
     true,
@@ -835,7 +837,7 @@ export enum TextureFormat {
     4,
     16
   ),
-  DXT5 = makeTextureFormat(
+  'dxt5': makeTextureFormat(
     COMPRESSION_FORMAT_BC3,
     true,
     true,
@@ -852,7 +854,7 @@ export enum TextureFormat {
     4,
     16
   ),
-  DXT5_SRGB = makeTextureFormat(
+  'dxt5-srgb': makeTextureFormat(
     COMPRESSION_FORMAT_BC3,
     true,
     true,
@@ -873,67 +875,67 @@ export enum TextureFormat {
 
 export function linearTextureFormatToSRGB(format: TextureFormat): TextureFormat {
   switch (format) {
-    case TextureFormat.RGBA8UNORM:
-      return TextureFormat.RGBA8UNORM_SRGB;
-    case TextureFormat.BGRA8UNORM:
-      return TextureFormat.BGRA8UNORM_SRGB;
-    case TextureFormat.DXT1:
-      return TextureFormat.DXT1_SRGB;
-    case TextureFormat.DXT3:
-      return TextureFormat.DXT3_SRGB;
-    case TextureFormat.DXT5:
-      return TextureFormat.DXT5_SRGB;
+    case 'rgba8unorm':
+      return 'rgba8unorm-srgb';
+    case 'bgra8unorm':
+      return 'bgra8unorm-srgb';
+    case 'dxt1':
+      return 'dxt1-srgb';
+    case 'dxt3':
+      return 'dxt3-srgb';
+    case 'dxt5':
+      return 'dxt5-srgb';
     default:
       return format;
   }
 }
 export function hasAlphaChannel(format: TextureFormat): boolean {
-  return !!(format & ALPHA_BITMASK);
+  return !!(textureFormatMap[format] & ALPHA_BITMASK);
 }
 export function hasRedChannel(format: TextureFormat): boolean {
-  return !!(format & RED_BITMASK);
+  return !!(textureFormatMap[format] & RED_BITMASK);
 }
 export function hasGreenChannel(format: TextureFormat): boolean {
-  return !!(format & GREEN_BITMASK);
+  return !!(textureFormatMap[format] & GREEN_BITMASK);
 }
 export function hasBlueChannel(format: TextureFormat): boolean {
-  return !!(format & BLUE_BITMASK);
+  return !!(textureFormatMap[format] & BLUE_BITMASK);
 }
 export function hasDepthChannel(format: TextureFormat): boolean {
-  return !!(format & DEPTH_BITMASK);
+  return !!(textureFormatMap[format] & DEPTH_BITMASK);
 }
 export function hasStencilChannel(format: TextureFormat): boolean {
-  return !!(format & STENCIL_BITMASK);
+  return !!(textureFormatMap[format] & STENCIL_BITMASK);
 }
 export function isFloatTextureFormat(format: TextureFormat): boolean {
-  return !!(format & FLOAT_BITMASK);
+  return !!(textureFormatMap[format] & FLOAT_BITMASK);
 }
 export function isIntegerTextureFormat(format: TextureFormat): boolean {
-  return !!(format & INTEGER_BITMASK);
+  return !!(textureFormatMap[format] & INTEGER_BITMASK);
 }
 export function isSignedTextureFormat(format: TextureFormat): boolean {
-  return !!(format & SIGNED_BITMASK);
+  return !!(textureFormatMap[format] & SIGNED_BITMASK);
 }
 export function isCompressedTextureFormat(format: TextureFormat): boolean {
-  return !!(format & COMPRESSION_FORMAT_BITMASK);
+  return !!(textureFormatMap[format] & COMPRESSION_FORMAT_BITMASK);
 }
 export function isDepthTextureFormat(format: TextureFormat): boolean {
-  return !!(format & DEPTH_BITMASK);
+  return !!(textureFormatMap[format] & DEPTH_BITMASK);
 }
 export function isSRGBTextureFormat(format: TextureFormat): boolean {
-  return !!(format & SRGB_BITMASK);
+  return !!(textureFormatMap[format] & SRGB_BITMASK);
 }
 export function getTextureFormatBlockSize(format: TextureFormat): number {
-  return (format & BLOCK_SIZE_MASK) >> BLOCK_SIZE_SHIFT;
+  return (textureFormatMap[format] & BLOCK_SIZE_MASK) >> BLOCK_SIZE_SHIFT;
 }
 export function getTextureFormatBlockWidth(format: TextureFormat): number {
-  return (format & BLOCK_WIDTH_MASK) >> BLOCK_WIDTH_SHIFT;
+  return (textureFormatMap[format] & BLOCK_WIDTH_MASK) >> BLOCK_WIDTH_SHIFT;
 }
 export function getTextureFormatBlockHeight(format: TextureFormat): number {
-  return (format & BLOCK_HEIGHT_MASK) >> BLOCK_HEIGHT_SHIFT;
+  return (textureFormatMap[format] & BLOCK_HEIGHT_MASK) >> BLOCK_HEIGHT_SHIFT;
 }
 export function getCompressedTextureFormat(format: TextureFormat): number {
-  return (format & COMPRESSED_FORMAT_MASK) >> COMPRESSED_FORMAT_SHIFT;
+  return (textureFormatMap[format] & COMPRESSED_FORMAT_MASK) >> COMPRESSED_FORMAT_SHIFT;
 }
 
 function normalizeColorComponent(val: number, maxval: number) {
@@ -1006,84 +1008,84 @@ function encode5551(r: number, g: number, b: number, a: number) {
 
 export function encodePixel(format: TextureFormat, r: number, g: number, b: number, a: number): TypedArray {
   switch (format) {
-    case TextureFormat.R8UNORM:
+    case 'r8unorm':
       return new Uint8Array([normalizeColorComponent(r, 255)]);
-    case TextureFormat.R8SNORM:
+    case 'r8snorm':
       return new Int8Array([normalizeColorComponentSigned(r, 255)]);
-    case TextureFormat.R16F:
+    case 'r16f':
       return new Uint16Array([floatToHalf(r)]);
-    case TextureFormat.R32F:
+    case 'r32f':
       return new Float32Array([r]);
-    case TextureFormat.R8UI:
+    case 'r8ui':
       return new Uint8Array([r | 0]);
-    case TextureFormat.R8I:
+    case 'r8i':
       return new Int8Array([r | 0]);
-    case TextureFormat.R16UI:
+    case 'r16ui':
       return new Uint16Array([r | 0]);
-    case TextureFormat.R16I:
+    case 'r16i':
       return new Int16Array([r | 0]);
-    case TextureFormat.R32UI:
+    case 'r32ui':
       return new Uint32Array([r | 0]);
-    case TextureFormat.R32I:
+    case 'r32i':
       return new Int32Array([r | 0]);
-    case TextureFormat.RG8UNORM:
+    case 'rg8unorm':
       return new Uint8Array([normalizeColorComponent(r, 255), normalizeColorComponent(g, 255)]);
-    case TextureFormat.RG8SNORM:
+    case 'rg8snorm':
       return new Int8Array([normalizeColorComponentSigned(r, 255), normalizeColorComponentSigned(g, 255)]);
-    case TextureFormat.RG16F:
+    case 'rg16f':
       return new Uint16Array([floatToHalf(r), floatToHalf(g)]);
-    case TextureFormat.RG32F:
+    case 'rg32f':
       return new Float32Array([r, g]);
-    case TextureFormat.RG8UI:
+    case 'rg8ui':
       return new Uint8Array([r | 0, g | 0]);
-    case TextureFormat.RG8I:
+    case 'rg8i':
       return new Int8Array([r | 0, g | 0]);
-    case TextureFormat.RG16UI:
+    case 'rg16ui':
       return new Uint16Array([r | 0, g | 0]);
-    case TextureFormat.RG16I:
+    case 'rg16i':
       return new Int16Array([r | 0, g | 0]);
-    case TextureFormat.RG32UI:
+    case 'rg32ui':
       return new Uint32Array([r | 0, g | 0]);
-    case TextureFormat.RG32I:
+    case 'rg32i':
       return new Int32Array([r | 0, g | 0]);
-    case TextureFormat.RGBA8UNORM:
-    case TextureFormat.RGBA8UNORM_SRGB:
+    case 'rgba8unorm':
+    case 'rgba8unorm-srgb':
       return new Uint8Array([
         normalizeColorComponent(r, 255),
         normalizeColorComponent(g, 255),
         normalizeColorComponent(b, 255),
         normalizeColorComponent(a, 255)
       ]);
-    case TextureFormat.BGRA8UNORM:
-    case TextureFormat.BGRA8UNORM_SRGB:
+    case 'bgra8unorm':
+    case 'bgra8unorm-srgb':
       return new Uint8Array([
         normalizeColorComponent(b, 255),
         normalizeColorComponent(g, 255),
         normalizeColorComponent(r, 255),
         normalizeColorComponent(a, 255)
       ]);
-    case TextureFormat.RGBA8SNORM:
+    case 'rgba8snorm':
       return new Int8Array([
         normalizeColorComponentSigned(r, 255),
         normalizeColorComponentSigned(g, 255),
         normalizeColorComponentSigned(b, 255),
         normalizeColorComponentSigned(a, 255)
       ]);
-    case TextureFormat.RGBA16F:
+    case 'rgba16f':
       return new Uint16Array([floatToHalf(r), floatToHalf(g), floatToHalf(b), floatToHalf(a)]);
-    case TextureFormat.RGBA32F:
+    case 'rgba32f':
       return new Float32Array([r, g, b, a]);
-    case TextureFormat.RGBA8UI:
+    case 'rgba8ui':
       return new Uint8Array([r | 0, g | 0, b | 0, a | 0]);
-    case TextureFormat.RGBA8I:
+    case 'rgba8i':
       return new Int8Array([r | 0, g | 0, b | 0, a | 0]);
-    case TextureFormat.RGBA16UI:
+    case 'rgba16ui':
       return new Uint16Array([r | 0, g | 0, b | 0, a | 0]);
-    case TextureFormat.RGBA16I:
+    case 'rgba16i':
       return new Int16Array([r | 0, g | 0, b | 0, a | 0]);
-    case TextureFormat.RGBA32UI:
+    case 'rgba32ui':
       return new Uint32Array([r | 0, g | 0, b | 0, a | 0]);
-    case TextureFormat.RGBA32I:
+    case 'rgba32i':
       return new Int32Array([r | 0, g | 0, b | 0, a | 0]);
     default:
       return null;
@@ -1099,68 +1101,68 @@ export function encodePixelToArray(
   arr: Array<number>
 ): void {
   switch (format) {
-    case TextureFormat.R8UNORM:
+    case 'r8unorm':
       arr.push(normalizeColorComponent(r, 255));
       break;
-    case TextureFormat.R8SNORM:
+    case 'r8snorm':
       arr.push(normalizeColorComponentSigned(r, 255));
       break;
-    case TextureFormat.R16F:
+    case 'r16f':
       arr.push(floatToHalf(r));
       break;
-    case TextureFormat.R32F:
+    case 'r32f':
       arr.push(r);
       break;
-    case TextureFormat.R8UI:
+    case 'r8ui':
       arr.push(r | 0);
       break;
-    case TextureFormat.R8I:
+    case 'r8i':
       arr.push(r | 0);
       break;
-    case TextureFormat.R16UI:
+    case 'r16ui':
       arr.push(r | 0);
       break;
-    case TextureFormat.R16I:
+    case 'r16i':
       arr.push(r | 0);
       break;
-    case TextureFormat.R32UI:
+    case 'r32ui':
       arr.push(r | 0);
       break;
-    case TextureFormat.R32I:
+    case 'r32i':
       arr.push(r | 0);
       break;
-    case TextureFormat.RG8UNORM:
+    case 'rg8unorm':
       arr.push(normalizeColorComponent(r, 255), normalizeColorComponent(g, 255));
       break;
-    case TextureFormat.RG8SNORM:
+    case 'rg8snorm':
       arr.push(normalizeColorComponentSigned(r, 255), normalizeColorComponentSigned(g, 255));
       break;
-    case TextureFormat.RG16F:
+    case 'rg16f':
       arr.push(floatToHalf(r), floatToHalf(g));
       break;
-    case TextureFormat.RG32F:
+    case 'rg32f':
       arr.push(r, g);
       break;
-    case TextureFormat.RG8UI:
+    case 'rg8ui':
       arr.push(r | 0, g | 0);
       break;
-    case TextureFormat.RG8I:
+    case 'rg8i':
       arr.push(r | 0, g | 0);
       break;
-    case TextureFormat.RG16UI:
+    case 'rg16ui':
       arr.push(r | 0, g | 0);
       break;
-    case TextureFormat.RG16I:
+    case 'rg16i':
       arr.push(r | 0, g | 0);
       break;
-    case TextureFormat.RG32UI:
+    case 'rg32ui':
       arr.push(r | 0, g | 0);
       break;
-    case TextureFormat.RG32I:
+    case 'rg32i':
       arr.push(r | 0, g | 0);
       break;
-    case TextureFormat.RGBA8UNORM:
-    case TextureFormat.RGBA8UNORM_SRGB:
+    case 'rgba8unorm':
+    case 'rgba8unorm-srgb':
       arr.push(
         normalizeColorComponent(r, 255),
         normalizeColorComponent(g, 255),
@@ -1168,8 +1170,8 @@ export function encodePixelToArray(
         normalizeColorComponent(a, 255)
       );
       break;
-    case TextureFormat.BGRA8UNORM:
-    case TextureFormat.BGRA8UNORM_SRGB:
+    case 'bgra8unorm':
+    case 'bgra8unorm-srgb':
       arr.push(
         normalizeColorComponent(b, 255),
         normalizeColorComponent(g, 255),
@@ -1177,7 +1179,7 @@ export function encodePixelToArray(
         normalizeColorComponent(a, 255)
       );
       break;
-    case TextureFormat.RGBA8SNORM:
+    case 'rgba8snorm':
       arr.push(
         normalizeColorComponentSigned(r, 255),
         normalizeColorComponentSigned(g, 255),
@@ -1185,28 +1187,28 @@ export function encodePixelToArray(
         normalizeColorComponentSigned(a, 255)
       );
       break;
-    case TextureFormat.RGBA16F:
+    case 'rgba16f':
       arr.push(floatToHalf(r), floatToHalf(g), floatToHalf(b), floatToHalf(a));
       break;
-    case TextureFormat.RGBA32F:
+    case 'rgba32f':
       arr.push(r, g, b, a);
       break;
-    case TextureFormat.RGBA8UI:
+    case 'rgba8ui':
       arr.push(r | 0, g | 0, b | 0, a | 0);
       break;
-    case TextureFormat.RGBA8I:
+    case 'rgba8i':
       arr.push(r | 0, g | 0, b | 0, a | 0);
       break;
-    case TextureFormat.RGBA16UI:
+    case 'rgba16ui':
       arr.push(r | 0, g | 0, b | 0, a | 0);
       break;
-    case TextureFormat.RGBA16I:
+    case 'rgba16i':
       arr.push(r | 0, g | 0, b | 0, a | 0);
       break;
-    case TextureFormat.RGBA32UI:
+    case 'rgba32ui':
       arr.push(r | 0, g | 0, b | 0, a | 0);
       break;
-    case TextureFormat.RGBA32I:
+    case 'rgba32i':
       arr.push(r | 0, g | 0, b | 0, a | 0);
       break;
   }

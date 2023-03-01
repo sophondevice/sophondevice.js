@@ -1,6 +1,5 @@
 import { CubeFace, TypedArray } from '@sophon/base';
 import {
-  TextureFormat,
   linearTextureFormatToSRGB,
   getTextureFormatBlockWidth,
   getTextureFormatBlockHeight,
@@ -15,6 +14,7 @@ import {
   GPUDataBuffer
 } from '../gpuobject';
 import type { WebGPUDevice } from './device';
+import type { TextureFormat } from '../base_types';
 
 export class WebGPUTextureCube extends WebGPUBaseTexture implements TextureCube<GPUTexture> {
   constructor(device: WebGPUDevice) {
@@ -89,10 +89,10 @@ export class WebGPUTextureCube extends WebGPUBaseTexture implements TextureCube<
     if (this._flags & GPUResourceUsageFlags.TF_WRITABLE) {
       console.error(new Error('storage texture can not be cube texture'));
     } else {
-      const format =
+      const format: TextureFormat =
         this._flags & GPUResourceUsageFlags.TF_LINEAR_COLOR_SPACE
-          ? TextureFormat.RGBA8UNORM
-          : TextureFormat.RGBA8UNORM_SRGB;
+          ? 'rgba8unorm'
+          : 'rgba8unorm-srgb';
       this.loadImages(images, format);
     }
   }

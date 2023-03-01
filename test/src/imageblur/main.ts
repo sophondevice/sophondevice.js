@@ -1,5 +1,5 @@
 import { REvent, Vector4 } from '@sophon/base';
-import { Viewer, ProgramBuilder, TextureFormat } from '@sophon/device';
+import { Viewer, ProgramBuilder } from '@sophon/device';
 import { AssetManager } from '@sophon/scene';
 import { GUI, GUIRenderer, ScrollBar, RValueChangeEvent, RElement } from '@sophon/dom';
 
@@ -114,12 +114,12 @@ import { GUI, GUIRenderer, ScrollBar, RValueChangeEvent, RElement } from '@sopho
   });
   const cubeTexture = await assetManager.fetchTexture('./assets/images/Di-3d.png', null, false, true);
   const textures = [
-    viewer.device.createTexture2D(TextureFormat.RGBA8UNORM, cubeTexture.width, cubeTexture.height, {
+    viewer.device.createTexture2D('rgba8unorm', cubeTexture.width, cubeTexture.height, {
       colorSpace: 'linear',
       writable: true,
       noMipmap: true
     }),
-    viewer.device.createTexture2D(TextureFormat.RGBA8UNORM, cubeTexture.width, cubeTexture.height, {
+    viewer.device.createTexture2D('rgba8unorm', cubeTexture.width, cubeTexture.height, {
       colorSpace: 'linear',
       writable: true,
       noMipmap: true

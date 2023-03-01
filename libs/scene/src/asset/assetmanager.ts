@@ -1,5 +1,4 @@
 import { Vector3, isPowerOf2, nextPowerOf2, HttpRequest } from '@sophon/base';
-import { TextureFormat, Device, BaseTexture, Texture2D, GPUObject } from '@sophon/device';
 import { AssetHierarchyNode, AssetSkeleton, AssetSubMeshData, SharedModel } from './model';
 import { GLTFLoader } from './loaders/gltf/gltf_loader';
 import { WebImageLoader } from './loaders/image/webimage_loader';
@@ -14,6 +13,7 @@ import { GammaBlitter } from '../blitter';
 import { getSheenLutLoader } from './builtin';
 import { GraphNode } from '../graph_node';
 import { BUILTIN_ASSET_TEXTURE_SHEEN_LUT } from '../values';
+import type { Device, BaseTexture, Texture2D, GPUObject } from '@sophon/device';
 import type { Scene } from '../scene';
 import type { AbstractTextureLoader, AbstractModelLoader } from './loaders/loader';
 
@@ -251,10 +251,10 @@ export class AssetManager {
         });
         const blitter = new GammaBlitter(1);
         const newTexture = tex.isTexture2D()
-          ? this.device.createTexture2D(TextureFormat.RGBA8UNORM, newWidth, newHeight, {
+          ? this.device.createTexture2D('rgba8unorm', newWidth, newHeight, {
               colorSpace: 'linear'
             })
-          : this.device.createCubeTexture(TextureFormat.RGBA8UNORM, newWidth, { colorSpace: 'linear' });
+          : this.device.createCubeTexture('rgba8unorm', newWidth, { colorSpace: 'linear' });
 
         blitter.blit(tex as any, newTexture as any, sampler);
         tex.dispose();

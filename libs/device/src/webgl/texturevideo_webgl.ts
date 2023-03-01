@@ -1,4 +1,3 @@
-import { TextureFormat } from '../base_types';
 import { textureTargetMap } from './constants_webgl';
 import { WebGLBaseTexture } from './basetexture_webgl';
 import { GPUResourceUsageFlags, TextureVideo } from '../gpuobject';
@@ -12,7 +11,7 @@ export class WebGLTextureVideo extends WebGLBaseTexture implements TextureVideo<
     super(device, '2d');
     this._source = null;
     this._callbackId = null;
-    this._format = TextureFormat.Unknown;
+    this._format = 'unknown';
     this.loadFromElement(source);
   }
   isTextureVideo(): this is TextureVideo {
@@ -48,7 +47,7 @@ export class WebGLTextureVideo extends WebGLBaseTexture implements TextureVideo<
   }
   /** @internal */
   private update(): void {
-    this.allocInternal(TextureFormat.RGBA8UNORM, this._source.videoWidth, this._source.videoHeight, 1, 1);
+    this.allocInternal('rgba8unorm', this._source.videoWidth, this._source.videoHeight, 1, 1);
     if (!this._device.isContextLost()) {
       const target = textureTargetMap[this._target];
       const params = (this.getTextureCaps() as WebGLTextureCap).getTextureFormatInfo(this._format);
@@ -81,7 +80,7 @@ export class WebGLTextureVideo extends WebGLBaseTexture implements TextureVideo<
       });
     }
     this.allocInternal(
-      TextureFormat.RGBA8UNORM,
+      'rgba8unorm',
       Math.max(this._source.videoWidth, 1),
       Math.max(this._source.videoHeight, 1),
       1,

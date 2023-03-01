@@ -2,9 +2,7 @@ import {
   TextureFormat,
   PBInsideFunctionScope,
   PBShaderExp,
-  isDepthTextureFormat,
-  PBGlobalScope,
-  PBIfScope
+  isDepthTextureFormat
 } from '@sophon/device';
 import { ShaderLib } from '../materiallib';
 import { LIGHT_TYPE_DIRECTIONAL, LIGHT_TYPE_POINT, LIGHT_TYPE_SPOT } from '../values';
@@ -179,7 +177,7 @@ export function computeShadowMapDepth(
             );
           });
         this.$return(
-          targetFormat === TextureFormat.RGBA8UNORM
+          targetFormat === 'rgba8unorm'
             ? lib.encodeNormalizedFloatToRGBA(this.depth)
             : pb.vec4(this.depth, 0, 0, 1)
         );
@@ -291,7 +289,7 @@ function sampleShadowMapPCF(
             cascade && pb.getDeviceType() !== 'webgl'
               ? pb.textureArraySampleLevel(this.shadowMap, uv, this.cascade, 0)
               : pb.textureSampleLevel(this.shadowMap, uv, 0);
-          if (shadowMapFormat === TextureFormat.RGBA8UNORM) {
+          if (shadowMapFormat === 'rgba8unorm') {
             this.shadowTex.x = lib.decodeNormalizedFloatFromRGBA(this.shadowTex);
           }
           this.$return(pb.step(sampleDepth, this.shadowTex.x));
@@ -334,7 +332,7 @@ function sampleShadowMap(
             this.$return(pb.clamp(pb.textureSampleCompareLevel(this.shadowMap, this.coords, this.z), 0, 1));
           } else {
             this.$l.shadowTex = pb.textureSampleLevel(this.shadowMap, this.coords, 0);
-            if (shadowMapFormat === TextureFormat.RGBA8UNORM) {
+            if (shadowMapFormat === 'rgba8unorm') {
               this.shadowTex.x = lib.decodeNormalizedFloatFromRGBA(this.shadowTex);
             }
             this.$return(pb.step(this.z, this.shadowTex.x));
@@ -351,7 +349,7 @@ function sampleShadowMap(
               cascade && pb.getDeviceType() !== 'webgl'
                 ? pb.textureArraySampleLevel(this.shadowMap, this.coords, this.cascade, 0)
                 : pb.textureSampleLevel(this.shadowMap, this.coords, 0);
-            if (shadowMapFormat === TextureFormat.RGBA8UNORM) {
+            if (shadowMapFormat === 'rgba8unorm') {
               this.shadowTex.x = lib.decodeNormalizedFloatFromRGBA(this.shadowTex);
             }
             this.$return(pb.step(this.z, this.shadowTex.x));
@@ -417,7 +415,7 @@ export function filterShadowVSM(
             chebyshevUpperBound(
               this,
               this.texCoord.w,
-              shadowMapFormat === TextureFormat.RGBA8UNORM
+              shadowMapFormat === 'rgba8unorm'
                 ? lib.decode2HalfFromRGBA(this.shadowTex)
                 : this.shadowTex.rg
             )
@@ -432,7 +430,7 @@ export function filterShadowVSM(
             chebyshevUpperBound(
               this,
               this.texCoord.z,
-              shadowMapFormat === TextureFormat.RGBA8UNORM
+              shadowMapFormat === 'rgba8unorm'
                 ? lib.decode2HalfFromRGBA(this.shadowTex)
                 : this.shadowTex.rg
             )
@@ -462,7 +460,7 @@ export function filterShadowESM(
         if (lightType === LIGHT_TYPE_POINT) {
           this.$l.depth = pb.div(pb.length(this.shadowVertex.xyz), this.global.light.lightParams[0].w);
           this.$l.shadowTex = pb.textureSampleLevel(this.shadowMap, this.texCoord.xyz, 0);
-          if (shadowMapFormat === TextureFormat.RGBA8UNORM) {
+          if (shadowMapFormat === 'rgba8unorm') {
             this.shadowTex.x = lib.decodeNormalizedFloatFromRGBA(this.shadowTex);
           }
         } else {
@@ -471,7 +469,7 @@ export function filterShadowESM(
           } else {
             this.$l.shadowTex = pb.textureSampleLevel(this.shadowMap, this.texCoord.xy, 0);
           }
-          if (shadowMapFormat === TextureFormat.RGBA8UNORM) {
+          if (shadowMapFormat === 'rgba8unorm') {
             this.shadowTex.x = lib.decodeNormalizedFloatFromRGBA(this.shadowTex);
           }
           if (lightType === LIGHT_TYPE_SPOT) {

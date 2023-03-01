@@ -1,12 +1,4 @@
 import { Vector4, Frustum } from '@sophon/base';
-import {
-  PBShaderExp,
-  PBGlobalScope,
-  BindGroup,
-  RenderStateSet,
-  TextureFormat,
-  PBInsideFunctionScope
-} from '@sophon/device';
 import { RenderPass } from './renderpass';
 import { RENDER_PASS_TYPE_SHADOWMAP } from '../values';
 import { PunctualLight } from '../light';
@@ -14,6 +6,13 @@ import { ShaderLib } from '../materiallib';
 import { Camera } from '../camera';
 import { CopyBlitter, GaussianBlurBlitter, BlitType } from '../blitter';
 import * as values from '../values';
+import type {
+  PBShaderExp,
+  PBGlobalScope,
+  BindGroup,
+  RenderStateSet,
+  PBInsideFunctionScope
+} from '@sophon/device';
 import type { Scene } from '../scene';
 import type { RenderQueue } from '../render_queue';
 import type { DrawContext } from '../drawable';
@@ -110,13 +109,13 @@ export class ShadowMapPass extends RenderPass {
     this._mainPass = null;
     this._lightCameras = new WeakMap();
     this._blurFilterH = new BlurBlitter('horizonal', 5, 4, 1 / 1024);
-    this._blurFilterH.packFloat = renderScheme.getShadowMapFormat() === TextureFormat.RGBA8UNORM;
+    this._blurFilterH.packFloat = renderScheme.getShadowMapFormat() === 'rgba8unorm';
     // this._blurFilterH.logSpace = true;
     this._blurFilterV = new BlurBlitter('vertical', 5, 4, 1 / 1024);
-    this._blurFilterV.packFloat = renderScheme.getShadowMapFormat() === TextureFormat.RGBA8UNORM;
+    this._blurFilterV.packFloat = renderScheme.getShadowMapFormat() === 'rgba8unorm';
     // this._blurFilterV.logSpace = true;
     this._debugBlitter = new DebugBlitter();
-    this._debugBlitter.packFloat = renderScheme.getShadowMapFormat() === TextureFormat.RGBA8UNORM;
+    this._debugBlitter.packFloat = renderScheme.getShadowMapFormat() === 'rgba8unorm';
     this.enableClear(true, true);
   }
   get light(): PunctualLight {

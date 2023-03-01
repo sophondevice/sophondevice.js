@@ -28,8 +28,8 @@ export class PCFPD extends ShadowImpl {
   }
   isSupported(shadowMapper: ShadowMapper): boolean {
     return (
-      this.getShadowMapColorFormat(shadowMapper) !== TextureFormat.Unknown &&
-      this.getShadowMapDepthFormat(shadowMapper) !== TextureFormat.Unknown
+      this.getShadowMapColorFormat(shadowMapper) !== 'unknown' &&
+      this.getShadowMapDepthFormat(shadowMapper) !== 'unknown'
     );
   }
   resourceDirty(): boolean {
@@ -62,24 +62,24 @@ export class PCFPD extends ShadowImpl {
   }
   getShadowMapColorFormat(shadowMapper: ShadowMapper): TextureFormat {
     if (this.useNativeShadowMap(shadowMapper)) {
-      return TextureFormat.RGBA8UNORM;
+      return 'rgba8unorm';
     } else {
       const device = shadowMapper.light.scene.device;
       return device.getTextureCaps().supportHalfFloatColorBuffer
         ? device.getDeviceType() === 'webgl'
-          ? TextureFormat.RGBA16F
-          : TextureFormat.R16F
+          ? 'rgba16f'
+          : 'r16f'
         : device.getTextureCaps().supportFloatColorBuffer
         ? device.getDeviceType() === 'webgl'
-          ? TextureFormat.RGBA32F
-          : TextureFormat.R32F
-        : TextureFormat.RGBA8UNORM;
+          ? 'rgba32f'
+          : 'r32f'
+        : 'rgba8unorm';
     }
   }
   getShadowMapDepthFormat(shadowMapper: ShadowMapper): TextureFormat {
     return shadowMapper.light.scene.device.getDeviceType() === 'webgl'
-      ? TextureFormat.D24S8
-      : TextureFormat.D32F;
+      ? 'd24s8'
+      : 'd32f';
   }
   computeShadowMapDepth(shadowMapper: ShadowMapper, scope: PBInsideFunctionScope): PBShaderExp {
     return lib.computeShadowMapDepth(scope, shadowMapper.shadowMap.format);
@@ -232,7 +232,7 @@ export class PCFPD extends ShadowImpl {
         funcNameSampleShadowMap,
         [pb.vec4('coords'), pb.float('z'), pb.float('bias')],
         function () {
-          const floatDepthTexture = shadowMapper.shadowMap.format !== TextureFormat.RGBA8UNORM;
+          const floatDepthTexture = shadowMapper.shadowMap.format !== 'rgba8unorm';
           if (shadowMapper.light.isPointLight()) {
             if (this.useNativeShadowMap(shadowMapper)) {
               this.$return(
@@ -287,7 +287,7 @@ export class PCFPD extends ShadowImpl {
         funcNameSampleShadowMapCSM,
         [pb.vec4('coords'), pb.int('split'), pb.float('z'), pb.float('bias')],
         function () {
-          const floatDepthTexture = shadowMapper.shadowMap.format !== TextureFormat.RGBA8UNORM;
+          const floatDepthTexture = shadowMapper.shadowMap.format !== 'rgba8unorm';
           this.$l.distance = pb.sub(this.z, this.bias);
           if (that.useNativeShadowMap(shadowMapper)) {
             if (shadowMapper.shadowMap.isTexture2DArray()) {

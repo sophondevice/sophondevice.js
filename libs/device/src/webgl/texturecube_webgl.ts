@@ -1,5 +1,5 @@
 import { CubeFace, TypedArray } from '@sophon/base';
-import { TextureFormat, linearTextureFormatToSRGB } from '../base_types';
+import { linearTextureFormatToSRGB } from '../base_types';
 import { WebGLBaseTexture } from './basetexture_webgl';
 import { textureTargetMap, cubeMapFaceMap } from './constants_webgl';
 import {
@@ -9,6 +9,7 @@ import {
   TextureImageElement,
   GPUDataBuffer
 } from '../gpuobject';
+import type { TextureFormat } from '../base_types';
 import type { WebGLDevice } from './device_webgl';
 import type { WebGLTextureCap } from './capabilities_webgl';
 
@@ -155,8 +156,8 @@ export class WebGLTextureCube extends WebGLBaseTexture implements TextureCube<We
     } else {
       const format =
         this._flags & GPUResourceUsageFlags.TF_LINEAR_COLOR_SPACE
-          ? TextureFormat.RGBA8UNORM
-          : TextureFormat.RGBA8UNORM_SRGB;
+          ? 'rgba8unorm'
+          : 'rgba8unorm-srgb';
       this.loadImages(images, format);
     }
   }

@@ -1,4 +1,4 @@
-import { TextureFormat, linearTextureFormatToSRGB } from '../base_types';
+import { linearTextureFormatToSRGB } from '../base_types';
 import { textureTargetMap } from './constants_webgl';
 import { WebGLBaseTexture } from './basetexture_webgl';
 import {
@@ -9,6 +9,7 @@ import {
   GPUDataBuffer
 } from '../gpuobject';
 import type { TypedArray } from '@sophon/base';
+import type { TextureFormat } from '../base_types';
 import type { WebGLDevice } from './device_webgl';
 import type { WebGLTextureCap } from './capabilities_webgl';
 
@@ -136,8 +137,8 @@ export class WebGLTexture2D extends WebGLBaseTexture implements Texture2D<WebGLT
     } else {
       const format =
         this._flags & GPUResourceUsageFlags.TF_LINEAR_COLOR_SPACE
-          ? TextureFormat.RGBA8UNORM
-          : TextureFormat.RGBA8UNORM_SRGB;
+          ? 'rgba8unorm'
+          : 'rgba8unorm-srgb';
       this.loadImage(element, format);
     }
   }
@@ -175,14 +176,14 @@ export class WebGLTexture2D extends WebGLBaseTexture implements Texture2D<WebGLT
   /** @internal */
   private guessTextureFormat(url: string, mimeType?: string) {
     if (mimeType === 'image/jpeg' || mimeType === 'image/png') {
-      return this.linearColorSpace ? TextureFormat.RGBA8UNORM : TextureFormat.RGBA8UNORM_SRGB;
+      return this.linearColorSpace ? 'rgba8unorm' : 'rgba8unorm-srgb';
     }
     const dataURIRegex = /^data:(.*?)(;base64)?,(.*)$/;
     const matchResult = url.match(dataURIRegex);
     if (matchResult) {
       const type = matchResult[1];
       if (type.indexOf('image/jpeg') >= 0 || type.indexOf('image/png') >= 0) {
-        return this.linearColorSpace ? TextureFormat.RGBA8UNORM : TextureFormat.RGBA8UNORM_SRGB;
+        return this.linearColorSpace ? 'rgba8unorm' : 'rgba8unorm-srgb';
       }
     } else {
       const pindex = url.indexOf('?');
@@ -193,11 +194,11 @@ export class WebGLTexture2D extends WebGLBaseTexture implements Texture2D<WebGLT
       if (eindex >= 0) {
         const ext = url.substring(eindex + 1).toLowerCase();
         if (ext === 'jpg' || ext === 'jpeg' || ext === 'png') {
-          return this.linearColorSpace ? TextureFormat.RGBA8UNORM : TextureFormat.RGBA8UNORM_SRGB;
+          return this.linearColorSpace ? 'rgba8unorm' : 'rgba8unorm-srgb';
         }
       }
     }
-    return TextureFormat.Unknown;
+    return 'unknown';
   }
   /** @internal */
   private loadEmpty(format: TextureFormat, width: number, height: number, numMipLevels: number): void {
@@ -211,11 +212,11 @@ export class WebGLTexture2D extends WebGLBaseTexture implements Texture2D<WebGLT
     const sRGB = !(this._flags & GPUResourceUsageFlags.TF_LINEAR_COLOR_SPACE);
     let format = sRGB ? linearTextureFormatToSRGB(levels.format) : levels.format;
     let swizzle = false;
-    if (format === TextureFormat.BGRA8UNORM) {
-      format = TextureFormat.RGBA8UNORM;
+    if (format === 'bgra8unorm') {
+      format = 'rgba8unorm';
       swizzle = true;
-    } else if (this._format === TextureFormat.BGRA8UNORM_SRGB) {
-      format = TextureFormat.RGBA8UNORM_SRGB;
+    } else if (this._format === 'bgra8unorm-srgb') {
+      format = 'rgba8unorm-srgb';
       swizzle = true;
     }
     const width = levels.width;

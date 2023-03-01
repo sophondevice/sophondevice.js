@@ -1,5 +1,4 @@
 import {
-  TextureFormat,
   linearTextureFormatToSRGB,
   getTextureFormatBlockWidth,
   getTextureFormatBlockHeight,
@@ -15,6 +14,7 @@ import {
 } from '../gpuobject';
 import type { TypedArray } from '@sophon/base';
 import type { WebGPUDevice } from './device';
+import type { TextureFormat } from '../base_types'
 
 export class WebGPUTexture2D extends WebGPUBaseTexture implements Texture2D<GPUTexture> {
   constructor(device: WebGPUDevice) {
@@ -94,8 +94,8 @@ export class WebGPUTexture2D extends WebGPUBaseTexture implements Texture2D<GPUT
     this._flags = Number(creationFlags) || 0;
     const format =
       this._flags & GPUResourceUsageFlags.TF_LINEAR_COLOR_SPACE
-        ? TextureFormat.RGBA8UNORM
-        : TextureFormat.RGBA8UNORM_SRGB;
+        ? 'rgba8unorm'
+        : 'rgba8unorm-srgb';
     this.loadImage(element, format);
   }
   createEmpty(format: TextureFormat, width: number, height: number, creationFlags?: number): void {
@@ -128,16 +128,16 @@ export class WebGPUTexture2D extends WebGPUBaseTexture implements Texture2D<GPUT
     }
   }
   /** @internal */
-  private guessTextureFormat(url: string, mimeType?: string) {
+  private guessTextureFormat(url: string, mimeType?: string): TextureFormat {
     if (mimeType === 'image/jpeg' || mimeType === 'image/png') {
-      return this.linearColorSpace ? TextureFormat.RGBA8UNORM : TextureFormat.RGBA8UNORM_SRGB;
+      return this.linearColorSpace ? 'rgba8unorm' : 'rgba8unorm-srgb';
     }
     const dataURIRegex = /^data:(.*?)(;base64)?,(.*)$/;
     const matchResult = url.match(dataURIRegex);
     if (matchResult) {
       const type = matchResult[1];
       if (type.indexOf('image/jpeg') >= 0 || type.indexOf('image/png') >= 0) {
-        return this.linearColorSpace ? TextureFormat.RGBA8UNORM : TextureFormat.RGBA8UNORM_SRGB;
+        return this.linearColorSpace ? 'rgba8unorm' : 'rgba8unorm-srgb';
       }
     } else {
       const pindex = url.indexOf('?');
@@ -148,11 +148,11 @@ export class WebGPUTexture2D extends WebGPUBaseTexture implements Texture2D<GPUT
       if (eindex >= 0) {
         const ext = url.substring(eindex + 1).toLowerCase();
         if (ext === 'jpg' || ext === 'jpeg' || ext === 'png') {
-          return this.linearColorSpace ? TextureFormat.RGBA8UNORM : TextureFormat.RGBA8UNORM_SRGB;
+          return this.linearColorSpace ? 'rgba8unorm' : 'rgba8unorm-srgb';
         }
       }
     }
-    return TextureFormat.Unknown;
+    return 'unknown';
   }
   /** @internal */
   private loadEmpty(format: TextureFormat, width: number, height: number, numMipLevels: number): void {
@@ -166,11 +166,11 @@ export class WebGPUTexture2D extends WebGPUBaseTexture implements Texture2D<GPUT
     const sRGB = !(this._flags & GPUResourceUsageFlags.TF_LINEAR_COLOR_SPACE);
     let format = sRGB ? linearTextureFormatToSRGB(levels.format) : levels.format;
     let swizzle = false;
-    if (format === TextureFormat.BGRA8UNORM) {
-      format = TextureFormat.RGBA8UNORM;
+    if (format === 'bgra8unorm') {
+      format = 'rgba8unorm';
       swizzle = true;
-    } else if (this._format === TextureFormat.BGRA8UNORM_SRGB) {
-      format = TextureFormat.RGBA8UNORM_SRGB;
+    } else if (this._format === 'bgra8unorm-srgb') {
+      format = 'rgba8unorm-srgb';
       swizzle = true;
     }
     const width = levels.width;

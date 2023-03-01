@@ -3,7 +3,6 @@ import {
   Device,
   GPUProgram,
   BaseTexture,
-  TextureFormat,
   Texture2D,
   TextureCube,
   TextureVideo,
@@ -277,7 +276,7 @@ export class TestTexture2DArray extends TextureTestCase {
       ...yellow,
       ...purple
     ]);
-    const tex = this.device.createTexture2DArray(TextureFormat.RGBA8UNORM, 4, 4, 4, {
+    const tex = this.device.createTexture2DArray('rgba8unorm', 4, 4, 4, {
       colorSpace: 'linear'
     });
     tex.update(pixels, 0, 0, 0, 4, 4, 4);
@@ -410,7 +409,7 @@ export class TestTexture3D extends TextureTestCase {
       ...yellow,
       ...purple
     ]);
-    const tex = this.device.createTexture3D(TextureFormat.RGBA8UNORM, 4, 4, 4, {
+    const tex = this.device.createTexture3D('rgba8unorm', 4, 4, 4, {
       colorSpace: 'linear',
       noMipmap: true
     });

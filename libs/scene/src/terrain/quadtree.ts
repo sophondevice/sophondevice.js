@@ -5,7 +5,6 @@ import {
   PrimitiveType,
   StructuredBuffer,
   Texture2D,
-  TextureFormat
 } from '@sophon/device';
 import { PatchPosition } from './types';
 import { BoundingBox } from '../bounding_volume';
@@ -244,7 +243,7 @@ export class Quadtree {
       normalMapBytes[i * 4 + 2] = Math.floor((normals[i * 3 + 2] * 0.5 + 0.5) * 255);
       normalMapBytes[i * 4 + 3] = 255;
     }
-    this._normalMap = device.createTexture2D(TextureFormat.RGBA8UNORM, rootSizeX, rootSizeZ, {
+    this._normalMap = device.createTexture2D('rgba8unorm', rootSizeX, rootSizeZ, {
       colorSpace: 'linear'
     });
     this._normalMap.name = `TerrainNormalMap-${this._normalMap.uid}`;
