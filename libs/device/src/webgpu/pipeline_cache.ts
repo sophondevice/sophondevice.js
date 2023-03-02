@@ -10,7 +10,7 @@ import { StencilOp } from '../render_states';
 import * as rs from './renderstates_webgpu';
 import { typeU16 } from '../builder';
 import type { PrimitiveType } from '../base_types';
-import type { WebGPUVertexInputLayout } from './vertexinputlayout_webgpu';
+import type { WebGPUVertexLayout } from './vertexlayout_webgpu';
 import type { WebGPUProgram } from './gpuprogram_webgpu';
 import type { WebGPUDevice } from './device';
 import type { WebGPURenderStateSet } from './renderstates_webgpu';
@@ -64,7 +64,7 @@ export class PipelineCache {
   }
   fetchRenderPipeline(
     program: WebGPUProgram,
-    vertexData: WebGPUVertexInputLayout,
+    vertexData: WebGPUVertexLayout,
     stateSet: WebGPURenderStateSet,
     primitiveType: PrimitiveType,
     frameBufferInfo: FrameBufferInfo
@@ -122,7 +122,7 @@ export class PipelineCache {
     return pipeline;
   }
   private createPrimitiveState(
-    vertexData: WebGPUVertexInputLayout,
+    vertexData: WebGPUVertexLayout,
     stateSet: WebGPURenderStateSet,
     primitiveType: PrimitiveType
   ): GPUPrimitiveState {
@@ -274,7 +274,7 @@ export class PipelineCache {
   private getRenderPipelineHash(
     fbHash: string,
     program: WebGPUProgram,
-    vertexData: WebGPUVertexInputLayout,
+    vertexData: WebGPUVertexLayout,
     stateSet: WebGPURenderStateSet,
     primitiveType: PrimitiveType
   ): string {

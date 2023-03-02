@@ -4,7 +4,7 @@ import { WebGPUComputePass } from './computepass_webgpu';
 import type { PrimitiveType } from '../base_types';
 import type { WebGPUDevice } from './device';
 import type { WebGPUProgram } from './gpuprogram_webgpu';
-import type { WebGPUVertexInputLayout } from './vertexinputlayout_webgpu';
+import type { WebGPUVertexLayout } from './vertexlayout_webgpu';
 import type { WebGPURenderStateSet } from './renderstates_webgpu';
 import type { WebGPUBindGroup } from './bindgroup_webgpu';
 import type { WebGPUFrameBuffer } from './framebuffer_webgpu';
@@ -60,7 +60,7 @@ export class CommandQueueImmediate {
   }
   draw(
     program: WebGPUProgram,
-    vertexData: WebGPUVertexInputLayout,
+    vertexData: WebGPUVertexLayout,
     stateSet: WebGPURenderStateSet,
     bindGroups: WebGPUBindGroup[],
     bindGroupOffsets: Iterable<number>[],

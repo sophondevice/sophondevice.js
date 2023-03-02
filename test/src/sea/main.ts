@@ -21,7 +21,7 @@ import { createSeaProgram } from './program';
     },
     new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1])
   );
-  const rect = viewer.device.createVAO({
+  const rect = viewer.device.createVertexLayout({
     vertexBuffers: [{
       buffer: vb
     }]

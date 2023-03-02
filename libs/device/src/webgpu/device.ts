@@ -9,7 +9,7 @@ import {
   Texture2DArray,
   TextureCube,
   TextureVideo,
-  VertexInputLayout,
+  VertexLayout,
   GPUDataBuffer,
   FrameBuffer,
   GPUProgram,
@@ -21,7 +21,7 @@ import {
   TextureImageElement,
   TextureCreationOptions,
   BufferCreationOptions,
-  VertexInputLayoutOptions
+  VertexLayoutOptions
 } from '../gpuobject';
 import {
   GPUProgramConstructParams,
@@ -48,14 +48,14 @@ import {
   WebGPUMiscCap,
   WebGPUShaderCap
 } from './capabilities_webgpu';
-import { WebGPUVertexInputLayout } from './vertexinputlayout_webgpu';
+import { WebGPUVertexLayout } from './vertexlayout_webgpu';
 import { PipelineCache } from './pipeline_cache';
 import { WebGPURenderStateSet } from './renderstates_webgpu';
 import { WebGPUBuffer } from './buffer_webgpu';
 import { WebGPUFrameBuffer } from './framebuffer_webgpu';
 import { WebGPUIndexBuffer } from './indexbuffer_webgpu';
 import { BindGroupCache } from './bindgroup_cache';
-import { VertexLayoutCache } from './vertexinputlayout_cache';
+import { VertexLayoutCache } from './vertexlayout_cache';
 import { SamplerCache } from './sampler_cache';
 import { CommandQueueImmediate } from './commandqueue';
 import { WebGPUStructuredBuffer } from './structuredbuffer_webgpu';
@@ -92,7 +92,7 @@ export class WebGPUDevice extends Device {
   private _samplerCache: SamplerCache;
   private _renderStatesOverridden: WebGPURenderStateSet;
   private _currentProgram: WebGPUProgram;
-  private _currentVertexData: WebGPUVertexInputLayout;
+  private _currentVertexData: WebGPUVertexLayout;
   private _currentStateSet: WebGPURenderStateSet;
   private _currentBindGroups: WebGPUBindGroup[];
   private _currentBindGroupOffsets: Iterable<number>[];
@@ -395,8 +395,8 @@ export class WebGPUDevice extends Device {
   ): StructuredBuffer {
     return new WebGPUStructuredBuffer(this, structureType, this.parseBufferOptions(options), data);
   }
-  createVAO(options: VertexInputLayoutOptions): VertexInputLayout {
-    return new WebGPUVertexInputLayout(this, options);
+  createVertexLayout(options: VertexLayoutOptions): VertexLayout {
+    return new WebGPUVertexLayout(this, options);
   }
   createFrameBuffer(options?: FrameBufferOptions): FrameBuffer {
     return new WebGPUFrameBuffer(this, options);
@@ -440,10 +440,10 @@ export class WebGPUDevice extends Device {
   getProgram(): GPUProgram {
     return this._currentProgram;
   }
-  setVertexData(vertexData: VertexInputLayout) {
-    this._currentVertexData = vertexData as WebGPUVertexInputLayout;
+  setVertexData(vertexData: VertexLayout) {
+    this._currentVertexData = vertexData as WebGPUVertexLayout;
   }
-  getVertexData(): VertexInputLayout {
+  getVertexData(): VertexLayout {
     return this._currentVertexData;
   }
   setRenderStates(stateSet: RenderStateSet) {

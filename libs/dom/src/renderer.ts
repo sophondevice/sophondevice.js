@@ -7,8 +7,8 @@ import type {
   Texture2D,
   GPUProgram,
   TextureSampler,
-  VertexInputLayout,
-  VertexInputLayoutOptions
+  VertexLayout,
+  VertexLayoutOptions
 } from '@sophon/device';
 import type { RColor } from './types';
 import type { GUI } from './gui';
@@ -16,11 +16,11 @@ import type { RNode } from './node';
 
 export class GUIRenderer extends REventTarget {
   /** @internal */
-  private static readonly VAO_BUFFER_SIZE = 8192;
+  private static readonly VERTEX_BUFFER_SIZE = 8192;
   /** @internal */
   private _device: Device;
   /** @internal */
-  private _primitiveBuffer: VertexInputLayout[];
+  private _primitiveBuffer: VertexLayout[];
   /** @internal */
   private _activeBuffer: number;
   /** @internal */
@@ -79,8 +79,8 @@ export class GUIRenderer extends REventTarget {
     this._activeBuffer = 0;
     this._savedViewports = [];
     this._savedScissors = [];
-    const indexArray = new Uint32Array(Array.from({ length: GUIRenderer.VAO_BUFFER_SIZE * 6 }));
-    for (let i = 0; i < GUIRenderer.VAO_BUFFER_SIZE; i++) {
+    const indexArray = new Uint32Array(Array.from({ length: GUIRenderer.VERTEX_BUFFER_SIZE * 6 }));
+    for (let i = 0; i < GUIRenderer.VERTEX_BUFFER_SIZE; i++) {
       const base = i * 4;
       indexArray[i * 6 + 0] = base + 0;
       indexArray[i * 6 + 1] = base + 1;
@@ -90,18 +90,18 @@ export class GUIRenderer extends REventTarget {
       indexArray[i * 6 + 5] = base + 3;
     }
     for (let i = 0; i < 2; i++) {
-      const opt: VertexInputLayoutOptions = {
+      const opt: VertexLayoutOptions = {
         vertexBuffers: [{
-          buffer: this._device.createInterleavedVertexBuffer(['position_f32x3', 'diffuse_f32x4', 'tex0_f32x2'], new Float32Array(GUIRenderer.VAO_BUFFER_SIZE * 4 * 9), { dynamic: true })
+          buffer: this._device.createInterleavedVertexBuffer(['position_f32x3', 'diffuse_f32x4', 'tex0_f32x2'], new Float32Array(GUIRenderer.VERTEX_BUFFER_SIZE * 4 * 9), { dynamic: true })
         }],
         indexBuffer: this._device.createIndexBuffer(indexArray, { managed: true })
       };
-      this._primitiveBuffer.push(this._device.createVAO(opt));
+      this._primitiveBuffer.push(this._device.createVertexLayout(opt));
     }
     this._drawPosition = 0;
     this._drawCount = 0;
     this._currentTexture = null;
-    this._vertexCache = new Float32Array(9 * 4 * GUIRenderer.VAO_BUFFER_SIZE);
+    this._vertexCache = new Float32Array(9 * 4 * GUIRenderer.VERTEX_BUFFER_SIZE);
   }
   get device() {
     return this._device;
@@ -192,7 +192,7 @@ export class GUIRenderer extends REventTarget {
     }
     if (
       tex !== this._currentTexture ||
-      this._drawPosition + this._drawCount === GUIRenderer.VAO_BUFFER_SIZE
+      this._drawPosition + this._drawCount === GUIRenderer.VERTEX_BUFFER_SIZE
     ) {
       this.flush();
       this._currentTexture = tex;
@@ -200,15 +200,15 @@ export class GUIRenderer extends REventTarget {
     let updatePosition = this._drawPosition + this._drawCount;
     let count = data.length / 36;
     let pos = 0;
-    while (updatePosition < GUIRenderer.VAO_BUFFER_SIZE && count > 0) {
-      const drawCount = Math.min(count, GUIRenderer.VAO_BUFFER_SIZE - updatePosition);
+    while (updatePosition < GUIRenderer.VERTEX_BUFFER_SIZE && count > 0) {
+      const drawCount = Math.min(count, GUIRenderer.VERTEX_BUFFER_SIZE - updatePosition);
       const subdata = pos === 0 && drawCount === count ? data : data.subarray(pos, pos + drawCount * 36);
       this._vertexCache.set(subdata, updatePosition * 36);
       this._drawCount += drawCount;
       pos += drawCount * 36;
       updatePosition += drawCount;
       count -= drawCount;
-      if (updatePosition === GUIRenderer.VAO_BUFFER_SIZE) {
+      if (updatePosition === GUIRenderer.VERTEX_BUFFER_SIZE) {
         this.flush();
         updatePosition = this._drawPosition + this._drawCount;
       }
@@ -243,7 +243,7 @@ export class GUIRenderer extends REventTarget {
       buffer.draw();
       */
       buffer.draw('triangle-list', this._drawPosition * 6, this._drawCount * 6);
-      if (this._drawPosition + this._drawCount === GUIRenderer.VAO_BUFFER_SIZE) {
+      if (this._drawPosition + this._drawCount === GUIRenderer.VERTEX_BUFFER_SIZE) {
         this._activeBuffer = 1 - this._activeBuffer;
         this._drawPosition = 0;
       } else {

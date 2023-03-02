@@ -1,12 +1,12 @@
 import { PrimitiveType } from '../base_types';
 import {
   StructuredBuffer,
-  VertexInputLayout,
+  VertexLayout,
   IndexBuffer,
   getVertexBufferStride,
   getVertexBufferAttribType,
   VertexSemantic,
-  VertexInputLayoutOptions
+  VertexLayoutOptions
 } from '../gpuobject';
 import { vertexFormatToHash } from './constants_webgpu';
 import { WebGPUObject } from './gpuobject_webgpu';
@@ -15,14 +15,14 @@ import { VertexData } from '../vertexdata';
 import type { WebGPUDevice } from './device';
 import type { WebGPUBuffer } from './buffer_webgpu';
 
-export class WebGPUVertexInputLayout extends WebGPUObject<unknown> implements VertexInputLayout<unknown> {
+export class WebGPUVertexLayout extends WebGPUObject<unknown> implements VertexLayout<unknown> {
   private static _hashCounter = 0;
   private _vertexData: VertexData;
   private _hash: string;
   private _layouts: {
     [hash: string]: { layoutHash: string; buffers: { buffer: WebGPUBuffer; offset: number }[] };
   };
-  constructor(device: WebGPUDevice, options: VertexInputLayoutOptions) {
+  constructor(device: WebGPUDevice, options: VertexLayoutOptions) {
     super(device);
     this._vertexData = new VertexData();
     for (const vb of options.vertexBuffers) {
@@ -31,7 +31,7 @@ export class WebGPUVertexInputLayout extends WebGPUObject<unknown> implements Ve
     if (options.indexBuffer) {
       this._vertexData.setIndexBuffer(options.indexBuffer);
     }
-    this._hash = String(++WebGPUVertexInputLayout._hashCounter);
+    this._hash = String(++WebGPUVertexLayout._hashCounter);
     this._layouts = {};
   }
   destroy() {

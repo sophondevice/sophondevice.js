@@ -1,25 +1,25 @@
 import { WebGLGPUObject } from './gpuobject_webgl';
 import { WebGLEnum } from './webgl_enum';
 import {
-  VertexInputLayout,
+  VertexLayout,
   StructuredBuffer,
   IndexBuffer,
   getVertexBufferAttribType,
   getVertexBufferStride,
   VertexSemantic,
-  VertexInputLayoutOptions
+  VertexLayoutOptions
 } from '../gpuobject';
 import { VertexData } from '../vertexdata';
 import { typeMap } from './constants_webgl';
 import type { PrimitiveType } from '../base_types';
 import type { WebGLDevice } from './device_webgl';
 
-export class WebGLVertexInputLayout
+export class WebGLVertexLayout
   extends WebGLGPUObject<WebGLVertexArrayObject | WebGLVertexArrayObjectOES>
-  implements VertexInputLayout<WebGLVertexArrayObject | WebGLVertexArrayObjectOES>
+  implements VertexLayout<WebGLVertexArrayObject | WebGLVertexArrayObjectOES>
 {
   private _vertexData: VertexData;
-  constructor(device: WebGLDevice, options: VertexInputLayoutOptions) {
+  constructor(device: WebGLDevice, options: VertexLayoutOptions) {
     super(device);
     this._vertexData = new VertexData();
     for (const vb of options.vertexBuffers) {
@@ -71,7 +71,7 @@ export class WebGLVertexInputLayout
     this._device.setVertexData(this);
     this._device.drawInstanced(primitiveType, first, count, numInstances);
   }
-  isVAO(): boolean {
+  isVertexLayout(): boolean {
     return true;
   }
   private load(): void {

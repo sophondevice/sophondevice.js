@@ -19,7 +19,7 @@ import { WebGLTexture2DArray } from './texture2darray_webgl';
 import { WebGLTexture3D } from './texture3d_webgl';
 import { WebGLTextureCube } from './texturecube_webgl';
 import { WebGLTextureVideo } from './texturevideo_webgl';
-import { WebGLVertexInputLayout } from './vertexinputlayout_webgl';
+import { WebGLVertexLayout } from './vertexlayout_webgl';
 import { WebGLGPUBuffer } from './buffer_webgl';
 import { WebGLIndexBuffer } from './indexbuffer_webgl';
 import { WebGLFrameBuffer } from './framebuffer_webgl';
@@ -33,7 +33,7 @@ import {
   Texture3D,
   TextureCube,
   TextureVideo,
-  VertexInputLayout,
+  VertexLayout,
   GPUDataBuffer,
   IndexBuffer,
   FrameBuffer,
@@ -46,7 +46,7 @@ import {
   Texture2DArray,
   TextureCreationOptions,
   BufferCreationOptions,
-  VertexInputLayoutOptions
+  VertexLayoutOptions
 } from '../gpuobject';
 import { WebGLTextureCap, WebGLFramebufferCap, WebGLMiscCap, WebGLShaderCap } from './capabilities_webgl';
 import { WebGLBindGroup } from './bindgroup_webgl';
@@ -85,7 +85,8 @@ declare global {
   }
 }
 
-export type VAOObject = WebGLVertexArrayObject | WebGLVertexArrayObjectOES;
+type VAOObject = WebGLVertexArrayObject | WebGLVertexArrayObjectOES;
+
 export interface VertexArrayObjectEXT {
   createVertexArray: () => VAOObject;
   bindVertexArray: (arrayObject: VAOObject) => void;
@@ -126,7 +127,7 @@ export class WebGLDevice extends Device {
   private _instancedArraysExt: InstancedArraysEXT;
   private _drawBuffersExt: DrawBuffersEXT;
   private _currentProgram: WebGLGPUProgram;
-  private _currentVertexData: WebGLVertexInputLayout;
+  private _currentVertexData: WebGLVertexLayout;
   private _currentStateSet: WebGLRenderStateSet;
   private _currentBindGroups: WebGLBindGroup[];
   private _currentBindGroupOffsets: Iterable<number>[];
@@ -418,8 +419,8 @@ export class WebGLDevice extends Device {
   ): StructuredBuffer {
     return new WebGLStructuredBuffer(this, structureType, this.parseBufferOptions(options), data);
   }
-  createVAO(options: VertexInputLayoutOptions): VertexInputLayout {
-    return new WebGLVertexInputLayout(this, options);
+  createVertexLayout(options: VertexLayoutOptions): VertexLayout {
+    return new WebGLVertexLayout(this, options);
   }
   createFrameBuffer(options?: FrameBufferOptions): FrameBuffer {
     return new WebGLFrameBuffer(this, options);
@@ -496,10 +497,10 @@ export class WebGLDevice extends Device {
   getProgram(): GPUProgram {
     return this._currentProgram;
   }
-  setVertexData(vertexData: VertexInputLayout) {
-    this._currentVertexData = vertexData as WebGLVertexInputLayout;
+  setVertexData(vertexData: VertexLayout) {
+    this._currentVertexData = vertexData as WebGLVertexLayout;
   }
-  getVertexData(): VertexInputLayout {
+  getVertexData(): VertexLayout {
     return this._currentVertexData;
   }
   setRenderStates(stateSet: RenderStateSet) {

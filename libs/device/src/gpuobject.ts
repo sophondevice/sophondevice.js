@@ -402,7 +402,7 @@ const vertexAttribNameRevMap = {
   [VERTEX_ATTRIB_CUSTOM1]: 'custom1'
 } as const;
 
-export type VertexInputLayoutOptions = {
+export type VertexLayoutOptions = {
   vertexBuffers: {
     buffer: StructuredBuffer,
     stepMode?: VertexStepMode
@@ -732,7 +732,7 @@ export interface GPUObject<T = unknown> {
   readonly disposed: boolean;
   name: string;
   restoreHandler: (tex: GPUObject) => Promise<void>;
-  isVAO(): this is VertexInputLayout;
+  isVertexLayout(): this is VertexLayout;
   isFramebuffer(): this is FrameBuffer;
   isSampler(): this is TextureSampler;
   isTexture(): this is BaseTexture;
@@ -883,7 +883,7 @@ export interface StructuredBuffer<T = unknown> extends GPUDataBuffer<T> {
   set(name: string, value: StructuredValue);
 }
 
-export interface VertexInputLayout<T = unknown> extends GPUObject<T> {
+export interface VertexLayout<T = unknown> extends GPUObject<T> {
   readonly vertexBuffers: {
     [semantic: number]: { buffer: GPUDataBuffer; offset: number };
   };
@@ -955,7 +955,7 @@ export function genDefaultName(obj: GPUObject) {
     return 'program';
   } else if (obj.isSampler()) {
     return 'sampler';
-  } else if (obj.isVAO()) {
+  } else if (obj.isVertexLayout()) {
     return 'vbo';
   } else {
     return 'unknown';

@@ -8,7 +8,7 @@ import {
   Texture2D,
   Texture3D,
   TextureCube,
-  VertexInputLayout,
+  VertexLayout,
   GPUDataBuffer,
   FrameBuffer,
   BaseTexture,
@@ -31,7 +31,7 @@ import {
   makeVertexBufferType,
   getVertexFormatSize,
   getVertexAttribFormat,
-  VertexInputLayoutOptions
+  VertexLayoutOptions
 } from './gpuobject';
 import { PBStructTypeInfo, ProgramBuilder } from './builder';
 import type { DataType, PrimitiveType, TextureFormat } from './base_types';
@@ -42,7 +42,7 @@ interface GPUObjectList {
   buffers: GPUDataBuffer[];
   programs: GPUProgram[];
   framebuffers: FrameBuffer[];
-  vertexArrayObjects: VertexInputLayout[];
+  vertexArrayObjects: VertexLayout[];
   bindGroups: BindGroup[];
 }
 
@@ -337,7 +337,7 @@ export abstract class Device extends REventTarget {
     options: BufferCreationOptions,
     data?: TypedArray
   ): StructuredBuffer;
-  abstract createVAO(options: VertexInputLayoutOptions): VertexInputLayout;
+  abstract createVertexLayout(options: VertexLayoutOptions): VertexLayout;
   abstract createFrameBuffer(options?: FrameBufferOptions): FrameBuffer;
   // render related
   abstract setViewport(vp?: number[]): number[];
@@ -348,8 +348,8 @@ export abstract class Device extends REventTarget {
   abstract getScissor(): number[];
   abstract setProgram(program: GPUProgram): void;
   abstract getProgram(): GPUProgram;
-  abstract setVertexData(vertexData: VertexInputLayout): void;
-  abstract getVertexData(): VertexInputLayout;
+  abstract setVertexData(vertexData: VertexLayout): void;
+  abstract getVertexData(): VertexLayout;
   abstract setRenderStates(renderStates: RenderStateSet): void;
   abstract getRenderStates(): RenderStateSet;
   abstract setFramebuffer(rt: FrameBuffer): void;
@@ -657,7 +657,7 @@ export abstract class Device extends REventTarget {
       list = this._gpuObjectList.framebuffers;
     } else if (obj.isProgram()) {
       list = this._gpuObjectList.programs;
-    } else if (obj.isVAO()) {
+    } else if (obj.isVertexLayout()) {
       list = this._gpuObjectList.vertexArrayObjects;
     } else if (obj.isBindGroup()) {
       list = this._gpuObjectList.bindGroups;

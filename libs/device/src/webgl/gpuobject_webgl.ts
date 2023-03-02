@@ -2,7 +2,7 @@ import { Device, DeviceGPUObjectRenameEvent } from '../device';
 import {
   genDefaultName,
   BindGroup,
-  VertexInputLayout,
+  VertexLayout,
   TextureSampler,
   BaseTexture,
   Texture2D,
@@ -66,7 +66,7 @@ export abstract class WebGLGPUObject<T> implements GPUObject<T> {
       this._device.dispatchEvent(evt);
     }
   }
-  isVAO(): this is VertexInputLayout {
+  isVertexLayout(): this is VertexLayout {
     return false;
   }
   isFramebuffer(): this is FrameBuffer {

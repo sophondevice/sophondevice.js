@@ -9,7 +9,7 @@ import type { WebGPUBaseTexture } from './basetexture_webgpu';
 import type { WebGPUBuffer } from './buffer_webgpu';
 import type { WebGPUDevice } from './device';
 import type { WebGPUFrameBuffer } from './framebuffer_webgpu';
-import type { WebGPUVertexInputLayout } from './vertexinputlayout_webgpu';
+import type { WebGPUVertexLayout } from './vertexlayout_webgpu';
 import type { WebGPUIndexBuffer } from './indexbuffer_webgpu';
 import type { FrameBufferInfo } from './pipeline_cache';
 import type { PrimitiveType } from '../base_types';
@@ -140,7 +140,7 @@ export class WebGPURenderPass {
   }
   draw(
     program: WebGPUProgram,
-    vertexData: WebGPUVertexInputLayout,
+    vertexData: WebGPUVertexLayout,
     stateSet: WebGPURenderStateSet,
     bindGroups: WebGPUBindGroup[],
     bindGroupOffsets: Iterable<number>[],
@@ -347,7 +347,7 @@ export class WebGPURenderPass {
   private drawInternal(
     renderPassEncoder: GPURenderPassEncoder,
     program: WebGPUProgram,
-    vertexData: WebGPUVertexInputLayout,
+    vertexData: WebGPUVertexLayout,
     stateSet: WebGPURenderStateSet,
     bindGroups: WebGPUBindGroup[],
     bindGroupOffsets: Iterable<number>[],
@@ -393,7 +393,7 @@ export class WebGPURenderPass {
   }
   private validateDraw(
     program: WebGPUProgram,
-    vertexData: WebGPUVertexInputLayout,
+    vertexData: WebGPUVertexLayout,
     bindGroups: WebGPUBindGroup[]
   ): number {
     let validation = 0;
@@ -448,7 +448,7 @@ export class WebGPURenderPass {
   private setBindGroupsForRender(
     renderPassEncoder: GPURenderPassEncoder,
     program: WebGPUProgram,
-    vertexData: WebGPUVertexInputLayout,
+    vertexData: WebGPUVertexLayout,
     bindGroups: WebGPUBindGroup[],
     bindGroupOffsets: Iterable<number>[]
   ): boolean {

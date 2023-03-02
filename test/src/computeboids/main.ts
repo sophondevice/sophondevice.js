@@ -6,7 +6,7 @@ import {
   PBStructTypeInfo,
   StructuredBuffer,
   BindGroup,
-  VertexInputLayout,
+  VertexLayout,
 } from '@sophon/device';
 import { GUIRenderer, GUI, RElement } from '@sophon/dom';
 
@@ -154,7 +154,7 @@ import { GUIRenderer, GUI, RElement } from '@sophon/dom';
   }
   const particleBuffers: StructuredBuffer[] = [];
   const particleBindGroups: BindGroup[] = [];
-  const primitives: VertexInputLayout[] = [];
+  const primitives: VertexLayout[] = [];
   for (let i = 0; i < 2; i++) {
     particleBuffers.push(
       viewer.device.createStructuredBuffer(
@@ -174,7 +174,7 @@ import { GUIRenderer, GUI, RElement } from '@sophon/dom';
     bindGroup.setBuffer('particlesB', particleBuffers[(i + 1) % 2]);
     particleBindGroups.push(bindGroup);
 
-    const primitive = viewer.device.createVAO({
+    const primitive = viewer.device.createVertexLayout({
       vertexBuffers: [{
         buffer: spriteVertexBuffer,
         stepMode: 'vertex'

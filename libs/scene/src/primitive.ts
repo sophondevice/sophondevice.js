@@ -1,15 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { TypedArray } from '@sophon/base';
-import type { Device, VertexStepMode, VertexInputLayout, VertexInputLayoutOptions, PrimitiveType, StructuredBuffer, IndexBuffer, VertexSemantic, VertexAttribFormat } from '@sophon/device';
+import type { Device, VertexStepMode, VertexLayout, VertexLayoutOptions, PrimitiveType, StructuredBuffer, IndexBuffer, VertexSemantic, VertexAttribFormat } from '@sophon/device';
 import type { BoundingVolume } from './bounding_volume';
 
 export class Primitive {
   /** @internal */
   protected _device: Device;
   /** @internal */
-  protected _vao: VertexInputLayout;
+  protected _vertexLayout: VertexLayout;
   /** @internal */
-  protected _vaoOptions: VertexInputLayoutOptions;
+  protected _vertexLayoutOptions: VertexLayoutOptions;
   /** @internal */
   protected _primitiveType: PrimitiveType;
   /** @internal */
@@ -17,7 +17,7 @@ export class Primitive {
   /** @internal */
   protected _indexCount: number;
   /** @internal */
-  protected _vaoDirty: boolean;
+  protected _vertexLayoutDirty: boolean;
   /** @internal */
   private static _nextId = 0;
   /** @internal */
@@ -29,12 +29,12 @@ export class Primitive {
 
   constructor(device: Device) {
     this._device = device;
-    this._vao = null;
-    this._vaoOptions = { vertexBuffers: [] };
+    this._vertexLayout = null;
+    this._vertexLayoutOptions = { vertexBuffers: [] };
     this._primitiveType = 'triangle-list';
     this._indexStart = 0;
     this._indexCount = 0;
-    this._vaoDirty = false;
+    this._vertexLayoutDirty = false;
     this._id = ++Primitive._nextId;
     this._bbox = null;
     this._bboxChangeCallback = [];
@@ -70,17 +70,17 @@ export class Primitive {
     this._indexCount = val;
   }
   removeVertexBuffer(buffer: StructuredBuffer): void {
-    for (let loc = 0; loc < this._vaoOptions.vertexBuffers.length; loc++) {
-      const info = this._vaoOptions.vertexBuffers[loc];
+    for (let loc = 0; loc < this._vertexLayoutOptions.vertexBuffers.length; loc++) {
+      const info = this._vertexLayoutOptions.vertexBuffers[loc];
       if (info?.buffer === buffer) {
         info[loc] = null;
-        this._vaoDirty = true;
+        this._vertexLayoutDirty = true;
       }
     }
   }
   getVertexBuffer(semantic: VertexSemantic): StructuredBuffer {
-    this.checkVAO();
-    return this._vao.getVertexBuffer(semantic);
+    this.checkVertexLayout();
+    return this._vertexLayout.getVertexBuffer(semantic);
   }
   createAndSetVertexBuffer(
     format: VertexAttribFormat,
@@ -91,11 +91,11 @@ export class Primitive {
     return this.setVertexBuffer(buffer, stepMode);
   }
   setVertexBuffer(buffer: StructuredBuffer, stepMode?: VertexStepMode) {
-    this._vaoOptions.vertexBuffers.push({
+    this._vertexLayoutOptions.vertexBuffers.push({
       buffer,
       stepMode
     });
-    this._vaoDirty = true;
+    this._vertexLayoutDirty = true;
     return buffer;
   }
   createAndSetIndexBuffer(data: Uint16Array | Uint32Array, dynamic?: boolean): IndexBuffer {
@@ -107,26 +107,26 @@ export class Primitive {
     return buffer;
   }
   setIndexBuffer(buffer: IndexBuffer): void {
-    if (this._vaoOptions.indexBuffer !== buffer) {
-      this._vaoOptions.indexBuffer = buffer;
-      this._vaoDirty = true;
+    if (this._vertexLayoutOptions.indexBuffer !== buffer) {
+      this._vertexLayoutOptions.indexBuffer = buffer;
+      this._vertexLayoutDirty = true;
     }
   }
   getIndexBuffer(): IndexBuffer {
-    return this._vaoOptions.indexBuffer;
+    return this._vertexLayoutOptions.indexBuffer;
   }
   draw() {
-    this.checkVAO();
-    this._vao?.draw(this._primitiveType, this._indexStart, this._indexCount);
+    this.checkVertexLayout();
+    this._vertexLayout?.draw(this._primitiveType, this._indexStart, this._indexCount);
   }
   drawInstanced(numInstances: number) {
-    this.checkVAO();
-    this._vao?.drawInstanced(this._primitiveType, this._indexStart, this._indexCount, numInstances);
+    this.checkVertexLayout();
+    this._vertexLayout?.drawInstanced(this._primitiveType, this._indexStart, this._indexCount, numInstances);
   }
   dispose() {
-    if (this._vao) {
-      this._vao.dispose();
-      this._vao = null;
+    if (this._vertexLayout) {
+      this._vertexLayout.dispose();
+      this._vertexLayout = null;
     }
     this._indexCount = 0;
     this._indexStart = 0;
@@ -152,11 +152,11 @@ export class Primitive {
     }
   }
   /** @internal */
-  private checkVAO() {
-    if (this._vaoDirty) {
-      this._vao?.dispose();
-      this._vao = this._device.createVAO(this._vaoOptions);
-      this._vaoDirty = false;
+  private checkVertexLayout() {
+    if (this._vertexLayoutDirty) {
+      this._vertexLayout?.dispose();
+      this._vertexLayout = this._device.createVertexLayout(this._vertexLayoutOptions);
+      this._vertexLayoutDirty = false;
     }
   }
 }
