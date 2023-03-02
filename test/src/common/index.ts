@@ -1,6 +1,7 @@
-import {
-  isDepthTextureFormat,
-  makeVertexBufferType,
+import { Vector4, REvent } from '@sophon/base';
+import { Primitive, Mesh, Scene, PunctualLight, AssetManager, EnvIBL, SkyboxMaterial } from '@sophon/scene';
+import { RElement, ScrollBar, Button, Input, RValueChangeEvent, Select, Option } from '@sophon/dom';
+import type {
   TextureCube,
   Texture2D,
   RenderStateSet,
@@ -11,11 +12,7 @@ import {
   DeviceGPUObjectRemovedEvent,
   DeviceGPUObjectRenameEvent,
   Device,
-  ProgramBuilder
 } from '@sophon/device';
-import { Primitive, Mesh, Scene, PunctualLight, AssetManager, EnvIBL, SkyboxMaterial } from '@sophon/scene';
-import { Vector4, REvent } from '@sophon/base';
-import { RElement, ScrollBar, Button, Input, RValueChangeEvent, Select, Option } from '@sophon/dom';
 
 export function getQueryString(name: string) {
   return new URL(window.location.toString()).searchParams.get(name) || null;
@@ -732,7 +729,7 @@ export class TextureView {
       that._device.setRenderStates(that._renderStates);
       that._rect.draw();
       if (that._tex && that._tex.isTexture2D() && !that._tex.disposed) {
-        const depth = isDepthTextureFormat(that._tex.format);
+        const depth = that._tex.isDepth();
         const filterable = that._tex.isFilterable();
         const program = depth ? that._programDepth : filterable ? that._program : that._programNonFilterable;
         const bindGroup = depth
@@ -765,14 +762,7 @@ export class TextureView {
     this._width = w;
   }
   private init() {
-    const vb = this._device.createStructuredBuffer(
-      makeVertexBufferType(4, 'position_f32x2', 'tex0_f32x2'),
-      {
-        usage: 'vertex',
-        managed: true
-      },
-      new Float32Array([-1, -1, 0, 1, 1, -1, 1, 1, -1, 1, 0, 0, 1, 1, 1, 0])
-    );
+    const vb = this._device.createInterleavedVertexBuffer(['position_f32x2', 'tex0_f32x2'], new Float32Array([-1, -1, 0, 1, 1, -1, 1, 1, -1, 1, 0, 0, 1, 1, 1, 0]));
     this._rect = new Primitive(this._device);
     this._rect.setVertexBuffer(vb);
     this._rect.indexStart = 0;
@@ -793,7 +783,7 @@ export class TextureView {
     this._bindGroupDepth = this._device.createBindGroup(this._programDepth.bindGroupLayouts[0]);
   }
   private createDefaultShader(depth: boolean, unfilterableFloat: boolean): GPUProgram {
-    const pb = new ProgramBuilder(this._device);
+    const pb = this._device.createProgramBuilder();
     return pb.buildRenderProgram({
       vertex() {
         this.$inputs.pos = pb.vec2().attrib('position');
@@ -838,7 +828,7 @@ export class TextureView {
     });
   }
   private createBkShader(): GPUProgram {
-    const pb = new ProgramBuilder(this._device);
+    const pb = this._device.createProgramBuilder();
     return pb.buildRenderProgram({
       vertex() {
         this.$inputs.pos = pb.vec2().attrib('position');
