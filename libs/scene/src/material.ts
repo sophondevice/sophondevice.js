@@ -1,6 +1,6 @@
 import { Matrix4x4, List, ListIterator } from '@sophon/base';
-import {
-  Geometry,
+import { ShaderLib } from './materiallib/shaderlib';
+import type {
   BindGroup,
   GPUProgram,
   RenderStateSet,
@@ -9,7 +9,7 @@ import {
   BindGroupLayout,
   TextureSampler
 } from '@sophon/device';
-import { ShaderLib } from './materiallib/shaderlib';
+import type { Primitive } from './primitive';
 import type { Drawable, DrawContext } from './drawable';
 
 export type MaterialGCOptions = {
@@ -175,7 +175,7 @@ export class Material {
   supportLighting(): boolean {
     return true;
   }
-  draw(primitive: Geometry, ctx: DrawContext) {
+  draw(primitive: Primitive, ctx: DrawContext) {
     if (this.beginDraw(ctx)) {
       if (ctx.instanceData?.worldMatrices.length > 1) {
         primitive.drawInstanced(ctx.instanceData.worldMatrices.length);

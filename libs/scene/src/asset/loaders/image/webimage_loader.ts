@@ -1,5 +1,5 @@
-import { BaseTexture, TextureCreationOptions } from '@sophon/device';
 import { AbstractTextureLoader } from '../loader';
+import type { BaseTexture, TextureCreationOptions } from '@sophon/device';
 import type { AssetManager } from '../../assetmanager';
 
 export class WebImageLoader extends AbstractTextureLoader {

@@ -2,11 +2,11 @@ import { REvent, Vector4 } from '@sophon/base';
 import {
   Viewer,
   ProgramBuilder,
-  Geometry,
   makeVertexBufferType,
   PBStructTypeInfo,
   StructuredBuffer,
   BindGroup,
+  VertexInputLayout,
 } from '@sophon/device';
 import { GUIRenderer, GUI, RElement } from '@sophon/dom';
 
@@ -154,7 +154,7 @@ import { GUIRenderer, GUI, RElement } from '@sophon/dom';
   }
   const particleBuffers: StructuredBuffer[] = [];
   const particleBindGroups: BindGroup[] = [];
-  const primitives: Geometry[] = [];
+  const primitives: VertexInputLayout[] = [];
   for (let i = 0; i < 2; i++) {
     particleBuffers.push(
       viewer.device.createStructuredBuffer(
@@ -174,11 +174,15 @@ import { GUIRenderer, GUI, RElement } from '@sophon/dom';
     bindGroup.setBuffer('particlesB', particleBuffers[(i + 1) % 2]);
     particleBindGroups.push(bindGroup);
 
-    const primitive = new Geometry(viewer.device);
-    primitive.primitiveType = 'triangle-list';
-    primitive.setVertexBuffer(spriteVertexBuffer, 'vertex');
-    primitive.setVertexBuffer(particleBuffers[i], 'instance');
-    primitive.indexCount = 3;
+    const primitive = viewer.device.createVAO({
+      vertexBuffers: [{
+        buffer: spriteVertexBuffer,
+        stepMode: 'vertex'
+      }, {
+        buffer: particleBuffers[i],
+        stepMode: 'instance'
+      }]
+    });
     primitives.push(primitive);
   }
 
@@ -198,7 +202,8 @@ import { GUIRenderer, GUI, RElement } from '@sophon/dom';
     viewer.device.clearFrameBuffer(new Vector4(0, 0, 0, 1), 1, 0);
     viewer.device.setProgram(spriteProgram);
     viewer.device.setBindGroup(0, null);
-    primitives[(t + 1) % 2].drawInstanced(numParticles);
+    primitives[(t + 1) % 2].drawInstanced('triangle-list', 0, 3, numParticles);
+    // primitives[(t + 1) % 2].drawInstanced(numParticles);
     t++;
   });
   viewer.device.runLoop((device) => gui.render());

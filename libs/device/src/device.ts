@@ -1,7 +1,6 @@
 import { REventTarget, REvent, Vector4, TypedArray } from '@sophon/base';
 import { CPUTimer, ITimer } from './timer';
 import type { RenderStateSet } from './render_states';
-import type { VertexData } from './vertexdata';
 import {
   FrameBufferOptions,
   SamplerOptions,
@@ -31,7 +30,8 @@ import {
   VertexAttribFormat,
   makeVertexBufferType,
   getVertexFormatSize,
-  getVertexAttribFormat
+  getVertexAttribFormat,
+  VertexInputLayoutOptions
 } from './gpuobject';
 import { PBStructTypeInfo, ProgramBuilder } from './builder';
 import type { DataType, PrimitiveType, TextureFormat } from './base_types';
@@ -337,7 +337,7 @@ export abstract class Device extends REventTarget {
     options: BufferCreationOptions,
     data?: TypedArray
   ): StructuredBuffer;
-  abstract createVAO(vertexData: VertexData): VertexInputLayout;
+  abstract createVAO(options: VertexInputLayoutOptions): VertexInputLayout;
   abstract createFrameBuffer(options?: FrameBufferOptions): FrameBuffer;
   // render related
   abstract setViewport(vp?: number[]): number[];

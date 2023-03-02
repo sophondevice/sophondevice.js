@@ -1,15 +1,15 @@
 import { Matrix4x4, Vector3, Vector4, REventTarget } from '@sophon/base';
-import {
+import { RMouseEvent, RDragEvent, RKeyEvent } from './events';
+import type {
   BindGroup,
   RenderStateSet,
-  ProgramBuilder,
   Device,
   Texture2D,
   GPUProgram,
   TextureSampler,
-  Geometry
+  VertexInputLayout,
+  VertexInputLayoutOptions
 } from '@sophon/device';
-import { RMouseEvent, RDragEvent, RKeyEvent } from './events';
 import type { RColor } from './types';
 import type { GUI } from './gui';
 import type { RNode } from './node';
@@ -20,7 +20,7 @@ export class GUIRenderer extends REventTarget {
   /** @internal */
   private _device: Device;
   /** @internal */
-  private _primitiveBuffer: Geometry[];
+  private _primitiveBuffer: VertexInputLayout[];
   /** @internal */
   private _activeBuffer: number;
   /** @internal */
@@ -75,7 +75,7 @@ export class GUIRenderer extends REventTarget {
       mipFilter: 'none'
     });
     this._renderStateSet = this.createStateSet();
-    this._primitiveBuffer = [new Geometry(device), new Geometry(device)];
+    this._primitiveBuffer = [];
     this._activeBuffer = 0;
     this._savedViewports = [];
     this._savedScissors = [];
@@ -90,11 +90,13 @@ export class GUIRenderer extends REventTarget {
       indexArray[i * 6 + 5] = base + 3;
     }
     for (let i = 0; i < 2; i++) {
-      const indexbuffer = this._device.createIndexBuffer(indexArray, { managed: true });
-      this._primitiveBuffer[i].setIndexBuffer(indexbuffer);
-      this._primitiveBuffer[i].primitiveType = 'triangle-list';
-      const buffer = this._device.createInterleavedVertexBuffer(['position_f32x3', 'diffuse_f32x4', 'tex0_f32x2'], new Float32Array(GUIRenderer.VAO_BUFFER_SIZE * 4 * 9), { dynamic: true });
-      this._primitiveBuffer[i].setVertexBuffer(buffer);
+      const opt: VertexInputLayoutOptions = {
+        vertexBuffers: [{
+          buffer: this._device.createInterleavedVertexBuffer(['position_f32x3', 'diffuse_f32x4', 'tex0_f32x2'], new Float32Array(GUIRenderer.VAO_BUFFER_SIZE * 4 * 9), { dynamic: true })
+        }],
+        indexBuffer: this._device.createIndexBuffer(indexArray, { managed: true })
+      };
+      this._primitiveBuffer.push(this._device.createVAO(opt));
     }
     this._drawPosition = 0;
     this._drawCount = 0;
@@ -235,9 +237,12 @@ export class GUIRenderer extends REventTarget {
       this._device.setBindGroup(2, null);
       this._device.setBindGroup(3, null);
       this._device.setRenderStates(this._renderStateSet);
+      /*
       buffer.indexStart = this._drawPosition * 6;
       buffer.indexCount = this._drawCount * 6;
       buffer.draw();
+      */
+      buffer.draw('triangle-list', this._drawPosition * 6, this._drawCount * 6);
       if (this._drawPosition + this._drawCount === GUIRenderer.VAO_BUFFER_SIZE) {
         this._activeBuffer = 1 - this._activeBuffer;
         this._drawPosition = 0;
@@ -311,7 +316,7 @@ export class GUIRenderer extends REventTarget {
   }
   /** @internal */
   private createProgram(diffuseMap: boolean): GPUProgram {
-    const pb = new ProgramBuilder(this._device);
+    const pb = this._device.createProgramBuilder();
     const structUniform = pb.defineStruct('UIMaterialUniforms', 'std140', pb.mat4('mvpMatrix'));
     return pb.buildRenderProgram({
       label: 'UI',

@@ -1,15 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Vector3, Vector4, Matrix4x4, Quaternion, TypedArray } from '@sophon/base';
 import {
-  PrimitiveType,
-  getVertexBufferAttribTypeBySemantic,
-  VertexSemantic,
-  GPUDataBuffer,
-  Texture2D,
-  IndexBuffer,
-  StructuredBuffer
-} from '@sophon/device';
-import {
   SharedModel,
   AssetHierarchyNode,
   AssetMeshData,
@@ -37,6 +28,14 @@ import { ComponentType, GLTFAccessor } from './helpers';
 import { Interpolator, InterpolationMode, InterpolationTarget } from '../../../interpolator';
 import { AbstractModelLoader } from '../loader';
 import { BUILTIN_ASSET_TEXTURE_SHEEN_LUT } from '../../../values';
+import type {
+  PrimitiveType,
+  VertexSemantic,
+  GPUDataBuffer,
+  Texture2D,
+  IndexBuffer,
+  StructuredBuffer
+} from '@sophon/device';
 import type { TextureWrapping, TextureFilter } from '@sophon/device';
 import type { AssetManager } from '../../assetmanager';
 import type { AnimationChannel, AnimationSampler, GlTf, Material, TextureInfo } from './gltf';
@@ -49,7 +48,6 @@ export interface GLTFContent extends GlTf {
   _textureCache: { [name: string]: Texture2D };
   _primitiveCache: { [hash: string]: Primitive };
   _materialCache: { [hash: string]: StandardMaterial };
-  _accessorCache: { [index: number]: { array: TypedArray; typeMask: number; elementCount: number } };
   _nodes: AssetHierarchyNode[];
   _meshes: AssetMeshData[];
 }
@@ -100,7 +98,6 @@ export class GLTFLoader extends AbstractModelLoader {
     gltf._textureCache = {};
     gltf._primitiveCache = {};
     gltf._materialCache = {};
-    gltf._accessorCache = {};
     gltf._nodes = [];
     gltf._meshes = [];
     // check asset property
@@ -1131,6 +1128,7 @@ export class GLTFLoader extends AbstractModelLoader {
     subMeshData: AssetSubMeshData
   ) {
     const accessor = gltf._accessors[accessorIndex];
+    const componentCount = accessor.getComponentCount(accessor.type);
     const normalized = !!accessor.normalized;
     const hash = `${accessorIndex}:${!!semantic}:${Number(normalized)}`;
     let buffer = gltf._bufferCache[hash];
@@ -1141,7 +1139,6 @@ export class GLTFLoader extends AbstractModelLoader {
         floatData.set(data);
         data = floatData;
       }
-      const componentCount = accessor.getComponentCount(accessor.type);
       if (!semantic) {
         if (
           !(data instanceof Uint8Array) &&
@@ -1186,17 +1183,13 @@ export class GLTFLoader extends AbstractModelLoader {
           if (min && max) {
             primitive.setBoundingVolume(new BoundingBox(new Vector3(min), new Vector3(max)));
           } else {
-            const numComponents = getVertexBufferAttribTypeBySemantic(
-              (buffer as StructuredBuffer).structure,
-              semantic
-            ).cols;
             const bbox = new BoundingBox();
             bbox.beginExtend();
             for (let i = 0; i < data.length; i++) {
               const v = new Vector3(
-                data[i * numComponents],
-                data[i * numComponents + 1],
-                data[i * numComponents + 2]
+                data[i * componentCount],
+                data[i * componentCount + 1],
+                data[i * componentCount + 2]
               );
               bbox.extend(v);
             }

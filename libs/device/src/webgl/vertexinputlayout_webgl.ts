@@ -6,7 +6,8 @@ import {
   IndexBuffer,
   getVertexBufferAttribType,
   getVertexBufferStride,
-  VertexSemantic
+  VertexSemantic,
+  VertexInputLayoutOptions
 } from '../gpuobject';
 import { VertexData } from '../vertexdata';
 import { typeMap } from './constants_webgl';
@@ -18,9 +19,15 @@ export class WebGLVertexInputLayout
   implements VertexInputLayout<WebGLVertexArrayObject | WebGLVertexArrayObjectOES>
 {
   private _vertexData: VertexData;
-  constructor(device: WebGLDevice, vertexData: VertexData) {
+  constructor(device: WebGLDevice, options: VertexInputLayoutOptions) {
     super(device);
-    this._vertexData = vertexData.clone();
+    this._vertexData = new VertexData();
+    for (const vb of options.vertexBuffers) {
+      this._vertexData.setVertexBuffer(vb.buffer, vb.stepMode);
+    }
+    if (options.indexBuffer) {
+      this._vertexData.setIndexBuffer(options.indexBuffer);
+    }
     this.load();
   }
   destroy() {

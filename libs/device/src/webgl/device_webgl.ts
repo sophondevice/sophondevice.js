@@ -45,7 +45,8 @@ import {
   TextureImageElement,
   Texture2DArray,
   TextureCreationOptions,
-  BufferCreationOptions
+  BufferCreationOptions,
+  VertexInputLayoutOptions
 } from '../gpuobject';
 import { WebGLTextureCap, WebGLFramebufferCap, WebGLMiscCap, WebGLShaderCap } from './capabilities_webgl';
 import { WebGLBindGroup } from './bindgroup_webgl';
@@ -417,8 +418,8 @@ export class WebGLDevice extends Device {
   ): StructuredBuffer {
     return new WebGLStructuredBuffer(this, structureType, this.parseBufferOptions(options), data);
   }
-  createVAO(vertexData: VertexData): VertexInputLayout {
-    return new WebGLVertexInputLayout(this, vertexData);
+  createVAO(options: VertexInputLayoutOptions): VertexInputLayout {
+    return new WebGLVertexInputLayout(this, options);
   }
   createFrameBuffer(options?: FrameBufferOptions): FrameBuffer {
     return new WebGLFrameBuffer(this, options);

@@ -1,5 +1,5 @@
 import { Vector4, REvent } from '@sophon/base';
-import { Viewer, DeviceType, makeVertexBufferType, Geometry } from '@sophon/device';
+import { Viewer, DeviceType, makeVertexBufferType } from '@sophon/device';
 import * as dom from '@sophon/dom';
 import * as common from '../common';
 import { createSeaProgram } from './program';
@@ -21,11 +21,11 @@ import { createSeaProgram } from './program';
     },
     new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1])
   );
-  const rect = new Geometry(viewer.device);
-  rect.setVertexBuffer(vb);
-  rect.indexStart = 0;
-  rect.indexCount = 4;
-  rect.primitiveType = 'triangle-strip';
+  const rect = viewer.device.createVAO({
+    vertexBuffers: [{
+      buffer: vb
+    }]
+  });
   const program = createSeaProgram(viewer.device);
   const bindGroup = viewer.device.createBindGroup(program.bindGroupLayouts[0]);
 
@@ -42,7 +42,7 @@ import { createSeaProgram } from './program';
     );
     viewer.device.setProgram(program);
     viewer.device.setBindGroup(0, bindGroup);
-    rect.draw();
+    rect.draw('triangle-strip', 0, 4);
   });
 
   viewer.device.runLoop((device) => GUI.render());

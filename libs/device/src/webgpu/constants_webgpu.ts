@@ -11,7 +11,7 @@ export const textureWrappingMap: Record<TextureWrapping, GPUAddressMode> = {
 export const textureFilterMap: Record<TextureFilter, GPUFilterMode> = {
   nearest: 'nearest',
   linear: 'linear',
-  none: null
+  none: undefined
 };
 
 export const compareFuncMap: Record<CompareFunc, GPUCompareFunction> = {

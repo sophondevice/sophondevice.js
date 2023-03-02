@@ -1,5 +1,4 @@
 import { REventTarget, REvent, Vector3, Vector4, Matrix4x4, Ray, AABB } from '@sophon/base';
-import { Device, TextureCube } from '@sophon/device';
 import { XFormChangeEvent } from './xform';
 import { SkyboxMaterial } from './materiallib';
 import { SceneNode, SceneNodeAttachEvent } from './scene_node';
@@ -10,6 +9,7 @@ import { OctreeUpdateVisitor } from './visitors';
 import { Material } from './material';
 import { GraphNode } from './graph_node';
 import { RaycastVisitor } from './visitors/raycast_visitor';
+import type { Device, TextureCube } from '@sophon/device';
 import type { PunctualLight } from './light';
 import type { EnvironmentLighting } from './materiallib/envlight';
 

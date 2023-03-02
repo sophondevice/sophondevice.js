@@ -1,6 +1,6 @@
-import { BaseTexture, TextureCreationOptions } from '@sophon/device';
 import { getDDSMipLevelsInfo } from './dds';
 import { AbstractTextureLoader } from '../loader';
+import type { BaseTexture, TextureCreationOptions } from '@sophon/device';
 import type { AssetManager } from '../../assetmanager';
 
 export class DDSLoader extends AbstractTextureLoader {

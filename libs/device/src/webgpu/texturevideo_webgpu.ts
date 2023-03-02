@@ -8,7 +8,7 @@ export class WebGPUTextureVideo
 {
   private _source: HTMLVideoElement;
   constructor(device: WebGPUDevice, element: HTMLVideoElement) {
-    super(device);
+    super(device, '2d');
     this._source = element;
     this._width = 0;
     this._height = 0;

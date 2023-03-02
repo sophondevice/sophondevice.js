@@ -20,7 +20,8 @@ import {
   TextureMipmapData,
   TextureImageElement,
   TextureCreationOptions,
-  BufferCreationOptions
+  BufferCreationOptions,
+  VertexInputLayoutOptions
 } from '../gpuobject';
 import {
   GPUProgramConstructParams,
@@ -394,8 +395,8 @@ export class WebGPUDevice extends Device {
   ): StructuredBuffer {
     return new WebGPUStructuredBuffer(this, structureType, this.parseBufferOptions(options), data);
   }
-  createVAO(data: VertexData): VertexInputLayout {
-    return new WebGPUVertexInputLayout(this, data);
+  createVAO(options: VertexInputLayoutOptions): VertexInputLayout {
+    return new WebGPUVertexInputLayout(this, options);
   }
   createFrameBuffer(options?: FrameBufferOptions): FrameBuffer {
     return new WebGPUFrameBuffer(this, options);

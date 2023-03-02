@@ -1,12 +1,3 @@
-import {
-  I8_BITMASK,
-  U8_BITMASK,
-  I16_BITMASK,
-  U16_BITMASK,
-  I32_BITMASK,
-  U32_BITMASK,
-  F32_BITMASK
-} from '@sophon/device';
 import { Accessor, AccessorSparse } from './gltf';
 import type { TypedArray } from '@sophon/base';
 import type { GLTFContent } from './gltf_loader';
@@ -27,7 +18,6 @@ export type GLTFComponentType = 'SCALAR' | 'VEC2' | 'VEC3' | 'VEC4' | 'MAT2' | '
 export class GLTFAccessor {
   bufferView: number;
   byteOffset: number;
-  typeMask: number;
   componentType: ComponentType;
   normalized: boolean;
   count: number;
@@ -44,7 +34,6 @@ export class GLTFAccessor {
     this.bufferView = accessorInfo.bufferView;
     this.byteOffset = accessorInfo.byteOffset ?? 0;
     this.componentType = accessorInfo.componentType;
-    this.typeMask = this.getTypeMask(this.componentType);
     this.normalized = !!accessorInfo.normalized;
     this.count = accessorInfo.count;
     this.type = accessorInfo.type;
@@ -345,27 +334,6 @@ export class GLTFAccessor {
         return 9;
       case 'MAT4':
         return 16;
-      default:
-        return 0;
-    }
-  }
-
-  getTypeMask(componentType: ComponentType): number {
-    switch (componentType) {
-      case ComponentType.BYTE:
-        return I8_BITMASK;
-      case ComponentType.UBYTE:
-        return U8_BITMASK;
-      case ComponentType.SHORT:
-        return I16_BITMASK;
-      case ComponentType.USHORT:
-        return U16_BITMASK;
-      case ComponentType.INT:
-        return I32_BITMASK;
-      case ComponentType.UINT:
-        return U32_BITMASK;
-      case ComponentType.FLOAT:
-        return F32_BITMASK;
       default:
         return 0;
     }

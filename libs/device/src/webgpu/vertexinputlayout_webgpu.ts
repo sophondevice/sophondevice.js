@@ -5,13 +5,14 @@ import {
   IndexBuffer,
   getVertexBufferStride,
   getVertexBufferAttribType,
-  VertexSemantic
+  VertexSemantic,
+  VertexInputLayoutOptions
 } from '../gpuobject';
 import { vertexFormatToHash } from './constants_webgpu';
 import { WebGPUObject } from './gpuobject_webgpu';
 import { WebGPUStructuredBuffer } from './structuredbuffer_webgpu';
+import { VertexData } from '../vertexdata';
 import type { WebGPUDevice } from './device';
-import type { VertexData } from '../vertexdata';
 import type { WebGPUBuffer } from './buffer_webgpu';
 
 export class WebGPUVertexInputLayout extends WebGPUObject<unknown> implements VertexInputLayout<unknown> {
@@ -21,9 +22,15 @@ export class WebGPUVertexInputLayout extends WebGPUObject<unknown> implements Ve
   private _layouts: {
     [hash: string]: { layoutHash: string; buffers: { buffer: WebGPUBuffer; offset: number }[] };
   };
-  constructor(device: WebGPUDevice, vertexData: VertexData) {
+  constructor(device: WebGPUDevice, options: VertexInputLayoutOptions) {
     super(device);
-    this._vertexData = vertexData.clone();
+    this._vertexData = new VertexData();
+    for (const vb of options.vertexBuffers) {
+      this._vertexData.setVertexBuffer(vb.buffer, vb.stepMode);
+    }
+    if (options.indexBuffer) {
+      this._vertexData.setIndexBuffer(options.indexBuffer);
+    }
     this._hash = String(++WebGPUVertexInputLayout._hashCounter);
     this._layouts = {};
   }

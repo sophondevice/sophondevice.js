@@ -402,6 +402,14 @@ const vertexAttribNameRevMap = {
   [VERTEX_ATTRIB_CUSTOM1]: 'custom1'
 } as const;
 
+export type VertexInputLayoutOptions = {
+  vertexBuffers: {
+    buffer: StructuredBuffer,
+    stepMode?: VertexStepMode
+  }[],
+  indexBuffer?: IndexBuffer
+};
+
 export type TextureColorSpace = 'srgb' | 'linear';
 export type BufferUsage = 'vertex' | 'index' | 'uniform' | 'read' | 'write';
 export interface BaseCreationOptions {
