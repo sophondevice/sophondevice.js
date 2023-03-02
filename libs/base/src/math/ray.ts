@@ -1,5 +1,6 @@
 import { Matrix4x4, Vector3 } from './vector';
 import { AABB } from './aabb';
+import type { Nullable } from 'src/utils';
 
 // reduce GC
 const tmpV0 = new Vector3();
@@ -9,41 +10,44 @@ const tmpV3 = new Vector3();
 const tmpV4 = new Vector3();
 
 export class Ray {
-  _origin: Vector3;
-  _direction: Vector3;
   /** @internal */
-  _ii: number;
+  private _origin: Vector3;
   /** @internal */
-  _ij: number;
+  private _direction: Vector3;
   /** @internal */
-  _ik: number;
+  private _ii = 0;
   /** @internal */
-  _ibyj: number;
+  private _ij = 0;
   /** @internal */
-  _jbyi: number;
+  private _ik = 0;
   /** @internal */
-  _kbyj: number;
+  private _ibyj = 0;
   /** @internal */
-  _jbyk: number;
+  private _jbyi = 0;
   /** @internal */
-  _ibyk: number;
+  private _kbyj = 0;
   /** @internal */
-  _kbyi: number;
+  private _jbyk = 0;
   /** @internal */
-  _c_xy: number;
+  private _ibyk = 0;
   /** @internal */
-  _c_xz: number;
+  private _kbyi = 0;
   /** @internal */
-  _c_yx: number;
+  private _c_xy = 0;
   /** @internal */
-  _c_yz: number;
+  private _c_xz = 0;
   /** @internal */
-  _c_zx: number;
+  private _c_yx = 0;
   /** @internal */
-  _c_zy: number;
-
-  bboxIntersectionTest: (bbox: AABB) => boolean;
-  bboxIntersectionTestEx: (bbox: AABB) => number | null;
+  private _c_yz = 0;
+  /** @internal */
+  private _c_zx = 0;
+  /** @internal */
+  private _c_zy = 0;
+  /** @internal */
+  private _bboxIntersectionTest: Nullable<(bbox: AABB) => boolean> = null;
+  /** @internal */
+  private _bboxIntersectionTestEx: Nullable<(bbox: AABB) => Nullable<number> > = null;
 
   constructor();
   constructor(origin: Vector3, directionNormalized: Vector3);
@@ -51,6 +55,14 @@ export class Ray {
     this._origin = origin ? new Vector3(origin) : Vector3.zero();
     this._direction = directionNormalized ? new Vector3(directionNormalized) : Vector3.axisPZ();
     this.prepare();
+  }
+
+  get bboxIntersectionTest(): (bbox: AABB) => boolean {
+    return this._bboxIntersectionTest!;
+  }
+
+  get bboxIntersectionTestEx(): (bbox: AABB) => Nullable<number> {
+    return this._bboxIntersectionTestEx!;
   }
 
   get origin(): Vector3 {
@@ -999,95 +1011,95 @@ export class Ray {
     if (i < 0) {
       if (j < 0) {
         if (k < 0) {
-          this.bboxIntersectionTest = this.qtestMMM;
-          this.bboxIntersectionTestEx = this.qtestMMMEx;
+          this._bboxIntersectionTest = this.qtestMMM;
+          this._bboxIntersectionTestEx = this.qtestMMMEx;
         } else if (k > 0) {
-          this.bboxIntersectionTest = this.qtestMMP;
-          this.bboxIntersectionTestEx = this.qtestMMPEx;
+          this._bboxIntersectionTest = this.qtestMMP;
+          this._bboxIntersectionTestEx = this.qtestMMPEx;
         } else {
-          this.bboxIntersectionTest = this.qtestMMO;
-          this.bboxIntersectionTestEx = this.qtestMMOEx;
+          this._bboxIntersectionTest = this.qtestMMO;
+          this._bboxIntersectionTestEx = this.qtestMMOEx;
         }
       } else {
         if (k < 0) {
-          this.bboxIntersectionTest = j > 0 ? this.qtestMPM : this.qtestMOM;
-          this.bboxIntersectionTestEx = j > 0 ? this.qtestMPMEx : this.qtestMOMEx;
+          this._bboxIntersectionTest = j > 0 ? this.qtestMPM : this.qtestMOM;
+          this._bboxIntersectionTestEx = j > 0 ? this.qtestMPMEx : this.qtestMOMEx;
         } else {
           if (j === 0 && k === 0) {
-            this.bboxIntersectionTest = this.qtestMOO;
-            this.bboxIntersectionTestEx = this.qtestMOOEx;
+            this._bboxIntersectionTest = this.qtestMOO;
+            this._bboxIntersectionTestEx = this.qtestMOOEx;
           } else if (k === 0) {
-            this.bboxIntersectionTest = this.qtestMPO;
-            this.bboxIntersectionTestEx = this.qtestMPOEx;
+            this._bboxIntersectionTest = this.qtestMPO;
+            this._bboxIntersectionTestEx = this.qtestMPOEx;
           } else if (j === 0) {
-            this.bboxIntersectionTest = this.qtestMOP;
-            this.bboxIntersectionTestEx = this.qtestMOPEx;
+            this._bboxIntersectionTest = this.qtestMOP;
+            this._bboxIntersectionTestEx = this.qtestMOPEx;
           } else {
-            this.bboxIntersectionTest = this.qtestMPP;
-            this.bboxIntersectionTestEx = this.qtestMPPEx;
+            this._bboxIntersectionTest = this.qtestMPP;
+            this._bboxIntersectionTestEx = this.qtestMPPEx;
           }
         }
       }
     } else {
       if (j < 0) {
         if (k < 0) {
-          this.bboxIntersectionTest = i > 0 ? this.qtestPMM : this.qtestOMM;
-          this.bboxIntersectionTestEx = i > 0 ? this.qtestPMMEx : this.qtestOMMEx;
+          this._bboxIntersectionTest = i > 0 ? this.qtestPMM : this.qtestOMM;
+          this._bboxIntersectionTestEx = i > 0 ? this.qtestPMMEx : this.qtestOMMEx;
         } else {
           if (i === 0 && k === 0) {
-            this.bboxIntersectionTest = this.qtestOMO;
-            this.bboxIntersectionTestEx = this.qtestOMOEx;
+            this._bboxIntersectionTest = this.qtestOMO;
+            this._bboxIntersectionTestEx = this.qtestOMOEx;
           } else if (k === 0) {
-            this.bboxIntersectionTest = this.qtestPMO;
-            this.bboxIntersectionTestEx = this.qtestPMOEx;
+            this._bboxIntersectionTest = this.qtestPMO;
+            this._bboxIntersectionTestEx = this.qtestPMOEx;
           } else if (i === 0) {
-            this.bboxIntersectionTest = this.qtestOMP;
-            this.bboxIntersectionTestEx = this.qtestOMPEx;
+            this._bboxIntersectionTest = this.qtestOMP;
+            this._bboxIntersectionTestEx = this.qtestOMPEx;
           } else {
-            this.bboxIntersectionTest = this.qtestPMP;
-            this.bboxIntersectionTestEx = this.qtestPMPEx;
+            this._bboxIntersectionTest = this.qtestPMP;
+            this._bboxIntersectionTestEx = this.qtestPMPEx;
           }
         }
       } else {
         if (k < 0) {
           if (i === 0 && j === 0) {
-            this.bboxIntersectionTest = this.qtestOOM;
-            this.bboxIntersectionTestEx = this.qtestOOMEx;
+            this._bboxIntersectionTest = this.qtestOOM;
+            this._bboxIntersectionTestEx = this.qtestOOMEx;
           } else if (i === 0) {
-            this.bboxIntersectionTest = this.qtestOPM;
-            this.bboxIntersectionTestEx = this.qtestOPMEx;
+            this._bboxIntersectionTest = this.qtestOPM;
+            this._bboxIntersectionTestEx = this.qtestOPMEx;
           } else if (j === 0) {
-            this.bboxIntersectionTest = this.qtestPOM;
-            this.bboxIntersectionTestEx = this.qtestPOMEx;
+            this._bboxIntersectionTest = this.qtestPOM;
+            this._bboxIntersectionTestEx = this.qtestPOMEx;
           } else {
-            this.bboxIntersectionTest = this.qtestPPM;
-            this.bboxIntersectionTestEx = this.qtestPPMEx;
+            this._bboxIntersectionTest = this.qtestPPM;
+            this._bboxIntersectionTestEx = this.qtestPPMEx;
           }
         } else {
           if (i === 0) {
             if (j === 0) {
-              this.bboxIntersectionTest = this.qtestOOP;
-              this.bboxIntersectionTestEx = this.qtestOOPEx;
+              this._bboxIntersectionTest = this.qtestOOP;
+              this._bboxIntersectionTestEx = this.qtestOOPEx;
             } else if (k === 0) {
-              this.bboxIntersectionTest = this.qtestOPO;
-              this.bboxIntersectionTestEx = this.qtestOPOEx;
+              this._bboxIntersectionTest = this.qtestOPO;
+              this._bboxIntersectionTestEx = this.qtestOPOEx;
             } else {
-              this.bboxIntersectionTest = this.qtestOPP;
-              this.bboxIntersectionTestEx = this.qtestOPPEx;
+              this._bboxIntersectionTest = this.qtestOPP;
+              this._bboxIntersectionTestEx = this.qtestOPPEx;
             }
           } else {
             if (j === 0 && k === 0) {
-              this.bboxIntersectionTest = this.qtestPOO;
-              this.bboxIntersectionTestEx = this.qtestPOOEx;
+              this._bboxIntersectionTest = this.qtestPOO;
+              this._bboxIntersectionTestEx = this.qtestPOOEx;
             } else if (j === 0) {
-              this.bboxIntersectionTest = this.qtestPOP;
-              this.bboxIntersectionTestEx = this.qtestPOPEx;
+              this._bboxIntersectionTest = this.qtestPOP;
+              this._bboxIntersectionTestEx = this.qtestPOPEx;
             } else if (k === 0) {
-              this.bboxIntersectionTest = this.qtestPPO;
-              this.bboxIntersectionTestEx = this.qtestPPOEx;
+              this._bboxIntersectionTest = this.qtestPPO;
+              this._bboxIntersectionTestEx = this.qtestPPOEx;
             } else {
-              this.bboxIntersectionTest = this.qtestPPP;
-              this.bboxIntersectionTestEx = this.qtestPPPEx;
+              this._bboxIntersectionTest = this.qtestPPP;
+              this._bboxIntersectionTestEx = this.qtestPPPEx;
             }
           }
         }

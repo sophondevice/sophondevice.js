@@ -1,8 +1,12 @@
+export type Nullable<T> = T | null;
+
+export type HttpURLResolver = (url: string) => string;
+
 export class HttpRequest {
   /** @internal */
-  static _tempElement: HTMLAnchorElement = null;
+  static _tempElement: Nullable<HTMLAnchorElement> = null;
   /** @internal */
-  private _urlResolver: (url: string) => string;
+  private _urlResolver: Nullable<HttpURLResolver>;
   /** @internal */
   private _crossOrigin: string;
   /** @internal */
@@ -12,10 +16,10 @@ export class HttpRequest {
     this._crossOrigin = '';
     this._headers = {};
   }
-  get urlResolver(): (url: string) => string {
+  get urlResolver(): Nullable<HttpURLResolver> {
     return this._urlResolver;
   }
-  set urlResolver(resolver: (url: string) => string) {
+  set urlResolver(resolver: Nullable<HttpURLResolver>) {
     this._urlResolver = resolver;
   }
   get crossOrigin(): string {
@@ -37,7 +41,7 @@ export class HttpRequest {
     HttpRequest._tempElement.href = url;
     return HttpRequest._tempElement.href;
   }
-  async request(url: string): Promise<Response> {
+  async request(url: string): Promise<Nullable<Response> > {
     url = this._urlResolver ? this._urlResolver(url) : this.resolveURL(url);
     return url
       ? fetch(url, {
@@ -48,14 +52,14 @@ export class HttpRequest {
   }
   async requestText(url: string): Promise<string> {
     const response = await this.request(url);
-    if (!response.ok) {
+    if (!response || !response.ok) {
       throw new Error(`Asset download failed: ${url}`);
     }
     return response.text();
   }
   async requestArrayBuffer(url: string): Promise<ArrayBuffer> {
     const response = await this.request(url);
-    if (!response.ok) {
+    if (!response || !response.ok) {
       throw new Error(`Asset download failed: ${url}`);
     }
     return response.arrayBuffer();

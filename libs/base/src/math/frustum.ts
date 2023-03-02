@@ -2,6 +2,7 @@ import { Plane } from './plane';
 import { Matrix4x4, Vector3 } from './vector';
 import { BoxSide } from './clip_test';
 import { BoundingBoxData } from './box_data';
+import type { Nullable } from 'src/utils';
 
 export class Frustum {
   static readonly CORNER_LEFT_TOP_NEAR = 0;
@@ -13,31 +14,36 @@ export class Frustum {
   static readonly CORNER_RIGHT_BOTTOM_FAR = 6;
   static readonly CORNER_RIGHT_BOTTOM_NEAR = 7;
   /** @internal */
-  private _worldMatrix: Matrix4x4;
+  private _worldMatrix: Nullable<Matrix4x4>;
   /** @internal */
-  private _viewProjMatrix: Matrix4x4;
+  private _viewProjMatrix: Nullable<Matrix4x4>;
   /** @internal */
-  private _planes: Plane[];
+  private _planes: Nullable<Plane[]>;
   /** @internal */
-  private _corners: Vector3[];
+  private _corners: Nullable<Vector3[]>;
   /** @internal */
   private _matrixDirty: boolean;
   constructor();
   constructor(viewProjMatrix: Matrix4x4, worldMatrix?: Matrix4x4);
   constructor(other: Frustum);
   constructor(arg0?: Matrix4x4 | Frustum, arg1?: Matrix4x4) {
+    this._worldMatrix = null;
+    this._viewProjMatrix = null;
     this._planes = null;
     this._corners = null;
-    if (arg0 instanceof Frustum) {
+    this._matrixDirty = false;
+    if (!arg0) {
+      this.setMatrix(Matrix4x4.identity(), Matrix4x4.identity());
+    } else if (arg0 instanceof Frustum) {
       this.setMatrix(arg0.viewProjectionMatrix, arg0.worldMatrix);
     } else {
-      this.setMatrix(arg0, arg1);
+      this.setMatrix(arg0, arg1 || Matrix4x4.identity());
     }
-    this._viewProjMatrix.setChangeCallback(() => this._invalidate());
-    this._worldMatrix.setChangeCallback(() => this._invalidate());
+    this._viewProjMatrix!.setChangeCallback(() => this._invalidate());
+    this._worldMatrix!.setChangeCallback(() => this._invalidate());
   }
-  get worldMatrix() {
-    return this._worldMatrix;
+  get worldMatrix(): Matrix4x4 {
+    return this._worldMatrix!;
   }
   set worldMatrix(m: Matrix4x4) {
     this.setWorldMatrix(m);
@@ -47,8 +53,8 @@ export class Frustum {
     this._invalidate();
     return this;
   }
-  get viewProjectionMatrix() {
-    return this._viewProjMatrix;
+  get viewProjectionMatrix(): Matrix4x4 {
+    return this._viewProjMatrix!;
   }
   set viewProjectionMatrix(m: Matrix4x4) {
     this.setViewProjectionMatrix(m);
@@ -67,27 +73,27 @@ export class Frustum {
   }
   transform(m: Matrix4x4) {
     if (m) {
-      this._worldMatrix.multiplyLeft(m);
+      this._worldMatrix!.multiplyLeft(m);
       this._matrixDirty = true;
     }
     return this;
   }
-  get planes() {
+  get planes(): Plane[] {
     if (this._matrixDirty) {
       this._matrixDirty = false;
       this._initWithMatrix();
     }
-    return this._planes;
+    return this._planes!;
   }
-  get corners() {
+  get corners(): Vector3[] {
     if (this._matrixDirty) {
       this._matrixDirty = false;
       this._initWithMatrix();
     }
-    return this._corners;
+    return this._corners!;
   }
   getCorner(pos: number) {
-    return this.corners[pos];
+    return this.corners![pos];
   }
   /** @internal */
   private _invalidate() {
@@ -95,7 +101,7 @@ export class Frustum {
   }
   /** @internal */
   private _initWithMatrix() {
-    const matrix = Matrix4x4.multiply(this._viewProjMatrix, this._worldMatrix);
+    const matrix = Matrix4x4.multiply(this._viewProjMatrix!, this._worldMatrix!);
     this._planes = this._planes || Array.from({ length: 6 }).map(() => new Plane());
     this._planes[BoxSide.LEFT]
       .set(matrix.m30 + matrix.m00, matrix.m31 + matrix.m01, matrix.m32 + matrix.m02, matrix.m33 + matrix.m03)
@@ -125,7 +131,7 @@ export class Frustum {
     return this;
   }
   containsPoint(pt: Vector3): boolean {
-    for (const p of this.planes) {
+    for (const p of this.planes!) {
       if (p.distanceToPoint(pt) < 0) {
         return false;
       }

@@ -3,6 +3,7 @@
  */
 
 import { formatNumber, numberEquals, numberClamp } from './misc';
+import type { Nullable } from 'src/utils';
 
 export class IterableWrapper implements Iterable<number> {
   protected _v: Float32Array;
@@ -48,16 +49,16 @@ export class VectorBase extends IterableWrapper {
   /** @internal */
   protected _doCallback: boolean;
   /** @internal */
-  protected _changeCallback: () => void;
+  protected _changeCallback: Nullable<() => void>;
   constructor(nOrArray: number | Float32Array) {
     super(nOrArray);
     this._doCallback = true;
     this._changeCallback = null;
   }
-  getChangeCallback(): () => void {
+  getChangeCallback(): Nullable<() => void> {
     return this._changeCallback;
   }
-  setChangeCallback(callback: () => void) {
+  setChangeCallback(callback: Nullable<() => void>) {
     this._changeCallback = callback;
   }
   get callbackEnabled() {
@@ -2504,7 +2505,7 @@ export class Matrix4x4 extends VectorBase {
       case CubeFace.NZ:
         return this.lookAt(Vector3.zero(), Vector3.axisNZ(), Vector3.axisNY(), result);
       default:
-        return null;
+        throw new Error(`Matrix4x4.lookAtCubeFace(): invalid face: ${face}`);
     }
   }
   static multiply(m1: Matrix4x4, m2: Matrix4x4, result?: Matrix4x4): Matrix4x4 {

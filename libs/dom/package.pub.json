@@ -35,7 +35,7 @@
     "rollup-plugin-typescript2": "^0.34.1",
     "shx": "^0.3.4",
     "cross-env": "^7.0.3",
-    "typescript": "^4.7.3",
+    "typescript": "^4.9.5",
     "@sophon/base": "workspace:*",
     "@sophon/device": "workspace:*"
   },

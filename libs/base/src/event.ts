@@ -1,3 +1,5 @@
+import type { Nullable } from './utils';
+
 export class REvent {
   static readonly NONE = 0;
   static readonly CAPTURING_PHASE = 1;
@@ -28,18 +30,24 @@ export class REvent {
   /** @internal */
   private _phase: number;
   /** @internal */
-  private _currentTarget: REventTarget;
+  private _currentTarget: Nullable<REventTarget>;
   /** @internal */
-  private _target: REventTarget;
+  private _target: Nullable<REventTarget>;
   /** @internal */
   private _timestamp: number;
   /** @internal */
 
   /** @internal */
-  private _path: REventPath;
+  private _path: Nullable<REventPath>;
 
   constructor(type: string, canBubble: boolean, cancelable: boolean) {
     this._type = type;
+    this._state = 0;
+    this._phase = REvent.NONE;
+    this._currentTarget = null;
+    this._target = null;
+    this._timestamp = 0;
+    this._path = null;
     !!canBubble && this._setFlag(REvent.BIT_CANBUBBLE);
     !!cancelable && this._setFlag(REvent.BIT_CANCELABLE);
     this.reset();
@@ -64,7 +72,7 @@ export class REvent {
   get composed(): boolean {
     return this._hasFlag(REvent.BIT_COMPOSED);
   }
-  get currentTarget(): REventTarget {
+  get currentTarget(): Nullable<REventTarget> {
     return this._currentTarget;
   }
   get defaultPrevented(): boolean {
@@ -73,7 +81,7 @@ export class REvent {
   get eventPhase(): number {
     return this._phase;
   }
-  get target(): REventTarget {
+  get target(): Nullable<REventTarget> {
     return this._target;
   }
   get timeStamp(): number {
@@ -85,7 +93,7 @@ export class REvent {
   get isTrusted(): boolean {
     return true;
   }
-  composedPath(): REventTarget[] {
+  composedPath(): Nullable<REventTarget[]> {
     return this._path?.toArray() || null;
   }
   preventDefault(): void {
@@ -144,11 +152,11 @@ export class REvent {
     return !!this._phase;
   }
   /** @internal */
-  _setTarget(target: REventTarget) {
+  _setTarget(target: Nullable<REventTarget>) {
     this._target = target || null;
   }
   /** @internal */
-  _setCurrentTarget(target: REventTarget) {
+  _setCurrentTarget(target: Nullable<REventTarget>) {
     this._currentTarget = target || null;
   }
   /** @internal */
@@ -156,11 +164,11 @@ export class REvent {
     this._phase = phase;
   }
   /** @internal */
-  _getPath(): REventPath {
+  _getPath(): Nullable<REventPath> {
     return this._path || null;
   }
   /** @internal */
-  _setPath(path: REventPath) {
+  _setPath(path: Nullable<REventPath>) {
     this._path = path;
   }
   /** @internal */
@@ -222,9 +230,9 @@ interface EventListenerMap {
 
 export class REventTarget {
   /** @internal */
-  _listeners: EventListenerMap;
+  _listeners: Nullable<EventListenerMap>;
   /** @internal */
-  _defaultListeners: EventListenerMap;
+  _defaultListeners: Nullable<EventListenerMap>;
   /** @internal */
   _pathBuilder: REventPathBuilder;
   constructor(pathBuilder?: REventPathBuilder) {
@@ -278,13 +286,13 @@ export class REventTarget {
   }
   /** @internal */
   _internalAddEventListener(
-    listenerMap: EventListenerMap,
+    listenerMap: Nullable<EventListenerMap>,
     type: string,
     listener: REventListener,
     options?: REventHandlerOptions
-  ): EventListenerMap {
+  ): Nullable<EventListenerMap> {
     if (typeof type !== 'string') {
-      return;
+      return null;
     }
     if (!listenerMap) {
       listenerMap = {};
@@ -301,7 +309,7 @@ export class REventTarget {
     }
     for (const handler of handlers) {
       if (handler.handler.handleEvent === l.handleEvent && handler.options.capture === o.capture) {
-        return;
+        return listenerMap;
       }
     }
     handlers.push({ handler: l, options: o, removed: false });
@@ -309,7 +317,7 @@ export class REventTarget {
   }
   /** @internal */
   _internalRemoveEventListener(
-    listenerMap: EventListenerMap,
+    listenerMap: Nullable<EventListenerMap>,
     type: string,
     listener: REventListener,
     options?: REventHandlerOptions
@@ -348,7 +356,7 @@ export class REventTarget {
       for (const handler of handlersCopy) {
         if (handler.options.capture === useCapture) {
           evt._setCurrentTarget(this);
-          evt._setPassive(handler.options.passive);
+          evt._setPassive(!!handler.options.passive);
           handler.handler.handleEvent.call(this, evt);
           if (handler.options.once) {
             handler.removed = true;

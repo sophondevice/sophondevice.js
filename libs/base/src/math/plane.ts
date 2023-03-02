@@ -2,19 +2,19 @@ import { VectorBase, Vector3, Vector3Like, Vector4, Matrix4x4 } from './vector';
 
 export class Plane extends VectorBase {
   /** @internal */
-  private _px: number;
+  private _px = 0;
   /** @internal */
-  private _py: number;
+  private _py = 0;
   /** @internal */
-  private _pz: number;
+  private _pz = 0;
   /** @internal */
-  private _nx: number;
+  private _nx = 0;
   /** @internal */
-  private _ny: number;
+  private _ny = 0;
   /** @internal */
-  private _nz: number;
+  private _nz = 0;
   /** @internal */
-  private _npDirty: boolean;
+  private _npDirty = false;
   constructor();
   constructor(a: number, b: number, c: number, d: number);
   constructor(other: Plane);

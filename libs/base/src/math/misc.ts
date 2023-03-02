@@ -5,9 +5,14 @@ export function formatNumber(
   fillchar?: string
 ): string {
   const fixed = val === (val | 0) ? String(val) : val.toFixed(fractLength);
-  const ch = fillchar || '0';
-  const tl = totalLength || 0;
-  return tl > 0 ? (Array(totalLength).join(ch) + fixed).substr(-totalLength) : fixed;
+  const ch = fillchar ?? '0';
+  const tl = totalLength ?? 0;
+  if (tl > 0) {
+    const s = Array(tl).join(ch) + fixed;
+    return s.substring(s.length - tl);
+  } else {
+    return fixed;
+  }
 }
 
 const f = new Float32Array(1);

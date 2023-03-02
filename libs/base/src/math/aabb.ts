@@ -22,12 +22,14 @@ export class AABB {
     if (arg0 instanceof AABB) {
       this._minPoint = new Vector3(arg0.minPoint);
       this._maxPoint = new Vector3(arg0.maxPoint);
-    } else if (arg0 instanceof Vector3) {
+    } else if (arg0 instanceof Vector3 && arg1 instanceof Vector3) {
       this._minPoint = new Vector3(arg0);
       this._maxPoint = new Vector3(arg1);
-    } else {
+    } else if (arg0 instanceof AABB && arg1 instanceof Vector3) {
       this._minPoint = new Vector3(0, 0, 0);
       this._maxPoint = new Vector3(0, 0, 0);
+    } else {
+      throw new Error('AABB.AABB(): invalid arguments');
     }
   }
   get minPoint() {

@@ -1,6 +1,8 @@
 import type { TypedArray } from '@sophon/base';
 
+/** @internal */
 export type WebGLContext = WebGLRenderingContext | WebGL2RenderingContext;
+
 export type TextureTarget = '2d' | '3d' | 'cube' | '2darray';
 export type CompareFunc = 'always' | 'le' | 'ge' | 'lt' | 'gt' | 'eq' | 'ne' | 'never';
 export type TextureWrapping = 'repeat' | 'mirrored-repeat' | 'clamp';

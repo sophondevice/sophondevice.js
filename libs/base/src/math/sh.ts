@@ -8,6 +8,7 @@
 //-------------------------------------------------------------------------------------
 
 import { Vector3, Vector4, Matrix4x4 } from './vector';
+import type { Nullable } from 'src/utils';
 
 const SH_MINORDER = 2;
 const SH_MAXORDER = 6;
@@ -15,7 +16,6 @@ const sqrtf = Math.sqrt;
 const cosf = Math.cos;
 const sinf = Math.sin;
 const asinf = Math.asin;
-const atan = Math.atan;
 const XM_PI = Math.PI;
 const XM_PIDIV2 = 1.570796327;
 const tmpArray = new Float32Array(19);
@@ -443,49 +443,18 @@ function sh_eval_basis_5(x: number, y: number, z: number, b: Float32Array) {
   b[35] = p_5_5 * c5; // l=5,m=+5
 }
 
-const M_PIjs = 4.0 * atan(1.0);
-const maxang = M_PIjs / 2;
 const NSH0 = 1;
 const NSH1 = 4;
 const NSH2 = 9;
 const NSH3 = 16;
 const NSH4 = 25;
-const NSH5 = 36;
-const NSH6 = 49;
-const NSH7 = 64;
-const NSH8 = 81;
-const NSH9 = 100;
-const NL0 = 1;
-const NL1 = 3;
-const NL2 = 5;
-const NL3 = 7;
-const NL4 = 9;
-const NL5 = 11;
-const NL6 = 13;
-const NL7 = 15;
-const NL8 = 17;
-const NL9 = 19;
 
-function rot(ct: number, st: number, x: number, y: number): [number, number] {
-  return [x * ct - y * st, y * ct + x * st];
-}
 
 function rot_inv(ct: number, st: number, x: number, y: number): [number, number] {
   return [x * ct + y * st, y * ct - x * st];
 }
 
-function rot_1(ct: number, st: number, ctm: number[], stm: number[]) {
-  ctm[0] = ct;
-  stm[0] = st;
-}
 
-function rot_2(ct: number, st: number, ctm: number[], stm: number[]) {
-  const ct2 = CONSTANT(2.0) * ct;
-  ctm[0] = ct;
-  stm[0] = st;
-  ctm[1] = ct2 * ct - CONSTANT(1.0);
-  stm[1] = ct2 * st;
-}
 
 function rot_3(ct: number, st: number, ctm: number[], stm: number[]) {
   const ct2 = CONSTANT(2.0) * ct;
@@ -523,12 +492,6 @@ function rot_5(ct: number, st: number, ctm: number[], stm: number[]) {
   stm[4] = ct2 * stm[3] - stm[2];
 }
 
-function sh_rotz_1(ctm: number[], stm: number[], y: number[], yr: number[]) {
-  yr[1] = y[1];
-  const [yr0, yr2] = rot_inv(ctm[0], stm[0], y[0], y[2]);
-  yr[0] = yr0;
-  yr[2] = yr2;
-}
 
 function sh_rotz_2(ctm: number[], stm: number[], y: Float32Array, yr: Float32Array) {
   yr[2] = y[2];
@@ -590,20 +553,8 @@ function sh_rotz_5(ctm: number[], stm: number[], y: Float32Array, yr: Float32Arr
 
 // rotation code generated programmatically by rotatex (2000x4000 samples, eps=1e-008)
 
-const fx_1_001 = sqrtf(1.0) / 1.0; // 1
-const fx_1_002 = -sqrtf(1.0) / 1.0; // -1.00000030843
 
-function sh_rotx90_1(y: number[], yr: number[]) {
-  yr[0] = fx_1_001 * y[1];
-  yr[1] = fx_1_002 * y[0];
-  yr[2] = fx_1_001 * y[2];
-}
 
-function sh_rotx90_inv_1(y: number[], yr: number[]) {
-  yr[0] = fx_1_002 * y[1];
-  yr[1] = fx_1_001 * y[0];
-  yr[2] = fx_1_001 * y[2];
-}
 
 const fx_2_001 = sqrtf(4.0) / 2.0; // 1
 const fx_2_002 = -sqrtf(4.0) / 2.0; // -1
@@ -756,12 +707,6 @@ function sh_rot_1(m: number[], y: Float32Array, yr: Float32Array) {
   yr[2] = yr2;
 }
 
-function sh_roty_1(ctm: number[], stm: number[], y: number[], yr: number[]) {
-  yr[0] = y[0];
-  const [yr1, yr2] = rot_inv(ctm[0], stm[0], y[1], y[2]);
-  yr[1] = yr1;
-  yr[2] = yr2;
-}
 
 function sh_roty_2(ctm: number[], stm: number[], y: Float32Array, yr: Float32Array) {
   sh_rotx90_2(y, yr);
@@ -965,10 +910,6 @@ function sh5_rot(
   sh_rotzyz_5(zc1m, zs1m, ycm, ysm, zc2m, zs2m, y.subarray(NSH4), yr.subarray(NSH4));
 }
 
-function sh1_rot(m: number[], y: Float32Array, yr: Float32Array) {
-  yr[0] = y[0];
-  sh_rot_1(m, y.subarray(NSH0), yr.subarray(NSH0));
-}
 
 function sh3_rot_n(m: number[], y: Float32Array, yr: Float32Array) {
   const [zc1, zs1, yc, ys, zc2, zs2] = zyz(m);
@@ -1000,7 +941,7 @@ function SimpMatMul(dim: number, matrix: number[], input: Float32Array, result: 
 //
 // http://msdn.microsoft.com/en-us/library/windows/desktop/bb205448.aspx
 //-------------------------------------------------------------------------------------
-function XMSHEvalDirection(result: Float32Array, order: number, dir: Vector3): Float32Array {
+export function XMSHEvalDirection(result: Float32Array, order: number, dir: Vector3): Nullable<Float32Array> {
   const dv = dir;
 
   const fX = dv.x;
@@ -1040,12 +981,12 @@ function XMSHEvalDirection(result: Float32Array, order: number, dir: Vector3): F
 //
 // http://msdn.microsoft.com/en-us/library/windows/desktop/bb204992.aspx
 //-------------------------------------------------------------------------------------
-function XMSHRotate(
+export function XMSHRotate(
   result: Float32Array,
   order: number,
   rotMatrix: Matrix4x4,
   input: Float32Array
-): Float32Array {
+): Nullable<Float32Array> {
   if (!result || !input) return null;
 
   if (result == input) return null;
@@ -1174,13 +1115,16 @@ function XMSHRotate(
 //
 // http://msdn.microsoft.com/en-us/library/windows/desktop/bb205461.aspx
 //-------------------------------------------------------------------------------------
-function XMSHRotateZ(result: Float32Array, order: number, angle: number, input: Float32Array): Float32Array {
-  if (!result || !input) return null;
-
-  if (result == input) return null;
-
-  if (order < SH_MINORDER || order > SH_MAXORDER) return null;
-
+export function XMSHRotateZ(result: Float32Array, order: number, angle: number, input: Float32Array): Nullable<Float32Array> {
+  if (!result || !input) {
+    return null;
+  }
+  if (result == input) {
+    return null;
+  }
+  if (order < SH_MINORDER || order > SH_MAXORDER) {
+    return null;
+  }
   const R: number[] = [];
 
   // these are actually very sparse matrices, most of the entries are zero's...
@@ -1334,14 +1278,15 @@ function XMSHRotateZ(result: Float32Array, order: number, angle: number, input: 
 //
 // http://msdn.microsoft.com/en-us/library/windows/desktop/bb205438.aspx
 //-------------------------------------------------------------------------------------
-function XMSHAdd(
+export function XMSHAdd(
   result: Float32Array,
   order: number,
   inputA: Float32Array,
   inputB: Float32Array
-): Float32Array {
-  if (!result || !inputA || !inputB) return null;
-
+): Nullable<Float32Array> {
+  if (!result || !inputA || !inputB) {
+    return null;
+  }
   const numcoeff = order * order;
 
   for (let i = 0; i < numcoeff; ++i) {
@@ -1356,7 +1301,7 @@ function XMSHAdd(
 //
 // http://msdn.microsoft.com/en-us/library/windows/desktop/bb204994.aspx
 //-------------------------------------------------------------------------------------
-function XMSHScale(result: Float32Array, order: number, input: Float32Array, scale: number): Float32Array {
+export function XMSHScale(result: Float32Array, order: number, input: Float32Array, scale: number): Nullable<Float32Array> {
   if (!result || !input) return null;
 
   const numcoeff = order * order;
@@ -1373,7 +1318,7 @@ function XMSHScale(result: Float32Array, order: number, input: Float32Array, sca
 //
 // http://msdn.microsoft.com/en-us/library/windows/desktop/bb205446.aspx
 //-------------------------------------------------------------------------------------
-function XMSHDot(order: number, inputA: Float32Array, inputB: Float32Array): number {
+export function XMSHDot(order: number, inputA: Float32Array, inputB: Float32Array): number {
   if (!inputA || !inputB) return 0;
 
   let result = inputA[0] * inputB[0];
@@ -1397,12 +1342,12 @@ function XMSHDot(order: number, inputA: Float32Array, inputB: Float32Array): num
 // that the product commutes (f*g == g*f) but doesn't associate
 // (f*(g*h) != (f*g)*h.
 //-------------------------------------------------------------------------------------
-function XMSHMultiply(
+export function XMSHMultiply(
   result: Float32Array,
   order: number,
   inputF: Float32Array,
   inputG: Float32Array
-): Float32Array {
+): Nullable<Float32Array> {
   switch (order) {
     case 2:
       return XMSHMultiply2(result, inputF, inputG);
@@ -1427,7 +1372,7 @@ function XMSHMultiply(
 //-------------------------------------------------------------------------------------
 // http://msdn.microsoft.com/en-us/library/windows/desktop/bb205454.aspx
 //-------------------------------------------------------------------------------------
-function XMSHMultiply2(y: Float32Array, f: Float32Array, g: Float32Array): Float32Array {
+function XMSHMultiply2(y: Float32Array, f: Float32Array, g: Float32Array): Nullable<Float32Array> {
   if (!y || !f || !g) return null;
 
   let tf: number, tg: number, t: number;
@@ -1463,7 +1408,7 @@ function XMSHMultiply2(y: Float32Array, f: Float32Array, g: Float32Array): Float
 //-------------------------------------------------------------------------------------
 // http://msdn.microsoft.com/en-us/library/windows/desktop/bb232906.aspx
 //-------------------------------------------------------------------------------------
-function XMSHMultiply3(y: Float32Array, f: Float32Array, g: Float32Array): Float32Array {
+function XMSHMultiply3(y: Float32Array, f: Float32Array, g: Float32Array): Nullable<Float32Array> {
   if (!y || !f || !g) return null;
 
   let tf: number, tg: number, t: number;
@@ -1602,7 +1547,7 @@ function XMSHMultiply3(y: Float32Array, f: Float32Array, g: Float32Array): Float
 //-------------------------------------------------------------------------------------
 // http://msdn.microsoft.com/en-us/library/windows/desktop/bb232907.aspx
 //-------------------------------------------------------------------------------------
-function XMSHMultiply4(y: Float32Array, f: Float32Array, g: Float32Array): Float32Array {
+function XMSHMultiply4(y: Float32Array, f: Float32Array, g: Float32Array): Nullable<Float32Array> {
   if (!y || !f || !g) return null;
 
   let tf: number, tg: number, t: number;
@@ -2014,7 +1959,7 @@ function XMSHMultiply4(y: Float32Array, f: Float32Array, g: Float32Array): Float
 //-------------------------------------------------------------------------------------
 // http://msdn.microsoft.com/en-us/library/windows/desktop/bb232908.aspx
 //-------------------------------------------------------------------------------------
-function XMSHMultiply5(y: Float32Array, f: Float32Array, g: Float32Array): Float32Array {
+function XMSHMultiply5(y: Float32Array, f: Float32Array, g: Float32Array): Nullable<Float32Array> {
   if (!y || !f || !g) return null;
 
   let tf: number, tg: number, t: number;
@@ -3199,7 +3144,7 @@ function XMSHMultiply5(y: Float32Array, f: Float32Array, g: Float32Array): Float
 //-------------------------------------------------------------------------------------
 // http://msdn.microsoft.com/en-us/library/windows/desktop/bb232909.aspx
 //-------------------------------------------------------------------------------------
-function XMSHMultiply6(y: Float32Array, f: Float32Array, g: Float32Array): Float32Array {
+function XMSHMultiply6(y: Float32Array, f: Float32Array, g: Float32Array): Nullable<Float32Array> {
   if (!y || !f || !g) return null;
 
   let tf: number, tg: number, t: number;
