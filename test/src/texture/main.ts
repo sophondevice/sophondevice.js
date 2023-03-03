@@ -1,5 +1,5 @@
 import { Vector4, REvent } from '@sophon/base';
-import { Device, DeviceType } from '@sophon/device';
+import { createDevice, DeviceType } from '@sophon/device';
 import { AssetManager } from '@sophon/scene';
 import { GUI, RElement } from '@sophon/dom';
 import * as common from '../common';
@@ -7,7 +7,7 @@ import { TestTexture2D, TestTexture2DArray, TestTexture3D, TestTextureCube, Test
 
 (async function () {
   const type = (common.getQueryString('dev') as DeviceType) || 'webgl';
-  const device = await Device.create(document.getElementById('canvas') as HTMLCanvasElement, type, { msaa: true });
+  const device = await createDevice(document.getElementById('canvas') as HTMLCanvasElement, type, { msaa: true });
   const gui = new GUI(device);
   await gui.deserializeFromXML(document.querySelector('#main-ui').innerHTML);
   const assetManager = new AssetManager(device);

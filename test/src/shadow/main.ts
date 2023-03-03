@@ -1,5 +1,5 @@
 import { Vector3, Vector4, Quaternion, Matrix4x4, REvent } from '@sophon/base';
-import { Device, DeviceType } from '@sophon/device';
+import { createDevice, DeviceType } from '@sophon/device';
 import {
   Scene,
   ForwardRenderScheme,
@@ -13,7 +13,7 @@ import * as common from '../common';
 
 (async function () {
   const type = (common.getQueryString('dev') as DeviceType) || 'webgl';
-  const device = await Device.create(document.getElementById('canvas') as HTMLCanvasElement, type, { msaa: true });
+  const device = await createDevice(document.getElementById('canvas') as HTMLCanvasElement, type, { msaa: true });
   const gui = new GUI(device);
   await gui.deserializeFromXML(document.querySelector('#main-ui').innerHTML);
   const sceneView = gui.document.querySelector('#scene-view');

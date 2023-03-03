@@ -2,7 +2,6 @@ import { WebGLDevice } from "./webgl/device_webgl";
 import { WebGPUDevice } from "./webgpu/device";
 import type { Device, DeviceType, DeviceOptions } from "./device";
 
-/** @internal */
 export async function createDevice(cvs: HTMLCanvasElement, deviceType: DeviceType[] | DeviceType, options?: DeviceOptions): Promise<Device> {
   const typelist = Array.isArray(deviceType) ? deviceType : [deviceType];
   let device: Device = null;

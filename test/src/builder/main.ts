@@ -1,4 +1,4 @@
-import { Device, ProgramBuilder, GPUProgram } from '@sophon/device';
+import { createDevice, Device, GPUProgram } from '@sophon/device';
 
 const defaultVS = `this.$inputs.pos = pb.vec3().attrib('position');
 this.$inputs.uv = pb.vec2().attrib('texCoord0');
@@ -72,7 +72,7 @@ this.$mainFunc(function(){
   const devices: { [name: string]: Device } = {};
   const deviceNames = ['webgl', 'webgl2' /*, 'webgpu'*/] as const;
   for (const name of deviceNames) {
-    devices[name] = await Device.create(document.querySelector<HTMLCanvasElement>(`#${name}`), name);
+    devices[name] = await createDevice(document.querySelector<HTMLCanvasElement>(`#${name}`), name);
   }
   function reset(resetSource: boolean) {
     const isCompute = selectDeviceType.selectedIndex === 3;
@@ -102,7 +102,7 @@ this.$mainFunc(function(){
   });
   buttonRun.addEventListener('click', function () {
     const deviceType = document.querySelector<HTMLSelectElement>('#device-type').value;
-    const pb = new ProgramBuilder(viewers[deviceType].device);
+    const pb = devices[deviceType].createProgramBuilder();
     pb.emulateDepthClamp = true;
     try {
       const isCompute = selectDeviceType.selectedIndex === 3;
@@ -120,7 +120,7 @@ this.$mainFunc(function(){
         }
         let program: GPUProgram;
         if (isCompute) {
-          program = viewers[deviceType].device.createGPUProgram({
+          program = devices[deviceType].createGPUProgram({
             type: 'compute',
             params: {
               source: ret[0],
@@ -128,7 +128,7 @@ this.$mainFunc(function(){
             }
           });
         } else {
-          program = viewers[deviceType].device.createGPUProgram({
+          program = devices[deviceType].createGPUProgram({
             type: 'render',
             params: {
               vs: ret[0],

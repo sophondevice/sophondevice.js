@@ -1,10 +1,10 @@
 import { REvent, Vector4 } from '@sophon/base';
-import { Device, ProgramBuilder } from '@sophon/device';
+import { createDevice, ProgramBuilder } from '@sophon/device';
 import { AssetManager } from '@sophon/scene';
 import { GUI, ScrollBar, RValueChangeEvent, RElement } from '@sophon/dom';
 
 (async function () {
-  const device = await Device.create(document.getElementById('canvas') as HTMLCanvasElement, 'webgpu', { msaa: true });
+  const device = await createDevice(document.getElementById('canvas') as HTMLCanvasElement, 'webgpu', { msaa: true });
   const gui = new GUI(device);
   await gui.deserializeFromXML(document.querySelector('#main-ui').innerHTML);
   const sceneView = gui.document.querySelector('#scene-view');

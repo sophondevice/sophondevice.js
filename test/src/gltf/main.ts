@@ -1,5 +1,5 @@
 import { REvent } from '@sophon/base';
-import { Device, DeviceType } from '@sophon/device';
+import { createDevice, DeviceType } from '@sophon/device';
 import { Scene } from '@sophon/scene';
 import { GUI, RElement } from '@sophon/dom';
 import * as common from '../common';
@@ -8,7 +8,7 @@ import { GLTFViewer } from './gltfviewer';
 (async function () {
   const canvas = document.getElementById('canvas') as HTMLCanvasElement;
   const type = (common.getQueryString('dev') as DeviceType) || 'webgl';
-  const device = await Device.create(canvas, type, { msaa: true });
+  const device = await createDevice(canvas, type, { msaa: true });
   const gui = new GUI(device);
   await gui.deserializeFromXML(document.querySelector('#main-ui').innerHTML);
   const sceneView = gui.document.querySelector('#scene-view');

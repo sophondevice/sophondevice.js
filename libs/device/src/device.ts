@@ -35,7 +35,6 @@ import {
 } from './gpuobject';
 import { PBStructTypeInfo, ProgramBuilder } from './builder';
 import type { DataType, PrimitiveType, TextureFormat } from './base_types';
-import { createDevice } from './createdevice';
 
 interface GPUObjectList {
   textures: BaseTexture[];
@@ -609,9 +608,6 @@ export abstract class Device extends REventTarget {
   }
   createProgramBuilder(): ProgramBuilder {
     return new ProgramBuilder(this);
-  }
-  static async create(canvas: HTMLCanvasElement, deviceType: DeviceType[] | DeviceType, options?: DeviceOptions): Promise<Device> {
-    return createDevice(canvas, deviceType, options);
   }
   /** @internal */
   addGPUObject(obj: GPUObject) {

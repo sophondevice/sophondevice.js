@@ -112,7 +112,7 @@ export class GUIRenderer extends REventTarget {
     this._device = null;
   }
   getCanvas(): HTMLCanvasElement {
-    return this._device.getCanvas();
+    return this._device.canvas;
   }
   getDrawingBufferWidth(): number {
     return this._device.deviceToScreen(this._device.getDrawingBufferWidth());
