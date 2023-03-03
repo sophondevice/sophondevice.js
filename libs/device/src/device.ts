@@ -35,6 +35,7 @@ import {
 } from './gpuobject';
 import { PBStructTypeInfo, ProgramBuilder } from './builder';
 import type { DataType, PrimitiveType, TextureFormat } from './base_types';
+import { createDevice } from './createdevice';
 
 interface GPUObjectList {
   textures: BaseTexture[];
@@ -221,20 +222,40 @@ export interface DeviceOptions {
 
 export abstract class Device extends REventTarget {
   /** @internal */
+  protected _canvas: HTMLCanvasElement;
+  /** @internal */
+  private _canvasClientWidth: number;
+  /** @internal */
+  private _canvasClientHeight: number;
+  /** @internal */
+  private _deviceType: DeviceType;
+  /** @internal */
   protected _gpuObjectList: GPUObjectList;
+  /** @internal */
   protected _gpuMemCost: number;
+  /** @internal */
   protected _disposeObjectList: GPUObject[];
+  /** @internal */
   protected _beginFrameTime: number;
+  /** @internal */
   protected _endFrameTime: number;
+  /** @internal */
   protected _frameInfo: FrameInfo;
+  /** @internal */
   protected _cpuTimer: CPUTimer;
+  /** @internal */
   protected _gpuTimer: ITimer;
+  /** @internal */
   protected _runningLoop: number;
+  /** @internal */
   protected _frameBeginEvent: DeviceFrameBegin;
+  /** @internal */
   protected _frameEndEvent: DeviceFrameEnd;
+  /** @internal */
   protected _fpsCounter: { time: number; frame: number };
+  /** @internal */
   protected _runLoopFunc: (device: Device) => void;
-  constructor() {
+  constructor(cvs: HTMLCanvasElement, type: DeviceType) {
     super();
     this._gpuObjectList = {
       textures: [],
@@ -245,6 +266,11 @@ export abstract class Device extends REventTarget {
       vertexArrayObjects: [],
       bindGroups: []
     };
+    this._canvas = cvs;
+    this._canvas.setAttribute('tabindex', '1');
+    this._canvasClientWidth = cvs.clientWidth;
+    this._canvasClientHeight = cvs.clientHeight;
+    this._deviceType = type;
     this._gpuMemCost = 0;
     this._disposeObjectList = [];
     this._beginFrameTime = 0;
@@ -268,9 +294,8 @@ export abstract class Device extends REventTarget {
     this._fpsCounter = { time: 0, frame: 0 };
     this._frameBeginEvent = new DeviceFrameBegin(this);
     this._frameEndEvent = new DeviceFrameEnd(this);
+    this._registerEventHandlers();
   }
-  abstract getDeviceType(): DeviceType;
-  abstract getCanvas(): HTMLCanvasElement;
   abstract isContextLost(): boolean;
   abstract getScale(): number;
   abstract getDrawingBufferWidth(): number;
@@ -379,6 +404,12 @@ export abstract class Device extends REventTarget {
   }
   get isRendering(): boolean {
     return this._runningLoop !== null;
+  }
+  get canvas(): HTMLCanvasElement {
+    return this._canvas;
+  }
+  get type(): DeviceType {
+    return this._deviceType;
   }
   getEngineCaps(): EngineCaps {
     return {
@@ -579,6 +610,9 @@ export abstract class Device extends REventTarget {
   createProgramBuilder(): ProgramBuilder {
     return new ProgramBuilder(this);
   }
+  static async create(canvas: HTMLCanvasElement, deviceType: DeviceType[] | DeviceType, options?: DeviceOptions): Promise<Device> {
+    return createDevice(canvas, deviceType, options);
+  }
   /** @internal */
   addGPUObject(obj: GPUObject) {
     const list = this.getGPUObjectList(obj);
@@ -606,6 +640,33 @@ export abstract class Device extends REventTarget {
   protected abstract onBeginFrame(): boolean;
   /** @internal */
   protected abstract onEndFrame(): void;
+  /** @internal */
+  private _onresize() {
+    if (this._canvasClientWidth !== this._canvas.clientWidth || this._canvasClientHeight !== this._canvas.clientHeight) {
+      this._canvasClientWidth = this._canvas.clientWidth;
+      this._canvasClientHeight = this._canvas.clientHeight;
+      this.dispatchEvent(new DeviceResizeEvent(this._canvasClientWidth, this._canvasClientHeight));
+    }
+  }
+  /** @internal */
+  private _registerEventHandlers() {
+    const canvas: HTMLCanvasElement = this._canvas;
+    const that = this;
+    if (window.ResizeObserver) {
+      new window.ResizeObserver((entries) => {
+        that._onresize();
+      }).observe(canvas, {});
+    } else {
+      new MutationObserver(function (mutations) {
+        if (mutations.length > 0) {
+          that._onresize();
+        }
+      }).observe(canvas, { attributes: true, attributeFilter: ['style'] });
+      window.addEventListener('resize', () => {
+        this._onresize();
+      });
+    }
+  }
   /** @internal */
   private updateFrameInfo() {
     this._frameInfo.frameCounter++;

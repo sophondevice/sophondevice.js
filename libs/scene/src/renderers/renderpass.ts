@@ -153,7 +153,7 @@ export abstract class RenderPass {
   }
   isAutoFlip(): boolean {
     return !!(
-      this._renderScheme.device.getFramebuffer() && this._renderScheme.device.getDeviceType() === 'webgpu'
+      this._renderScheme.device.getFramebuffer() && this._renderScheme.device.type === 'webgpu'
     );
   }
   enableClear(color: boolean, depthStencil: boolean) {

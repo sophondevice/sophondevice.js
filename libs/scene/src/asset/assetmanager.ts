@@ -214,7 +214,7 @@ export class AssetManager {
     noMipmap: boolean,
     texture?: BaseTexture
   ): Promise<BaseTexture> {
-    if (this.device.getDeviceType() !== 'webgl') {
+    if (this.device.type !== 'webgl') {
       return await loader.load(this, url, mimeType, data, srgb, noMipmap, texture);
     } else {
       let tex = await loader.load(this, url, mimeType, data, srgb, noMipmap);

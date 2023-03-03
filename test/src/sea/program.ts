@@ -203,7 +203,7 @@ export function createSeaProgram(device: Device) {
       this.$function('getPixel', [pb.vec2('coord'), pb.float('time')], function () {
         this.uv = pb.div(this.coord, this.uniforms.zw);
         this.uv = pb.sub(pb.mul(this.uv, 2), pb.vec2(1));
-        if (pb.getDeviceType() === 'webgpu') {
+        if (pb.device.type === 'webgpu') {
           this.uv.y = pb.neg(this.uv.y);
         }
         this.uv.x = pb.mul(this.uv.x, pb.div(this.uniforms.z, this.uniforms.w));

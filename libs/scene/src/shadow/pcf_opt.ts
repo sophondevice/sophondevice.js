@@ -61,7 +61,7 @@ export class PCFOPT extends ShadowImpl {
     return 'rgba8unorm';
   }
   getShadowMapDepthFormat(shadowMapper: ShadowMapper): TextureFormat {
-    return shadowMapper.light.scene.device.getDeviceType() === 'webgl'
+    return shadowMapper.light.scene.device.type === 'webgl'
       ? 'd24s8'
       : 'd32f';
   }
@@ -137,7 +137,7 @@ export class PCFOPT extends ShadowImpl {
           if (shadowMapper.light.isPointLight()) {
             if (that.useNativeShadowMap(shadowMapper)) {
               this.$l.nearFar =
-                pb.getDeviceType() === 'webgl'
+                pb.device.type === 'webgl'
                   ? this.global.light.shadowCameraParams.xy
                   : this.global.light.lightParams[5].xy;
               this.$l.distance = shaderlib.linearToNonLinear(
@@ -197,7 +197,7 @@ export class PCFOPT extends ShadowImpl {
     return pb.globalScope[funcNameComputeShadow](shadowVertex, NdotL);
   }
   useNativeShadowMap(shadowMapper: ShadowMapper): boolean {
-    return shadowMapper.light.scene.device.getDeviceType() !== 'webgl';
+    return shadowMapper.light.scene.device.type !== 'webgl';
   }
   /** @internal */
   sampleShadowMap(

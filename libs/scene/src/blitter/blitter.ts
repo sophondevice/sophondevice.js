@@ -288,7 +288,7 @@ function createBlitProgram(device: Device, type: BlitType, filter: Blitter): Bli
           type === 'cube'
             ? pb.mul(pb.vec2(1, -1), this.$inputs.pos.xy)
             : pb.add(pb.mul(this.$inputs.pos.xy, 0.5), pb.vec2(0.5));
-        if (device.getDeviceType() === 'webgpu') {
+        if (device.type === 'webgpu') {
           this.$builtins.position.y = pb.neg(this.$builtins.position.y);
         }
       });

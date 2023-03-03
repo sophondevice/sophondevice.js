@@ -21,7 +21,7 @@ import { Button } from './components/button';
 import { ScrollBar } from './components/scrollbar';
 import { Option, Select } from './components/select';
 import { Slider } from './components/slider';
-import type { Texture2D } from '@sophon/device';
+import type { Device, Texture2D } from '@sophon/device';
 import type { Font } from './font';
 import type { RPrimitiveBatchList } from './primitive';
 
@@ -414,9 +414,9 @@ export class GUI extends REventTarget {
   /** @internal */
   protected _httpRequest: HttpRequest;
 
-  constructor(renderer: GUIRenderer, bounds?: UIRect) {
+  constructor(device: Device, bounds?: UIRect) {
     super(new GUIEventPathBuilder());
-    this._renderer = renderer;
+    this._renderer = new GUIRenderer(device);
     this._drawVisitor = new DrawVisitor(this);
     this._imageManager = new ImageManager(this._renderer);
     this._glyphManager = new GlyphManager(this._renderer);

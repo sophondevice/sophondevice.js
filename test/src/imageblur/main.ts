@@ -1,20 +1,18 @@
 import { REvent, Vector4 } from '@sophon/base';
-import { Viewer, ProgramBuilder } from '@sophon/device';
+import { Device, ProgramBuilder } from '@sophon/device';
 import { AssetManager } from '@sophon/scene';
-import { GUI, GUIRenderer, ScrollBar, RValueChangeEvent, RElement } from '@sophon/dom';
+import { GUI, ScrollBar, RValueChangeEvent, RElement } from '@sophon/dom';
 
 (async function () {
-  const viewer = new Viewer(document.getElementById('canvas') as HTMLCanvasElement);
-  await viewer.initDevice('webgpu', { msaa: true });
-  const guiRenderer = new GUIRenderer(viewer.device);
-  const gui = new GUI(guiRenderer);
+  const device = await Device.create(document.getElementById('canvas') as HTMLCanvasElement, 'webgpu', { msaa: true });
+  const gui = new GUI(device);
   await gui.deserializeFromXML(document.querySelector('#main-ui').innerHTML);
   const sceneView = gui.document.querySelector('#scene-view');
   sceneView.customDraw = true;
 
-  const assetManager = new AssetManager(viewer.device);
+  const assetManager = new AssetManager(device);
 
-  const pb = new ProgramBuilder(viewer.device);
+  const pb = new ProgramBuilder(device);
   const fullScreenQuadProgram = pb.buildRenderProgram({
     label: 'fullScreenQuad',
     vertex() {
@@ -114,31 +112,31 @@ import { GUI, GUIRenderer, ScrollBar, RValueChangeEvent, RElement } from '@sopho
   });
   const cubeTexture = await assetManager.fetchTexture('./assets/images/Di-3d.png', null, false, true);
   const textures = [
-    viewer.device.createTexture2D('rgba8unorm', cubeTexture.width, cubeTexture.height, {
+    device.createTexture2D('rgba8unorm', cubeTexture.width, cubeTexture.height, {
       colorSpace: 'linear',
       writable: true,
       noMipmap: true
     }),
-    viewer.device.createTexture2D('rgba8unorm', cubeTexture.width, cubeTexture.height, {
+    device.createTexture2D('rgba8unorm', cubeTexture.width, cubeTexture.height, {
       colorSpace: 'linear',
       writable: true,
       noMipmap: true
     })
   ];
-  const computeUniforms = viewer.device.createBindGroup(blurProgram.bindGroupLayouts[0]);
-  const computeBindGroup0 = viewer.device.createBindGroup(blurProgram.bindGroupLayouts[1]);
+  const computeUniforms = device.createBindGroup(blurProgram.bindGroupLayouts[0]);
+  const computeBindGroup0 = device.createBindGroup(blurProgram.bindGroupLayouts[1]);
   computeBindGroup0.setTexture('inputTex', cubeTexture);
   computeBindGroup0.setTexture('outputTex', textures[0]);
   computeBindGroup0.setValue('flip', { value: 0 });
-  const computeBindGroup1 = viewer.device.createBindGroup(blurProgram.bindGroupLayouts[1]);
+  const computeBindGroup1 = device.createBindGroup(blurProgram.bindGroupLayouts[1]);
   computeBindGroup1.setTexture('inputTex', textures[0]);
   computeBindGroup1.setTexture('outputTex', textures[1]);
   computeBindGroup1.setValue('flip', { value: 1 });
-  const computeBindGroup2 = viewer.device.createBindGroup(blurProgram.bindGroupLayouts[1]);
+  const computeBindGroup2 = device.createBindGroup(blurProgram.bindGroupLayouts[1]);
   computeBindGroup2.setTexture('inputTex', textures[1]);
   computeBindGroup2.setTexture('outputTex', textures[0]);
   computeBindGroup2.setValue('flip', { value: 0 });
-  const resultBindGroup = viewer.device.createBindGroup(fullScreenQuadProgram.bindGroupLayouts[0]);
+  const resultBindGroup = device.createBindGroup(fullScreenQuadProgram.bindGroupLayouts[0]);
   resultBindGroup.setTexture('texture', textures[1]);
   let blockDim: number;
   const tileDim = 128;
@@ -167,41 +165,41 @@ import { GUI, GUIRenderer, ScrollBar, RValueChangeEvent, RElement } from '@sopho
   updateSettings();
   sceneView.addEventListener('draw', function (this: RElement, evt: REvent) {
     evt.preventDefault();
-    viewer.device.setProgram(blurProgram);
-    viewer.device.setBindGroup(0, computeUniforms);
-    viewer.device.setBindGroup(1, computeBindGroup0);
-    viewer.device.compute(
+    device.setProgram(blurProgram);
+    device.setBindGroup(0, computeUniforms);
+    device.setBindGroup(1, computeBindGroup0);
+    device.compute(
       Math.ceil(cubeTexture.width / blockDim),
       Math.ceil(cubeTexture.height / batch[1]),
       1
     );
-    viewer.device.setBindGroup(1, computeBindGroup1);
-    viewer.device.compute(
+    device.setBindGroup(1, computeBindGroup1);
+    device.compute(
       Math.ceil(cubeTexture.height / blockDim),
       Math.ceil(cubeTexture.width / batch[1]),
       1
     );
     for (let i = 0; i < settings.iterations - 1; i++) {
-      viewer.device.setBindGroup(1, computeBindGroup2);
-      viewer.device.compute(
+      device.setBindGroup(1, computeBindGroup2);
+      device.compute(
         Math.ceil(cubeTexture.width / blockDim),
         Math.ceil(cubeTexture.height / batch[1]),
         1
       );
-      viewer.device.setBindGroup(1, computeBindGroup1);
-      viewer.device.compute(
+      device.setBindGroup(1, computeBindGroup1);
+      device.compute(
         Math.ceil(cubeTexture.height / blockDim),
         Math.ceil(cubeTexture.width / batch[1]),
         1
       );
     }
-    viewer.device.clearFrameBuffer(new Vector4(0, 0, 0, 1), 1, 0);
-    viewer.device.setProgram(fullScreenQuadProgram);
-    viewer.device.setBindGroup(0, resultBindGroup);
-    viewer.device.setBindGroup(1, null);
-    viewer.device.setVertexData(null);
-    viewer.device.draw('triangle-list', 0, 6);
+    device.clearFrameBuffer(new Vector4(0, 0, 0, 1), 1, 0);
+    device.setProgram(fullScreenQuadProgram);
+    device.setBindGroup(0, resultBindGroup);
+    device.setBindGroup(1, null);
+    device.setVertexData(null);
+    device.draw('triangle-list', 0, 6);
   });
 
-  viewer.device.runLoop((device) => gui.render());
+  device.runLoop((device) => gui.render());
 })();

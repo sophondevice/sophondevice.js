@@ -1,26 +1,25 @@
 import { Vector3, Vector4, Quaternion, Matrix4x4, REvent } from '@sophon/base';
-import { Viewer, DeviceType } from '@sophon/device';
+import { Device, DeviceType } from '@sophon/device';
 import { Scene, ForwardRenderScheme, FPSCameraModel, DirectionalLight } from '@sophon/scene';
-import { GUI, GUIRenderer, RElement, RKeyEvent } from '@sophon/dom';
+import { GUI, RElement, RKeyEvent } from '@sophon/dom';
 import * as common from '../common';
 import { loadEarthSculptorMap } from './earthscuptor';
 
 (async function () {
-  const viewer = new Viewer(document.getElementById('canvas') as HTMLCanvasElement);
-  await viewer.initDevice((common.getQueryString('dev') as DeviceType) || 'webgl', { msaa: true });
-  const guiRenderer = new GUIRenderer(viewer.device);
-  const gui = new GUI(guiRenderer);
+  const type = (common.getQueryString('dev') as DeviceType) || 'webgl';
+  const device = await Device.create(document.getElementById('canvas') as HTMLCanvasElement, type, { msaa: true });
+  const gui = new GUI(device);
 
   await gui.deserializeFromXML(document.querySelector('#main-ui').innerHTML);
   const sceneView = gui.document.querySelector('#scene-view');
   sceneView.customDraw = true;
-  const scene = new Scene(viewer.device);
-  const scheme = new ForwardRenderScheme(viewer.device);
+  const scene = new Scene(device);
+  const scheme = new ForwardRenderScheme(device);
   const camera = scene.addCamera();
   camera.setProjectionMatrix(
     Matrix4x4.perspective(
       Math.PI / 3,
-      viewer.device.getDrawingBufferWidth() / viewer.device.getDrawingBufferHeight(),
+      device.getDrawingBufferWidth() / device.getDrawingBufferHeight(),
       1,
       300
     )
@@ -39,7 +38,7 @@ import { loadEarthSculptorMap } from './earthscuptor';
     width: '200px'
   });
   common.createSceneTweakPanel(scene, sceneView, { width: '200px' });
-  common.createTextureViewPanel(viewer.device, sceneView, 300);
+  common.createTextureViewPanel(device, sceneView, 300);
   common.createLightTweakPanel(light, sceneView, {
     width: '200px'
   });
@@ -96,5 +95,5 @@ import { loadEarthSculptorMap } from './earthscuptor';
   });
 
   loadTerrain('./assets/maps/map1/test1.map');
-  viewer.device.runLoop((device) => gui.render());
+  device.runLoop((device) => gui.render());
 })();

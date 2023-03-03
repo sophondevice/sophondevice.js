@@ -54,18 +54,18 @@ export class SSM extends ShadowImpl {
     } else {
       const device = shadowMapper.light.scene.device;
       return device.getTextureCaps().supportHalfFloatColorBuffer
-        ? device.getDeviceType() === 'webgl'
+        ? device.type === 'webgl'
           ? 'rgba16f'
           : 'r16f'
         : device.getTextureCaps().supportFloatColorBuffer
-        ? device.getDeviceType() === 'webgl'
+        ? device.type === 'webgl'
           ? 'rgba32f'
           : 'r32f'
         : 'rgba8unorm';
     }
   }
   getShadowMapDepthFormat(shadowMapper: ShadowMapper): TextureFormat {
-    return shadowMapper.light.scene.device.getDeviceType() === 'webgl'
+    return shadowMapper.light.scene.device.type === 'webgl'
       ? 'd24s8'
       : 'd32f';
   }
@@ -198,7 +198,7 @@ export class SSM extends ShadowImpl {
           if (shadowMapper.light.isPointLight()) {
             if (that.useNativeShadowMap(shadowMapper)) {
               this.$l.nearFar =
-                pb.getDeviceType() === 'webgl'
+                pb.device.type === 'webgl'
                   ? this.global.light.shadowCameraParams.xy
                   : this.global.light.lightParams[5].xy;
               this.$l.distance = lib.linearToNonLinear(
@@ -256,7 +256,7 @@ export class SSM extends ShadowImpl {
               } else {
                 if (shadowMapper.light.isSpotLight()) {
                   this.$l.nearFar =
-                    pb.getDeviceType() === 'webgl'
+                    pb.device.type === 'webgl'
                       ? this.global.light.shadowCameraParams.xy
                       : this.global.light.lightParams[5].xy;
                   this.shadowCoord.z = lib.nonLinearDepthToLinearNormalized(this.shadowCoord.z, this.nearFar);
@@ -278,6 +278,6 @@ export class SSM extends ShadowImpl {
     return pb.globalScope[funcNameComputeShadow](shadowVertex, NdotL);
   }
   useNativeShadowMap(shadowMapper: ShadowMapper): boolean {
-    return shadowMapper.light.scene.device.getDeviceType() !== 'webgl';
+    return shadowMapper.light.scene.device.type !== 'webgl';
   }
 }

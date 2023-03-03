@@ -1,5 +1,5 @@
 import { Vector3, Vector4, Quaternion, Matrix4x4, REvent } from '@sophon/base';
-import { Viewer, DeviceType } from '@sophon/device';
+import { Device, DeviceType } from '@sophon/device';
 import {
   Scene,
   OrbitCameraModel,
@@ -10,24 +10,23 @@ import {
   Mesh,
   PBRMetallicRoughnessMaterial
 } from '@sophon/scene';
-import { GUI, GUIRenderer, RElement, RKeyEvent } from '@sophon/dom';
+import { GUI, RElement, RKeyEvent } from '@sophon/dom';
 import * as common from '../common';
 
 (async function () {
-  const viewer = new Viewer(document.getElementById('canvas') as HTMLCanvasElement);
-  await viewer.initDevice((common.getQueryString('dev') as DeviceType) || 'webgl', { msaa: false });
-  const guiRenderer = new GUIRenderer(viewer.device);
-  const gui = new GUI(guiRenderer);
+  const type = (common.getQueryString('dev') as DeviceType) || 'webgl';
+  const device = await Device.create(document.getElementById('canvas') as HTMLCanvasElement, type, { msaa: false });
+  const gui = new GUI(device);
   await gui.deserializeFromXML(document.querySelector('#main-ui').innerHTML);
   const sceneView = gui.document.querySelector('#scene-view');
   sceneView.customDraw = true;
-  const scene = new Scene(viewer.device);
-  const scheme = new ForwardRenderScheme(viewer.device);
+  const scene = new Scene(device);
+  const scheme = new ForwardRenderScheme(device);
   const camera = scene.addCamera().lookAt(new Vector3(0, 8, 30), new Vector3(0, 8, 0), Vector3.axisPY());
   camera.setProjectionMatrix(
     Matrix4x4.perspective(
       Math.PI / 3,
-      viewer.device.getDrawingBufferWidth() / viewer.device.getDrawingBufferHeight(),
+      device.getDrawingBufferWidth() / device.getDrawingBufferHeight(),
       1,
       260
     )
@@ -40,7 +39,7 @@ import * as common from '../common';
     width: '200px'
   });
   common.createSceneTweakPanel(scene, sceneView, { width: '200px' });
-  common.createTextureViewPanel(viewer.device, sceneView, 300);
+  common.createTextureViewPanel(device, sceneView, 300);
 
   const directionlight = new DirectionalLight(scene);
   directionlight.setCastShadow(false).setColor(new Vector4(1, 0, 1, 1));
@@ -64,7 +63,7 @@ import * as common from '../common';
     width: '200px'
   });
 
-  const ballMaterial = new UnlitMaterial(viewer.device);
+  const ballMaterial = new UnlitMaterial(device);
   ballMaterial.lightModel.albedo = new Vector4(1, 1, 0, 1);
   const ball = Mesh.unitSphere(scene);
   ball.scaling = new Vector3(1, 1, 1);
@@ -86,7 +85,7 @@ new HemiSphericLight(scene, null)
   .setColorDown(new Vector4(0.1, 0.2, 0, 1))
   .setColorUp(new Vector4(0, 0.2, 0.4, 1));
 */
-  //const sphereMaterial = new StandardMaterial(viewer.device);
+  //const sphereMaterial = new StandardMaterial(device);
   //const lm = new PBRLightModel();
   //lm.albedo = new Vector4(1, 1, 0, 1);
   //lm.metallic = 0.8;
@@ -94,7 +93,7 @@ new HemiSphericLight(scene, null)
   //sphereMaterial.lightModel = lm;
   //new SphereMesh(scene, null, { radius: 8, verticalDetail: 40, horizonalDetail: 40 }).setPosition(new Vector3(0, 8, 0)).material = sphereMaterial;
 
-  const planeMaterial = new PBRMetallicRoughnessMaterial(viewer.device);
+  const planeMaterial = new PBRMetallicRoughnessMaterial(device);
   planeMaterial.lightModel.metallic = 0.1;
   planeMaterial.lightModel.roughness = 0.6;
 
@@ -141,7 +140,7 @@ new HemiSphericLight(scene, null)
 
   scene.addEventListener('tick', () => {
     if (!pause) {
-      const elapsed = viewer.device.frameInfo.elapsedOverall;
+      const elapsed = device.frameInfo.elapsedOverall;
       if (pointlight) {
         pointlight.position.x = 15 * Math.sin(elapsed / 3000);
         pointlight.position.y = 25;
@@ -166,5 +165,5 @@ new HemiSphericLight(scene, null)
     scheme.renderScene(scene, camera);
   });
 
-  viewer.device.runLoop((device) => gui.render());
+  device.runLoop((device) => gui.render());
 })();

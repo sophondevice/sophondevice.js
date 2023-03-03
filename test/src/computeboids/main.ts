@@ -1,6 +1,6 @@
 import { REvent, Vector4 } from '@sophon/base';
 import {
-  Viewer,
+  Device,
   ProgramBuilder,
   makeVertexBufferType,
   PBStructTypeInfo,
@@ -8,18 +8,16 @@ import {
   BindGroup,
   VertexLayout,
 } from '@sophon/device';
-import { GUIRenderer, GUI, RElement } from '@sophon/dom';
+import { GUI, RElement } from '@sophon/dom';
 
 (async function () {
-  const viewer = new Viewer(document.getElementById('canvas') as HTMLCanvasElement);
-  await viewer.initDevice('webgpu', { msaa: true });
-  const guiRenderer = new GUIRenderer(viewer.device);
-  const gui = new GUI(guiRenderer);
+  const device = await Device.create(document.getElementById('canvas') as HTMLCanvasElement, 'webgpu', { msaa: true });
+  const gui = new GUI(device);
   await gui.deserializeFromXML(document.querySelector('#main-ui').innerHTML);
   const sceneView = gui.document.querySelector('#scene-view');
   sceneView.customDraw = true;
 
-  const pb = new ProgramBuilder(viewer.device);
+  const pb = device.createProgramBuilder();
   const spriteProgram = pb.buildRenderProgram({
     label: 'spriteRender',
     vertex() {
@@ -121,7 +119,7 @@ import { GUIRenderer, GUI, RElement } from '@sophon/dom';
       });
     }
   });
-  const spriteVertexBuffer = viewer.device.createStructuredBuffer(
+  const spriteVertexBuffer = device.createStructuredBuffer(
     makeVertexBufferType(3, 'position_f32x2'),
     {
       usage: 'vertex',
@@ -138,7 +136,7 @@ import { GUIRenderer, GUI, RElement } from '@sophon/dom';
     rule2Scale: 0.05,
     rule3Scale: 0.005
   };
-  const uniformBuffer = viewer.device.createStructuredBuffer(
+  const uniformBuffer = device.createStructuredBuffer(
     spriteUpdateProgram.getBindingInfo('params').type as PBStructTypeInfo,
     {
       usage: 'uniform'
@@ -157,7 +155,7 @@ import { GUIRenderer, GUI, RElement } from '@sophon/dom';
   const primitives: VertexLayout[] = [];
   for (let i = 0; i < 2; i++) {
     particleBuffers.push(
-      viewer.device.createStructuredBuffer(
+      device.createStructuredBuffer(
         makeVertexBufferType(numParticles, 'tex0_f32x2', 'tex1_f32x2'),
         {
           usage: 'vertex',
@@ -168,13 +166,13 @@ import { GUIRenderer, GUI, RElement } from '@sophon/dom';
     );
   }
   for (let i = 0; i < 2; i++) {
-    const bindGroup = viewer.device.createBindGroup(spriteUpdateProgram.bindGroupLayouts[0]);
+    const bindGroup = device.createBindGroup(spriteUpdateProgram.bindGroupLayouts[0]);
     bindGroup.setBuffer('params', uniformBuffer);
     bindGroup.setBuffer('particlesA', particleBuffers[i]);
     bindGroup.setBuffer('particlesB', particleBuffers[(i + 1) % 2]);
     particleBindGroups.push(bindGroup);
 
-    const primitive = viewer.device.createVertexLayout({
+    const primitive = device.createVertexLayout({
       vertexBuffers: [{
         buffer: spriteVertexBuffer,
         stepMode: 'vertex'
@@ -195,16 +193,16 @@ import { GUIRenderer, GUI, RElement } from '@sophon/dom';
   let t = 0;
   sceneView.addEventListener('draw', function (this: RElement, evt: REvent) {
     evt.preventDefault();
-    viewer.device.setProgram(spriteUpdateProgram);
-    viewer.device.setBindGroup(0, particleBindGroups[t % 2]);
-    viewer.device.compute(Math.ceil(numParticles / 64), 1, 1);
+    device.setProgram(spriteUpdateProgram);
+    device.setBindGroup(0, particleBindGroups[t % 2]);
+    device.compute(Math.ceil(numParticles / 64), 1, 1);
 
-    viewer.device.clearFrameBuffer(new Vector4(0, 0, 0, 1), 1, 0);
-    viewer.device.setProgram(spriteProgram);
-    viewer.device.setBindGroup(0, null);
+    device.clearFrameBuffer(new Vector4(0, 0, 0, 1), 1, 0);
+    device.setProgram(spriteProgram);
+    device.setBindGroup(0, null);
     primitives[(t + 1) % 2].drawInstanced('triangle-list', 0, 3, numParticles);
     // primitives[(t + 1) % 2].drawInstanced(numParticles);
     t++;
   });
-  viewer.device.runLoop((device) => gui.render());
+  device.runLoop((device) => gui.render());
 })();

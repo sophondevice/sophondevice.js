@@ -71,7 +71,6 @@ import { SamplerCache } from './sampler_cache';
 import { WebGLStructuredBuffer } from './structuredbuffer_webgl';
 import { PBStructTypeInfo, typeU16 } from '../builder';
 import type { ITimer } from '../timer';
-import type { VertexData } from '../vertexdata';
 import type { PrimitiveType, TextureFormat } from '../base_types';
 
 declare global {
@@ -115,8 +114,6 @@ export class WebGLDevice extends Device {
   private _loseContextExtension: WEBGL_lose_context;
   private _contextLost: boolean;
   private _isRendering: boolean;
-  private _deviceType: DeviceTypeWebGL;
-  private _canvas: HTMLCanvasElement;
   private _dpr: number;
   private _reverseWindingOrder: boolean;
   private _textureCaps: WebGLTextureCap;
@@ -136,10 +133,8 @@ export class WebGLDevice extends Device {
   private _samplerCache: SamplerCache;
   private _renderStatesOverridden: RenderStateSet;
   constructor(cvs: HTMLCanvasElement, type: DeviceTypeWebGL, options?: DeviceOptions) {
-    super();
-    this._canvas = cvs;
+    super(cvs, type);
     this._dpr = Math.ceil(options?.dpr ?? window.devicePixelRatio);
-    this._canvas.style.outline = 'none';
     this._isRendering = false;
     let context: WebGLContext = null;
     context = this._canvas.getContext(type, {
@@ -149,11 +144,9 @@ export class WebGLDevice extends Device {
       premultipliedAlpha: false
     }) as WebGLContext;
     if (!context) {
-      this._deviceType = null;
       throw new Error('Invalid argument or no webgl support');
     }
     this._contextLost = false;
-    this._deviceType = type;
     this._reverseWindingOrder = false;
     this._textureCaps = null;
     this._framebufferCaps = null;
@@ -206,17 +199,11 @@ export class WebGLDevice extends Device {
   get clientHeight() {
     return this._canvas.clientHeight;
   }
-  getCanvas(): HTMLCanvasElement {
-    return this._canvas;
-  }
   getScale(): number {
     return this._dpr;
   }
   isContextLost(): boolean {
     return this._context.isContextLost();
-  }
-  getDeviceType(): DeviceType {
-    return this._deviceType;
   }
   getTextureCaps(): TextureCaps {
     return this._textureCaps;

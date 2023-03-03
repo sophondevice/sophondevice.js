@@ -32,7 +32,7 @@ function vec_n(
   vecType: typeinfo.PBPrimitiveTypeInfo,
   ...args: (number | boolean | string | PBShaderExp)[]
 ): PBShaderExp {
-  if (this.getDeviceType() === 'webgl') {
+  if (this.device.type === 'webgl') {
     if (vecType.scalarType === typeinfo.PBPrimitiveType.U32) {
       throw new errors.PBDeviceNotSupport('unsigned integer type');
     }

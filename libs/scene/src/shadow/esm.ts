@@ -308,11 +308,11 @@ export class ESM extends ShadowImpl {
   getShadowMapColorFormat(shadowMapper: ShadowMapper): TextureFormat {
     const device = shadowMapper.light.scene.device;
     return device.getTextureCaps().supportHalfFloatColorBuffer
-      ? device.getDeviceType() === 'webgl'
+      ? device.type === 'webgl'
         ? 'rgba16f'
         : 'r16f'
       : device.getTextureCaps().supportFloatColorBuffer
-      ? device.getDeviceType() === 'webgl'
+      ? device.type === 'webgl'
         ? 'rgba32f'
         : 'r32f'
       : 'rgba8unorm';

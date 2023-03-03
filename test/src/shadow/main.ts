@@ -1,5 +1,5 @@
 import { Vector3, Vector4, Quaternion, Matrix4x4, REvent } from '@sophon/base';
-import { Viewer, DeviceType } from '@sophon/device';
+import { Device, DeviceType } from '@sophon/device';
 import {
   Scene,
   ForwardRenderScheme,
@@ -8,25 +8,24 @@ import {
   PBRMetallicRoughnessMaterial,
   Mesh
 } from '@sophon/scene';
-import { GUI, GUIRenderer, RElement } from '@sophon/dom';
+import { GUI, RElement } from '@sophon/dom';
 import * as common from '../common';
 
 (async function () {
-  const viewer = new Viewer(document.getElementById('canvas') as HTMLCanvasElement);
-  await viewer.initDevice((common.getQueryString('dev') as DeviceType) || 'webgl', { msaa: true });
-  const guiRenderer = new GUIRenderer(viewer.device);
-  const gui = new GUI(guiRenderer);
+  const type = (common.getQueryString('dev') as DeviceType) || 'webgl';
+  const device = await Device.create(document.getElementById('canvas') as HTMLCanvasElement, type, { msaa: true });
+  const gui = new GUI(device);
   await gui.deserializeFromXML(document.querySelector('#main-ui').innerHTML);
   const sceneView = gui.document.querySelector('#scene-view');
   sceneView.customDraw = true;
-  const scene = new Scene(viewer.device);
+  const scene = new Scene(device);
   scene.envLightStrength = 0.2;
-  const scheme = new ForwardRenderScheme(viewer.device);
+  const scheme = new ForwardRenderScheme(device);
   const camera = scene.addCamera().lookAt(new Vector3(0, 8, 30), new Vector3(0, 8, 0), Vector3.axisPY());
   camera.setProjectionMatrix(
     Matrix4x4.perspective(
       Math.PI / 3,
-      viewer.device.getDrawingBufferWidth() / viewer.device.getDrawingBufferHeight(),
+      device.getDrawingBufferWidth() / device.getDrawingBufferHeight(),
       1,
       1000
     )
@@ -38,7 +37,7 @@ import * as common from '../common';
   common.createTestPanel(scene, sceneView, {
     width: '200px'
   });
-  common.createTextureViewPanel(viewer.device, sceneView, 300);
+  common.createTextureViewPanel(device, sceneView, 300);
 
   // const directionlight = null;
   const directionlight = new DirectionalLight(scene);
@@ -46,7 +45,7 @@ import * as common from '../common';
   directionlight.lookAt(new Vector3(20, 28, -20), Vector3.zero(), Vector3.axisPY());
   directionlight.shadow.shadowMapSize = 2048;
   directionlight.shadow.numShadowCascades = 4;
-  const planeMaterial = new PBRMetallicRoughnessMaterial(viewer.device);
+  const planeMaterial = new PBRMetallicRoughnessMaterial(device);
   planeMaterial.lightModel.metallic = 0.1;
   planeMaterial.lightModel.roughness = 0.6;
 
@@ -84,7 +83,7 @@ import * as common from '../common';
   });
 
   scene.addEventListener('tick', () => {
-    const elapsed = viewer.device.frameInfo.elapsedOverall;
+    const elapsed = device.frameInfo.elapsedOverall;
     if (false && directionlight) {
       directionlight.setRotation(
         Quaternion.fromAxisAngle(Vector3.axisNX(), Math.PI * (0.5 + 0.25 * Math.sin(elapsed / 2000)))
@@ -102,5 +101,5 @@ import * as common from '../common';
     scheme.renderScene(scene, camera);
   });
 
-  viewer.device.runLoop((device) => gui.render());
+  device.runLoop((device) => gui.render());
 })();

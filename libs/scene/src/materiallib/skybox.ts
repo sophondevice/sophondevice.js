@@ -41,7 +41,7 @@ export class SkyboxMaterial extends Material {
   protected _createHash(): string {
     if (!this._skyCubemap) {
       return '0';
-    } else if (this.device.getDeviceType() === 'webgpu') {
+    } else if (this.device.type === 'webgpu') {
       return this._skyCubemap.isFilterable() ? '1' : '2';
     } else {
       return '1';

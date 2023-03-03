@@ -209,7 +209,7 @@ export class TerrainLightModel extends LambertLightModel {
   _calcTextureHash(tex: BaseTexture): string {
     if (!tex) {
       return '0';
-    } else if (tex.device.getDeviceType() === 'webgpu') {
+    } else if (tex.device.type === 'webgpu') {
       return tex.isFilterable() ? '1' : '2';
     } else {
       return '1';

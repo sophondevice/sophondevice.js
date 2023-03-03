@@ -70,7 +70,6 @@ import type { PrimitiveType, TextureFormat } from '../base_types';
 
 export class WebGPUDevice extends Device {
   private _context: GPUCanvasContext;
-  private _canvas: HTMLCanvasElement;
   private _dpr: number;
   private _device: GPUDevice;
   private _adapter: GPUAdapter;
@@ -102,8 +101,7 @@ export class WebGPUDevice extends Device {
   private _defaultRenderPassDesc: GPURenderPassDescriptor;
   private _sampleCount: number;
   constructor(cvs: HTMLCanvasElement, options?: DeviceOptions) {
-    super();
-    this._canvas = cvs;
+    super(cvs, 'webgpu');
     this._dpr = Math.ceil(options?.dpr ?? window.devicePixelRatio);
     this._device = null;
     this._adapter = null;
@@ -182,17 +180,11 @@ export class WebGPUDevice extends Device {
   get currentPass(): WebGPURenderPass | WebGPUComputePass {
     return this._commandQueue.currentPass;
   }
-  getCanvas(): HTMLCanvasElement {
-    return this._canvas;
-  }
   getScale(): number {
     return this._dpr;
   }
   isContextLost(): boolean {
     return false;
-  }
-  getDeviceType(): DeviceType {
-    return 'webgpu';
   }
   getTextureCaps(): TextureCaps {
     return this._textureCaps;

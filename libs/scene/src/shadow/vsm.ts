@@ -391,12 +391,12 @@ export class VSM extends ShadowImpl {
     const device = shadowMapper.light.scene.device;
     return device.getTextureCaps().supportFloatColorBuffer &&
       device.getTextureCaps().supportLinearFloatTexture
-      ? device.getDeviceType() === 'webgl'
+      ? device.type === 'webgl'
         ? 'rgba32f'
         : 'rg32f'
       : device.getTextureCaps().supportHalfFloatColorBuffer &&
         device.getTextureCaps().supportLinearHalfFloatTexture
-      ? device.getDeviceType() === 'webgl'
+      ? device.type === 'webgl'
         ? 'rgba16f'
         : 'rg16f'
       : 'rgba8unorm';
@@ -501,7 +501,7 @@ export class VSM extends ShadowImpl {
             this.$if(this.inShadow, function () {
               if (shadowMapper.light.isSpotLight()) {
                 this.$l.nearFar =
-                  pb.getDeviceType() === 'webgl'
+                  pb.device.type === 'webgl'
                     ? this.global.light.shadowCameraParams.xy
                     : this.global.light.lightParams[5].xy;
                 this.shadowCoord.z = lib.nonLinearDepthToLinearNormalized(this.shadowCoord.z, this.nearFar);

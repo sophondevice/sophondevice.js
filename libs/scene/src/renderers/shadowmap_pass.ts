@@ -305,7 +305,7 @@ export class ShadowMapPass extends RenderPass {
                 adjMatrix.setRow(2, new Vector4(0, 0, 1, 0));
                 adjMatrix.setRow(3, new Vector4(col - 0.5 * numCols + 0.5, row - 0.5 * numRows + 0.5, 0, 1));
                 shadowMapRenderCamera.projectionMatrix.multiplyLeft(cropMatrix).multiplyLeft(adjMatrix);
-                if (scene.device.getDeviceType() === 'webgpu') {
+                if (scene.device.type === 'webgpu') {
                   this.scissor = [col * light.shadowMapSize, (numRows - 1 - row) * light.shadowMapSize, light.shadowMapSize, light.shadowMapSize];
                 } else {
                   this.scissor = [col * light.shadowMapSize, row * light.shadowMapSize, light.shadowMapSize, light.shadowMapSize];

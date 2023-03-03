@@ -130,7 +130,7 @@ export class ShaderLib {
         this.$l.u3 = pb.div(pb.add(this.xIndex, 2.5), this.w);
         this.$l.u4 = pb.div(pb.add(this.xIndex, 3.5), this.w);
         this.$l.v = pb.div(pb.add(this.yIndex, 0.5), this.w);
-        if (pb.getDeviceType() !== 'webgl') {
+        if (pb.device.type !== 'webgl') {
           this.$l.row1 = pb.textureSampleLevel(boneTexture, pb.vec2(this.u1, this.v), 0);
           this.$l.row2 = pb.textureSampleLevel(boneTexture, pb.vec2(this.u2, this.v), 0);
           this.$l.row3 = pb.textureSampleLevel(boneTexture, pb.vec2(this.u3, this.v), 0);
@@ -161,7 +161,7 @@ export class ShaderLib {
         );
         this.$return(pb.mul(invBindMatrix, this.m));
         /*
-        if (pb.getDeviceType() === 'webgl') {
+        if (pb.device.type === 'webgl') {
           this.$l.m0 = pb.mat4();
           this.$l.m1 = pb.mat4();
           this.$l.m2 = pb.mat4();

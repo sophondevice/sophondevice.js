@@ -359,12 +359,12 @@ export class ShadowMapper {
     const pb = scope.$builder;
     const lib = new ShaderLib(pb);
     const depthBiasParam =
-      pb.getDeviceType() === 'webgl' ? scope.global.light.depthBias : scope.global.light.lightParams[4];
+      pb.device.type === 'webgl' ? scope.global.light.depthBias : scope.global.light.lightParams[4];
     if (this.light.isDirectionLight()) {
       return pb.dot(pb.mul(depthBiasParam.xy, pb.vec2(1, pb.sub(1, NdotL))), pb.vec2(1, 1));
     } else {
       const nearFar =
-        pb.getDeviceType() === 'webgl'
+        pb.device.type === 'webgl'
           ? scope.global.light.shadowCameraParams.xy
           : scope.global.light.lightParams[5].xy;
       const linearDepth = lib.nonLinearDepthToLinearNormalized(z, nearFar);
@@ -376,7 +376,7 @@ export class ShadowMapper {
   computeShadowBiasCSM(scope: PBInsideFunctionScope, NdotL: PBShaderExp, split: PBShaderExp): PBShaderExp {
     const pb = scope.$builder;
     const depthBiasParam =
-      pb.getDeviceType() === 'webgl' ? scope.global.light.depthBias : scope.global.light.lightParams[4];
+      pb.device.type === 'webgl' ? scope.global.light.depthBias : scope.global.light.lightParams[4];
     const splitFlags = pb.vec4(
       pb.float(pb.equal(split, 0)),
       pb.float(pb.equal(split, 1)),
@@ -384,7 +384,7 @@ export class ShadowMapper {
       pb.float(pb.equal(split, 3))
     );
     const depthBiasScale =
-      pb.getDeviceType() === 'webgl'
+      pb.device.type === 'webgl'
         ? pb.dot(scope.global.light.depthBiasScales, splitFlags)
         : pb.dot(scope.global.light.lightParams[6], splitFlags);
     // const biasScaleFactor = pb.mix(1, depthBiasParam.w, linearDepth);
@@ -470,7 +470,7 @@ export class ShadowMapper {
       const colorFormat = this._impl.getShadowMapColorFormat(this);
       const depthFormat = this._impl.getShadowMapDepthFormat(this);
       const numCascades = this._light.isDirectionLight() ? this._config.numCascades : 1;
-      const useTextureArray = numCascades > 1 && device.getDeviceType() !== 'webgl';
+      const useTextureArray = numCascades > 1 && device.type !== 'webgl';
       const shadowMapWidth =
         numCascades > 1 && !useTextureArray ? 2 * this._config.shadowMapSize : this._config.shadowMapSize;
       const shadowMapHeight =
@@ -803,7 +803,7 @@ export class ShadowMapper {
             adjMatrix.setRow(2, new Vector4(0, 0, 1, 0));
             adjMatrix.setRow(3, new Vector4(col - 0.5 * numCols + 0.5, row - 0.5 * numRows + 0.5, 0, 1));
             shadowMapRenderCamera.projectionMatrix.multiplyLeft(cropMatrix).multiplyLeft(adjMatrix);
-            if (scene.device.getDeviceType() === 'webgpu') {
+            if (scene.device.type === 'webgpu') {
               renderPass.scissor = [
                 col * this._config.shadowMapSize,
                 (numRows - 1 - row) * this._config.shadowMapSize,

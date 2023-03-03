@@ -670,8 +670,6 @@ export class ProgramBuilder {
   /** @internal */
   _shaderType: ShaderType = ShaderType.Vertex | ShaderType.Fragment | ShaderType.Compute;
   /** @internal */
-  _deviceType: DeviceType;
-  /** @internal */
   _structInfo: { [type: number]: StructDef };
   /** @internal */
   _uniforms: UniformInfo[];
@@ -701,9 +699,8 @@ export class ProgramBuilder {
   _autoStructureTypeIndex: number;
   /** @internal */
   _nameMap: { [name: string]: string }[];
-  constructor(device: Device | DeviceType) {
-    this._device = typeof device === 'string' ? null : device;
-    this._deviceType = typeof device === 'string' ? device : device.getDeviceType();
+  constructor(device: Device) {
+    this._device = device;
     this._workgroupSize = null;
     this._structInfo = {};
     this._uniforms = [];
@@ -715,7 +712,7 @@ export class ProgramBuilder {
     this._inputs = [];
     this._outputs = [];
     this._vertexAttributes = [];
-    this._depthRangeCorrection = this._deviceType === 'webgpu';
+    this._depthRangeCorrection = this.device.type === 'webgpu';
     this._emulateDepthClamp = false;
     this._lastError = null;
     this._reflection = new PBReflection(this);
@@ -774,7 +771,7 @@ export class ProgramBuilder {
     this._inputs = [];
     this._outputs = [];
     this._vertexAttributes = [];
-    this._depthRangeCorrection = this._deviceType === 'webgpu';
+    this._depthRangeCorrection = this.device.type === 'webgpu';
     this._reflection = new PBReflection(this);
     this._autoStructureTypeIndex = 0;
     this._nameMap = [];
@@ -846,11 +843,8 @@ export class ProgramBuilder {
         })
       : null;
   }
-  getDeviceType() {
-    return this._deviceType;
-  }
   addressOf(ref: PBShaderExp): PBShaderExp {
-    if (this.getDeviceType() !== 'webgpu') {
+    if (this.device.type !== 'webgpu') {
       throw new errors.PBDeviceNotSupport('pointer shader type');
     }
     if (!ref.$ast.isReference()) {
@@ -861,7 +855,7 @@ export class ProgramBuilder {
     return exp;
   }
   referenceOf(ptr: PBShaderExp): PBShaderExp {
-    if (this.getDeviceType() !== 'webgpu') {
+    if (this.device.type !== 'webgpu') {
       throw new errors.PBDeviceNotSupport('pointer shader type');
     }
     if (!ptr.$ast.getType().isPointerType()) {
@@ -1370,7 +1364,7 @@ export class ProgramBuilder {
       throw new Error('multiple sampler not supported');
     }
     this._uniforms[u].texture.autoBindSampler = samplerType;
-    if (this._deviceType === 'webgpu') {
+    if (this.device.type === 'webgpu') {
       const samplerName = AST.genSamplerName(t.$str, comparison);
       if (!this.globalScope[samplerName]) {
         throw new Error(`failed to find sampler name ${samplerName}`);
@@ -1459,7 +1453,7 @@ export class ProgramBuilder {
       ];
     } catch (err) {
       if (err instanceof errors.PBError) {
-        this._lastError = err.getMessage(this.getDeviceType());
+        this._lastError = err.getMessage(this.device.type);
         console.error(this._lastError);
         return null;
       } else if (err instanceof Error) {
@@ -1492,7 +1486,7 @@ export class ProgramBuilder {
       const vertexBuiltinScope = this._builtinScope;
       const vertexInputs = this._inputs;
       const vertexOutputs = this._outputs;
-      if (this._deviceType === 'webgpu') {
+      if (this.device.type === 'webgpu') {
         // this.removeUnusedSamplerBindings(vertexScope);
       }
 
@@ -1517,7 +1511,7 @@ export class ProgramBuilder {
       const fragBuiltinScope = this._builtinScope;
       const fragInputs = this._inputs;
       const fragOutputs = this._outputs;
-      if (this._deviceType === 'webgpu') {
+      if (this.device.type === 'webgpu') {
         // this.removeUnusedSamplerBindings(fragScope);
       }
 
@@ -1544,7 +1538,7 @@ export class ProgramBuilder {
       ];
     } catch (err) {
       if (err instanceof errors.PBError) {
-        this._lastError = err.getMessage(this.getDeviceType());
+        this._lastError = err.getMessage(this.device.type);
         console.error(this._lastError);
         return null;
       } else if (err instanceof Error) {
@@ -1589,7 +1583,7 @@ export class ProgramBuilder {
       vertexAttributes: this._vertexAttributes,
       workgroupSize: null
     };
-    switch (this._deviceType) {
+    switch (this.device.type) {
       case 'webgl':
         for (const u of this._uniforms) {
           if (u.texture) {
@@ -1875,7 +1869,7 @@ export class ProgramBuilder {
           };
         } else {
           const sampleType =
-            this._deviceType === 'webgpu'
+            this.device.type === 'webgpu'
               ? uniformInfo.texture.exp.$sampleType
               : uniformInfo.texture.autoBindSampler && entry.type.isDepthTexture()
               ? 'float'
@@ -1899,11 +1893,11 @@ export class ProgramBuilder {
             autoBindSampler: null,
             autoBindSamplerComparison: null
           };
-          if (this.getDeviceType() === 'webgpu' || uniformInfo.texture.autoBindSampler === 'sample') {
+          if (this.device.type === 'webgpu' || uniformInfo.texture.autoBindSampler === 'sample') {
             entry.texture.autoBindSampler = AST.genSamplerName(uniformInfo.texture.exp.$str, false);
           }
           if (
-            (this.getDeviceType() === 'webgpu' && entry.type.isDepthTexture()) ||
+            (this.device.type === 'webgpu' && entry.type.isDepthTexture()) ||
             uniformInfo.texture.autoBindSampler === 'comparison'
           ) {
             entry.texture.autoBindSamplerComparison = AST.genSamplerName(uniformInfo.texture.exp.$str, true);
@@ -2030,7 +2024,7 @@ export class ProgramBuilder {
       args,
       returnType,
       func,
-      getCurrentProgramBuilder().getDeviceType()
+      getCurrentProgramBuilder().device.type
     );
     this.currentScope().$ast.statements.push(exp.$ast);
     return exp;
@@ -2131,7 +2125,7 @@ export class PBScope extends Proxiable<PBScope> {
     if (!(variable.$ast instanceof AST.ASTPrimitive)) {
       throw new Error(
         `invalid variable declaration: '${variable.$ast.toString(
-          getCurrentProgramBuilder().getDeviceType()
+          getCurrentProgramBuilder().device.type
         )}'`
       );
     }
@@ -2243,7 +2237,7 @@ export class PBScope extends Proxiable<PBScope> {
       uniformInfo.texture &&
       !(uniformInfo.texture.exp.$typeinfo as PBTextureTypeInfo).isStorageTexture() &&
       !(uniformInfo.texture.exp.$typeinfo as PBTextureTypeInfo).isExternalTexture() &&
-      getCurrentProgramBuilder().getDeviceType() === 'webgpu'
+      getCurrentProgramBuilder().device.type === 'webgpu'
     ) {
       // webgpu requires explicit sampler bindings
       const isDepth = variable.$typeinfo.isTextureType() && variable.$typeinfo.isDepthTexture();
@@ -2287,18 +2281,18 @@ export class PBScope extends Proxiable<PBScope> {
         throw new errors.PBASTError(
           variable.$ast,
           `type '${variable.$typeinfo.toTypeName(
-            getCurrentProgramBuilder().getDeviceType()
+            getCurrentProgramBuilder().device.type
           )}' cannot be declared in uniform address space`
         );
       }
       if (variable.$declareType === AST.DeclareType.DECLARE_TYPE_STORAGE) {
-        if (getCurrentProgramBuilder().getDeviceType() !== 'webgpu') {
+        if (getCurrentProgramBuilder().device.type !== 'webgpu') {
           throw new errors.PBDeviceNotSupport('storage buffer binding');
         } else if (!variable.$typeinfo.isHostSharable()) {
           throw new errors.PBASTError(
             variable.$ast,
             `type '${variable.$typeinfo.toTypeName(
-              getCurrentProgramBuilder().getDeviceType()
+              getCurrentProgramBuilder().device.type
             )}' cannot be declared in storage address space`
           );
         }
@@ -2485,16 +2479,16 @@ export class PBBuiltinScope extends PBScope {
   constructor() {
     super(null);
     this.$_usedBuiltins = new Set();
-    const isWebGPU = getCurrentProgramBuilder().getDeviceType() === 'webgpu';
+    const isWebGPU = getCurrentProgramBuilder().device.type === 'webgpu';
     if (!isWebGPU) {
       this.$_builtinVars = {};
-      const v = AST.builtinVariables[getCurrentProgramBuilder().getDeviceType()];
+      const v = AST.builtinVariables[getCurrentProgramBuilder().device.type];
       for (const k in v) {
         const info = v[k];
         this.$_builtinVars[k] = new PBShaderExp(info.name, info.type);
       }
     }
-    const v = AST.builtinVariables[getCurrentProgramBuilder().getDeviceType()];
+    const v = AST.builtinVariables[getCurrentProgramBuilder().device.type];
     const that = this;
     for (const k of Object.keys(v)) {
       Object.defineProperty(this, k, {
@@ -2522,9 +2516,9 @@ export class PBBuiltinScope extends PBScope {
   /** @internal */
   private $getBuiltinVar(name: string) {
     this.$_usedBuiltins.add(name);
-    const isWebGPU = getCurrentProgramBuilder().getDeviceType() === 'webgpu';
+    const isWebGPU = getCurrentProgramBuilder().device.type === 'webgpu';
     if (isWebGPU) {
-      const v = AST.builtinVariables[getCurrentProgramBuilder().getDeviceType()];
+      const v = AST.builtinVariables[getCurrentProgramBuilder().device.type];
       const info = v[name];
       const inout = info.inOrOut;
       const structName =
@@ -2581,7 +2575,7 @@ export class PBInputScope extends PBScope {
       getCurrentProgramBuilder()._vertexAttributes.push(attrib);
       getCurrentProgramBuilder().reflection.setAttrib(value.$attrib, exp);
       // modify input struct for webgpu
-      if (getCurrentProgramBuilder().getDeviceType() === 'webgpu') {
+      if (getCurrentProgramBuilder().device.type === 'webgpu') {
         if (getCurrentProgramBuilder().findStructType(AST.getBuiltinInputStructName(st), st)) {
           getCurrentProgramBuilder().defineBuiltinStruct(st, 'in');
         }
@@ -2622,7 +2616,7 @@ export class PBOutputScope extends PBScope {
           new PBShaderExp(`${output_prefix}${prop}`, type).tag(...value.$tags)
         );
         // modify output struct for webgpu
-        if (getCurrentProgramBuilder().getDeviceType() === 'webgpu') {
+        if (getCurrentProgramBuilder().device.type === 'webgpu') {
           const st = getCurrentProgramBuilder().shaderType;
           if (getCurrentProgramBuilder().findStructType(AST.getBuiltinInputStructName(st), st)) {
             getCurrentProgramBuilder().defineBuiltinStruct(st, 'out');
@@ -2643,7 +2637,7 @@ export class PBGlobalScope extends PBScope {
   }
   $mainFunc(this: PBGlobalScope, body?: (this: PBFunctionScope) => void) {
     const builder = getCurrentProgramBuilder();
-    if (builder.getDeviceType() === 'webgpu') {
+    if (builder.device.type === 'webgpu') {
       const inputStruct = builder.defineBuiltinStruct(builder.shaderType, 'in');
       this.$local(inputStruct[1]);
       const isCompute = builder.shaderType === ShaderType.Compute;
@@ -2734,7 +2728,7 @@ export class PBGlobalScope extends PBScope {
       if (!(param.$ast instanceof AST.ASTPrimitive)) {
         throw new Error(`${name}(): invalid function definition`);
       }
-      param.$ast = new AST.ASTFunctionParameter(param.$ast, getCurrentProgramBuilder().getDeviceType());
+      param.$ast = new AST.ASTFunctionParameter(param.$ast, getCurrentProgramBuilder().device.type);
     });
     Object.defineProperty(this, name, {
       get: function () {
@@ -2817,7 +2811,7 @@ export class PBInsideFunctionScope extends PBScope {
     } else if (astFunc.returnType.typeId !== returnType.typeId) {
       throw new Error(
         `function ${astFunc.name}: return type must be ${
-          astFunc.returnType?.toTypeName(getCurrentProgramBuilder().getDeviceType()) || 'void'
+          astFunc.returnType?.toTypeName(getCurrentProgramBuilder().device.type) || 'void'
         }`
       );
     }

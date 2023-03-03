@@ -298,7 +298,7 @@ export class PBShaderExp extends Proxiable<PBShaderExp> {
     return varType.isPrimitiveType() ? varType.cols : 0;
   }
   getTypeName(): string {
-    return this.$ast.getType().toTypeName(currentProgramBuilder.getDeviceType());
+    return this.$ast.getType().toTypeName(currentProgramBuilder.device.type);
   }
   /** @internal */
   protected $get(prop: string): any {
@@ -328,7 +328,7 @@ export class PBShaderExp extends Proxiable<PBShaderExp> {
               if (!varType.isPrimitiveType() || !varType.isVectorType()) {
                 throw new Error(
                   `invalid index operation: ${this.$ast.toString(
-                    currentProgramBuilder.getDeviceType()
+                    currentProgramBuilder.device.type
                   )}[${prop}]`
                 );
               }
@@ -340,7 +340,7 @@ export class PBShaderExp extends Proxiable<PBShaderExp> {
               ) {
                 throw new Error(
                   `unknown swizzle target: ${this.$ast.toString(
-                    currentProgramBuilder.getDeviceType()
+                    currentProgramBuilder.device.type
                   )}[${prop}]`
                 );
               }

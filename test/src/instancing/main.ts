@@ -1,5 +1,5 @@
 import { Vector3, Vector4, Quaternion, REvent } from '@sophon/base';
-import { Viewer, DeviceType } from '@sophon/device';
+import { Device, DeviceType } from '@sophon/device';
 import {
   Scene,
   ForwardRenderScheme,
@@ -9,29 +9,28 @@ import {
   Mesh,
   DirectionalLight
 } from '@sophon/scene';
-import { GUI, GUIRenderer, RElement } from '@sophon/dom';
+import { GUI, RElement } from '@sophon/dom';
 import * as common from '../common';
 
 (async function () {
-  const viewer = new Viewer(document.getElementById('canvas') as HTMLCanvasElement);
-  await viewer.initDevice((common.getQueryString('dev') as DeviceType) || 'webgl', { msaa: true });
-  const guiRenderer = new GUIRenderer(viewer.device);
-  const gui = new GUI(guiRenderer);
+  const type = (common.getQueryString('dev') as DeviceType) || 'webgl';
+  const device = await Device.create(document.getElementById('canvas') as HTMLCanvasElement, type, { msaa: true });
+  const gui = new GUI(device);
   await gui.deserializeFromXML(document.querySelector('#main-ui').innerHTML);
   const sceneView = gui.document.querySelector('#scene-view');
   const group = gui.document.querySelector('#button-group');
   sceneView.customDraw = true;
-  const scene = new Scene(viewer.device);
-  const scheme = new ForwardRenderScheme(viewer.device);
+  const scene = new Scene(device);
+  const scheme = new ForwardRenderScheme(device);
   const camera = scene.addCamera().setPosition(new Vector3(0, 0, 60));
   camera.mouseInputSource = sceneView;
   camera.keyboardInputSource = sceneView;
   camera.setModel(new OrbitCameraModel({ distance: camera.position.magnitude }));
   common.createTestPanel(scene, group);
   common.createSceneTweakPanel(scene, group, { width: '200px' });
-  const assetManager = new AssetManager(viewer.device);
+  const assetManager = new AssetManager(device);
 
-  const boxMaterial = new PBRMetallicRoughnessMaterial(viewer.device);
+  const boxMaterial = new PBRMetallicRoughnessMaterial(device);
   boxMaterial.lightModel.setAlbedoMap(
     await assetManager.fetchTexture('./assets/images/rustediron2_basecolor.png', null, true),
     null,
@@ -69,5 +68,5 @@ import * as common from '../common';
     scheme.renderScene(scene, camera);
   });
 
-  viewer.device.runLoop((device) => gui.render());
+  device.runLoop((device) => gui.render());
 })();

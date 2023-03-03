@@ -14,7 +14,7 @@ export class ForwardRenderScheme extends RenderScheme {
   constructor(device: Device) {
     super(device);
     this._scenePass =
-      device.getDeviceType() === 'webgl'
+      device.type === 'webgl'
         ? new ForwardMultiRenderPass(this, '')
         : new ForwardRenderPass(this, '');
     this._shadowMapPass = new ShadowMapPass(this, '');

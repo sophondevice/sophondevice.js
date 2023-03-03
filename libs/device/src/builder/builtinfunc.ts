@@ -33,9 +33,9 @@ type WrapFunction = (pb: ProgramBuilder, name: string, ...args: ExpValueType[]) 
 
 function matchFunctionOverloadings(pb: ProgramBuilder, name: string, ...args: ExpValueType[]) {
   const bit =
-    pb.getDeviceType() === 'webgl'
+    pb.device.type === 'webgl'
       ? MASK_WEBGL1
-      : pb.getDeviceType() === 'webgl2'
+      : pb.device.type === 'webgl2'
       ? MASK_WEBGL2
       : MASK_WEBGPU;
   const overloadings = builtinFunctionsAll?.[name].overloads
@@ -361,10 +361,10 @@ const builtinFunctionsAll: {
         argType.isPrimitiveType() &&
         (argType.scalarType === typeinfo.PBPrimitiveType.I32 ||
           argType.scalarType === typeinfo.PBPrimitiveType.U32);
-      if (pb.getDeviceType() === 'webgl' && isIntegerType) {
+      if (pb.device.type === 'webgl' && isIntegerType) {
         throw new PBDeviceNotSupport('integer modulus');
       }
-      if (pb.getDeviceType() === 'webgpu' || isIntegerType) {
+      if (pb.device.type === 'webgpu' || isIntegerType) {
         return binaryFunc(matchResult[1][0], matchResult[1][1], '%', matchResult[0].returnType);
       } else {
         return callBuiltinChecked(pb, matchResult);
@@ -550,7 +550,7 @@ const builtinFunctionsAll: {
     normalizeFunc(pb, name, ...args) {
       const matchResult = matchFunctionOverloadings(pb, name, ...args);
       const argType = matchResult[1][0].getType();
-      if (pb.getDeviceType() === 'webgpu' || (argType.isPrimitiveType() && argType.isScalarType())) {
+      if (pb.device.type === 'webgpu' || (argType.isPrimitiveType() && argType.isScalarType())) {
         return binaryFunc(matchResult[1][0], matchResult[1][1], '<', matchResult[0].returnType);
       } else {
         return callBuiltinChecked(pb, matchResult);
@@ -566,7 +566,7 @@ const builtinFunctionsAll: {
     normalizeFunc(pb, name, ...args) {
       const matchResult = matchFunctionOverloadings(pb, name, ...args);
       const argType = matchResult[1][0].getType();
-      if (pb.getDeviceType() === 'webgpu' || (argType.isPrimitiveType() && argType.isScalarType())) {
+      if (pb.device.type === 'webgpu' || (argType.isPrimitiveType() && argType.isScalarType())) {
         return binaryFunc(matchResult[1][0], matchResult[1][1], '<=', matchResult[0].returnType);
       } else {
         return callBuiltinChecked(pb, matchResult);
@@ -582,7 +582,7 @@ const builtinFunctionsAll: {
     normalizeFunc(pb, name, ...args) {
       const matchResult = matchFunctionOverloadings(pb, name, ...args);
       const argType = matchResult[1][0].getType();
-      if (pb.getDeviceType() === 'webgpu' || (argType.isPrimitiveType() && argType.isScalarType())) {
+      if (pb.device.type === 'webgpu' || (argType.isPrimitiveType() && argType.isScalarType())) {
         return binaryFunc(matchResult[1][0], matchResult[1][1], '>', matchResult[0].returnType);
       } else {
         return callBuiltinChecked(pb, matchResult);
@@ -598,7 +598,7 @@ const builtinFunctionsAll: {
     normalizeFunc(pb, name, ...args) {
       const matchResult = matchFunctionOverloadings(pb, name, ...args);
       const argType = matchResult[1][0].getType();
-      if (pb.getDeviceType() === 'webgpu' || (argType.isPrimitiveType() && argType.isScalarType())) {
+      if (pb.device.type === 'webgpu' || (argType.isPrimitiveType() && argType.isScalarType())) {
         return binaryFunc(matchResult[1][0], matchResult[1][1], '>=', matchResult[0].returnType);
       } else {
         return callBuiltinChecked(pb, matchResult);
@@ -615,7 +615,7 @@ const builtinFunctionsAll: {
     normalizeFunc(pb, name, ...args) {
       const matchResult = matchFunctionOverloadings(pb, name, ...args);
       const argType = matchResult[1][0].getType();
-      if (pb.getDeviceType() === 'webgpu' || (argType.isPrimitiveType() && argType.isScalarType())) {
+      if (pb.device.type === 'webgpu' || (argType.isPrimitiveType() && argType.isScalarType())) {
         return binaryFunc(matchResult[1][0], matchResult[1][1], '==', matchResult[0].returnType);
       } else {
         return callBuiltinChecked(pb, matchResult);
@@ -632,7 +632,7 @@ const builtinFunctionsAll: {
     normalizeFunc(pb, name, ...args) {
       const matchResult = matchFunctionOverloadings(pb, name, ...args);
       const argType = matchResult[1][0].getType();
-      if (pb.getDeviceType() === 'webgpu' || (argType.isPrimitiveType() && argType.isScalarType())) {
+      if (pb.device.type === 'webgpu' || (argType.isPrimitiveType() && argType.isScalarType())) {
         return binaryFunc(matchResult[1][0], matchResult[1][1], '!=', matchResult[0].returnType);
       } else {
         return callBuiltinChecked(pb, matchResult);
@@ -649,7 +649,7 @@ const builtinFunctionsAll: {
     normalizeFunc(pb, name, ...args) {
       const matchResult = matchFunctionOverloadings(pb, name, ...args);
       const argType = matchResult[1][0].getType();
-      if (pb.getDeviceType() === 'webgpu' && argType.isPrimitiveType() && !argType.isScalarType()) {
+      if (pb.device.type === 'webgpu' && argType.isPrimitiveType() && !argType.isScalarType()) {
         return pb.all(pb.compEqual(args[0] as PBShaderExp, args[1] as PBShaderExp));
       } else {
         return binaryFunc(matchResult[1][0], matchResult[1][1], '==', matchResult[0].returnType);
@@ -666,7 +666,7 @@ const builtinFunctionsAll: {
     normalizeFunc(pb, name, ...args) {
       const matchResult = matchFunctionOverloadings(pb, name, ...args);
       const argType = matchResult[1][0].getType();
-      if (pb.getDeviceType() === 'webgpu' && argType.isPrimitiveType() && !argType.isScalarType()) {
+      if (pb.device.type === 'webgpu' && argType.isPrimitiveType() && !argType.isScalarType()) {
         return pb.any(pb.compNotEqual(args[0] as PBShaderExp, args[1] as PBShaderExp));
       } else {
         return binaryFunc(matchResult[1][0], matchResult[1][1], '!=', matchResult[0].returnType);
@@ -680,7 +680,7 @@ const builtinFunctionsAll: {
     normalizeFunc(pb, name, ...args) {
       const matchResult = matchFunctionOverloadings(pb, name, ...args);
       const argType = matchResult[1][0].getType();
-      if (pb.getDeviceType() === 'webgpu' || (argType.isPrimitiveType() && argType.isScalarType())) {
+      if (pb.device.type === 'webgpu' || (argType.isPrimitiveType() && argType.isScalarType())) {
         return unaryFunc(matchResult[1][0], '!', matchResult[0].returnType);
       } else {
         return callBuiltinChecked(pb, matchResult);
@@ -740,7 +740,7 @@ const builtinFunctionsAll: {
   },
   arrayLength: {
     normalizeFunc(pb, name, ...args) {
-      if (pb.getDeviceType() !== 'webgpu') {
+      if (pb.device.type !== 'webgpu') {
         throw new PBDeviceNotSupport('arrayLength builtin function');
       }
       if (
@@ -1125,14 +1125,14 @@ const builtinFunctionsAll: {
       if (!texType.isTextureType()) {
         throw new PBParamTypeError('textureDimensions', 'tex');
       }
-      if (pb.getDeviceType() === 'webgpu') {
+      if (pb.device.type === 'webgpu') {
         if (texType.isMultisampledTexture() || texType.isStorageTexture()) {
           if (args[1] !== undefined) {
             throw new PBParamValueError('textureDimensions', 'level');
           }
         }
         return callBuiltin(pb, name, ...args);
-      } else if (pb.getDeviceType() === 'webgl2') {
+      } else if (pb.device.type === 'webgl2') {
         const tex = args[0];
         const level = args[1] || 0;
         return texType.is1DTexture()
@@ -1428,7 +1428,7 @@ const builtinFunctionsAll: {
       if (!texType.isTextureType()) {
         throw new PBParamTypeError('textureLoad', 'tex');
       }
-      if (pb.getDeviceType() === 'webgl2') {
+      if (pb.device.type === 'webgl2') {
         if (args.length !== 3) {
           throw new PBParamLengthError('textureLoad');
         }
@@ -1451,7 +1451,7 @@ const builtinFunctionsAll: {
           }
           args[1] = pb.ivec2(args[1], 0);
         }
-      } else if (pb.getDeviceType() === 'webgpu' && texType.isExternalTexture()) {
+      } else if (pb.device.type === 'webgpu' && texType.isExternalTexture()) {
         args = args.slice(0, 2);
       }
       return callBuiltin(pb, name, ...args);
@@ -1501,7 +1501,7 @@ const builtinFunctionsAll: {
       ])
     ],
     normalizeFunc(pb, name, ...args) {
-      if (pb.getDeviceType() === 'webgl2') {
+      if (pb.device.type === 'webgl2') {
         if (args.length !== 4) {
           throw new PBParamLengthError('textureArrayLoad');
         }
@@ -2033,7 +2033,7 @@ const builtinFunctionsAll: {
       if (!texType.isTextureType()) {
         throw new PBParamTypeError('textureSample', 'texture');
       }
-      if (pb.getDeviceType() === 'webgpu') {
+      if (pb.device.type === 'webgpu') {
         if (texType.isExternalTexture()) {
           return pb.textureLoad(tex, pb.ivec2(args[1] as any), 0);
         } else {
@@ -2111,7 +2111,7 @@ const builtinFunctionsAll: {
       if (!texType.isTextureType()) {
         throw new PBParamTypeError('textureArraySample', 'texture');
       }
-      if (pb.getDeviceType() === 'webgpu') {
+      if (pb.device.type === 'webgpu') {
         const sampler = pb.getDefaultSampler(tex, false);
         const coords = args[1];
         const arrayIndex = args[2];
@@ -2121,7 +2121,7 @@ const builtinFunctionsAll: {
         } else {
           return ret;
         }
-      } else if (pb.getDeviceType() === 'webgl2') {
+      } else if (pb.device.type === 'webgl2') {
         pb.getDefaultSampler(tex, false);
         const coords = args[1];
         const arrayIndex = args[2];
@@ -2189,7 +2189,7 @@ const builtinFunctionsAll: {
       if (!texType.isTextureType()) {
         throw new PBParamTypeError('textureSampleBias', 'texture');
       }
-      if (pb.getDeviceType() === 'webgpu') {
+      if (pb.device.type === 'webgpu') {
         const sampler = pb.getDefaultSampler(tex, false);
         return callBuiltin(pb, name, tex, sampler, args[1], args[2]);
       } else {
@@ -2233,10 +2233,10 @@ const builtinFunctionsAll: {
       if (!texType.isTextureType()) {
         throw new PBParamTypeError('textureArraySampleBias', 'texture');
       }
-      if (pb.getDeviceType() === 'webgpu') {
+      if (pb.device.type === 'webgpu') {
         const sampler = pb.getDefaultSampler(tex, false);
         return callBuiltin(pb, name, tex, sampler, args[1], args[2], args[3]);
-      } else if (pb.getDeviceType() === 'webgl2') {
+      } else if (pb.device.type === 'webgl2') {
         pb.getDefaultSampler(tex, false);
         const coords = args[1];
         const arrayIndex = args[2];
@@ -2275,7 +2275,7 @@ const builtinFunctionsAll: {
       if (!texType.isTextureType() || !texType.isDepthTexture()) {
         throw new PBParamTypeError('textureSampleCompare', 'texture');
       }
-      if (pb.getDeviceType() === 'webgpu') {
+      if (pb.device.type === 'webgpu') {
         const sampler = pb.getDefaultSampler(args[0] as PBShaderExp, true);
         return callBuiltin(pb, name, tex, sampler, args[1], args[2]);
       } else {
@@ -2324,7 +2324,7 @@ const builtinFunctionsAll: {
       if (!texType.isTextureType() || !texType.isDepthTexture()) {
         throw new PBParamTypeError('textureArraySampleCompare', 'texture');
       }
-      if (pb.getDeviceType() === 'webgpu') {
+      if (pb.device.type === 'webgpu') {
         const sampler = pb.getDefaultSampler(args[0] as PBShaderExp, true);
         return callBuiltin(pb, name, tex, sampler, args[1], args[2], args[3]);
       } else {
@@ -2437,7 +2437,7 @@ const builtinFunctionsAll: {
       if (!texType.isTextureType()) {
         throw new PBParamTypeError('textureSampleLevel', 'texture');
       }
-      if (pb.getDeviceType() === 'webgpu') {
+      if (pb.device.type === 'webgpu') {
         if (texType.isExternalTexture()) {
           return pb.textureLoad(tex, pb.ivec2(args[1] as any), 0);
         } else {
@@ -2514,7 +2514,7 @@ const builtinFunctionsAll: {
       if (!texType.isTextureType()) {
         throw new PBParamTypeError('textureArraySampleLevel', 'texture');
       }
-      if (pb.getDeviceType() === 'webgpu') {
+      if (pb.device.type === 'webgpu') {
         const sampler = pb.getDefaultSampler(tex, false);
         const level =
           texType.isDepthTexture() &&
@@ -2569,7 +2569,7 @@ const builtinFunctionsAll: {
       if (!texType.isTextureType() || !texType.isDepthTexture()) {
         throw new PBParamTypeError('textureSampleCompareLevel', 'texture');
       }
-      if (pb.getDeviceType() === 'webgpu') {
+      if (pb.device.type === 'webgpu') {
         const sampler = pb.getDefaultSampler(tex, true);
         return callBuiltin(pb, name, tex, sampler, args[1], args[2]);
       } else {
@@ -2620,7 +2620,7 @@ const builtinFunctionsAll: {
       if (!texType.isTextureType() || !texType.isDepthTexture()) {
         throw new PBParamTypeError('textureArraySampleCompareLevel', 'texture');
       }
-      if (pb.getDeviceType() === 'webgpu') {
+      if (pb.device.type === 'webgpu') {
         const sampler = pb.getDefaultSampler(tex, true);
         return callBuiltin(pb, name, tex, sampler, args[1], args[2], args[3]);
       } else {
@@ -2697,7 +2697,7 @@ const builtinFunctionsAll: {
       if (!texType.isTextureType()) {
         throw new PBParamTypeError('textureSampleGrad', 'texture');
       }
-      if (pb.getDeviceType() === 'webgpu') {
+      if (pb.device.type === 'webgpu') {
         const sampler = pb.getDefaultSampler(tex, false);
         return callBuiltin(pb, name, tex, sampler, args[1], args[2], args[3]);
       } else {
@@ -2744,7 +2744,7 @@ const builtinFunctionsAll: {
       if (!texType.isTextureType() || !texType.isArrayTexture()) {
         throw new PBParamTypeError('textureArraySampleGrad', 'texture');
       }
-      if (pb.getDeviceType() === 'webgpu') {
+      if (pb.device.type === 'webgpu') {
         const sampler = pb.getDefaultSampler(tex, false);
         return callBuiltin(pb, name, tex, sampler, args[1], args[2], args[3], args[4]);
       } else {

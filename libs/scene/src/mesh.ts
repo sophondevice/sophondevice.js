@@ -44,7 +44,7 @@ export class Mesh extends GraphNode implements BatchDrawable {
     this._invBindMatrix = null;
     this._instanceHash = null;
     this._boundingBoxNode = null;
-    this._batchable = scene.device.getDeviceType() !== 'webgl';
+    this._batchable = scene.device.type !== 'webgl';
     this._bboxChangeCallback = this._onBoundingboxChange.bind(this);
   }
   getInstanceId(renderPass: RenderPass): string {

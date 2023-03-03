@@ -1,12 +1,11 @@
 import { Matrix4x4, Vector3, Vector4, REvent } from '@sophon/base';
 import {
-  Viewer,
+  Device,
   DeviceType,
   FrameBuffer,
   TextureSampler,
   TextureCube,
   Texture2D,
-  Device,
   PBInsideFunctionScope,
   PBShaderExp
 } from '@sophon/device';
@@ -28,7 +27,7 @@ import {
   StandardMaterial,
   PBRMetallicRoughnessMaterial
 } from '@sophon/scene';
-import { GUIRenderer, GUI, RElement, RKeyEvent } from '@sophon/dom';
+import { GUI, RElement, RKeyEvent } from '@sophon/dom';
 import * as common from '../common';
 
 class MyRenderScheme extends ForwardRenderScheme {
@@ -42,7 +41,7 @@ class MyRenderScheme extends ForwardRenderScheme {
   constructor(device: Device) {
     super(device);
     this.cubemapRenderPass =
-      device.getDeviceType() === 'webgl'
+      device.type === 'webgl'
         ? new ForwardMultiRenderPass(this, 'cubemap')
         : new ForwardRenderPass(this, 'cubemap');
     this.cubemapRenderCamera = new Map();
@@ -61,7 +60,7 @@ class MyRenderScheme extends ForwardRenderScheme {
       depthAttachment: {
         texture: this.depthAttachment
       },
-      sampleCount: device.getDeviceType() === 'webgl' ? 1 : 4,
+      sampleCount: device.type === 'webgl' ? 1 : 4,
       ignoreDepthStencil: false
     });
   }
@@ -112,21 +111,20 @@ class ReflectLightModel extends UnlitLightModel {
 }
 
 (async function () {
-  const viewer = new Viewer(document.getElementById('canvas') as HTMLCanvasElement);
-  await viewer.initDevice((common.getQueryString('dev') as DeviceType) || 'webgl', { msaa: true });
-  const guiRenderer = new GUIRenderer(viewer.device);
-  const gui = new GUI(guiRenderer);
+  const type = (common.getQueryString('dev') as DeviceType) || 'webgl';
+  const device = await Device.create(document.getElementById('canvas') as HTMLCanvasElement, type, { msaa: true });
+  const gui = new GUI(device);
 
   await gui.deserializeFromXML(document.querySelector('#main-ui').innerHTML);
   const sceneView = gui.document.querySelector('#scene-view');
   sceneView.customDraw = true;
-  const scene = new Scene(viewer.device);
-  const scheme = new MyRenderScheme(viewer.device);
+  const scene = new Scene(device);
+  const scheme = new MyRenderScheme(device);
   const camera = scene.addCamera().lookAt(new Vector3(0, 8, 30), new Vector3(0, 0, 0), Vector3.axisPY());
   camera.setProjectionMatrix(
     Matrix4x4.perspective(
       Math.PI / 3,
-      viewer.device.getDrawingBufferWidth() / viewer.device.getDrawingBufferHeight(),
+      device.getDrawingBufferWidth() / device.getDrawingBufferHeight(),
       1,
       160
     )
@@ -212,12 +210,12 @@ class ReflectLightModel extends UnlitLightModel {
 
   sceneView.addEventListener('draw', function (this: RElement, evt: REvent) {
     evt.preventDefault();
-    const elapsed = viewer.device.frameInfo.elapsedOverall;
+    const elapsed = device.frameInfo.elapsedOverall;
     sphere2.position.set(20 * Math.sin(elapsed * 0.003), 0, 20 * Math.cos(elapsed * 0.003));
     sphere3.position.set(0, 20 * Math.sin(elapsed * 0.002), 20 * Math.cos(elapsed * 0.002));
     sphere4.position.set(20 * Math.sin(elapsed * 0.002), 20 * Math.cos(elapsed * 0.002), 0);
     scheme.renderScene(scene, camera);
   });
 
-  viewer.device.runLoop((device) => gui.render());
+  device.runLoop((device) => gui.render());
 })();

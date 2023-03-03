@@ -486,7 +486,7 @@ export function createTestPanel(scene: Scene, el: RElement, styles?: any): RElem
   const deviceName = el.ownerDocument.createElement('div');
   deviceName.style.color = 'yellow';
   deviceName.style.marginTop = '5px';
-  deviceName.textContent = `Device: ${scene.device.getDeviceType()}`;
+  deviceName.textContent = `Device: ${scene.device.type}`;
   panel.append(deviceName);
   const timerCPU = el.ownerDocument.createElement('div');
   timerCPU.style.color = 'yellow';

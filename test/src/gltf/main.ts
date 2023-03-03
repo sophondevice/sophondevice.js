@@ -1,24 +1,23 @@
 import { REvent } from '@sophon/base';
-import { Viewer, DeviceType } from '@sophon/device';
+import { Device, DeviceType } from '@sophon/device';
 import { Scene } from '@sophon/scene';
-import { GUI, GUIRenderer, RElement } from '@sophon/dom';
+import { GUI, RElement } from '@sophon/dom';
 import * as common from '../common';
 import { GLTFViewer } from './gltfviewer';
 
 (async function () {
   const canvas = document.getElementById('canvas') as HTMLCanvasElement;
-  const viewer = new Viewer(canvas);
-  await viewer.initDevice((common.getQueryString('dev') as DeviceType) || 'webgl', { msaa: true });
-  const guiRenderer = new GUIRenderer(viewer.device);
-  const gui = new GUI(guiRenderer);
+  const type = (common.getQueryString('dev') as DeviceType) || 'webgl';
+  const device = await Device.create(canvas, type, { msaa: true });
+  const gui = new GUI(device);
   await gui.deserializeFromXML(document.querySelector('#main-ui').innerHTML);
   const sceneView = gui.document.querySelector('#scene-view');
   sceneView.customDraw = true;
   const group = gui.document.querySelector('#button-group');
-  const scene = new Scene(viewer.device);
+  const scene = new Scene(device);
   common.createTestPanel(scene, group);
   common.createSceneTweakPanel(scene, group, { width: '200px' });
-  common.createTextureViewPanel(viewer.device, sceneView, 300);
+  common.createTextureViewPanel(device, sceneView, 300);
 
   const gltfViewer = new GLTFViewer(gui, scene);
   gltfViewer.camera.mouseInputSource = sceneView;
@@ -56,5 +55,5 @@ import { GLTFViewer } from './gltfviewer';
     console.log(`raycast: ${intersected?.constructor.name || null}`);
   });
 
-  viewer.device.runLoop((device) => gui.render());
+  device.runLoop((device) => gui.render());
 })();

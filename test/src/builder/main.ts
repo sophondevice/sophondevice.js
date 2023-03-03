@@ -1,4 +1,4 @@
-import { Viewer, ProgramBuilder, GPUProgram } from '@sophon/device';
+import { Device, ProgramBuilder, GPUProgram } from '@sophon/device';
 
 const defaultVS = `this.$inputs.pos = pb.vec3().attrib('position');
 this.$inputs.uv = pb.vec2().attrib('texCoord0');
@@ -69,11 +69,10 @@ this.$mainFunc(function(){
   const vsgenerated = document.querySelector<HTMLTextAreaElement>('#vertexshader-generated');
   const fsgenerated = document.querySelector<HTMLTextAreaElement>('#fragmentshader-generated');
   const bg = document.querySelector<HTMLTextAreaElement>('#bindgroups');
-  const viewers: { [name: string]: Viewer } = {};
+  const devices: { [name: string]: Device } = {};
   const deviceNames = ['webgl', 'webgl2' /*, 'webgpu'*/] as const;
   for (const name of deviceNames) {
-    viewers[name] = new Viewer(document.querySelector<HTMLCanvasElement>(`#${name}`));
-    await viewers[name].initDevice(name);
+    devices[name] = await Device.create(document.querySelector<HTMLCanvasElement>(`#${name}`), name);
   }
   function reset(resetSource: boolean) {
     const isCompute = selectDeviceType.selectedIndex === 3;

@@ -116,14 +116,14 @@ const PCF_POISSON_DISC = [
 
 function getShadowMapTexelSize(scope: PBInsideFunctionScope): PBShaderExp {
   const pb = scope.$builder;
-  return pb.getDeviceType() === 'webgl'
+  return pb.device.type === 'webgl'
     ? scope.global.light.shadowCameraParams.w
     : scope.global.light.lightParams[5].w;
 }
 
 function getShadowMapSize(scope: PBInsideFunctionScope): PBShaderExp {
   const pb = scope.$builder;
-  return pb.getDeviceType() === 'webgl'
+  return pb.device.type === 'webgl'
     ? scope.global.light.shadowCameraParams.z
     : scope.global.light.lightParams[5].z;
 }
@@ -244,7 +244,7 @@ function getRandomRotationMatrix(scope: PBInsideFunctionScope, fragCoord: PBShad
 
 function getPoissonDiscSampleRadius(scope: PBInsideFunctionScope): PBShaderExp {
   const pb = scope.$builder;
-  return pb.device.getDeviceType() === 'webgl'
+  return pb.device.type === 'webgl'
     ? scope.global.light.depthBias.z
     : scope.global.light.lightParams[4].z;
 }
@@ -280,13 +280,13 @@ function sampleShadowMapPCF(
         const uv = pb.add(this.coords, this.offset);
         if (nativeShadowMap) {
           this.$return(
-            cascade && pb.getDeviceType() !== 'webgl'
+            cascade && pb.device.type !== 'webgl'
               ? pb.textureArraySampleCompareLevel(this.shadowMap, uv, this.cascade, sampleDepth)
               : pb.textureSampleCompareLevel(this.shadowMap, uv, sampleDepth)
           );
         } else {
           this.$l.shadowTex =
-            cascade && pb.getDeviceType() !== 'webgl'
+            cascade && pb.device.type !== 'webgl'
               ? pb.textureArraySampleLevel(this.shadowMap, uv, this.cascade, 0)
               : pb.textureSampleLevel(this.shadowMap, uv, 0);
           if (shadowMapFormat === 'rgba8unorm') {
@@ -340,13 +340,13 @@ function sampleShadowMap(
         } else {
           if (nativeShadowMap) {
             this.$return(
-              cascade && pb.getDeviceType() !== 'webgl'
+              cascade && pb.device.type !== 'webgl'
                 ? pb.textureArraySampleCompareLevel(this.shadowMap, this.coords, this.cascade, this.z)
                 : pb.textureSampleCompareLevel(this.shadowMap, this.coords, this.z)
             );
           } else {
             this.$l.shadowTex =
-              cascade && pb.getDeviceType() !== 'webgl'
+              cascade && pb.device.type !== 'webgl'
                 ? pb.textureArraySampleLevel(this.shadowMap, this.coords, this.cascade, 0)
                 : pb.textureSampleLevel(this.shadowMap, this.coords, 0);
             if (shadowMapFormat === 'rgba8unorm') {
@@ -381,7 +381,7 @@ function chebyshevUpperBound(
           this.$l.d = pb.sub(this.distance, this.occluder.x);
           this.$l.variance = pb.max(pb.mul(this.occluder.y, this.occluder.y), 0);
           const darkness =
-            pb.device.getDeviceType() === 'webgl'
+            pb.device.type === 'webgl'
               ? this.global.light.depthBias.z
               : this.global.light.lightParams[4].z;
           this.shadow = pb.div(this.variance, pb.add(this.variance, pb.mul(this.d, this.d)));
@@ -421,7 +421,7 @@ export function filterShadowVSM(
             )
           );
         } else {
-          if (pb.getDeviceType() !== 'webgl' && cascade) {
+          if (pb.device.type !== 'webgl' && cascade) {
             this.$l.shadowTex = pb.textureArraySampleLevel(this.shadowMap, this.texCoord.xy, this.cascade, 0);
           } else {
             this.$l.shadowTex = pb.textureSampleLevel(this.shadowMap, this.texCoord.xy, 0);
@@ -464,7 +464,7 @@ export function filterShadowESM(
             this.shadowTex.x = lib.decodeNormalizedFloatFromRGBA(this.shadowTex);
           }
         } else {
-          if (cascade && pb.getDeviceType() !== 'webgl') {
+          if (cascade && pb.device.type !== 'webgl') {
             this.$l.shadowTex = pb.textureArraySampleLevel(this.shadowMap, this.texCoord.xy, this.cascade, 0);
           } else {
             this.$l.shadowTex = pb.textureSampleLevel(this.shadowMap, this.texCoord.xy, 0);
@@ -474,7 +474,7 @@ export function filterShadowESM(
           }
           if (lightType === LIGHT_TYPE_SPOT) {
             this.$l.nearFar =
-              pb.getDeviceType() === 'webgl'
+              pb.device.type === 'webgl'
                 ? this.global.light.shadowCameraParams.xy
                 : this.global.light.lightParams[5].xy;
             this.$l.depth = lib.nonLinearDepthToLinearNormalized(this.texCoord.z, this.nearFar);
@@ -483,7 +483,7 @@ export function filterShadowESM(
           }
         }
         const depthScale =
-          pb.device.getDeviceType() === 'webgl'
+          pb.device.type === 'webgl'
             ? this.global.light.depthBias.z
             : this.global.light.lightParams[4].z;
         this.$return(
