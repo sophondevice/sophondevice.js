@@ -1,4 +1,4 @@
-import { Device, Texture2D, BindGroup, GPUProgram, PBGlobalScope, ProgramBuilder } from '@sophon/device';
+import { Device, Texture2D, BindGroup, GPUProgram, PBGlobalScope, ProgramBuilder, ShaderType } from '@sophon/device';
 import { Material } from '../material';
 import { ShaderLib } from '../materiallib/shaderlib';
 import { TerrainLightModel } from './terrainlightmodel';
@@ -76,7 +76,7 @@ export class TerrainMaterial extends Material {
     } else {
       pb.emulateDepthClamp = false;
     }
-    return pb.buildRenderProgram({
+    const program = pb.buildRenderProgram({
       vertex(this: PBGlobalScope) {
         const terrainInfoStruct = pb.defineStruct(null, 'std140', pb.ivec4('value'));
         Material.initShader(pb, ctx);
@@ -128,6 +128,9 @@ export class TerrainMaterial extends Material {
         }
       }
     });
+    console.log(program?.getShaderSource(ShaderType.Vertex));
+    console.log(program?.getShaderSource(ShaderType.Fragment));
+    return program;
   }
 }
 

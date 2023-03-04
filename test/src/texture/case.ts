@@ -86,7 +86,8 @@ export class TestTexture2D extends TextureTestCase {
     });
   }
   protected async createTexture(): Promise<BaseTexture> {
-    return (await this.assetManager.fetchTexture(`./assets/images/Di-3d.png`, null, true)) as Texture2D;
+    //return (await this.assetManager.fetchTexture(`./assets/images/Di-3d.png`, null, true)) as Texture2D;
+    return (await this.assetManager.fetchTexture(`./assets/maps/map1/test1_d.png`, null, true)) as Texture2D;
   }
   protected createBindGroup(): BindGroup {
     const bindGroup = this.device.createBindGroup(this.program.bindGroupLayouts[0]);

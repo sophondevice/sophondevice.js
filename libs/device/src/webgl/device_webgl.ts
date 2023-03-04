@@ -55,7 +55,6 @@ import { primitiveTypeMap, typeMap } from './constants_webgl';
 import {
   GPUProgramConstructParams,
   Device,
-  DeviceType,
   DeviceTypeWebGL,
   TextureCaps,
   MiscCaps,
@@ -64,7 +63,8 @@ import {
   RenderProgramConstructParams,
   DeviceOptions,
   DeviceLostEvent,
-  DeviceRestoreEvent
+  DeviceRestoreEvent,
+  DeviceResizeEvent
 } from '../device';
 import { RenderStateSet } from '../render_states';
 import { SamplerCache } from './sampler_cache';
@@ -250,6 +250,7 @@ export class WebGLDevice extends Device {
         this.setScissor(null);
       }
     });
+    this.dispatchEvent(new DeviceResizeEvent(this._canvas.clientWidth, this._canvas.clientHeight));
   }
   clearFrameBuffer(clearColor: Vector4, clearDepth: number, clearStencil: number) {
     const gl = this._context;

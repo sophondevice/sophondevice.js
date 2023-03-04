@@ -254,7 +254,8 @@ export abstract class WebGPUBaseTexture<
               y: upload.offsetY,
               z: upload.offsetZ
             },
-            mipLevel: upload.mipLevel
+            mipLevel: upload.mipLevel,
+            premultipliedAlpha: false
           };
           this._device.device.queue.copyExternalImageToTexture({ source: upload.image }, copyView, {
             width: upload.width,
@@ -524,8 +525,8 @@ export abstract class WebGPUBaseTexture<
     miplevel: number,
     faceIndex: number
   ) {
-    if (
-      !this._device.isTextureUploading(this as any) &&
+    // fixme: copyExternalImageToTexture() premultipliedAlpha: false does not work
+    if (false && !this._device.isTextureUploading(this as any) &&
       this._device.device.queue.copyExternalImageToTexture
     ) {
       this.clearPendingUploads();
@@ -536,7 +537,8 @@ export abstract class WebGPUBaseTexture<
           y: offsetY,
           z: faceIndex || 0
         },
-        mipLevel: miplevel || 0
+        mipLevel: miplevel || 0,
+        premultipliedAlpha: false
       };
       this._device.device.queue.copyExternalImageToTexture({ source: data }, copyView, {
         width: width,
@@ -544,13 +546,20 @@ export abstract class WebGPUBaseTexture<
         depthOrArrayLayers: 1
       });
     } else {
+      // can not use getImageData() because it is not accurate
       const tmpCanvas = document.createElement('canvas');
-      tmpCanvas.width = width;
-      tmpCanvas.height = height;
-      const ctx = tmpCanvas.getContext('2d');
-      ctx.drawImage(data, 0, 0, width, height, 0, 0, width, height);
-      const imageData = ctx.getImageData(0, 0, width, height);
-      this.uploadRaw(imageData.data, width, height, 1, offsetX, offsetY, faceIndex, miplevel);
+      let gl = tmpCanvas.getContext("webgl2");
+      gl.activeTexture(gl.TEXTURE0);
+      let texture = gl.createTexture();
+      gl.bindTexture(gl.TEXTURE_2D, texture);
+      const framebuffer = gl.createFramebuffer();
+      gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
+      gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, data);
+      gl.drawBuffers([gl.COLOR_ATTACHMENT0]);
+      let pixels = new Uint8Array(width * height * 4);
+      gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
+      this.uploadRaw(pixels, width, height, 1, offsetX, offsetY, faceIndex, miplevel);
       tmpCanvas.width = 0;
       tmpCanvas.height = 0;
     }

@@ -26,12 +26,12 @@ import {
 import {
   GPUProgramConstructParams,
   Device,
-  DeviceType,
   TextureCaps,
   MiscCaps,
   FramebufferCaps,
   ShaderCaps,
-  DeviceOptions
+  DeviceOptions,
+  DeviceResizeEvent
 } from '../device';
 import { RenderStateSet } from '../render_states';
 import { WebGPUTextureSampler } from './sampler_webgpu';
@@ -61,7 +61,6 @@ import { CommandQueueImmediate } from './commandqueue';
 import { WebGPUStructuredBuffer } from './structuredbuffer_webgpu';
 import { textureFormatInvMap } from './constants_webgpu';
 import { WebGPUBaseTexture } from './basetexture_webgpu';
-import type { VertexData } from '../vertexdata';
 import type { PBStructTypeInfo } from '../builder';
 import type { WebGPURenderPass } from './renderpass_webgpu';
 import type { WebGPUComputePass } from './computepass_webgpu';
@@ -268,8 +267,11 @@ export class WebGPUDevice extends Device {
         this._canvas.width = width;
         this._canvas.height = height;
         this.createDefaultRenderAttachments();
+        this.setViewport(null);
+        this.setScissor(null);
       }
     });
+    this.dispatchEvent(new DeviceResizeEvent(this._canvas.clientWidth, this._canvas.clientHeight));
   }
   clearFrameBuffer(clearColor: Vector4, clearDepth: number, clearStencil: number) {
     this._commandQueue.clear(clearColor, clearDepth, clearStencil);

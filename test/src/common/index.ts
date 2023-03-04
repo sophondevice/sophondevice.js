@@ -621,6 +621,13 @@ export function createTextureViewPanel(device: Device, el: RElement, width: numb
   return textureViewerPanel;
 }
 
+const RGBA = 0;
+const RGB = 1;
+const R = 2;
+const G = 3;
+const B = 4;
+const A = 5;
+
 export function initTextureViewPanel(device: Device, el: RElement, width: number) {
   el.style.display = 'flex';
   el.style.flexFlow = 'column nowrap';
@@ -634,9 +641,36 @@ export function initTextureViewPanel(device: Device, el: RElement, width: number
   textureSelect.style.padding = '5px';
   textureSelect.style.backgroundColor = '#aaa';
   el.append(textureSelect);
+  const modeSelect = el.ownerDocument.createElement<Select>('select');
+  modeSelect.id = 'select-texture-mode';
+  modeSelect.style.padding = '5px';
+  modeSelect.style.backgroundColor = '#aaa';
+  const modes = [
+    ['RGBA', RGBA],
+    ['RGB', RGB],
+    ['R', R],
+    ['G', G],
+    ['B', B],
+    ['A', A]
+  ] as const;
+  for (const mode of modes) {
+    const opt = el.ownerDocument.createElement<Option>('option');
+    opt.setAttribute('value', String(mode[1]));
+    opt.textContent = mode[0];
+    if (mode[0] === 'RGBA') {
+      opt.setAttribute('selected', 'selected');
+    }
+    modeSelect.append(opt);
+  }
+  el.append(modeSelect);
   const textureViewer = el.ownerDocument.createElement('div');
   textureViewer.style.height = '1px';
-  (textureViewer as any).viewer = new TextureView(device, textureViewer, width);
+  const tv = new TextureView(device, textureViewer, width);
+  tv.mode = RGBA;
+  modeSelect.addEventListener('change', function () {
+    tv.mode = Number(modeSelect.value);
+  });
+  (textureViewer as any).viewer = tv;
   el.append(textureViewer);
   const textureList = device.getGPUObjects().textures;
   for (const tex of textureList) {
@@ -755,6 +789,12 @@ export class TextureView {
       this._el.style.height = `${Math.max(1, Math.floor(this._width * (tex.height / tex.width)))}px`;
     }
   }
+  get mode(): number {
+    return this._mode;
+  }
+  set mode(val: number) {
+    this._mode = val;
+  }
   get width(): number {
     return this._width;
   }
@@ -797,31 +837,33 @@ export class TextureView {
       fragment() {
         this.tex = depth
           ? pb.tex2DShadow().uniform(0)
-          : pb
-              .tex2D()
-              .sampleType(unfilterableFloat ? 'unfilterable-float' : null)
-              .uniform(0);
+          : pb.tex2D().sampleType(unfilterableFloat ? 'unfilterable-float' : null).uniform(0);
         this.linearOutput = pb.int().uniform(0);
         this.mode = pb.int().uniform(0);
         this.$outputs.color = pb.vec4();
         this.$mainFunc(function () {
           this.c = pb.textureSample(this.tex, this.$inputs.uv);
-          this.$if(pb.equal(this.mode, 1), function () {
-            this.c = this.c.xxxw;
-          })
-            .$elseif(pb.equal(this.mode, 2), function () {
-              this.c = this.c.yyyw;
-            })
-            .$elseif(pb.equal(this.mode, 3), function () {
-              this.c = this.c.zzzw;
-            })
-            .$elseif(pb.equal(this.mode, 4), function () {
-              this.c = this.c.wwww;
-            });
+          this.rgb = this.c.rgb;
+          this.a = this.c.a;
+          this.$if(pb.equal(this.mode, RGB), function () {
+            this.a = 1;
+          }).$elseif(pb.equal(this.mode, R), function () {
+            this.rgb = this.rgb.rrr;
+            this.a = 1;
+          }).$elseif(pb.equal(this.mode, G), function () {
+            this.rgb = this.rgb.ggg;
+            this.a = 1;
+          }).$elseif(pb.equal(this.mode, B), function () {
+            this.rgb = this.rgb.bbb;
+            this.a = 1;
+          }).$elseif(pb.equal(this.mode, A), function() {
+            this.rgb = pb.vec3(this.a);
+            this.a = 1;
+          });
           this.$if(pb.notEqual(this.linearOutput, 0), function () {
-            this.$outputs.color = pb.vec4(pb.mul(this.c.xyz, this.c.w), this.c.w);
+            this.$outputs.color = pb.vec4(pb.mul(this.rgb, this.a), this.a);
           }).$else(function () {
-            this.$outputs.color = pb.vec4(pb.mul(pb.pow(this.c.xyz, pb.vec3(1 / 2.2)), this.c.w), this.c.w);
+            this.$outputs.color = pb.vec4(pb.mul(pb.pow(this.rgb, pb.vec3(1 / 2.2)), this.a), this.a);
           });
         });
       }
