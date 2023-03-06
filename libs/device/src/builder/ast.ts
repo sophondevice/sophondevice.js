@@ -344,7 +344,6 @@ export interface ASTContext {
   workgroupSize: [number, number, number];
 }
 
-/** @internal */
 export class ShaderAST {
   constructor() {}
   isReference(): boolean {
@@ -370,7 +369,6 @@ export class ShaderAST {
   }
 }
 
-/** @internal */
 export abstract class ASTExpression extends ShaderAST {
   abstract getType(): typeinfo.PBTypeInfo;
   abstract markWritable(): void;
@@ -379,10 +377,12 @@ export abstract class ASTExpression extends ShaderAST {
   abstract isConstExp(): boolean;
 }
 
-/** @internal */
 export class ASTFunctionParameter extends ASTExpression {
+  /** @internal */
   paramAST: ASTPrimitive | ASTReferenceOf;
+  /** @internal */
   deviceType: DeviceType;
+  /** @internal */
   writable: boolean;
   constructor(init: ASTPrimitive, deviceType: DeviceType) {
     super();
@@ -428,7 +428,6 @@ export class ASTFunctionParameter extends ASTExpression {
   }
 }
 
-/** @internal */
 export class ASTScope extends ShaderAST {
   statements: ShaderAST[];
   constructor() {
@@ -462,7 +461,6 @@ export class ASTScope extends ShaderAST {
   }
 }
 
-/** @internal */
 export class ASTNakedScope extends ASTScope {
   toWebGL(indent: string, ctx: ASTContext): string {
     return `${indent}{\n${super.toWebGL(indent + ' ', ctx)}${indent}}\n`;
@@ -475,8 +473,8 @@ export class ASTNakedScope extends ASTScope {
   }
 }
 
-/** @internal */
 export class ASTGlobalScope extends ASTScope {
+  /** @internal */
   uniforms: ASTDeclareVar[];
   constructor() {
     super();
@@ -563,11 +561,14 @@ export class ASTGlobalScope extends ASTScope {
   }
 }
 
-/** @internal */
 export class ASTPrimitive extends ASTExpression {
+  /** @internal */
   value: PBShaderExp;
+  /** @internal */
   ref: ASTExpression;
+  /** @internal */
   writable: boolean;
+  /** @internal */
   constExp: boolean;
   constructor(value: PBShaderExp) {
     super();
@@ -633,15 +634,14 @@ export class ASTPrimitive extends ASTExpression {
   }
 }
 
-/** @internal */
 export abstract class ASTLValue extends ShaderAST {
   abstract getType(): typeinfo.PBTypeInfo;
   abstract markWritable(): void;
   abstract isWritable(): boolean;
 }
 
-/** @internal */
 export class ASTLValueScalar extends ASTLValue {
+  /** @internal */
   value: ASTExpression;
   constructor(value: ASTExpression) {
     super();
@@ -679,10 +679,12 @@ export class ASTLValueScalar extends ASTLValue {
   }
 }
 
-/** @internal */
 export class ASTLValueHash extends ASTLValue {
+  /** @internal */
   scope: ASTLValueScalar | ASTLValueHash | ASTLValueArray;
+  /** @internal */
   field: string;
+  /** @internal */
   type: typeinfo.PBTypeInfo;
   constructor(
     scope: ASTLValueScalar | ASTLValueHash | ASTLValueArray,
@@ -722,10 +724,12 @@ export class ASTLValueHash extends ASTLValue {
   }
 }
 
-/** @internal */
 export class ASTLValueArray extends ASTLValue {
+  /** @internal */
   value: ASTLValueScalar | ASTLValueHash | ASTLValueArray;
+  /** @internal */
   index: ASTExpression;
+  /** @internal */
   type: typeinfo.PBTypeInfo;
   constructor(
     value: ASTLValueScalar | ASTLValueHash | ASTLValueArray,
@@ -768,8 +772,8 @@ export class ASTLValueArray extends ASTLValue {
   }
 }
 
-/** @internal */
 export class ASTLValueDeclare extends ASTLValue {
+  /** @internal */
   value: ASTPrimitive;
   constructor(value: ASTPrimitive) {
     super();
@@ -862,10 +866,12 @@ export class ASTLValueDeclare extends ASTLValue {
   }
 }
 
-/** @internal */
 export class ASTShaderExpConstructor extends ASTExpression {
+  /** @internal */
   type: typeinfo.PBTypeInfo;
+  /** @internal */
   args: (number | boolean | ASTExpression)[];
+  /** @internal */
   constExp: boolean;
   constructor(type: typeinfo.PBTypeInfo, args: (number | boolean | ASTExpression)[]) {
     super();
@@ -948,9 +954,10 @@ export class ASTShaderExpConstructor extends ASTExpression {
   }
 }
 
-/** @internal */
 export class ASTScalar extends ASTExpression {
+  /** @internal */
   value: number | boolean;
+  /** @internal */
   type: typeinfo.PBPrimitiveTypeInfo;
   constructor(value: number | boolean, type: typeinfo.PBPrimitiveTypeInfo) {
     super();
@@ -1038,10 +1045,12 @@ export class ASTScalar extends ASTExpression {
   }
 }
 
-/** @internal */
 export class ASTHash extends ASTExpression {
+  /** @internal */
   source: ASTExpression;
+  /** @internal */
   field: string;
+  /** @internal */
   type: typeinfo.PBTypeInfo;
   constructor(source: ASTExpression, field: string, type: typeinfo.PBTypeInfo) {
     super();
@@ -1086,9 +1095,10 @@ export class ASTHash extends ASTExpression {
   }
 }
 
-/** @internal */
 export class ASTCast extends ASTExpression {
+  /** @internal */
   sourceValue: ASTExpression;
+  /** @internal */
   castType: typeinfo.PBTypeInfo;
   constructor(source: ASTExpression, type: typeinfo.PBTypeInfo) {
     super();
@@ -1137,9 +1147,10 @@ export class ASTCast extends ASTExpression {
   }
 }
 
-/** @internal */
 export class ASTAddressOf extends ASTExpression {
+  /** @internal */
   value: ASTExpression;
+  /** @internal */
   type: typeinfo.PBTypeInfo;
   constructor(value: ASTExpression) {
     super();
@@ -1182,8 +1193,8 @@ export class ASTAddressOf extends ASTExpression {
   }
 }
 
-/** @internal */
 export class ASTReferenceOf extends ASTExpression {
+  /** @internal */
   value: ASTExpression | ASTLValue;
   constructor(value: ASTExpression | ASTLValue) {
     super();
@@ -1227,10 +1238,12 @@ export class ASTReferenceOf extends ASTExpression {
   }
 }
 
-/** @internal */
 export class ASTUnaryFunc extends ASTExpression {
+  /** @internal */
   value: ASTExpression;
+  /** @internal */
   op: string;
+  /** @internal */
   type: typeinfo.PBTypeInfo;
   constructor(value: ASTExpression, op: string, type: typeinfo.PBTypeInfo) {
     super();
@@ -1270,11 +1283,14 @@ export class ASTUnaryFunc extends ASTExpression {
   }
 }
 
-/** @internal */
 export class ASTBinaryFunc extends ASTExpression {
+  /** @internal */
   left: ASTExpression;
+  /** @internal */
   right: ASTExpression;
+  /** @internal */
   type: typeinfo.PBTypeInfo;
+  /** @internal */
   op: string;
   constructor(left: ASTExpression, right: ASTExpression, op: string, type: typeinfo.PBTypeInfo) {
     super();
@@ -1320,10 +1336,12 @@ export class ASTBinaryFunc extends ASTExpression {
   }
 }
 
-/** @internal */
 export class ASTArrayIndex extends ASTExpression {
+  /** @internal */
   source: ASTExpression;
+  /** @internal */
   index: ASTExpression;
+  /** @internal */
   type: typeinfo.PBTypeInfo;
   constructor(source: ASTExpression, index: ASTExpression, type: typeinfo.PBTypeInfo) {
     super();
@@ -1369,8 +1387,8 @@ export class ASTArrayIndex extends ASTExpression {
   }
 }
 
-/** @internal */
 export class ASTTouch extends ShaderAST {
+  /** @internal */
   value: ASTExpression;
   constructor(value: ASTExpression) {
     super();
@@ -1397,9 +1415,10 @@ export class ASTTouch extends ShaderAST {
   }
 }
 
-/** @internal */
 export class ASTAssignment extends ShaderAST {
+  /** @internal */
   lvalue: ASTLValue;
+  /** @internal */
   rvalue: ASTExpression | number | boolean;
   constructor(lvalue: ASTLValue, rvalue: ASTExpression | number | boolean) {
     super();
@@ -1578,7 +1597,6 @@ export class ASTAssignment extends ShaderAST {
   }
 }
 
-/** @internal */
 export class ASTDiscard extends ShaderAST {
   toWebGL(indent: string, ctx: ASTContext) {
     return `${indent}discard;\n`;
@@ -1591,7 +1609,6 @@ export class ASTDiscard extends ShaderAST {
   }
 }
 
-/** @internal */
 export class ASTBreak extends ShaderAST {
   toWebGL(indent: string, ctx: ASTContext) {
     return `${indent}break;\n`;
@@ -1604,7 +1621,6 @@ export class ASTBreak extends ShaderAST {
   }
 }
 
-/** @internal */
 export class ASTContinue extends ShaderAST {
   toWebGL(indent: string, ctx: ASTContext) {
     return `${indent}continue;\n`;
@@ -1617,8 +1633,8 @@ export class ASTContinue extends ShaderAST {
   }
 }
 
-/** @internal */
 export class ASTReturn extends ShaderAST {
+  /** @internal */
   value: ASTExpression;
   constructor(value: ASTExpression) {
     super();
@@ -1644,12 +1660,16 @@ export class ASTReturn extends ShaderAST {
   }
 }
 
-/** @internal */
 export class ASTCallFunction extends ASTExpression {
+  /** @internal */
   name: string;
+  /** @internal */
   args: ASTExpression[];
+  /** @internal */
   retType: typeinfo.PBTypeInfo;
+  /** @internal */
   func: ASTFunction;
+  /** @internal */
   isStatement: boolean;
   constructor(
     name: string,
@@ -1773,11 +1793,14 @@ export class ASTCallFunction extends ASTExpression {
   }
 }
 
-/** @internal */
 export class ASTDeclareVar extends ShaderAST {
+  /** @internal */
   value: ASTPrimitive;
+  /** @internal */
   group: number;
+  /** @internal */
   binding: number;
+  /** @internal */
   blockName: string;
   constructor(exp: ASTPrimitive) {
     super();
@@ -1923,14 +1946,20 @@ export class ASTDeclareVar extends ShaderAST {
   }
 }
 
-/** @internal */
 export class ASTFunction extends ASTScope {
+  /** @internal */
   isBuiltin: boolean;
+  /** @internal */
   isMainFunc: boolean;
+  /** @internal */
   name: string;
+  /** @internal */
   returnType: typeinfo.PBTypeInfo;
+  /** @internal */
   args: ASTFunctionParameter[];
+  /** @internal */
   funcOverloads: typeinfo.PBFunctionTypeInfo[];
+  /** @internal */
   builtins: string[];
   constructor(
     name: string,
@@ -2079,10 +2108,12 @@ export class ASTFunction extends ASTScope {
   }
 }
 
-/** @internal */
 export class ASTIf extends ASTScope {
+  /** @internal */
   keyword: string;
+  /** @internal */
   condition: ASTExpression;
+  /** @internal */
   nextElse: ASTIf;
   constructor(keyword: string, condition: ASTExpression) {
     super();
@@ -2128,11 +2159,14 @@ export class ASTIf extends ASTScope {
   }
 }
 
-/** @internal */
 export class ASTRange extends ASTScope {
+  /** @internal */
   init: ASTPrimitive;
+  /** @internal */
   start: ASTExpression;
+  /** @internal */
   end: ASTExpression;
+  /** @internal */
   open: boolean;
   constructor(init: ASTPrimitive, start: ASTExpression, end: ASTExpression, open: boolean) {
     super();
@@ -2181,8 +2215,8 @@ export class ASTRange extends ASTScope {
   }
 }
 
-/** @internal */
 export class ASTDoWhile extends ASTScope {
+  /** @internal */
   condition: ASTExpression;
   constructor(condition: ASTExpression) {
     super();
@@ -2212,8 +2246,8 @@ export class ASTDoWhile extends ASTScope {
   }
 }
 
-/** @internal */
 export class ASTWhile extends ASTScope {
+  /** @internal */
   condition: ASTExpression;
   constructor(condition: ASTExpression) {
     super();
@@ -2243,10 +2277,12 @@ export class ASTWhile extends ASTScope {
   }
 }
 
-/** @internal */
 export class ASTStructDefine extends ShaderAST {
+  /** @internal */
   type: typeinfo.PBStructTypeInfo;
+  /** @internal */
   prefix: string[];
+  /** @internal */
   builtin: boolean;
   constructor(type: typeinfo.PBStructTypeInfo, builtin: boolean) {
     super();

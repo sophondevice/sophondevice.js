@@ -6,9 +6,13 @@ export interface ITimer {
 }
 
 export class CPUTimer implements ITimer {
+  /** @internal */
   private _cpuTimer: Performance | DateConstructor;
+  /** @internal */
   private _cpuStart: number;
+  /** @internal */
   private _cpuTime: number;
+  /** @internal */
   private _ended: boolean;
   constructor() {
     this._cpuTimer = window.performance || window.Date;

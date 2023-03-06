@@ -386,13 +386,16 @@ export abstract class Device extends REventTarget {
   abstract looseContext(): void;
   abstract restoreContext(): void;
   // draw
+  /** @internal */
   protected abstract _draw(primitiveType: PrimitiveType, first: number, count: number): void;
+  /** @internal */
   protected abstract _drawInstanced(
     primitiveType: PrimitiveType,
     first: number,
     count: number,
     numInstances: number
   ): void;
+  /** @internal */
   protected abstract _compute(workgroupCountX, workgroupCountY, workgroupCountZ): void;
 
   get videoMemoryUsage(): number {

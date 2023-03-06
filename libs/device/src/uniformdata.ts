@@ -13,10 +13,15 @@ type TypedArrayConstructor<T extends TypedArray = any> = {
 };
 
 export class StructuredBufferData {
+  /** @internal */
   protected _cache: ArrayBuffer;
+  /** @internal */
   protected _buffer: StructuredBuffer;
+  /** @internal */
   protected _size: number;
+  /** @internal */
   protected _uniformMap: { [name: string]: TypedArray };
+  /** @internal */
   protected _uniformPositions: { [name: string]: [number, number] };
   constructor(layout: UniformBufferLayout, buffer?: StructuredBuffer | ArrayBuffer) {
     this._size = (layout.byteSize + 15) & ~15;
