@@ -25,11 +25,9 @@ export class WebImageLoader extends AbstractTextureLoader {
       const src = URL.createObjectURL(new Blob([data], { type: mimeType }));
       const img = document.createElement('img');
       img.src = src;
-
-      img.onload = () => {
+      img.decode().then(() => {
         createImageBitmap(img, {
-          premultiplyAlpha: 'none',
-          colorSpaceConversion: 'none'
+          premultiplyAlpha: 'none'
         }).then((bm) => {
           const options: TextureCreationOptions = {
             colorSpace: srgb ? 'srgb' : 'linear',
@@ -43,7 +41,7 @@ export class WebImageLoader extends AbstractTextureLoader {
             reject('create texture from image element failed');
           }
         });
-      };
+      });
       img.onerror = (err) => {
         reject(err);
       };

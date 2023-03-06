@@ -185,8 +185,7 @@ export class WebGPUTextureCube extends WebGPUBaseTexture implements TextureCube<
       const h = this._height;
       for (let face = 0; face < 6; face++) {
         createImageBitmap(images[face], {
-          premultiplyAlpha: 'none',
-          colorSpaceConversion: 'none'
+          premultiplyAlpha: 'none'
         }).then((bmData) => {
           this.uploadImageData(bmData, w, h, 0, 0, 0, 0);
         });

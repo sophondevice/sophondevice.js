@@ -23,7 +23,6 @@ export class WebGPURenderPass {
   private _frameBuffer: WebGPUFrameBuffer;
   private _bufferUploads: Set<WebGPUBuffer>;
   private _textureUploads: Set<WebGPUBaseTexture>;
-  private _uploadCommandEncoder: GPUCommandEncoder;
   private _renderCommandEncoder: GPUCommandEncoder;
   private _renderPassEncoder: GPURenderPassEncoder;
   private _fbBindFlag: number;
@@ -34,7 +33,6 @@ export class WebGPURenderPass {
     this._device = device;
     this._bufferUploads = new Set();
     this._textureUploads = new Set();
-    this._uploadCommandEncoder = this._device.device.createCommandEncoder();
     this._renderCommandEncoder = this._device.device.createCommandEncoder();
     this._renderPassEncoder = null;
     this._frameBuffer = null;
@@ -198,7 +196,6 @@ export class WebGPURenderPass {
       console.error('WebGPURenderPass.begin() failed: begin() has already been called');
       return;
     }
-    this._uploadCommandEncoder = this._device.device.createCommandEncoder();
     this._renderCommandEncoder = this._device.device.createCommandEncoder();
     if (!this._frameBuffer) {
       this._frameBufferInfo = {
@@ -329,8 +326,8 @@ export class WebGPURenderPass {
     }
   }
   end() {
+    this.flush();
     if (this.active) {
-      this.flush();
       if (this._frameBuffer) {
         const colorAttachmentTextures = this._frameBuffer.getColorAttachments() as WebGPUBaseTexture[];
         const depthAttachmentTexture = this._frameBuffer.getDepthAttachment() as WebGPUBaseTexture;
@@ -471,17 +468,23 @@ export class WebGPURenderPass {
       this._renderPassEncoder.end();
       this._renderPassEncoder = null;
     }
-    this._bufferUploads.forEach((buffer) => buffer.beginSyncChanges(this._uploadCommandEncoder));
-    this._textureUploads.forEach((tex) => tex.beginSyncChanges(this._uploadCommandEncoder));
-    this._device.device.queue.submit([
-      this._uploadCommandEncoder.finish(),
-      this._renderCommandEncoder.finish()
-    ]);
+    const commands: GPUCommandBuffer[] = [];
+    if (this._bufferUploads.size > 0 || this._textureUploads.size > 0) {
+      const uploadCommandEncoder = this._device.device.createCommandEncoder();
+      this._bufferUploads.forEach((buffer) => buffer.beginSyncChanges(uploadCommandEncoder));
+      this._textureUploads.forEach((tex) => tex.beginSyncChanges(uploadCommandEncoder));
+      commands.push(uploadCommandEncoder.finish());
+    }
+    if (this._renderCommandEncoder) {
+      commands.push(this._renderCommandEncoder.finish());
+    }
+    if (commands.length > 0) {
+      this._device.device.queue.submit(commands);
+    }
     this._bufferUploads.forEach((buffer) => buffer.endSyncChanges());
     this._textureUploads.forEach((tex) => tex.endSyncChanges());
     this._bufferUploads.clear();
     this._textureUploads.clear();
-    this._uploadCommandEncoder = null;
     this._renderCommandEncoder = null;
   }
 }

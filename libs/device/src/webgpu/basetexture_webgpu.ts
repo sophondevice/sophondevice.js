@@ -525,7 +525,6 @@ export abstract class WebGPUBaseTexture<
     miplevel: number,
     faceIndex: number
   ) {
-    // fixme: copyExternalImageToTexture() premultipliedAlpha: false does not work
     if (false && !this._device.isTextureUploading(this as any) &&
       this._device.device.queue.copyExternalImageToTexture
     ) {
@@ -535,9 +534,9 @@ export abstract class WebGPUBaseTexture<
         origin: {
           x: offsetX,
           y: offsetY,
-          z: faceIndex || 0
+          z: faceIndex ?? 0
         },
-        mipLevel: miplevel || 0,
+        mipLevel: miplevel ?? 0,
         premultipliedAlpha: false
       };
       this._device.device.queue.copyExternalImageToTexture({ source: data }, copyView, {
@@ -546,6 +545,7 @@ export abstract class WebGPUBaseTexture<
         depthOrArrayLayers: 1
       });
     } else {
+      /*
       // can not use getImageData() because it is not accurate
       const tmpCanvas = document.createElement('canvas');
       let gl = tmpCanvas.getContext("webgl2");
@@ -562,6 +562,17 @@ export abstract class WebGPUBaseTexture<
       this.uploadRaw(pixels, width, height, 1, offsetX, offsetY, faceIndex, miplevel);
       tmpCanvas.width = 0;
       tmpCanvas.height = 0;
+      */
+      this._pendingUploads.push({
+        image: data,
+        offsetX: offsetX,
+        offsetY: offsetY,
+        offsetZ: faceIndex ?? 0,
+        width: width,
+        height: height,
+        depth: 1,
+        mipLevel: miplevel ?? 0
+      });
     }
   }
   /** @internal */

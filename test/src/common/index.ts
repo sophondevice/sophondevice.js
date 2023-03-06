@@ -12,6 +12,7 @@ import type {
   DeviceGPUObjectRemovedEvent,
   DeviceGPUObjectRenameEvent,
   Device,
+  BaseTexture,
 } from '@sophon/device';
 
 export function getQueryString(name: string) {
@@ -663,12 +664,20 @@ export function initTextureViewPanel(device: Device, el: RElement, width: number
     modeSelect.append(opt);
   }
   el.append(modeSelect);
+  const mipLevelSelect = el.ownerDocument.createElement<Select>('select');
+  mipLevelSelect.id = 'select-miplevel';
+  mipLevelSelect.style.padding = '5px';
+  mipLevelSelect.style.backgroundColor = '#aaa';
+  el.append(mipLevelSelect);
   const textureViewer = el.ownerDocument.createElement('div');
   textureViewer.style.height = '1px';
   const tv = new TextureView(device, textureViewer, width);
   tv.mode = RGBA;
   modeSelect.addEventListener('change', function () {
     tv.mode = Number(modeSelect.value);
+  });
+  mipLevelSelect.addEventListener('change', function(){
+    tv.miplevel = Number(mipLevelSelect.value);
   });
   (textureViewer as any).viewer = tv;
   el.append(textureViewer);
@@ -686,8 +695,21 @@ export function initTextureViewPanel(device: Device, el: RElement, width: number
     (textureViewer as any).viewer.texture = texture;
   }
   textureSelect.addEventListener('change', function () {
-    const texture = device.getGPUObjectById(Number(textureSelect.value));
+    const texture = device.getGPUObjectById(Number(textureSelect.value)) as BaseTexture;
     (textureViewer as any).viewer.texture = texture;
+    (textureViewer as any).viewer.miplevel = 0;
+    while(mipLevelSelect.firstChild) {
+      mipLevelSelect.removeChild(mipLevelSelect.firstChild);
+    }
+    for (let i = 0; i < texture.mipLevelCount; i++) {
+      const opt = el.ownerDocument.createElement<Option>('option');
+      opt.setAttribute('value', String(i));
+      opt.textContent = String(i);
+      if (i === 0) {
+        opt.setAttribute('selected', 'selected');
+      }
+      mipLevelSelect.append(opt);
+    }
   });
   function onDeviceAddGPUObject(this: Device, e: REvent) {
     const evt = e as DeviceGPUObjectAddedEvent;
@@ -744,6 +766,7 @@ export class TextureView {
   private _renderStates: RenderStateSet;
   private _width: number;
   private _mode: number;
+  private _miplevel: number;
   constructor(device: Device, container: RElement, width: number) {
     this._device = device;
     this._el = container;
@@ -751,6 +774,7 @@ export class TextureView {
     this._tex = null;
     this._width = width;
     this._mode = 0;
+    this._miplevel = 0;
     this.init();
     const that = this;
     this._el.addEventListener('draw', function (this: RElement, evt: REvent) {
@@ -774,6 +798,7 @@ export class TextureView {
         bindGroup.setTexture('tex', that._tex);
         bindGroup.setValue('linearOutput', 0);
         bindGroup.setValue('mode', that._mode);
+        bindGroup.setValue('miplevel', that._miplevel);
         that._device.setBindGroup(0, bindGroup);
         that._device.setProgram(program);
         that._rect.draw();
@@ -800,6 +825,12 @@ export class TextureView {
   }
   set width(w: number) {
     this._width = w;
+  }
+  get miplevel(): number {
+    return this._miplevel;
+  }
+  set miplevel(val: number) {
+    this._miplevel = val;
   }
   private init() {
     const vb = this._device.createInterleavedVertexBuffer(['position_f32x2', 'tex0_f32x2'], new Float32Array([-1, -1, 0, 1, 1, -1, 1, 1, -1, 1, 0, 0, 1, 1, 1, 0]));
@@ -840,9 +871,10 @@ export class TextureView {
           : pb.tex2D().sampleType(unfilterableFloat ? 'unfilterable-float' : null).uniform(0);
         this.linearOutput = pb.int().uniform(0);
         this.mode = pb.int().uniform(0);
+        this.miplevel = pb.float().uniform(0);
         this.$outputs.color = pb.vec4();
         this.$mainFunc(function () {
-          this.c = pb.textureSample(this.tex, this.$inputs.uv);
+          this.c = pb.textureSampleLevel(this.tex, this.$inputs.uv, this.miplevel);
           this.rgb = this.c.rgb;
           this.a = this.c.a;
           this.$if(pb.equal(this.mode, RGB), function () {
