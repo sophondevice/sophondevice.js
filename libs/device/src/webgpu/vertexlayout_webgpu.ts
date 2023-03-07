@@ -120,7 +120,7 @@ export class WebGPUVertexLayout extends WebGPUObject<unknown> implements VertexL
     };
   }
   bind(): void {
-    this._device.setVertexData(this);
+    this._device.setVertexLayout(this);
   }
   draw(primitiveType: PrimitiveType, first: number, count: number): void {
     this.bind();

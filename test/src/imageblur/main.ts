@@ -197,7 +197,7 @@ import { GUI, ScrollBar, RValueChangeEvent, RElement } from '@sophon/dom';
     device.setProgram(fullScreenQuadProgram);
     device.setBindGroup(0, resultBindGroup);
     device.setBindGroup(1, null);
-    device.setVertexData(null);
+    device.setVertexLayout(null);
     device.draw('triangle-list', 0, 6);
   });
 

@@ -2610,10 +2610,22 @@ export class PBOutputScope extends PBScope {
           throw new Error(`type cannot be used as pipeline input/output: ${prop}`);
         }
         const location = getCurrentProgramBuilder()._outputs.length;
+        let stPrefix: string = '';
+        switch(getCurrentProgramBuilder().shaderType) {
+          case ShaderType.Vertex:
+            stPrefix = 'vs_';
+            break;
+          case ShaderType.Fragment:
+            stPrefix = 'fs_';
+            break;
+          case ShaderType.Compute:
+            stPrefix = 'cs_';
+            break;
+        }
         getCurrentProgramBuilder().out(
           location,
           prop,
-          new PBShaderExp(`${output_prefix}${prop}`, type).tag(...value.$tags)
+          new PBShaderExp(`${stPrefix}${output_prefix}${prop}`, type).tag(...value.$tags)
         );
         // modify output struct for webgpu
         if (getCurrentProgramBuilder().device.type === 'webgpu') {

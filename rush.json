@@ -448,6 +448,10 @@
       "shouldPublish": true
     },
     {
+      "packageName": "@sophon/examples",
+      "projectFolder": "examples"
+    },
+    {
       "packageName": "@sophon/test",
       "projectFolder": "test"
     }

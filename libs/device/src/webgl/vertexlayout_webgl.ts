@@ -64,11 +64,11 @@ export class WebGLVertexLayout
     }
   }
   draw(primitiveType: PrimitiveType, first: number, count: number): void {
-    this._device.setVertexData(this);
+    this._device.setVertexLayout(this);
     this._device.draw(primitiveType, first, count);
   }
   drawInstanced(primitiveType: PrimitiveType, first: number, count: number, numInstances: number): void {
-    this._device.setVertexData(this);
+    this._device.setVertexLayout(this);
     this._device.drawInstanced(primitiveType, first, count, numInstances);
   }
   isVertexLayout(): boolean {
@@ -109,7 +109,7 @@ export class WebGLVertexLayout
             loc,
             vertexType.cols,
             typeMap[vertexType.scalarType],
-            false,
+            vertexType.normalized,
             stride,
             bufferInfo.offset
           );
@@ -119,7 +119,7 @@ export class WebGLVertexLayout
             loc,
             vertexType.cols,
             typeMap[vertexType.scalarType],
-            false,
+            vertexType.normalized,
             stride,
             drawOffset * stride + bufferInfo.offset
           );

@@ -1,0 +1,62 @@
+{
+  "name": "@sophon/examples",
+  "version": "0.0.1",
+  "description": "sophondevice examples",
+  "homepage": "https://github.com/sophondevice/sophondevice#readme",
+  "private": "true",
+  "files": [
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sophondevice/sophondevice.git"
+  },
+  "scripts": {
+    "copy-assets": "shx mkdir -p dist/js && shx cp -R src/assets dist && shx cp src/index.html dist",
+    "clean": "shx rm -rf dist",
+    "build": "npm run clean && cross-env NODE_OPTIONS=--max_old_space_size=8192 rollup -c",
+    "dev-test": "web-dev-server --port 8000 --open dist/index.html",
+    "lint": "eslint src --ext .ts",
+    "lint-fix": "eslint src --ext .ts --fix"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.51.0",
+    "@typescript-eslint/parser": "^5.51.0",
+    "@web/dev-server": "^0.1.35",
+    "eslint": "^8.33.0",
+    "eslint-config-prettier": "^8.6.0",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-tsdoc": "^0.2.17",
+    "typedoc": "^0.23.24",
+    "@babel/core": "^7.20.12",
+    "@babel/preset-env": "^7.20.2",
+    "@rollup/plugin-babel": "^6.0.3",
+    "@rollup/plugin-node-resolve": "^15.0.1",
+    "@rollup/plugin-strip": "^3.0.2",
+    "@rollup/plugin-terser": "^0.4.0",
+    "rollup-plugin-typescript2": "^0.34.1",
+    "@rollup/pluginutils": "^5.0.2",
+    "rollup": "^3.15.0",
+    "rollup-plugin-dts": "^5.2.0",
+    "rollup-plugin-copy": "^3.4.0",
+    "prettier": "^2.8.4",
+    "replace": "^1.2.2",
+    "run-script-os": "^1.1.6",
+    "shx": "^0.3.4",
+    "cross-env": "^7.0.3",
+    "typescript": "^4.7.3",
+    "tslib": "^2.5.0"
+  },
+  "dependencies": {
+    "@types/colors": "^1.2.1",
+    "@types/diff": "^5.0.2",
+    "@webgpu/types": "^0.1.26",
+    "colors": "^1.4.0",
+    "diff": "^5.0.0",
+    "@sophon/base": "workspace:*",
+    "@sophon/device": "workspace:*",
+    "@sophon/scene": "workspace:*",
+    "@sophon/dom": "workspace:*"
+  }
+}

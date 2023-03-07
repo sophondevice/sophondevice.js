@@ -485,7 +485,7 @@ export class WebGLDevice extends Device {
   getProgram(): GPUProgram {
     return this._currentProgram;
   }
-  setVertexData(vertexData: VertexLayout) {
+  setVertexLayout(vertexData: VertexLayout) {
     this._currentVertexData = vertexData as WebGLVertexLayout;
   }
   getVertexData(): VertexLayout {

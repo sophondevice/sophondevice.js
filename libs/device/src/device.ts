@@ -372,7 +372,7 @@ export abstract class Device extends REventTarget {
   abstract getScissor(): number[];
   abstract setProgram(program: GPUProgram): void;
   abstract getProgram(): GPUProgram;
-  abstract setVertexData(vertexData: VertexLayout): void;
+  abstract setVertexLayout(vertexData: VertexLayout): void;
   abstract getVertexData(): VertexLayout;
   abstract setRenderStates(renderStates: RenderStateSet): void;
   abstract getRenderStates(): RenderStateSet;
