@@ -155,8 +155,8 @@ export class Select extends RElement {
     this._hiddenInput.style.pointerEvents = 'auto';
     this._hiddenInput.style.left = `${l}px`;
     this._hiddenInput.style.top = `${t}px`;
-    this._hiddenInput.style.width = `${this.getRect().width}px`;
-    this._hiddenInput.style.height = `${this.getRect().height}px`;
+    this._hiddenInput.style.width = `${this.getRect().z}px`;
+    this._hiddenInput.style.height = `${this.getRect().w}px`;
     this._hiddenInput.style.font = `${this._getCachedFont().size}px ${this._getCachedFont().family}`;
   }
   /** @internal */

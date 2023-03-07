@@ -123,7 +123,7 @@ new HemiSphericLight(scene, null)
     camera.setProjectionMatrix(
       Matrix4x4.perspective(
         camera.getFOV(),
-        rect.width / rect.height,
+        rect.z / rect.w,
         camera.getNearPlane(),
         camera.getFarPlane()
       )

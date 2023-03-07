@@ -1,15 +1,13 @@
-import { REvent } from '@sophon/base';
+import { REvent, ColorRGBA, Tuple4 } from '@sophon/base';
 import { RRectPrimitive } from '../primitive';
 import { RElement } from '../element';
 import { RAttributeChangeEvent, RMouseEvent, RValueChangeEvent, RElementLayoutEvent } from '../events';
 import type { GUI } from '../gui';
 import type { StyleSheet } from '../style';
-import type { UIRect } from '../layout';
-import type { RColor } from '../types';
 
 export class Slider extends RElement {
   /** @internal */
-  protected _blockRect: UIRect;
+  protected _blockRect: Tuple4;
   /** @internal */
   protected _lastX: number;
   /** @internal */
@@ -23,7 +21,7 @@ export class Slider extends RElement {
   /** @internal */
   protected _draggingBlock: boolean;
   /** @internal */
-  protected _blockColor: RColor;
+  protected _blockColor: ColorRGBA;
   constructor(uiscene: GUI) {
     super(uiscene);
     this._blockRect = null;
@@ -42,8 +40,8 @@ export class Slider extends RElement {
         this._blockRect &&
         data.offsetX >= this._blockRect.x &&
         data.offsetY >= this._blockRect.y &&
-        data.offsetX < this._blockRect.x + this._blockRect.width &&
-        data.offsetY < this._blockRect.y + this._blockRect.height
+        data.offsetX < this._blockRect.x + this._blockRect.z &&
+        data.offsetY < this._blockRect.y + this._blockRect.w
       ) {
         this.setCapture();
         this._lastX = data.offsetX;
@@ -69,14 +67,14 @@ export class Slider extends RElement {
         const my = data.offsetY;
         let ratio: number;
         if (isVertical) {
-          const freeSpace = clientRect.height - this.blockSize;
+          const freeSpace = clientRect.w - this.blockSize;
           this._blockRect.y = Math.max(
             clientRect.y,
             Math.min(clientRect.y + freeSpace, this._lastRectY + my - this._lastY)
           );
           ratio = (this._blockRect.y - clientRect.y) / freeSpace;
         } else {
-          const freeSpace = clientRect.width - this.blockSize;
+          const freeSpace = clientRect.z - this.blockSize;
           this._blockRect.x = Math.max(
             clientRect.x,
             Math.min(clientRect.x + freeSpace, this._lastRectX + mx - this._lastX)
@@ -183,8 +181,8 @@ export class Slider extends RElement {
         new RRectPrimitive(
           this._blockRect.x,
           this._blockRect.y,
-          this._blockRect.width,
-          this._blockRect.height,
+          this._blockRect.z,
+          this._blockRect.w,
           uvMin?.x || 0,
           uvMin?.y || 0,
           uvMax?.x || 0,
@@ -203,7 +201,7 @@ export class Slider extends RElement {
     const rangeMax = this.rangeStart < this.rangeEnd ? this.rangeEnd : this.rangeStart;
     const value = Math.max(Math.min(this.value, rangeMax), rangeMin);
     const clientRect = this._layout.clientRect;
-    const freeSpace = (isVertical ? clientRect.height : clientRect.width) - this.blockSize;
+    const freeSpace = (isVertical ? clientRect.w : clientRect.z) - this.blockSize;
     if (freeSpace < 0) {
       return -1;
     }
@@ -223,7 +221,7 @@ export class Slider extends RElement {
     }
     const isVertical = this.orientation === 'vertical';
     const clientRect = this.getClientRect();
-    const freeSpace = (isVertical ? clientRect.height : clientRect.width) - this.blockSize;
+    const freeSpace = (isVertical ? clientRect.w : clientRect.z) - this.blockSize;
     if (freeSpace < 0) {
       this._blockRect = null;
       return;
@@ -231,8 +229,8 @@ export class Slider extends RElement {
     this._blockRect = {
       x: isVertical ? clientRect.x : clientRect.x + this._blockPos,
       y: isVertical ? clientRect.y + this._blockPos : clientRect.y,
-      width: isVertical ? clientRect.width : blockSize,
-      height: isVertical ? blockSize : clientRect.height
+      z: isVertical ? clientRect.z : blockSize,
+      w: isVertical ? blockSize : clientRect.w
     };
     this._buildBlockVertexData();
   }

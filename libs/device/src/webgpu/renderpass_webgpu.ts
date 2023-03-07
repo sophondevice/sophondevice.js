@@ -326,19 +326,44 @@ export class WebGPURenderPass {
     }
   }
   end() {
-    this.flush();
-    if (this.active) {
-      if (this._frameBuffer) {
-        const colorAttachmentTextures = this._frameBuffer.getColorAttachments() as WebGPUBaseTexture[];
-        const depthAttachmentTexture = this._frameBuffer.getDepthAttachment() as WebGPUBaseTexture;
-        for (const texture of colorAttachmentTextures) {
-          texture._markAsCurrentFB(false);
-          if (texture.mipLevelCount > 1) {
-            texture.generateMipmaps();
-          }
+    const commands: GPUCommandBuffer[] = [];
+    // upload the resources needed for this rendering pass
+    if (this._bufferUploads.size > 0 || this._textureUploads.size > 0) {
+      const uploadCommandEncoder = this._device.device.createCommandEncoder();
+      this._bufferUploads.forEach((buffer) => buffer.beginSyncChanges(uploadCommandEncoder));
+      this._textureUploads.forEach((tex) => tex.beginSyncChanges(uploadCommandEncoder));
+      commands.push(uploadCommandEncoder.finish());
+    }
+    // finish current render pass command
+    if (this._renderPassEncoder) {
+      this._renderPassEncoder.end();
+      this._renderPassEncoder = null;
+    }
+    // render commands
+    if (this._renderCommandEncoder) {
+      commands.push(this._renderCommandEncoder.finish());
+      this._renderCommandEncoder = null;
+    }
+    // submit to GPU
+    if (commands.length > 0) {
+      this._device.device.queue.submit(commands);
+    }
+    // free up resource upload buffers
+    this._bufferUploads.forEach((buffer) => buffer.endSyncChanges());
+    this._textureUploads.forEach((tex) => tex.endSyncChanges());
+    this._bufferUploads.clear();
+    this._textureUploads.clear();
+    // unmark render target flags and generate render target mipmaps if needed
+    if (this._frameBuffer) {
+      const colorAttachmentTextures = this._frameBuffer.getColorAttachments() as WebGPUBaseTexture[];
+      const depthAttachmentTexture = this._frameBuffer.getDepthAttachment() as WebGPUBaseTexture;
+      for (const texture of colorAttachmentTextures) {
+        texture._markAsCurrentFB(false);
+        if (texture.mipLevelCount > 1) {
+          texture.generateMipmaps();
         }
-        depthAttachmentTexture?._markAsCurrentFB(false);
       }
+      depthAttachmentTexture?._markAsCurrentFB(false);
     }
   }
   private drawInternal(
@@ -462,29 +487,5 @@ export class WebGPURenderPass {
       }
     }
     return true;
-  }
-  private flush() {
-    if (this._renderPassEncoder) {
-      this._renderPassEncoder.end();
-      this._renderPassEncoder = null;
-    }
-    const commands: GPUCommandBuffer[] = [];
-    if (this._bufferUploads.size > 0 || this._textureUploads.size > 0) {
-      const uploadCommandEncoder = this._device.device.createCommandEncoder();
-      this._bufferUploads.forEach((buffer) => buffer.beginSyncChanges(uploadCommandEncoder));
-      this._textureUploads.forEach((tex) => tex.beginSyncChanges(uploadCommandEncoder));
-      commands.push(uploadCommandEncoder.finish());
-    }
-    if (this._renderCommandEncoder) {
-      commands.push(this._renderCommandEncoder.finish());
-    }
-    if (commands.length > 0) {
-      this._device.device.queue.submit(commands);
-    }
-    this._bufferUploads.forEach((buffer) => buffer.endSyncChanges());
-    this._textureUploads.forEach((tex) => tex.endSyncChanges());
-    this._bufferUploads.clear();
-    this._textureUploads.clear();
-    this._renderCommandEncoder = null;
   }
 }

@@ -42,7 +42,7 @@ import { GLTFViewer } from './gltfviewer';
   */
   sceneView.addEventListener('layout', function (this: RElement) {
     const rect = this.getClientRect();
-    gltfViewer.aspect = rect.width / rect.height;
+    gltfViewer.aspect = rect.z / rect.w;
   });
 
   sceneView.addEventListener('draw', function (this: RElement, evt: REvent) {

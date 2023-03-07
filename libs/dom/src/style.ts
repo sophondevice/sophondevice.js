@@ -1,5 +1,5 @@
 import * as Yoga from './typeflex/api';
-import type { RColor } from './types';
+import type { ColorRGBA } from '@sophon/base';
 
 const colorNames = {
   aliceblue: '#f0f8ff',
@@ -488,8 +488,8 @@ interface NodeLayout {
   updateFontSize(val: string): void;
   updateFontFamily(val: string): void;
   updateFontColor(val: string): void;
-  updateBorderColor(edge: number, val: RColor): void;
-  updateBackgroundColor(val: RColor): void;
+  updateBorderColor(edge: number, val: ColorRGBA): void;
+  updateBackgroundColor(val: ColorRGBA): void;
   updateBorder(val: number): void;
   invalidateLayout(): void;
 }
@@ -519,13 +519,13 @@ export class ElementStyle {
     this._stylesheet = {};
     this._setNonInline = false;
   }
-  static get defaultBackgroundColor(): RColor {
+  static get defaultBackgroundColor(): ColorRGBA {
     return { r: 0, g: 0, b: 0, a: 0 };
   }
-  static get defaultBorderColor(): RColor {
+  static get defaultBorderColor(): ColorRGBA {
     return { r: 0, g: 0, b: 0, a: 1 };
   }
-  static get defaultFontColor(): RColor {
+  static get defaultFontColor(): ColorRGBA {
     return { r: 0, g: 0, b: 0, a: 1 };
   }
   get display(): string {
@@ -1719,10 +1719,10 @@ export class ElementStyle {
     this._setNonInline = false;
   }
   /** @internal */
-  parseColor(input: string): RColor {
+  parseColor(input: string): ColorRGBA {
     input = input.trim().toLowerCase();
     input = colorNames[input] || input;
-    let v: RColor = null;
+    let v: ColorRGBA = null;
     if (input.substr(0, 1) == '#') {
       const collen = (input.length - 1) / 3;
       const fact = [17, 1, 0.062272][collen - 1];

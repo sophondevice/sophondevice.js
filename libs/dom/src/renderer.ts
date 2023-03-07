@@ -1,4 +1,4 @@
-import { Matrix4x4, Vector3, Vector4, REventTarget } from '@sophon/base';
+import { Matrix4x4, Vector3, Vector4, ColorRGBA, REventTarget } from '@sophon/base';
 import { RMouseEvent, RDragEvent, RKeyEvent } from './events';
 import type {
   BindGroup,
@@ -10,7 +10,6 @@ import type {
   VertexLayout,
   VertexLayoutOptions
 } from '@sophon/device';
-import type { RColor } from './types';
 import type { GUI } from './gui';
 import type { RNode } from './node';
 
@@ -129,7 +128,7 @@ export class GUIRenderer extends REventTarget {
   supportColorComposition(): boolean {
     return true;
   }
-  createTexture(width: number, height: number, color: RColor, linear: boolean): Texture2D {
+  createTexture(width: number, height: number, color: ColorRGBA, linear: boolean): Texture2D {
     const tex = this._device.createTexture2D('rgba8unorm', width, height, {
       colorSpace: linear ? 'linear' : 'srgb',
       noMipmap: true
@@ -139,7 +138,7 @@ export class GUIRenderer extends REventTarget {
     }
     return tex;
   }
-  clearTexture(tex: Texture2D, color: RColor) {
+  clearTexture(tex: Texture2D, color: ColorRGBA) {
     const pixels = new Uint8Array(tex.width * tex.height * 4);
     const r = Math.round(color.r * 255);
     const g = Math.round(color.g * 255);
@@ -291,16 +290,16 @@ export class GUIRenderer extends REventTarget {
     const pos = node.toAbsolute({ x: 0, y: 0 });
     const posClient = { x: pos.x + rect.x, y: pos.y + rect.y };
     let x = posClient.x;
-    let y = height - posClient.y - rect.height;
-    const w = rect.width;
-    const h = rect.height;
+    let y = height - posClient.y - rect.w;
+    const w = rect.z;
+    const h = rect.w;
     this.pushViewport(x, y, w, h);
     const cliprect = node.getClippedRect() || rect;
     if (cliprect) {
       x = cliprect.x + pos.x;
-      y = height - cliprect.y - pos.y - cliprect.height;
+      y = height - cliprect.y - pos.y - cliprect.w;
     }
-    this.pushScissor(x, y, cliprect.width, cliprect.height);
+    this.pushScissor(x, y, cliprect.z, cliprect.w);
   }
   endCustomDraw(node: RNode) {
     this.popScissor();

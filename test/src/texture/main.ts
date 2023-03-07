@@ -27,7 +27,7 @@ const testVideo = false;
       evt.preventDefault();
       device.clearFrameBuffer(new Vector4(0, 0, 0.5, 1), 1, 0);
       const rect = this.getClientRect();
-      case2d.draw(rect.width, rect.height);
+      case2d.draw(rect.z, rect.w);
     });
   }
   if (test3D) {
@@ -41,7 +41,7 @@ const testVideo = false;
       device.clearFrameBuffer(new Vector4(0, 0, 0.5, 1), 1, 0);
       if (device.type !== 'webgl') {
         const rect = this.getClientRect();
-        case3d.draw(rect.width, rect.height);
+        case3d.draw(rect.z, rect.w);
       }
     });
   }
@@ -54,7 +54,7 @@ const testVideo = false;
       evt.preventDefault();
       device.clearFrameBuffer(new Vector4(0, 0, 0.5, 1), 1, 0);
       const rect = this.getClientRect();
-      caseCube.draw(rect.width, rect.height);
+      caseCube.draw(rect.z, rect.w);
     });
   }
   if (test2DArray) {
@@ -68,7 +68,7 @@ const testVideo = false;
       device.clearFrameBuffer(new Vector4(0, 0, 0.5, 1), 1, 0);
       if (device.type !== 'webgl') {
         const rect = this.getClientRect();
-        case2dArray.draw(rect.width, rect.height);
+        case2dArray.draw(rect.z, rect.w);
       }
     });  
   }
@@ -81,7 +81,7 @@ const testVideo = false;
       evt.preventDefault();
       device.clearFrameBuffer(new Vector4(0, 0, 0.5, 1), 1, 0);
       const rect = this.getClientRect();
-      caseVideo.draw(rect.width, rect.height);
+      caseVideo.draw(rect.z, rect.w);
     });
   }
 

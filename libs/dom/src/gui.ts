@@ -1,11 +1,11 @@
-import { REvent, REventTarget, HttpRequest } from '@sophon/base';
+import { REvent, REventTarget, HttpRequest, ColorRGBA, Tuple4 } from '@sophon/base';
 import * as Yoga from './typeflex/api';
 import { injectGUIEvents, GUIRenderer } from './renderer';
-import { RColor, GUIEventPathBuilder } from './types';
+import { GUIEventPathBuilder } from './types';
 import { GlyphManager, GlyphInfo } from './glyph_manager';
 import { ImageManager } from './image_manager';
 import { GUIHitTestVisitor } from './hittest_visitor';
-import { UILayout, UIRect } from './layout';
+import { UILayout } from './layout';
 import { RNode } from './node';
 import { RText } from './components/text';
 import { RDocument } from './document';
@@ -368,7 +368,7 @@ export class GUI extends REventTarget {
   /** @internal */
   protected _hoverElements: { element: RNode; x: number; y: number }[];
   /** @internal */
-  protected _bounds: UIRect;
+  protected _bounds: Tuple4;
   /** @internal */
   protected _rendererWidth: number;
   /** @internal */
@@ -414,7 +414,7 @@ export class GUI extends REventTarget {
   /** @internal */
   protected _httpRequest: HttpRequest;
 
-  constructor(device: Device, bounds?: UIRect) {
+  constructor(device: Device, bounds?: Tuple4) {
     super(new GUIEventPathBuilder());
     this._renderer = new GUIRenderer(device);
     this._drawVisitor = new DrawVisitor(this);
@@ -456,8 +456,8 @@ export class GUI extends REventTarget {
     this._topLayout.node.setPositionType(Yoga.POSITION_TYPE_ABSOLUTE);
     this._topLayout.node.setPosition(Yoga.EDGE_LEFT, this._bounds ? this._bounds.x : 0);
     this._topLayout.node.setPosition(Yoga.EDGE_TOP, this._bounds ? this._bounds.y : 0);
-    this._topLayout.node.setWidth(this._bounds ? this._bounds.width : this._rendererWidth);
-    this._topLayout.node.setHeight(this._bounds ? this._bounds.height : this._rendererHeight);
+    this._topLayout.node.setWidth(this._bounds ? this._bounds.z : this._rendererWidth);
+    this._topLayout.node.setHeight(this._bounds ? this._bounds.w : this._rendererHeight);
     (this._renderer as any).device?.addEventListener('device_restored', () => {
       this._invalidateTextContents();
     });
@@ -689,19 +689,19 @@ export class GUI extends REventTarget {
   get renderer() {
     return this._renderer;
   }
-  get bounds(): UIRect {
+  get bounds(): Tuple4 {
     return this._bounds;
   }
   get httpRequest(): HttpRequest {
     return this._httpRequest;
   }
-  set bounds(rect: UIRect) {
+  set bounds(rect: Tuple4) {
     this._bounds = rect ? { ...rect } : null;
     this._topLayout.node.setPosition(Yoga.EDGE_LEFT, this._bounds ? this._bounds.x : 0);
     this._topLayout.node.setPosition(Yoga.EDGE_TOP, this._bounds ? this._bounds.y : 0);
-    this._topLayout.node.setWidth(this._bounds ? this._bounds.width : this._renderer.getDrawingBufferWidth());
+    this._topLayout.node.setWidth(this._bounds ? this._bounds.z : this._renderer.getDrawingBufferWidth());
     this._topLayout.node.setHeight(
-      this._bounds ? this._bounds.height : this._renderer.getDrawingBufferHeight()
+      this._bounds ? this._bounds.w : this._renderer.getDrawingBufferHeight()
     );
     this.invalidateLayout();
   }
@@ -1045,7 +1045,7 @@ export class GUI extends REventTarget {
     return this._glyphManager.getGlyphTexture(index);
   }
   /** @internal */
-  _getGlyphInfo(char: string, font: Font, color: RColor): GlyphInfo {
+  _getGlyphInfo(char: string, font: Font, color: ColorRGBA): GlyphInfo {
     return this._glyphManager.getGlyphInfo(char, font, color);
   }
   /** @internal */

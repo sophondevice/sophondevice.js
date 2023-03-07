@@ -43,7 +43,9 @@ function getTargetES6(input, output) {
     },
     plugins: [
       nodeResolve(),
-      typescript(),
+      typescript({
+        check: true
+      }),
       babel({
         babelHelpers: 'bundled',
         babelrc: false,

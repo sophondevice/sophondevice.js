@@ -1,17 +1,9 @@
-import { List, ListIterator } from '@sophon/base';
+import { List, ListIterator, Tuple2, Tuple4, ColorRGBA } from '@sophon/base';
 import * as Yoga from './typeflex/api';
 import { YGSize } from './typeflex/yoga';
 import type { RNode } from './node';
-import type { RCoord, RColor } from './types';
 import type { YGNode } from './typeflex/yoga';
 import type { YGMeasureMode } from './typeflex/enums';
-
-export interface UIRect {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-}
 
 const yogaConfig = Yoga.Config.create();
 yogaConfig.config.useWebDefaults = true;
@@ -19,11 +11,11 @@ yogaConfig.config.useWebDefaults = true;
 /** @internal */
 export class UILayout {
   element: RNode;
-  actualRect: UIRect;
-  clientRect: UIRect;
-  borderRect: UIRect;
-  clippedRect: UIRect;
-  scrollRect: UIRect;
+  actualRect: Tuple4;
+  clientRect: Tuple4;
+  borderRect: Tuple4;
+  clippedRect: Tuple4;
+  scrollRect: Tuple4;
   desiredScrollX: number;
   desiredScrollY: number;
   actualScrollX: number;
@@ -42,11 +34,11 @@ export class UILayout {
     this._parent = null;
     this._children = new List<UILayout>();
     this._iterator = null;
-    this.actualRect = { x: 0, y: 0, width: 0, height: 0 };
-    this.clientRect = { x: 0, y: 0, width: 0, height: 0 };
-    this.borderRect = { x: 0, y: 0, width: 0, height: 0 };
+    this.actualRect = { x: 0, y: 0, z: 0, w: 0 };
+    this.clientRect = { x: 0, y: 0, z: 0, w: 0 };
+    this.borderRect = { x: 0, y: 0, z: 0, w: 0 };
     this.clippedRect = null;
-    this.scrollRect = { x: 0, y: 0, width: 0, height: 0 };
+    this.scrollRect = { x: 0, y: 0, z: 0, w: 0 };
     this.desiredScrollX = 0;
     this.desiredScrollY = 0;
     this.actualScrollX = 0;
@@ -69,12 +61,12 @@ export class UILayout {
           const rc = element._measureContentSize({
             x: 0,
             y: 0,
-            width: 0,
-            height: 0
+            z: 0,
+            w: 0
           });
           const size = new YGSize();
-          size.width = rc.width;
-          size.height = rc.height;
+          size.width = rc.z;
+          size.height = rc.w;
           return size;
         }
       );
@@ -184,7 +176,7 @@ export class UILayout {
   updateFontColor(val: string): void {
     this.element._updateFontColor(val);
   }
-  updateBorderColor(edge: number, val: RColor): void {
+  updateBorderColor(edge: number, val: ColorRGBA): void {
     switch (edge) {
       case Yoga.EDGE_LEFT:
         this.element._updateBorderLeftColor(val);
@@ -200,7 +192,7 @@ export class UILayout {
         break;
     }
   }
-  updateBackgroundColor(val: RColor): void {
+  updateBackgroundColor(val: ColorRGBA): void {
     this.element._updateBackgroundColor(val);
   }
   protected syncComputedRect(px: number, py: number, markChanged: boolean) {
@@ -218,59 +210,59 @@ export class UILayout {
     const y = this.node.getComputedTop() - py;
     const w = this.node.getComputedWidth();
     const h = this.node.getComputedHeight();
-    if (!markChanged && (x !== rect.x || y !== rect.y || w !== rect.width || h !== rect.height)) {
+    if (!markChanged && (x !== rect.x || y !== rect.y || w !== rect.z || h !== rect.w)) {
       markChanged = true;
     }
     rect.x = x;
     rect.y = y;
-    rect.width = w;
-    rect.height = h;
+    rect.z = w;
+    rect.w = h;
 
     const clientRect = this.clientRect;
     const cx = paddingLeft + borderLeft;
     const cy = paddingTop + borderTop;
-    const cw = Math.max(0, rect.width - paddingLeft - paddingRight - borderLeft - borderRight);
-    const ch = Math.max(0, rect.height - paddingTop - paddingBottom - borderTop - borderBottom);
+    const cw = Math.max(0, rect.z - paddingLeft - paddingRight - borderLeft - borderRight);
+    const ch = Math.max(0, rect.w - paddingTop - paddingBottom - borderTop - borderBottom);
     if (
       !markChanged &&
-      (cx !== clientRect.x || cy !== clientRect.y || cw !== clientRect.width || ch !== clientRect.height)
+      (cx !== clientRect.x || cy !== clientRect.y || cw !== clientRect.z || ch !== clientRect.w)
     ) {
       markChanged = true;
     }
     clientRect.x = cx;
     clientRect.y = cy;
-    clientRect.width = cw;
-    clientRect.height = ch;
+    clientRect.z = cw;
+    clientRect.w = ch;
 
     const borderRect = this.borderRect;
     const bx = borderLeft;
     const by = borderTop;
-    const bw = Math.max(0, rect.width - borderLeft - borderRight);
-    const bh = Math.max(0, rect.height - borderTop - borderBottom);
+    const bw = Math.max(0, rect.z - borderLeft - borderRight);
+    const bh = Math.max(0, rect.w - borderTop - borderBottom);
     if (
       !markChanged &&
-      (bx !== borderRect.x || by !== borderRect.y || bw !== borderRect.width || bh !== borderRect.height)
+      (bx !== borderRect.x || by !== borderRect.y || bw !== borderRect.z || bh !== borderRect.w)
     ) {
       markChanged = true;
     }
     borderRect.x = bx;
     borderRect.y = by;
-    borderRect.width = bw;
-    borderRect.height = bh;
+    borderRect.z = bw;
+    borderRect.w = bh;
 
     this.actualScrollX = 0;
     this.actualScrollY = 0;
     let minX = 0;
     let minY = 0;
-    let maxX = clientRect.width;
-    let maxY = clientRect.height;
+    let maxX = clientRect.z;
+    let maxY = clientRect.w;
     this._children.forEach((child) => {
       if (child.element._isVisible()) {
         child.syncComputedRect(paddingLeft + borderLeft, paddingTop + borderTop, markChanged);
         const x1 = child.actualRect.x;
         const y1 = child.actualRect.y;
-        const x2 = x1 + child.actualRect.width;
-        const y2 = y1 + child.actualRect.height;
+        const x2 = x1 + child.actualRect.z;
+        const y2 = y1 + child.actualRect.w;
         minX = Math.min(minX, x1);
         minY = Math.min(minY, y1);
         maxX = Math.max(maxX, x2);
@@ -280,24 +272,24 @@ export class UILayout {
     this.scrollRect = {
       x: minX,
       y: minY,
-      width: maxX - minX,
-      height: maxY - minY
+      z: maxX - minX,
+      w: maxY - minY
     };
     this.minScrollX = this.scrollRect.x;
-    this.maxScrollX = this.scrollRect.x + this.scrollRect.width - clientRect.width;
+    this.maxScrollX = this.scrollRect.x + this.scrollRect.z - clientRect.z;
     this.minScrollY = this.scrollRect.y;
-    this.maxScrollY = this.scrollRect.y + this.scrollRect.height - clientRect.height;
+    this.maxScrollY = this.scrollRect.y + this.scrollRect.w - clientRect.w;
 
     if (markChanged) {
       this.changeStamp++;
     }
   }
-  thisToParentClient(p: RCoord): RCoord {
+  thisToParentClient(p: Tuple2): Tuple2 {
     p.x += this.actualRect.x;
     p.y += this.actualRect.y;
     return p;
   }
-  thisToParent(p: RCoord): RCoord {
+  thisToParent(p: Tuple2): Tuple2 {
     this.thisToParentClient(p);
     if (this._parent) {
       p.x += this._parent.clientRect.x;
@@ -305,25 +297,25 @@ export class UILayout {
     }
     return p;
   }
-  clipRectForChildren(): UIRect {
+  clipRectForChildren(): Tuple4 {
     const rcClient = this.clientRect;
     if (this.clippedRect) {
       const x = Math.max(rcClient.x, this.clippedRect.x);
       const y = Math.max(rcClient.y, this.clippedRect.y);
-      const width = Math.max(
+      const z = Math.max(
         0,
-        Math.min(this.clippedRect.x + this.clippedRect.width, rcClient.x + rcClient.width) - x
+        Math.min(this.clippedRect.x + this.clippedRect.z, rcClient.x + rcClient.z) - x
       );
-      const height = Math.max(
+      const w = Math.max(
         0,
-        Math.min(this.clippedRect.y + this.clippedRect.height, rcClient.y + rcClient.height) - y
+        Math.min(this.clippedRect.y + this.clippedRect.w, rcClient.y + rcClient.w) - y
       );
-      return { x, y, width, height };
+      return { x, y, z, w };
     } else {
       return rcClient;
     }
   }
-  toAbsolute(v?: RCoord): RCoord {
+  toAbsolute(v?: Tuple2): Tuple2 {
     v = v || { x: 0, y: 0 };
     let layout: UILayout = this;
     v.x += layout.actualRect.x;
@@ -334,18 +326,18 @@ export class UILayout {
     }
     return v;
   }
-  clipToParent(parent: UILayout): UIRect {
-    const parentRect: UIRect = parent.clipRectForChildren();
+  clipToParent(parent: UILayout): Tuple4 {
+    const parentRect: Tuple4 = parent.clipRectForChildren();
     const vThis = this.toAbsolute({ x: 0, y: 0 });
     const vParent = parent.toAbsolute({ x: parentRect.x, y: parentRect.y });
     const x1This = vThis.x;
     const y1This = vThis.y;
-    const x2This = x1This + this.actualRect.width;
-    const y2This = y1This + this.actualRect.height;
+    const x2This = x1This + this.actualRect.z;
+    const y2This = y1This + this.actualRect.w;
     const x1Parent = vParent.x;
     const y1Parent = vParent.y;
-    const x2Parent = x1Parent + parentRect.width;
-    const y2Parent = y1Parent + parentRect.height;
+    const x2Parent = x1Parent + parentRect.z;
+    const y2Parent = y1Parent + parentRect.w;
     const x1Clip = Math.max(x1This, x1Parent);
     const y1Clip = Math.max(y1This, y1Parent);
     const x2Clip = Math.min(x2This, x2Parent);
@@ -353,8 +345,8 @@ export class UILayout {
     return {
       x: x1Clip - x1This,
       y: y1Clip - y1This,
-      width: Math.max(0, x2Clip - x1Clip),
-      height: Math.max(0, y2Clip - y1Clip)
+      z: Math.max(0, x2Clip - x1Clip),
+      w: Math.max(0, y2Clip - y1Clip)
     };
   }
   calcLayoutScroll() {
@@ -377,8 +369,8 @@ export class UILayout {
   }
   calcLayoutClip() {
     let parent: UILayout = this._parent;
-    let xClip: UIRect = null;
-    let yClip: UIRect = null;
+    let xClip: Tuple4 = null;
+    let yClip: Tuple4 = null;
     if (!this._isClipX()) {
       while (parent && !parent._isClipX()) {
         parent = parent._parent;
@@ -407,14 +399,14 @@ export class UILayout {
       this.clippedRect = {
         x: xClip.x,
         y: yClip.y,
-        width: xClip.width,
-        height: yClip.height
+        z: xClip.z,
+        w: yClip.w
       };
     }
     if (
       this.clippedRect &&
-      this.clippedRect.width === this.actualRect.width &&
-      this.clippedRect.height === this.actualRect.height
+      this.clippedRect.z === this.actualRect.z &&
+      this.clippedRect.w === this.actualRect.w
     ) {
       this.clippedRect = null;
     }
@@ -424,8 +416,8 @@ export class UILayout {
         markChanged =
           this.clippedRect.x !== lastClippedRect.x ||
           this.clippedRect.y !== lastClippedRect.y ||
-          this.clippedRect.width !== lastClippedRect.width ||
-          this.clippedRect.height !== lastClippedRect.height;
+          this.clippedRect.z !== lastClippedRect.z ||
+          this.clippedRect.w !== lastClippedRect.w;
       } else {
         markChanged = true;
       }

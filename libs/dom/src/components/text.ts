@@ -1,10 +1,9 @@
-import { REvent } from '@sophon/base';
+import { REvent, Tuple4 } from '@sophon/base';
 import { RRectPrimitive } from '../primitive';
 import { RNode } from '../node';
 import { RTextEvent, RAttributeChangeEvent } from '../events';
 import type { GUI } from '../gui';
 import type { StyleSheet } from '../style';
-import type { UIRect } from '../layout';
 
 export class RText extends RNode {
   /** @internal */
@@ -129,34 +128,34 @@ export class RText extends RNode {
     return { line: l, pos: c };
   }
   /** @internal */
-  _measureContentSize(rc: UIRect): UIRect {
+  _measureContentSize(rc: Tuple4): Tuple4 {
     const lines = this._splitContent();
     const font = this._getCachedFont();
     const lineHeight = (this.lineHeight >= 0 ? this.lineHeight : -this.lineHeight * font.maxHeight) | 0;
     const charMargin = this.charMargin;
     const autoWrap = this.autoWrap;
-    if (rc.width === 0 && rc.height === 0) {
+    if (rc.z === 0 && rc.w === 0) {
       for (const line of lines) {
-        rc.width = Math.max(rc.width, this._uiscene._measureStringWidth(line, charMargin, font));
-        rc.height += lineHeight;
+        rc.z = Math.max(rc.z, this._uiscene._measureStringWidth(line, charMargin, font));
+        rc.w += lineHeight;
       }
-    } else if (rc.height === 0) {
+    } else if (rc.w === 0) {
       for (const line of lines) {
         let start = 0;
         if (line.length === 0) {
-          rc.height += lineHeight;
+          rc.w += lineHeight;
         } else {
           while (start < line.length) {
             start += autoWrap
-              ? Math.max(1, this._uiscene._clipStringToWidth(line, rc.width, charMargin, start, font))
+              ? Math.max(1, this._uiscene._clipStringToWidth(line, rc.z, charMargin, start, font))
               : line.length;
-            rc.height += lineHeight;
+            rc.w += lineHeight;
           }
         }
       }
-    } else if (rc.width === 0) {
+    } else if (rc.z === 0) {
       for (const line of lines) {
-        rc.width = Math.max(rc.width, this._uiscene._measureStringWidth(line, charMargin, font));
+        rc.z = Math.max(rc.z, this._uiscene._measureStringWidth(line, charMargin, font));
       }
     }
     return rc;
@@ -256,7 +255,7 @@ export class RText extends RNode {
                   1,
                   this._uiscene._clipStringToWidth(
                     line,
-                    this._layout.clientRect.width,
+                    this._layout.clientRect.z,
                     charMargin,
                     start,
                     font

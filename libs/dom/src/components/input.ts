@@ -248,7 +248,7 @@ export class Input extends RElement {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let el: any = this._uiscene.renderer.getCanvas();
     const v = this.toAbsolute({ x: 0, y: 0 });
-    let t = v.y + this.getRect().height;
+    let t = v.y + this.getRect().w;
     let l = v.x;
     if (el instanceof HTMLCanvasElement) {
       t += el.offsetTop;
@@ -259,7 +259,7 @@ export class Input extends RElement {
       }
     }
     if (this.type === 'color') {
-      t -= this.getRect().height;
+      t -= this.getRect().w;
       this._hiddenInput.style.transform = '';
       this._hiddenInput.style.pointerEvents = 'auto';
     } else {
@@ -268,8 +268,8 @@ export class Input extends RElement {
     }
     this._hiddenInput.style.left = `${l}px`;
     this._hiddenInput.style.top = `${t}px`;
-    this._hiddenInput.style.width = `${this.getRect().width}px`;
-    this._hiddenInput.style.height = `${this.getRect().height}px`;
+    this._hiddenInput.style.width = `${this.getRect().z}px`;
+    this._hiddenInput.style.height = `${this.getRect().w}px`;
     this._hiddenInput.style.font = `${this._getCachedFont().size}px ${this._getCachedFont().family}`;
   }
   /** @internal */
@@ -316,7 +316,7 @@ export class Input extends RElement {
       const v = this.toAbsolute({ x: 0, y: 0 });
       this._cursorBatch = new RPrimitiveBatchList(v.x, v.y);
       this._cursorBatch.addPrimitive(
-        new RRectPrimitive(x, this.getClientRect().y - 2, 1, this.getClientRect().height, 0, 0, 0, 0),
+        new RRectPrimitive(x, this.getClientRect().y - 2, 1, this.getClientRect().w, 0, 0, 0, 0),
         clipper,
         null,
         this._getCachedFontColor()

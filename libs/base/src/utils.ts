@@ -85,3 +85,27 @@ export class HttpRequest {
     return new Blob([arrayBuffer]);
   }
 }
+
+export interface Tuple2 {
+  x: number;
+  y: number;
+}
+
+export interface Tuple3 {
+  x: number;
+  y: number;
+  z: number;
+}
+export interface Tuple4 {
+  x: number;
+  y: number;
+  z: number;
+  w: number;
+}
+
+export interface ColorRGBA {
+  r: number;
+  g: number;
+  b: number;
+  a: number;
+}

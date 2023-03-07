@@ -1,5 +1,4 @@
-import { UIRect } from './layout';
-import { RColor } from './types';
+import type { ColorRGBA, Tuple4 } from '@sophon/base';
 import type { Texture2D } from '@sophon/device';
 
 export abstract class RPrimitive {
@@ -230,7 +229,7 @@ export class RPrimitiveBatchList {
   }
   clone(transformOptions?: {
     textureTransformFunc?: (t: Texture2D) => Texture2D;
-    colorTransformFunc?: (c: RColor) => RColor;
+    colorTransformFunc?: (c: ColorRGBA) => ColorRGBA;
   }): RPrimitiveBatchList {
     const copy = new RPrimitiveBatchList(this._absoluteX, this._absoluteY);
     copy._batchList = this._batchList.map((bv) => {
@@ -269,7 +268,7 @@ export class RPrimitiveBatchList {
       this._needUpdate = true;
     }
   }
-  addPrimitive(prim: RPrimitive, clipper: UIRect, tex?: Texture2D, color?: RColor) {
+  addPrimitive(prim: RPrimitive, clipper: Tuple4, tex?: Texture2D, color?: ColorRGBA) {
     if (prim && clipper) {
       tex = tex || null;
       color = color || { r: 1, g: 1, b: 1, a: 1 };
@@ -312,14 +311,14 @@ export class RPrimitiveBatchList {
 
 export class RPrimitiveBatch {
   /** @internal */
-  private _clippedRect: UIRect;
+  private _clippedRect: Tuple4;
   /** @internal */
   private _tex: Texture2D;
   /** @internal */
-  private _color: RColor;
+  private _color: ColorRGBA;
   /** @internal */
   private _primitives: RPrimitive[];
-  constructor(clipper: UIRect) {
+  constructor(clipper: Tuple4) {
     if (!clipper) {
       throw new Error('Failed to construct RPrimitiveBatch: clipper must not be null');
     }
@@ -334,10 +333,10 @@ export class RPrimitiveBatch {
   set texture(tex: Texture2D) {
     this._tex = tex;
   }
-  get color(): RColor {
+  get color(): ColorRGBA {
     return this._color;
   }
-  set color(clr: RColor) {
+  set color(clr: ColorRGBA) {
     clr = clr || { r: 1, g: 1, b: 1, a: 1 };
     this._color.r = clr.r;
     this._color.g = clr.g;
@@ -349,7 +348,7 @@ export class RPrimitiveBatch {
   }
   clone(transformOptions?: {
     textureTransformFunc?: (t: Texture2D) => Texture2D;
-    colorTransformFunc?: (c: RColor) => RColor;
+    colorTransformFunc?: (c: ColorRGBA) => ColorRGBA;
   }): RPrimitiveBatch {
     const copy = new RPrimitiveBatch({ ...this._clippedRect });
     copy._tex = transformOptions?.textureTransformFunc
@@ -370,8 +369,8 @@ export class RPrimitiveBatch {
         prim = prim.clipToRect(
           this._clippedRect.x,
           this._clippedRect.y,
-          this._clippedRect.width,
-          this._clippedRect.height
+          this._clippedRect.z,
+          this._clippedRect.w
         );
       }
       if (prim) {
@@ -379,15 +378,15 @@ export class RPrimitiveBatch {
       }
     }
   }
-  setClipper(rect: UIRect) {
+  setClipper(rect: Tuple4) {
     this._clippedRect = rect ? { ...rect } : null;
   }
-  isSameClipper(rc: UIRect) {
+  isSameClipper(rc: Tuple4) {
     return (
       rc.x !== this._clippedRect.x ||
       rc.y !== this._clippedRect.y ||
-      rc.width !== this._clippedRect.width ||
-      rc.height !== this._clippedRect.height
+      rc.z !== this._clippedRect.z ||
+      rc.w !== this._clippedRect.w
     );
   }
   clear() {

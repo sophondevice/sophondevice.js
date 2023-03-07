@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { REventTarget, REvent, REventListener, REventHandlerOptions } from '@sophon/base';
-import { RCoord, RColor, GUIEventPathBuilder } from './types';
+import { REventTarget, REvent, REventListener, REventHandlerOptions, Tuple2, Tuple4, ColorRGBA } from '@sophon/base';
+import { GUIEventPathBuilder } from './types';
 import { RRectPrimitive, RPolygonPrimitive, RPrimitiveBatchList } from './primitive';
 import { RNodeList, RLiveNodeList } from './nodelist';
-import { UIRect, UILayout } from './layout';
+import { UILayout } from './layout';
 import { unescapeCSSString, ElementStyle, StyleSheet } from './style';
 import {
   RValueChangeEvent,
@@ -98,17 +98,17 @@ export class RNode extends REventTarget {
   /** @internal */
   protected _loadingTextures: unknown[];
   /** @internal */
-  protected _backgroundColor: RColor;
+  protected _backgroundColor: ColorRGBA;
   /** @internal */
   protected _backgroundImage: TextureAtlas;
   /** @internal */
-  protected _borderLeftColor: RColor;
+  protected _borderLeftColor: ColorRGBA;
   /** @internal */
-  protected _borderTopColor: RColor;
+  protected _borderTopColor: ColorRGBA;
   /** @internal */
-  protected _borderRightColor: RColor;
+  protected _borderRightColor: ColorRGBA;
   /** @internal */
-  protected _borderBottomColor: RColor;
+  protected _borderBottomColor: ColorRGBA;
   /** @internal */
   protected _style: ElementStyle;
   /** @internal */
@@ -124,7 +124,7 @@ export class RNode extends REventTarget {
   /** @internal */
   protected _cachedFontFamily: string;
   /** @internal */
-  protected _fontColor: RColor;
+  protected _fontColor: ColorRGBA;
   /** @internal */
   protected _customDraw: boolean;
   /** @internal */
@@ -314,19 +314,19 @@ export class RNode extends REventTarget {
       this._syncLayout();
     }
   }
-  getRect(): UIRect {
+  getRect(): Tuple4 {
     this._uiscene.updateLayout();
     return this._layout.actualRect;
   }
-  getClippedRect(): UIRect {
+  getClippedRect(): Tuple4 {
     this._uiscene.updateLayout();
     return this._layout.clippedRect;
   }
-  getClientRect(): UIRect {
+  getClientRect(): Tuple4 {
     this._uiscene.updateLayout();
     return this._layout.clientRect;
   }
-  getBorderRect(): UIRect {
+  getBorderRect(): Tuple4 {
     this._uiscene.updateLayout();
     return this._layout.borderRect;
   }
@@ -564,8 +564,8 @@ export class RNode extends REventTarget {
     if (this._contentDirty) {
       this._contentDirty = false;
       this._batchList.clear();
-      const w = this._layout.actualRect.width;
-      const h = this._layout.actualRect.height;
+      const w = this._layout.actualRect.z;
+      const h = this._layout.actualRect.w;
       if (w > 0 && h > 0) {
         const v = this.toAbsolute({ x: 0, y: 0 });
         this._batchList.x = v.x;
@@ -590,7 +590,7 @@ export class RNode extends REventTarget {
       this._draw(renderer);
     }
   }
-  toAbsolute(v?: RCoord): RCoord {
+  toAbsolute(v?: Tuple2): Tuple2 {
     return this._layout.toAbsolute(v);
   }
   /** @internal */
@@ -613,7 +613,7 @@ export class RNode extends REventTarget {
     return this._font;
   }
   /** @internal */
-  _getCachedFontColor(): RColor {
+  _getCachedFontColor(): ColorRGBA {
     return this._fontColor || this.parentNode?._getCachedFontColor() || ElementStyle.defaultFontColor;
   }
   /** @internal */
@@ -683,7 +683,7 @@ export class RNode extends REventTarget {
     this._hide = val === 'none';
   }
   /** @internal */
-  _updateBorderLeftColor(val: RColor): void {
+  _updateBorderLeftColor(val: ColorRGBA): void {
     this._borderLeftColor.r = val.r;
     this._borderLeftColor.g = val.g;
     this._borderLeftColor.b = val.b;
@@ -691,7 +691,7 @@ export class RNode extends REventTarget {
     this._invalidateContent();
   }
   /** @internal */
-  _updateBorderTopColor(val: RColor): void {
+  _updateBorderTopColor(val: ColorRGBA): void {
     this._borderTopColor.r = val.r;
     this._borderTopColor.g = val.g;
     this._borderTopColor.b = val.b;
@@ -699,7 +699,7 @@ export class RNode extends REventTarget {
     this._invalidateContent();
   }
   /** @internal */
-  _updateBorderRightColor(val: RColor): void {
+  _updateBorderRightColor(val: ColorRGBA): void {
     this._borderRightColor.r = val.r;
     this._borderRightColor.g = val.g;
     this._borderRightColor.b = val.b;
@@ -707,7 +707,7 @@ export class RNode extends REventTarget {
     this._invalidateContent();
   }
   /** @internal */
-  _updateBorderBottomColor(val: RColor): void {
+  _updateBorderBottomColor(val: ColorRGBA): void {
     this._borderBottomColor.r = val.r;
     this._borderBottomColor.g = val.g;
     this._borderBottomColor.b = val.b;
@@ -715,7 +715,7 @@ export class RNode extends REventTarget {
     this._invalidateContent();
   }
   /** @internal */
-  _updateBackgroundColor(val: RColor): void {
+  _updateBackgroundColor(val: ColorRGBA): void {
     this._backgroundColor.r = val.r;
     this._backgroundColor.g = val.g;
     this._backgroundColor.b = val.b;
@@ -822,23 +822,23 @@ export class RNode extends REventTarget {
     this._syncLayout();
   }
   /** @internal */
-  _getClipper(clipToClient: boolean): UIRect {
-    const clipper: UIRect =
+  _getClipper(clipToClient: boolean): Tuple4 {
+    const clipper: Tuple4 =
       this._layout.clippedRect ||
       (clipToClient
         ? this._layout.clientRect
         : {
             x: 0,
             y: 0,
-            width: this._layout.actualRect.width,
-            height: this._layout.actualRect.height
+            z: this._layout.actualRect.z,
+            w: this._layout.actualRect.w
           });
-    return clipper.width > 0 && clipper.height > 0 ? clipper : null;
+    return clipper.z > 0 && clipper.w > 0 ? clipper : null;
   }
   /** @internal */
-  _measureContentSize(rc: UIRect): UIRect {
-    rc.width = 0;
-    rc.height = 0;
+  _measureContentSize(rc: Tuple4): Tuple4 {
+    rc.z = 0;
+    rc.w = 0;
     return rc;
   }
   /** @internal */
@@ -916,14 +916,14 @@ export class RNode extends REventTarget {
   }
   /** @internal */
   protected _buildVertexData() {
-    const w = this._layout.actualRect.width;
-    const h = this._layout.actualRect.height;
+    const w = this._layout.actualRect.z;
+    const h = this._layout.actualRect.w;
     const img = this._backgroundImage;
     let drawPatch9 = !!(img?.topLeftPatch9 && img?.bottomRightPatch9);
     if (drawPatch9) {
       if (
-        img.topLeftPatch9.x + img.bottomRightPatch9.x > this._layout.actualRect.height ||
-        img.topLeftPatch9.y + img.bottomRightPatch9.y > this._layout.actualRect.width
+        img.topLeftPatch9.x + img.bottomRightPatch9.x > this._layout.actualRect.w ||
+        img.topLeftPatch9.y + img.bottomRightPatch9.y > this._layout.actualRect.z
       ) {
         drawPatch9 = false;
       }
@@ -1208,18 +1208,18 @@ export class RNode extends REventTarget {
       overflowX === 'scroll' ||
       (overflowX === 'auto' &&
         this._layout.scrollRect !== null &&
-        this._layout.scrollRect.width > this._layout.actualRect.width);
+        this._layout.scrollRect.z > this._layout.actualRect.z);
     let yOverflow =
       overflowY === 'scroll' ||
       (overflowY === 'auto' &&
         this._layout.scrollRect !== null &&
-        this._layout.scrollRect.height > this._layout.actualRect.height);
+        this._layout.scrollRect.w > this._layout.actualRect.w);
     const scrollBarSize = 12;
     const blockSize = 8;
     const buttonSize = 12;
     if (xOverflow) {
-      const width = yOverflow ? this._layout.clientRect.width - scrollBarSize : this._layout.clientRect.width;
-      if (this._layout.clientRect.height < scrollBarSize || width < 2 * buttonSize + blockSize) {
+      const width = yOverflow ? this._layout.clientRect.z - scrollBarSize : this._layout.clientRect.z;
+      if (this._layout.clientRect.w < scrollBarSize || width < 2 * buttonSize + blockSize) {
         xOverflow = false;
       } else {
         if (!this._hScroll) {
@@ -1243,8 +1243,8 @@ export class RNode extends REventTarget {
         this._hScroll.style.left = this._layout.clientRect.x - this._layout.borderRect.x;
         this._hScroll.style.width = width;
         this._hScroll.style.bottom =
-          this._layout.borderRect.height -
-          this._layout.clientRect.height -
+          this._layout.borderRect.w -
+          this._layout.clientRect.w -
           this._layout.clientRect.y +
           this._layout.borderRect.y;
       }
@@ -1255,9 +1255,9 @@ export class RNode extends REventTarget {
     }
     if (yOverflow) {
       const height = xOverflow
-        ? this._layout.clientRect.height - scrollBarSize
-        : this._layout.clientRect.height;
-      if (this._layout.clientRect.width < scrollBarSize || height < 2 * buttonSize + blockSize) {
+        ? this._layout.clientRect.w - scrollBarSize
+        : this._layout.clientRect.w;
+      if (this._layout.clientRect.z < scrollBarSize || height < 2 * buttonSize + blockSize) {
         yOverflow = false;
       } else {
         if (!this._vScroll) {
@@ -1281,8 +1281,8 @@ export class RNode extends REventTarget {
         this._vScroll.style.top = this._layout.clientRect.y - this._layout.borderRect.y;
         this._vScroll.style.height = height;
         this._vScroll.style.right =
-          this._layout.borderRect.width -
-          this._layout.clientRect.width -
+          this._layout.borderRect.z -
+          this._layout.clientRect.z -
           this._layout.clientRect.x +
           this._layout.borderRect.x;
       }

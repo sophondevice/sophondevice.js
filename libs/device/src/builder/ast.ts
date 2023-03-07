@@ -1,6 +1,21 @@
 import { ShaderType } from '../base_types';
 import { semanticToAttrib } from '../gpuobject';
-import * as typeinfo from './types';
+import {
+  typeI32,
+  typeU32,
+  typeF32,
+  typeBool,
+  TypeInfo,
+  PBTextureTypeInfo,
+  PBPrimitiveType,
+  PBPrimitiveTypeInfo,
+  PBTextureType,
+  PBTypeInfo,
+  PBAddressSpace,
+  PBPointerTypeInfo,
+  PBFunctionTypeInfo,
+  PBStructTypeInfo
+} from './types';
 import * as errors from './errors';
 import type { PBGlobalScope } from './programbuilder';
 import type { PBShaderExp } from './base';
@@ -91,35 +106,35 @@ export function getBuiltinOutputStructName(shaderType: ShaderType) {
 }
 
 /** @internal */
-export function getTextureSampleType(type: typeinfo.PBTextureTypeInfo): typeinfo.PBPrimitiveTypeInfo {
+export function getTextureSampleType(type: PBTextureTypeInfo): PBPrimitiveTypeInfo {
   switch (type.textureType) {
-    case typeinfo.PBTextureType.TEX_1D:
-    case typeinfo.PBTextureType.TEX_STORAGE_1D:
-    case typeinfo.PBTextureType.TEX_2D:
-    case typeinfo.PBTextureType.TEX_STORAGE_2D:
-    case typeinfo.PBTextureType.TEX_2D_ARRAY:
-    case typeinfo.PBTextureType.TEX_STORAGE_2D_ARRAY:
-    case typeinfo.PBTextureType.TEX_3D:
-    case typeinfo.PBTextureType.TEX_STORAGE_3D:
-    case typeinfo.PBTextureType.TEX_CUBE:
-    case typeinfo.PBTextureType.TEX_EXTERNAL:
-      return new typeinfo.PBPrimitiveTypeInfo(typeinfo.PBPrimitiveType.F32VEC4);
-    case typeinfo.PBTextureType.TEX_DEPTH_2D_ARRAY:
-    case typeinfo.PBTextureType.TEX_DEPTH_2D:
-    case typeinfo.PBTextureType.TEX_DEPTH_CUBE:
-      return new typeinfo.PBPrimitiveTypeInfo(typeinfo.PBPrimitiveType.F32);
-    case typeinfo.PBTextureType.ITEX_2D_ARRAY:
-    case typeinfo.PBTextureType.ITEX_1D:
-    case typeinfo.PBTextureType.ITEX_2D:
-    case typeinfo.PBTextureType.ITEX_3D:
-    case typeinfo.PBTextureType.ITEX_CUBE:
-      return new typeinfo.PBPrimitiveTypeInfo(typeinfo.PBPrimitiveType.I32);
-    case typeinfo.PBTextureType.UTEX_2D_ARRAY:
-    case typeinfo.PBTextureType.UTEX_1D:
-    case typeinfo.PBTextureType.UTEX_2D:
-    case typeinfo.PBTextureType.UTEX_3D:
-    case typeinfo.PBTextureType.UTEX_CUBE:
-      return new typeinfo.PBPrimitiveTypeInfo(typeinfo.PBPrimitiveType.U32);
+    case PBTextureType.TEX_1D:
+    case PBTextureType.TEX_STORAGE_1D:
+    case PBTextureType.TEX_2D:
+    case PBTextureType.TEX_STORAGE_2D:
+    case PBTextureType.TEX_2D_ARRAY:
+    case PBTextureType.TEX_STORAGE_2D_ARRAY:
+    case PBTextureType.TEX_3D:
+    case PBTextureType.TEX_STORAGE_3D:
+    case PBTextureType.TEX_CUBE:
+    case PBTextureType.TEX_EXTERNAL:
+      return new PBPrimitiveTypeInfo(PBPrimitiveType.F32VEC4);
+    case PBTextureType.TEX_DEPTH_2D_ARRAY:
+    case PBTextureType.TEX_DEPTH_2D:
+    case PBTextureType.TEX_DEPTH_CUBE:
+      return new PBPrimitiveTypeInfo(PBPrimitiveType.F32);
+    case PBTextureType.ITEX_2D_ARRAY:
+    case PBTextureType.ITEX_1D:
+    case PBTextureType.ITEX_2D:
+    case PBTextureType.ITEX_3D:
+    case PBTextureType.ITEX_CUBE:
+      return new PBPrimitiveTypeInfo(PBPrimitiveType.I32);
+    case PBTextureType.UTEX_2D_ARRAY:
+    case PBTextureType.UTEX_1D:
+    case PBTextureType.UTEX_2D:
+    case PBTextureType.UTEX_3D:
+    case PBTextureType.UTEX_CUBE:
+      return new PBPrimitiveTypeInfo(PBPrimitiveType.U32);
     default:
       return null;
   }
@@ -145,27 +160,27 @@ export const builtinVariables = {
   webgl: {
     position: {
       name: 'gl_Position',
-      type: new typeinfo.PBPrimitiveTypeInfo(typeinfo.PBPrimitiveType.F32VEC4),
+      type: new PBPrimitiveTypeInfo(PBPrimitiveType.F32VEC4),
       stage: 'vertex'
     },
     pointSize: {
       name: 'gl_PointSize',
-      type: new typeinfo.PBPrimitiveTypeInfo(typeinfo.PBPrimitiveType.F32),
+      type: new PBPrimitiveTypeInfo(PBPrimitiveType.F32),
       stage: 'vertex'
     },
     fragCoord: {
       name: 'gl_FragCoord',
-      type: new typeinfo.PBPrimitiveTypeInfo(typeinfo.PBPrimitiveType.F32VEC4),
+      type: new PBPrimitiveTypeInfo(PBPrimitiveType.F32VEC4),
       stage: 'fragment'
     },
     frontFacing: {
       name: 'gl_FrontFacing',
-      type: new typeinfo.PBPrimitiveTypeInfo(typeinfo.PBPrimitiveType.BOOL),
+      type: new PBPrimitiveTypeInfo(PBPrimitiveType.BOOL),
       stage: 'fragment'
     },
     fragDepth: {
       name: 'gl_FragDepthEXT',
-      type: new typeinfo.PBPrimitiveTypeInfo(typeinfo.PBPrimitiveType.F32),
+      type: new PBPrimitiveTypeInfo(PBPrimitiveType.F32),
       inOrOut: 'out',
       extension: 'GL_EXT_frag_depth',
       stage: 'fragment'
@@ -175,40 +190,40 @@ export const builtinVariables = {
     vertexIndex: {
       name: 'gl_VertexID',
       semantic: 'vertex_index',
-      type: new typeinfo.PBPrimitiveTypeInfo(typeinfo.PBPrimitiveType.U32),
+      type: new PBPrimitiveTypeInfo(PBPrimitiveType.U32),
       inOrOut: 'in',
       stage: 'vertex'
     },
     instanceIndex: {
       name: 'gl_InstanceID',
       semantic: 'instance_index',
-      type: new typeinfo.PBPrimitiveTypeInfo(typeinfo.PBPrimitiveType.U32),
+      type: new PBPrimitiveTypeInfo(PBPrimitiveType.U32),
       inOrOut: 'in',
       stage: 'vertex'
     },
     position: {
       name: 'gl_Position',
-      type: new typeinfo.PBPrimitiveTypeInfo(typeinfo.PBPrimitiveType.F32VEC4),
+      type: new PBPrimitiveTypeInfo(PBPrimitiveType.F32VEC4),
       stage: 'vertex'
     },
     pointSize: {
       name: 'gl_PointSize',
-      type: new typeinfo.PBPrimitiveTypeInfo(typeinfo.PBPrimitiveType.F32),
+      type: new PBPrimitiveTypeInfo(PBPrimitiveType.F32),
       stage: 'vertex'
     },
     fragCoord: {
       name: 'gl_FragCoord',
-      type: new typeinfo.PBPrimitiveTypeInfo(typeinfo.PBPrimitiveType.F32VEC4),
+      type: new PBPrimitiveTypeInfo(PBPrimitiveType.F32VEC4),
       stage: 'fragment'
     },
     frontFacing: {
       name: 'gl_FrontFacing',
-      type: new typeinfo.PBPrimitiveTypeInfo(typeinfo.PBPrimitiveType.BOOL),
+      type: new PBPrimitiveTypeInfo(PBPrimitiveType.BOOL),
       stage: 'fragment'
     },
     fragDepth: {
       name: 'gl_FragDepth',
-      type: new typeinfo.PBPrimitiveTypeInfo(typeinfo.PBPrimitiveType.F32),
+      type: new PBPrimitiveTypeInfo(PBPrimitiveType.F32),
       stage: 'fragment'
     }
   },
@@ -216,91 +231,91 @@ export const builtinVariables = {
     vertexIndex: {
       name: 'ch_builtin_vertexIndex',
       semantic: 'vertex_index',
-      type: new typeinfo.PBPrimitiveTypeInfo(typeinfo.PBPrimitiveType.U32),
+      type: new PBPrimitiveTypeInfo(PBPrimitiveType.U32),
       inOrOut: 'in',
       stage: 'vertex'
     },
     instanceIndex: {
       name: 'ch_builtin_instanceIndex',
       semantic: 'instance_index',
-      type: new typeinfo.PBPrimitiveTypeInfo(typeinfo.PBPrimitiveType.U32),
+      type: new PBPrimitiveTypeInfo(PBPrimitiveType.U32),
       inOrOut: 'in',
       stage: 'vertex'
     },
     position: {
       name: 'ch_builtin_position',
       semantic: 'position',
-      type: new typeinfo.PBPrimitiveTypeInfo(typeinfo.PBPrimitiveType.F32VEC4),
+      type: new PBPrimitiveTypeInfo(PBPrimitiveType.F32VEC4),
       inOrOut: 'out',
       stage: 'vertex'
     },
     fragCoord: {
       name: 'ch_builtin_fragCoord',
       semantic: 'position',
-      type: new typeinfo.PBPrimitiveTypeInfo(typeinfo.PBPrimitiveType.F32VEC4),
+      type: new PBPrimitiveTypeInfo(PBPrimitiveType.F32VEC4),
       inOrOut: 'in',
       stage: 'fragment'
     },
     frontFacing: {
       name: 'ch_builtin_frontFacing',
       semantic: 'front_facing',
-      type: new typeinfo.PBPrimitiveTypeInfo(typeinfo.PBPrimitiveType.BOOL),
+      type: new PBPrimitiveTypeInfo(PBPrimitiveType.BOOL),
       inOrOut: 'in',
       stage: 'fragment'
     },
     fragDepth: {
       name: 'ch_builtin_fragDepth',
       semantic: 'frag_depth',
-      type: new typeinfo.PBPrimitiveTypeInfo(typeinfo.PBPrimitiveType.F32),
+      type: new PBPrimitiveTypeInfo(PBPrimitiveType.F32),
       inOrOut: 'out',
       stage: 'fragment'
     },
     localInvocationId: {
       name: 'ch_builtin_localInvocationId',
       semantic: 'local_invocation_id',
-      type: new typeinfo.PBPrimitiveTypeInfo(typeinfo.PBPrimitiveType.U32VEC3),
+      type: new PBPrimitiveTypeInfo(PBPrimitiveType.U32VEC3),
       inOrOut: 'in',
       stage: 'compute'
     },
     globalInvocationId: {
       name: 'ch_builtin_globalInvocationId',
       semantic: 'global_invocation_id',
-      type: new typeinfo.PBPrimitiveTypeInfo(typeinfo.PBPrimitiveType.U32VEC3),
+      type: new PBPrimitiveTypeInfo(PBPrimitiveType.U32VEC3),
       inOrOut: 'in',
       stage: 'compute'
     },
     workGroupId: {
       name: 'ch_builtin_workGroupId',
       semantic: 'workgroup_id',
-      type: new typeinfo.PBPrimitiveTypeInfo(typeinfo.PBPrimitiveType.U32VEC3),
+      type: new PBPrimitiveTypeInfo(PBPrimitiveType.U32VEC3),
       inOrOut: 'in',
       stage: 'compute'
     },
     numWorkGroups: {
       name: 'ch_builtin_numWorkGroups',
       semantic: 'num_workgroups',
-      type: new typeinfo.PBPrimitiveTypeInfo(typeinfo.PBPrimitiveType.U32VEC3),
+      type: new PBPrimitiveTypeInfo(PBPrimitiveType.U32VEC3),
       inOrOut: 'in',
       stage: 'compute'
     },
     sampleMaskIn: {
       name: 'ch_builtin_sampleMaskIn',
       semantic: 'sample_mask_in',
-      type: new typeinfo.PBPrimitiveTypeInfo(typeinfo.PBPrimitiveType.U32),
+      type: new PBPrimitiveTypeInfo(PBPrimitiveType.U32),
       inOrOut: 'in',
       stage: 'fragment'
     },
     sampleMaskOut: {
       name: 'ch_builtin_sampleMaskOut',
       semantic: 'sample_mask_out',
-      type: new typeinfo.PBPrimitiveTypeInfo(typeinfo.PBPrimitiveType.U32),
+      type: new PBPrimitiveTypeInfo(PBPrimitiveType.U32),
       inOrOut: 'out',
       stage: 'fragment'
     },
     sampleIndex: {
       name: 'ch_builtin_sampleIndex',
       semantic: 'sample_index',
-      type: new typeinfo.PBPrimitiveTypeInfo(typeinfo.PBPrimitiveType.U32),
+      type: new PBPrimitiveTypeInfo(PBPrimitiveType.U32),
       inOrOut: 'in',
       stage: 'fragment'
     }
@@ -328,7 +343,6 @@ function unbracket(e: string): string {
   }
 }
 
-/** @internal */
 export interface ASTContext {
   type: ShaderType;
   mrt: boolean;
@@ -338,7 +352,7 @@ export interface ASTContext {
   inputs: ShaderAST[];
   outputs: ShaderAST[];
   types: ShaderAST[];
-  typeReplacement: Map<PBShaderExp, typeinfo.PBTypeInfo>;
+  typeReplacement: Map<PBShaderExp, PBTypeInfo>;
   global: PBGlobalScope;
   vertexAttributes: number[];
   workgroupSize: [number, number, number];
@@ -352,7 +366,7 @@ export class ShaderAST {
   isPointer(): boolean {
     return !!this.getType()?.isPointerType();
   }
-  getType(): typeinfo.PBTypeInfo {
+  getType(): PBTypeInfo {
     return null;
   }
   toWebGL(indent: string, ctx: ASTContext): string {
@@ -370,10 +384,10 @@ export class ShaderAST {
 }
 
 export abstract class ASTExpression extends ShaderAST {
-  abstract getType(): typeinfo.PBTypeInfo;
+  abstract getType(): PBTypeInfo;
   abstract markWritable(): void;
   abstract isWritable(): boolean;
-  abstract getAddressSpace(): typeinfo.PBAddressSpace;
+  abstract getAddressSpace(): PBAddressSpace;
   abstract isConstExp(): boolean;
 }
 
@@ -390,15 +404,15 @@ export class ASTFunctionParameter extends ASTExpression {
     this.deviceType = deviceType;
     this.writable = false;
   }
-  getType(): typeinfo.PBTypeInfo<typeinfo.TypeInfo> {
+  getType(): PBTypeInfo<TypeInfo> {
     return this.paramAST.getType();
   }
   markWritable(): void {
     if (this.paramAST instanceof ASTPrimitive) {
       if (this.deviceType === 'webgpu') {
-        this.paramAST.value.$typeinfo = new typeinfo.PBPointerTypeInfo(
+        this.paramAST.value.$typeinfo = new PBPointerTypeInfo(
           this.paramAST.value.$typeinfo,
-          typeinfo.PBAddressSpace.UNKNOWN
+          PBAddressSpace.UNKNOWN
         );
       }
       this.paramAST = new ASTReferenceOf(this.paramAST);
@@ -408,7 +422,7 @@ export class ASTFunctionParameter extends ASTExpression {
   isWritable(): boolean {
     return this.writable;
   }
-  getAddressSpace(): typeinfo.PBAddressSpace {
+  getAddressSpace(): PBAddressSpace {
     return this.paramAST.getAddressSpace();
   }
   isConstExp(): boolean {
@@ -596,20 +610,20 @@ export class ASTPrimitive extends ASTExpression {
   isWritable(): boolean {
     return this.writable;
   }
-  getAddressSpace(): typeinfo.PBAddressSpace {
+  getAddressSpace(): PBAddressSpace {
     switch (this.value.$declareType) {
       case DeclareType.DECLARE_TYPE_UNIFORM:
-        return typeinfo.PBAddressSpace.UNIFORM;
+        return PBAddressSpace.UNIFORM;
       case DeclareType.DECLARE_TYPE_STORAGE:
-        return typeinfo.PBAddressSpace.STORAGE;
+        return PBAddressSpace.STORAGE;
       case DeclareType.DECLARE_TYPE_IN:
       case DeclareType.DECLARE_TYPE_OUT:
         return null;
       default:
-        return this.value.$global ? typeinfo.PBAddressSpace.PRIVATE : typeinfo.PBAddressSpace.FUNCTION;
+        return this.value.$global ? PBAddressSpace.PRIVATE : PBAddressSpace.FUNCTION;
     }
   }
-  getType(): typeinfo.PBTypeInfo {
+  getType(): PBTypeInfo {
     return this.value.$typeinfo;
   }
   toWebGL(indent: string, ctx: ASTContext): string {
@@ -635,7 +649,7 @@ export class ASTPrimitive extends ASTExpression {
 }
 
 export abstract class ASTLValue extends ShaderAST {
-  abstract getType(): typeinfo.PBTypeInfo;
+  abstract getType(): PBTypeInfo;
   abstract markWritable(): void;
   abstract isWritable(): boolean;
 }
@@ -645,7 +659,7 @@ export class ASTLValueScalar extends ASTLValue {
   value: ASTExpression;
   constructor(value: ASTExpression) {
     super();
-    if (value.getAddressSpace() === typeinfo.PBAddressSpace.UNIFORM) {
+    if (value.getAddressSpace() === PBAddressSpace.UNIFORM) {
       throw new errors.PBASTError(value, 'cannot assign to uniform variable');
     }
     this.value = value;
@@ -653,7 +667,7 @@ export class ASTLValueScalar extends ASTLValue {
       this.value.isStatement = false;
     }
   }
-  getType(): typeinfo.PBTypeInfo {
+  getType(): PBTypeInfo {
     return this.value.getType();
   }
   markWritable(): void {
@@ -685,18 +699,18 @@ export class ASTLValueHash extends ASTLValue {
   /** @internal */
   field: string;
   /** @internal */
-  type: typeinfo.PBTypeInfo;
+  type: PBTypeInfo;
   constructor(
     scope: ASTLValueScalar | ASTLValueHash | ASTLValueArray,
     field: string,
-    type: typeinfo.PBTypeInfo
+    type: PBTypeInfo
   ) {
     super();
     this.scope = scope;
     this.field = field;
     this.type = type;
   }
-  getType(): typeinfo.PBTypeInfo {
+  getType(): PBTypeInfo {
     return this.type;
   }
   markWritable(): void {
@@ -730,11 +744,11 @@ export class ASTLValueArray extends ASTLValue {
   /** @internal */
   index: ASTExpression;
   /** @internal */
-  type: typeinfo.PBTypeInfo;
+  type: PBTypeInfo;
   constructor(
     value: ASTLValueScalar | ASTLValueHash | ASTLValueArray,
     index: ASTExpression,
-    type: typeinfo.PBTypeInfo
+    type: PBTypeInfo
   ) {
     super();
     this.value = value;
@@ -744,7 +758,7 @@ export class ASTLValueArray extends ASTLValue {
       this.index.isStatement = false;
     }
   }
-  getType(): typeinfo.PBTypeInfo {
+  getType(): PBTypeInfo {
     return this.type;
   }
   markWritable(): void {
@@ -780,7 +794,7 @@ export class ASTLValueDeclare extends ASTLValue {
     this.value = value;
     this.value.constExp = true;
   }
-  getType(): typeinfo.PBTypeInfo {
+  getType(): PBTypeInfo {
     return this.value.getType();
   }
   markWritable(): void {}
@@ -840,13 +854,13 @@ export class ASTLValueDeclare extends ASTLValue {
         const readonly =
           this.getType().isPointerType() ||
           (!this.value.writable &&
-            (addressSpace === typeinfo.PBAddressSpace.PRIVATE ||
-              addressSpace === typeinfo.PBAddressSpace.FUNCTION));
-        const moduleScope = addressSpace === typeinfo.PBAddressSpace.PRIVATE;
+            (addressSpace === PBAddressSpace.PRIVATE ||
+              addressSpace === PBAddressSpace.FUNCTION));
+        const moduleScope = addressSpace === PBAddressSpace.PRIVATE;
         const storageAccessMode =
-          addressSpace === typeinfo.PBAddressSpace.STORAGE && this.value.writable ? ', read_write' : '';
+          addressSpace === PBAddressSpace.STORAGE && this.value.writable ? ', read_write' : '';
         const decorator =
-          addressSpace !== typeinfo.PBAddressSpace.FUNCTION ? `<${addressSpace}${storageAccessMode}>` : '';
+          addressSpace !== PBAddressSpace.FUNCTION ? `<${addressSpace}${storageAccessMode}>` : '';
         prefix = readonly ? (moduleScope ? 'const ' : 'let ') : `var${decorator} `;
         break;
       }
@@ -868,12 +882,12 @@ export class ASTLValueDeclare extends ASTLValue {
 
 export class ASTShaderExpConstructor extends ASTExpression {
   /** @internal */
-  type: typeinfo.PBTypeInfo;
+  type: PBTypeInfo;
   /** @internal */
   args: (number | boolean | ASTExpression)[];
   /** @internal */
   constExp: boolean;
-  constructor(type: typeinfo.PBTypeInfo, args: (number | boolean | ASTExpression)[]) {
+  constructor(type: PBTypeInfo, args: (number | boolean | ASTExpression)[]) {
     super();
     this.type = type;
     this.args = args;
@@ -888,7 +902,7 @@ export class ASTShaderExpConstructor extends ASTExpression {
       this.constExp &&= !(arg instanceof ASTExpression) || arg.isConstExp();
     }
   }
-  getType(): typeinfo.PBTypeInfo {
+  getType(): PBTypeInfo {
     return this.type;
   }
   markWritable() {}
@@ -898,7 +912,7 @@ export class ASTShaderExpConstructor extends ASTExpression {
   isConstExp(): boolean {
     return this.constExp;
   }
-  getAddressSpace(): typeinfo.PBAddressSpace {
+  getAddressSpace(): PBAddressSpace {
     return null;
   }
   toWebGL(indent: string, ctx: ASTContext): string {
@@ -958,34 +972,34 @@ export class ASTScalar extends ASTExpression {
   /** @internal */
   value: number | boolean;
   /** @internal */
-  type: typeinfo.PBPrimitiveTypeInfo;
-  constructor(value: number | boolean, type: typeinfo.PBPrimitiveTypeInfo) {
+  type: PBPrimitiveTypeInfo;
+  constructor(value: number | boolean, type: PBPrimitiveTypeInfo) {
     super();
     this.value = value;
     this.type = type;
     const valueType = typeof value;
     if (valueType === 'number') {
-      if (type.primitiveType === typeinfo.PBPrimitiveType.BOOL) {
+      if (type.primitiveType === PBPrimitiveType.BOOL) {
         throw new errors.PBTypeCastError(value, valueType, type);
       }
       if (
-        type.primitiveType === typeinfo.PBPrimitiveType.I32 &&
+        type.primitiveType === PBPrimitiveType.I32 &&
         (!Number.isInteger(value) || value < 0x80000000 >> 0 || value > 0xffffffff)
       ) {
         throw new errors.PBTypeCastError(value, valueType, type);
       }
       if (
         value < 0 &&
-        type.primitiveType === typeinfo.PBPrimitiveType.U32 &&
+        type.primitiveType === PBPrimitiveType.U32 &&
         (!Number.isInteger(value) || value < 0 || value > 0xffffffff)
       ) {
         throw new errors.PBTypeCastError(value, valueType, type);
       }
-    } else if (type.primitiveType !== typeinfo.PBPrimitiveType.BOOL) {
+    } else if (type.primitiveType !== PBPrimitiveType.BOOL) {
       throw new errors.PBTypeCastError(value, valueType, type);
     }
   }
-  getType(): typeinfo.PBTypeInfo {
+  getType(): PBTypeInfo {
     return this.type;
   }
   markWritable() {}
@@ -995,18 +1009,18 @@ export class ASTScalar extends ASTExpression {
   isConstExp(): boolean {
     return true;
   }
-  getAddressSpace(): typeinfo.PBAddressSpace {
+  getAddressSpace(): PBAddressSpace {
     return null;
   }
   toWebGL(indent: string, ctx: ASTContext) {
     switch (this.type.primitiveType) {
-      case typeinfo.PBPrimitiveType.F32:
+      case PBPrimitiveType.F32:
         return toFixed(this.value as number);
-      case typeinfo.PBPrimitiveType.I32:
+      case PBPrimitiveType.I32:
         return toInt(this.value as number);
-      case typeinfo.PBPrimitiveType.U32:
+      case PBPrimitiveType.U32:
         return toUint(this.value as number);
-      case typeinfo.PBPrimitiveType.BOOL:
+      case PBPrimitiveType.BOOL:
         return String(!!this.value);
       default:
         throw new Error('Invalid scalar type');
@@ -1014,13 +1028,13 @@ export class ASTScalar extends ASTExpression {
   }
   toWebGL2(indent: string, ctx: ASTContext) {
     switch (this.type.primitiveType) {
-      case typeinfo.PBPrimitiveType.F32:
+      case PBPrimitiveType.F32:
         return toFixed(this.value as number);
-      case typeinfo.PBPrimitiveType.I32:
+      case PBPrimitiveType.I32:
         return toInt(this.value as number);
-      case typeinfo.PBPrimitiveType.U32:
+      case PBPrimitiveType.U32:
         return toUint(this.value as number);
-      case typeinfo.PBPrimitiveType.BOOL:
+      case PBPrimitiveType.BOOL:
         return String(!!this.value);
       default:
         throw new Error('Invalid scalar type');
@@ -1028,13 +1042,13 @@ export class ASTScalar extends ASTExpression {
   }
   toWGSL(indent: string, ctx: ASTContext) {
     switch (this.type.primitiveType) {
-      case typeinfo.PBPrimitiveType.F32:
+      case PBPrimitiveType.F32:
         return toFixed(this.value as number);
-      case typeinfo.PBPrimitiveType.I32:
+      case PBPrimitiveType.I32:
         return toInt(this.value as number);
-      case typeinfo.PBPrimitiveType.U32:
+      case PBPrimitiveType.U32:
         return `${toUint(this.value as number)}u`;
-      case typeinfo.PBPrimitiveType.BOOL:
+      case PBPrimitiveType.BOOL:
         return String(!!this.value);
       default:
         throw new Error('Invalid scalar type');
@@ -1051,8 +1065,8 @@ export class ASTHash extends ASTExpression {
   /** @internal */
   field: string;
   /** @internal */
-  type: typeinfo.PBTypeInfo;
-  constructor(source: ASTExpression, field: string, type: typeinfo.PBTypeInfo) {
+  type: PBTypeInfo;
+  constructor(source: ASTExpression, field: string, type: PBTypeInfo) {
     super();
     this.source = source;
     this.field = field;
@@ -1061,7 +1075,7 @@ export class ASTHash extends ASTExpression {
       this.source.isStatement = false;
     }
   }
-  getType(): typeinfo.PBTypeInfo {
+  getType(): PBTypeInfo {
     return this.type;
   }
   isReference(): boolean {
@@ -1076,7 +1090,7 @@ export class ASTHash extends ASTExpression {
   isWritable(): boolean {
     return this.source.isWritable();
   }
-  getAddressSpace(): typeinfo.PBAddressSpace {
+  getAddressSpace(): PBAddressSpace {
     return this.source.getAddressSpace();
   }
   toWebGL(indent: string, ctx: ASTContext) {
@@ -1099,8 +1113,8 @@ export class ASTCast extends ASTExpression {
   /** @internal */
   sourceValue: ASTExpression;
   /** @internal */
-  castType: typeinfo.PBTypeInfo;
-  constructor(source: ASTExpression, type: typeinfo.PBTypeInfo) {
+  castType: PBTypeInfo;
+  constructor(source: ASTExpression, type: PBTypeInfo) {
     super();
     this.sourceValue = source;
     this.castType = type;
@@ -1108,7 +1122,7 @@ export class ASTCast extends ASTExpression {
       this.sourceValue.isStatement = false;
     }
   }
-  getType(): typeinfo.PBTypeInfo {
+  getType(): PBTypeInfo {
     return this.castType;
   }
   markWritable() {}
@@ -1118,7 +1132,7 @@ export class ASTCast extends ASTExpression {
   isConstExp(): boolean {
     return this.sourceValue.isConstExp();
   }
-  getAddressSpace(): typeinfo.PBAddressSpace {
+  getAddressSpace(): PBAddressSpace {
     return null;
   }
   toWebGL(indent: string, ctx: ASTContext) {
@@ -1151,14 +1165,14 @@ export class ASTAddressOf extends ASTExpression {
   /** @internal */
   value: ASTExpression;
   /** @internal */
-  type: typeinfo.PBTypeInfo;
+  type: PBTypeInfo;
   constructor(value: ASTExpression) {
     super();
     console.assert(value.isReference(), 'no pointer type for non-reference values', true);
     this.value = value;
-    this.type = new typeinfo.PBPointerTypeInfo(value.getType(), value.getAddressSpace());
+    this.type = new PBPointerTypeInfo(value.getType(), value.getAddressSpace());
   }
-  getType(): typeinfo.PBTypeInfo {
+  getType(): PBTypeInfo {
     return this.type;
   }
   isConstExp(): boolean {
@@ -1166,7 +1180,7 @@ export class ASTAddressOf extends ASTExpression {
   }
   markWritable() {
     const addressSpace = this.value.getAddressSpace();
-    if (addressSpace === typeinfo.PBAddressSpace.UNIFORM) {
+    if (addressSpace === PBAddressSpace.UNIFORM) {
       throw new errors.PBASTError(this.value, 'uniforms are not writable');
     }
     this.value.markWritable();
@@ -1174,7 +1188,7 @@ export class ASTAddressOf extends ASTExpression {
   isWritable(): boolean {
     return this.value.isWritable();
   }
-  getAddressSpace(): typeinfo.PBAddressSpace {
+  getAddressSpace(): PBAddressSpace {
     return this.value.getAddressSpace();
   }
   toWebGL(indent: string, ctx: ASTContext): string {
@@ -1203,7 +1217,7 @@ export class ASTReferenceOf extends ASTExpression {
       this.value.isStatement = false;
     }
   }
-  getType(): typeinfo.PBTypeInfo {
+  getType(): PBTypeInfo {
     const type = this.value.getType();
     return type.isPointerType() ? type.pointerType : type;
   }
@@ -1219,7 +1233,7 @@ export class ASTReferenceOf extends ASTExpression {
   isConstExp(): boolean {
     return false;
   }
-  getAddressSpace(): typeinfo.PBAddressSpace {
+  getAddressSpace(): PBAddressSpace {
     return this.value instanceof ASTExpression ? this.value.getAddressSpace() : null;
   }
   toWebGL(indent: string, ctx: ASTContext): string {
@@ -1244,8 +1258,8 @@ export class ASTUnaryFunc extends ASTExpression {
   /** @internal */
   op: string;
   /** @internal */
-  type: typeinfo.PBTypeInfo;
-  constructor(value: ASTExpression, op: string, type: typeinfo.PBTypeInfo) {
+  type: PBTypeInfo;
+  constructor(value: ASTExpression, op: string, type: PBTypeInfo) {
     super();
     this.value = value;
     this.op = op;
@@ -1254,7 +1268,7 @@ export class ASTUnaryFunc extends ASTExpression {
       this.value.isStatement = false;
     }
   }
-  getType(): typeinfo.PBTypeInfo {
+  getType(): PBTypeInfo {
     return this.type;
   }
   markWritable() {}
@@ -1264,7 +1278,7 @@ export class ASTUnaryFunc extends ASTExpression {
   isConstExp(): boolean {
     return this.value.isConstExp();
   }
-  getAddressSpace(): typeinfo.PBAddressSpace {
+  getAddressSpace(): PBAddressSpace {
     return null;
   }
   toWebGL(indent: string, ctx: ASTContext) {
@@ -1289,10 +1303,10 @@ export class ASTBinaryFunc extends ASTExpression {
   /** @internal */
   right: ASTExpression;
   /** @internal */
-  type: typeinfo.PBTypeInfo;
+  type: PBTypeInfo;
   /** @internal */
   op: string;
-  constructor(left: ASTExpression, right: ASTExpression, op: string, type: typeinfo.PBTypeInfo) {
+  constructor(left: ASTExpression, right: ASTExpression, op: string, type: PBTypeInfo) {
     super();
     this.left = left;
     this.right = right;
@@ -1305,7 +1319,7 @@ export class ASTBinaryFunc extends ASTExpression {
       this.right.isStatement = false;
     }
   }
-  getType(): typeinfo.PBTypeInfo {
+  getType(): PBTypeInfo {
     return this.type;
   }
   markWritable() {}
@@ -1315,7 +1329,7 @@ export class ASTBinaryFunc extends ASTExpression {
   isConstExp(): boolean {
     return this.left.isConstExp() && this.right.isConstExp();
   }
-  getAddressSpace(): typeinfo.PBAddressSpace {
+  getAddressSpace(): PBAddressSpace {
     return null;
   }
   toWebGL(indent: string, ctx: ASTContext) {
@@ -1342,8 +1356,8 @@ export class ASTArrayIndex extends ASTExpression {
   /** @internal */
   index: ASTExpression;
   /** @internal */
-  type: typeinfo.PBTypeInfo;
-  constructor(source: ASTExpression, index: ASTExpression, type: typeinfo.PBTypeInfo) {
+  type: PBTypeInfo;
+  constructor(source: ASTExpression, index: ASTExpression, type: PBTypeInfo) {
     super();
     this.source = source;
     this.index = index;
@@ -1355,7 +1369,7 @@ export class ASTArrayIndex extends ASTExpression {
       this.index.isStatement = false;
     }
   }
-  getType(): typeinfo.PBTypeInfo {
+  getType(): PBTypeInfo {
     return this.type;
   }
   isReference(): boolean {
@@ -1370,7 +1384,7 @@ export class ASTArrayIndex extends ASTExpression {
   isConstExp(): boolean {
     return this.source.isConstExp() && this.index.isConstExp();
   }
-  getAddressSpace(): typeinfo.PBAddressSpace {
+  getAddressSpace(): PBAddressSpace {
     return this.source.getAddressSpace();
   }
   toWebGL(indent: string, ctx: ASTContext) {
@@ -1447,7 +1461,7 @@ export class ASTAssignment extends ShaderAST {
       this.rvalue.isStatement = false;
     }
   }
-  getType(): typeinfo.PBTypeInfo {
+  getType(): PBTypeInfo {
     return null;
   }
   toWebGL(indent: string, ctx: ASTContext) {
@@ -1463,7 +1477,7 @@ export class ASTAssignment extends ShaderAST {
     }
     if (typeof this.rvalue === 'number' || typeof this.rvalue === 'boolean') {
       rhs =
-        (rtype as typeinfo.PBPrimitiveTypeInfo).primitiveType === typeinfo.PBPrimitiveType.F32
+        (rtype as PBPrimitiveTypeInfo).primitiveType === PBPrimitiveType.F32
           ? toFixed(this.rvalue as number)
           : String(this.rvalue);
     } else {
@@ -1487,7 +1501,7 @@ export class ASTAssignment extends ShaderAST {
     }
     if (typeof this.rvalue === 'number' || typeof this.rvalue === 'boolean') {
       rhs =
-        (rtype as typeinfo.PBPrimitiveTypeInfo).primitiveType === typeinfo.PBPrimitiveType.F32
+        (rtype as PBPrimitiveTypeInfo).primitiveType === PBPrimitiveType.F32
           ? toFixed(this.rvalue as number)
           : String(this.rvalue);
     } else {
@@ -1503,7 +1517,7 @@ export class ASTAssignment extends ShaderAST {
     const [valueTypeLeft, lvalueIsPtr] = ltype.isPointerType() ? [ltype.pointerType, true] : [ltype, false];
     const rtype = this.checkScalarType(this.rvalue, valueTypeLeft);
     const rvalueIsPtr = rtype && rtype.isPointerType();
-    const valueTypeRight = rvalueIsPtr ? (rtype as typeinfo.PBPointerTypeInfo).pointerType : rtype;
+    const valueTypeRight = rvalueIsPtr ? (rtype as PBPointerTypeInfo).pointerType : rtype;
     if (valueTypeLeft.typeId !== valueTypeRight.typeId) {
       throw new errors.PBTypeCastError(
         this.rvalue instanceof ASTExpression ? this.rvalue.toString('webgpu') : `${this.rvalue}`,
@@ -1523,7 +1537,7 @@ export class ASTAssignment extends ShaderAST {
     let rhs: string;
     if (typeof this.rvalue === 'number' || typeof this.rvalue === 'boolean') {
       rhs =
-        (rtype as typeinfo.PBPrimitiveTypeInfo).primitiveType === typeinfo.PBPrimitiveType.F32
+        (rtype as PBPrimitiveTypeInfo).primitiveType === PBPrimitiveType.F32
           ? toFixed(this.rvalue as number)
           : String(this.rvalue);
     } else {
@@ -1544,8 +1558,8 @@ export class ASTAssignment extends ShaderAST {
   }
   private checkScalarType(
     value: number | boolean | ASTExpression,
-    targetType: typeinfo.PBTypeInfo
-  ): typeinfo.PBTypeInfo {
+    targetType: PBTypeInfo
+  ): PBTypeInfo {
     if (value instanceof ASTExpression) {
       return value.getType();
     }
@@ -1556,43 +1570,43 @@ export class ASTAssignment extends ShaderAST {
     const isFloat = typeof value === 'number';
     if (targetType.isPrimitiveType()) {
       switch (targetType.primitiveType) {
-        case typeinfo.PBPrimitiveType.BOOL:
+        case PBPrimitiveType.BOOL:
           return isBool
             ? targetType
             : isInt
-            ? typeinfo.typeI32
+            ? typeI32
             : isUint
-            ? typeinfo.typeU32
-            : typeinfo.typeF32;
-        case typeinfo.PBPrimitiveType.F32:
-          return isFloat ? targetType : typeinfo.typeBool;
-        case typeinfo.PBPrimitiveType.I32:
+            ? typeU32
+            : typeF32;
+        case PBPrimitiveType.F32:
+          return isFloat ? targetType : typeBool;
+        case PBPrimitiveType.I32:
           return isInt
             ? targetType
             : isBool
-            ? typeinfo.typeBool
+            ? typeBool
             : isUint
-            ? typeinfo.typeU32
-            : typeinfo.typeF32;
-        case typeinfo.PBPrimitiveType.U32:
+            ? typeU32
+            : typeF32;
+        case PBPrimitiveType.U32:
           return isUint
             ? targetType
             : isBool
-            ? typeinfo.typeBool
+            ? typeBool
             : isInt
-            ? typeinfo.typeI32
-            : typeinfo.typeF32;
+            ? typeI32
+            : typeF32;
         default:
           return null;
       }
     } else {
       return isBool
-        ? typeinfo.typeBool
+        ? typeBool
         : isInt
-        ? typeinfo.typeI32
+        ? typeI32
         : isUint
-        ? typeinfo.typeU32
-        : typeinfo.typeF32;
+        ? typeU32
+        : typeF32;
     }
   }
 }
@@ -1666,7 +1680,7 @@ export class ASTCallFunction extends ASTExpression {
   /** @internal */
   args: ASTExpression[];
   /** @internal */
-  retType: typeinfo.PBTypeInfo;
+  retType: PBTypeInfo;
   /** @internal */
   func: ASTFunction;
   /** @internal */
@@ -1674,7 +1688,7 @@ export class ASTCallFunction extends ASTExpression {
   constructor(
     name: string,
     args: ASTExpression[],
-    retType: typeinfo.PBTypeInfo,
+    retType: PBTypeInfo,
     func: ASTFunction,
     deviceType: DeviceType
   ) {
@@ -1694,8 +1708,8 @@ export class ASTCallFunction extends ASTExpression {
           if (deviceType === 'webgpu') {
             const argAddressSpace = args[i].getAddressSpace();
             if (
-              argAddressSpace !== typeinfo.PBAddressSpace.FUNCTION &&
-              argAddressSpace !== typeinfo.PBAddressSpace.PRIVATE
+              argAddressSpace !== PBAddressSpace.FUNCTION &&
+              argAddressSpace !== PBAddressSpace.PRIVATE
             ) {
               throw new errors.PBParamTypeError(
                 name,
@@ -1706,7 +1720,7 @@ export class ASTCallFunction extends ASTExpression {
             if (!argType.isPointerType()) {
               throw new errors.PBInternalError(`ASTCallFunction(): invalid reference type`);
             }
-            if (argType.addressSpace === typeinfo.PBAddressSpace.UNKNOWN) {
+            if (argType.addressSpace === PBAddressSpace.UNKNOWN) {
               argType.addressSpace = argAddressSpace;
             } else if (argType.addressSpace !== argAddressSpace) {
               throw new errors.PBParamTypeError(
@@ -1725,7 +1739,7 @@ export class ASTCallFunction extends ASTExpression {
       }
     }
   }
-  getType(): typeinfo.PBTypeInfo {
+  getType(): PBTypeInfo {
     return this.retType;
   }
   isConstExp(): boolean {
@@ -1735,7 +1749,7 @@ export class ASTCallFunction extends ASTExpression {
   isWritable(): boolean {
     return false;
   }
-  getAddressSpace(): typeinfo.PBAddressSpace {
+  getAddressSpace(): PBAddressSpace {
     return null;
   }
   toWebGL(indent: string, ctx: ASTContext) {
@@ -1954,11 +1968,11 @@ export class ASTFunction extends ASTScope {
   /** @internal */
   name: string;
   /** @internal */
-  returnType: typeinfo.PBTypeInfo;
+  returnType: PBTypeInfo;
   /** @internal */
   args: ASTFunctionParameter[];
   /** @internal */
-  funcOverloads: typeinfo.PBFunctionTypeInfo[];
+  funcOverloads: PBFunctionTypeInfo[];
   /** @internal */
   builtins: string[];
   constructor(
@@ -1966,7 +1980,7 @@ export class ASTFunction extends ASTScope {
     args: ASTFunctionParameter[],
     isMainFunc: boolean,
     isBuiltin = false,
-    overloads: typeinfo.PBFunctionTypeInfo[] = null
+    overloads: PBFunctionTypeInfo[] = null
   ) {
     super();
     this.name = name;
@@ -1982,7 +1996,7 @@ export class ASTFunction extends ASTScope {
     this.isMainFunc = isMainFunc;
     this.funcOverloads = null;
   }
-  get overloads(): typeinfo.PBFunctionTypeInfo[] {
+  get overloads(): PBFunctionTypeInfo[] {
     return this.getOverloads();
   }
   toWebGL(indent: string, ctx: ASTContext) {
@@ -2087,11 +2101,11 @@ export class ASTFunction extends ASTScope {
       return '';
     }
   }
-  private getOverloads(): typeinfo.PBFunctionTypeInfo[] {
+  private getOverloads(): PBFunctionTypeInfo[] {
     if (!this.funcOverloads && this.args) {
       this.funcOverloads = this.args
         ? [
-            new typeinfo.PBFunctionTypeInfo(
+            new PBFunctionTypeInfo(
               this.name,
               this.returnType,
               this.args.map((arg) => {
@@ -2206,7 +2220,7 @@ export class ASTRange extends ASTScope {
     const init = `var ${this.init.getType().toTypeName('webgpu', this.init.name)}`;
     const start = unbracket(this.start.toWGSL(indent, ctx));
     const end = unbracket(this.end.toWGSL(indent, ctx));
-    const incr = new ASTScalar(1, this.init.getType() as typeinfo.PBPrimitiveTypeInfo).toWGSL(indent, ctx);
+    const incr = new ASTScalar(1, this.init.getType() as PBPrimitiveTypeInfo).toWGSL(indent, ctx);
     const comp = this.open ? '<' : '<=';
     let str = `${indent}for (${init} = ${start}; ${this.init.name} ${comp} ${end}; ${this.init.name} = ${this.init.name} + ${incr}) {\n`;
     str += super.toWGSL(indent + '  ', ctx);
@@ -2279,18 +2293,18 @@ export class ASTWhile extends ASTScope {
 
 export class ASTStructDefine extends ShaderAST {
   /** @internal */
-  type: typeinfo.PBStructTypeInfo;
+  type: PBStructTypeInfo;
   /** @internal */
   prefix: string[];
   /** @internal */
   builtin: boolean;
-  constructor(type: typeinfo.PBStructTypeInfo, builtin: boolean) {
+  constructor(type: PBStructTypeInfo, builtin: boolean) {
     super();
     this.prefix = null;
     this.builtin = builtin;
     this.type = type;
   }
-  getType(): typeinfo.PBStructTypeInfo {
+  getType(): PBStructTypeInfo {
     return this.type;
   }
   toWebGL(indent: string, ctx: ASTContext): string {
@@ -2344,7 +2358,7 @@ export class ASTStructDefine extends ShaderAST {
 
 function convertArgs(
   args: (number | boolean | ASTExpression)[],
-  overload: typeinfo.PBFunctionTypeInfo
+  overload: PBFunctionTypeInfo
 ): { name: string; args: ASTExpression[] } {
   if (args.length !== overload.argTypes.length) {
     return null;
@@ -2359,14 +2373,14 @@ function convertArgs(
         !isRef &&
         argType.isPrimitiveType() &&
         argType.isScalarType() &&
-        argType.primitiveType !== typeinfo.PBPrimitiveType.BOOL
+        argType.primitiveType !== PBPrimitiveType.BOOL
       ) {
         result.push(new ASTScalar(arg, argType));
       } else {
         return null;
       }
     } else if (typeof arg === 'boolean') {
-      if (!isRef && argType.isPrimitiveType() && argType.primitiveType === typeinfo.PBPrimitiveType.BOOL) {
+      if (!isRef && argType.isPrimitiveType() && argType.primitiveType === PBPrimitiveType.BOOL) {
         result.push(new ASTScalar(arg, argType));
       } else {
         return null;

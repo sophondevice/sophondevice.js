@@ -31,8 +31,8 @@ export class GUIHitTestVisitor {
       const rc = w.getClippedRect();
       const cx1 = rc ? rc.x : 0;
       const cy1 = rc ? rc.y : 0;
-      const cx2 = rc ? rc.x + rc.width : w.getRect().width;
-      const cy2 = rc ? rc.y + rc.height : w.getRect().height;
+      const cx2 = rc ? rc.x + rc.z : w.getRect().z;
+      const cy2 = rc ? rc.y + rc.w : w.getRect().w;
       if (x >= cx1 && x < cx2 && y >= cy1 && y < cy2) {
         this._hits.push({
           element: w,

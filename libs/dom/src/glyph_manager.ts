@@ -1,7 +1,7 @@
 import { Font, FontCanvas } from './font';
 import { GUIRenderer } from './renderer';
-import { RColor } from './types';
 import { AtlasManager } from './atlas_manager';
+import type { ColorRGBA } from '@sophon/base';
 import type { Texture2D } from '@sophon/device';
 
 export interface GlyphInfo {
@@ -26,7 +26,7 @@ export class GlyphManager extends AtlasManager {
   getGlyphTexture(index: number): Texture2D {
     return this.getAtlasTexture(index);
   }
-  getGlyphInfo(char: string, font: Font, color: RColor): GlyphInfo {
+  getGlyphInfo(char: string, font: Font, color: ColorRGBA): GlyphInfo {
     if (!char || !font || !color) {
       return null;
     }
@@ -57,19 +57,19 @@ export class GlyphManager extends AtlasManager {
     return i - start;
   }
   /** @internal */
-  private _normalizeColor(color: RColor): string {
+  private _normalizeColor(color: ColorRGBA): string {
     const r = `0${(Math.round(color.r * 255) & 0xff).toString(16)}`.slice(-2);
     const g = `0${(Math.round(color.g * 255) & 0xff).toString(16)}`.slice(-2);
     const b = `0${(Math.round(color.b * 255) & 0xff).toString(16)}`.slice(-2);
     return `#${r}${g}${b}`;
   }
   /** @internal */
-  private _hash(char: string, font: Font, color: RColor) {
+  private _hash(char: string, font: Font, color: ColorRGBA) {
     const clr = this._renderer.supportColorComposition() ? '' : `@${this._normalizeColor(color)}`;
     return `${font.family}@${font.size}${clr}&${char}`;
   }
   /** @internal */
-  private _cacheGlyph(char: string, font: Font, color: RColor): GlyphInfo {
+  private _cacheGlyph(char: string, font: Font, color: ColorRGBA): GlyphInfo {
     const bitmap = this._getGlyphBitmap(char, font, color) as ImageData;
     return this.pushBitmap(this._hash(char, font, color), bitmap);
   }
@@ -93,7 +93,7 @@ export class GlyphManager extends AtlasManager {
   private _getGlyphBitmap(
     char: string,
     font: Font,
-    color: RColor
+    color: ColorRGBA
   ): ImageData | { x: number; y: number; w: number; h: number } {
     if (!font) {
       return null;
