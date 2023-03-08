@@ -22,9 +22,12 @@ import { createDevice, DeviceType } from "@sophon/device";
   const program = device.createProgramBuilder().buildRenderProgram({
     vertex() {
       const pb = this.$builder;
+      // define the vertex input streams
       this.$inputs.position = pb.vec2().attrib('position');
       this.$inputs.color = pb.vec4().attrib('diffuse');
+      // define the varying outputs
       this.$outputs.color = pb.vec4();
+      // define the vertex shader entry function
       this.$mainFunc(function(){
         this.$builtins.position = pb.vec4(this.$inputs.position, 0, 1);
         this.$outputs.color = this.$inputs.color;
@@ -32,8 +35,11 @@ import { createDevice, DeviceType } from "@sophon/device";
     },
     fragment() {
       const pb = this.$builder;
+      // define the fragment color output
       this.$outputs.color = pb.vec4();
+      // define the fragment shader entry function
       this.$mainFunc(function(){
+        // output the vertex color in sRGB color space
         this.$outputs.color = pb.vec4(pb.pow(this.$inputs.color.rgb, pb.vec3(1/2.2)), 1);
       });
     }
