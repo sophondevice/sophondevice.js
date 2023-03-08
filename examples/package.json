@@ -15,7 +15,7 @@
     "copy-assets": "shx mkdir -p dist/js && shx cp -R src/assets dist && shx cp src/index.html dist",
     "clean": "shx rm -rf dist .tsbuildinfo",
     "build": "npm run clean && cross-env NODE_OPTIONS=--max_old_space_size=8192 rollup -c",
-    "dev-test": "web-dev-server --port 8000 --open dist/index.html",
+    "dev-test": "web-dev-server --port 8000 -r dist --open /",
     "lint": "eslint src --ext .ts",
     "lint-fix": "eslint src --ext .ts --fix"
   },

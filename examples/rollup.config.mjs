@@ -36,7 +36,7 @@ function getTargetES6(input, output) {
     input: input,
     preserveSymlinks: false,
     output: {
-      file: path.join(destdir, 'js', `${output}.js`),
+      file: path.join(destdir, output, `${output}.js`),
       format: 'esm',
       sourcemap: true
     },
@@ -68,9 +68,8 @@ function getTargetES6(input, output) {
       copy({
         targets: [
           {
-            src: `${output}/index.html`,
-            dest: 'dist',
-            rename: `${output}.html`
+            src: [`${output}/**/*`, `!${output}/**/*.ts`],
+            dest: `dist/${output}`
           }
         ],
         verbose: true

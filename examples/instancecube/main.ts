@@ -94,7 +94,7 @@ import { createDevice, DeviceType } from "@sophon/device";
       this.$outputs.color = pb.vec4();
       this.$mainFunc(function() {
         this.normal = pb.add(pb.mul(pb.normalize(this.$inputs.normal), 0.5), pb.vec3(0.5));
-        this.$outputs.color = pb.vec4(this.normal, 1);
+        this.$outputs.color = pb.vec4(pb.pow(this.normal, pb.vec3(1/2.2)), 1);
       });
     }
   });
@@ -104,12 +104,12 @@ import { createDevice, DeviceType } from "@sophon/device";
 
   // start render loop
   device.runLoop(device => {
-    const t = device.frameInfo.elapsedOverall * 0.005;
+    const t = device.frameInfo.elapsedOverall * 0.002;
     const rotateMatrix = Quaternion.fromEulerAngle(t, t, 0, 'XYZ').toMatrix4x4();
     bindGroup.setValue('worldMatrix', rotateMatrix);
     bindGroup.setValue('projMatrix', Matrix4x4.perspective(1.5, device.getDrawingBufferWidth()/device.getDrawingBufferHeight(), 1, 50));
 
-    device.clearFrameBuffer(new Vector4(0.5, 0.5, 0.5, 1), 1, 0);
+    device.clearFrameBuffer(new Vector4(0, 0, 0.5, 1), 1, 0);
     device.setProgram(program);
     device.setVertexLayout(vertexLayout);
     device.setBindGroup(0, bindGroup);

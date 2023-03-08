@@ -34,14 +34,14 @@ import { createDevice, DeviceType } from "@sophon/device";
       const pb = this.$builder;
       this.$outputs.color = pb.vec4();
       this.$mainFunc(function(){
-        this.$outputs.color = this.$inputs.color;
+        this.$outputs.color = pb.vec4(pb.pow(this.$inputs.color.rgb, pb.vec3(1/2.2)), 1);
       });
     }
   });
 
   // start render loop
   device.runLoop(device => {
-    device.clearFrameBuffer(new Vector4(0, 0, 0, 1), 1, 0);
+    device.clearFrameBuffer(new Vector4(0, 0, 0.5, 1), 1, 0);
     device.setProgram(program);
     device.setVertexLayout(vertexLayout);
     device.draw('triangle-list', 0, 3);
