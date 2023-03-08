@@ -918,6 +918,7 @@ export interface GPUProgram<T = unknown> extends GPUObject<T> {
   getShaderSource(type: ShaderType): string;
   getCompileError(): string;
   getBindingInfo(name: string): BindPointInfo;
+  createUniformBuffer(uniform: string): StructuredBuffer;
   use(): void;
 }
 

@@ -3,12 +3,13 @@ import { WebGLGPUObject } from './gpuobject_webgl';
 import { isWebGL2 } from './utils';
 import { WebGLEnum } from './webgl_enum';
 import { ShaderType } from '../base_types';
-import { GPUProgram, semanticList, BindGroupLayout, BindPointInfo } from '../gpuobject';
+import { GPUProgram, semanticList, BindGroupLayout, BindPointInfo, StructuredBuffer } from '../gpuobject';
 import { WebGLTextureSampler } from './sampler_webgl';
 import type { WebGLBaseTexture } from './basetexture_webgl';
 import type { WebGLGPUBuffer } from './buffer_webgl';
 import type { WebGLDevice } from './device_webgl';
 import type { WebGLStructuredBuffer } from './structuredbuffer_webgl';
+import { PBStructTypeInfo } from '../builder';
 
 type TypedArray = Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array | Float32Array;
 type TypedArrayConstructor<T extends TypedArray = any> = {
@@ -188,6 +189,10 @@ export class WebGLGPUProgram extends WebGLGPUObject<WebGLProgram> implements GPU
       this._device.context.useProgram(this._object);
     }
     return true;
+  }
+  createUniformBuffer(uniform: string): StructuredBuffer<unknown> {
+    const type = this.getBindingInfo(uniform)?.type as PBStructTypeInfo;
+    return type ? this.device.createStructuredBuffer(type, { usage: 'uniform' }) : null;
   }
   private _setUniformStruct(name: string, value: Record<string, IUniformValue>) {
     for (const k in value) {

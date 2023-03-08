@@ -18,7 +18,7 @@
     "url": "git+https://github.com/sophondevice/sophondevice.git"
   },
   "scripts": {
-    "clean": "shx rm -rf ./dist",
+    "clean": "shx rm -rf ./dist .tsbuildinfo",
     "build": "npm run clean && cross-env NODE_OPTIONS=--max_old_space_size=8192 rollup -c"
   },
   "keywords": [

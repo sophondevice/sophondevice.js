@@ -1,13 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { WebGPUObject } from './gpuobject_webgpu';
 import { ShaderType } from '../base_types';
-import type { GPUProgram, BindGroupLayout, BindPointInfo } from '../gpuobject';
+import type { GPUProgram, BindGroupLayout, BindPointInfo, StructuredBuffer } from '../gpuobject';
 import type {
   GPUProgramConstructParams,
   RenderProgramConstructParams,
   ComputeProgramConstructParams
 } from '../device';
 import type { WebGPUDevice } from './device';
+import type { PBStructTypeInfo } from '../builder/types';
 
 export class WebGPUProgram extends WebGPUObject<unknown> implements GPUProgram {
   private static _hashCounter = 0;
@@ -118,6 +119,10 @@ export class WebGPUProgram extends WebGPUObject<unknown> implements GPUProgram {
   }
   isProgram(): boolean {
     return true;
+  }
+  createUniformBuffer(uniform: string): StructuredBuffer<unknown> {
+    const type = this.getBindingInfo(uniform)?.type as PBStructTypeInfo;
+    return type ? this.device.createStructuredBuffer(type, { usage: 'uniform' }) : null;
   }
   private _load() {
     if (this._type === 'render') {
