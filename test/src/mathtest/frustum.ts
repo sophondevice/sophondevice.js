@@ -68,7 +68,7 @@ export function testFrustum() {
     assert(matrix1.equalsTo(matrix2, 0.001), 'setNearFar() test failed');
 
     /*
-    const eyeSpaceVector = new chaospace.Vector3(0, 0, -rand(near + 0.5, far - 0.5));
+    const eyeSpaceVector = new Vector3(0, 0, -rand(near + 0.5, far - 0.5));
     const clipSpaceVector = matrix.transformPoint(eyeSpaceVector);
     const clipSpaceZ_GL = clipSpaceVector.z / clipSpaceVector.w;
     const clipSpaceZ_D3D = (clipSpaceVector.z + clipSpaceVector.w) / (2 * clipSpaceVector.w);

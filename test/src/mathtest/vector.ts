@@ -163,17 +163,17 @@ export function testQuaternion() {
     );
     const q3 = new Quaternion([x, y, z, w]);
     assert(q3.x === q2.x && q3.y === q2.y && q3.z === q2.z && q3.w === q2.w, 'array constructor failed');
-    const axis = new Vector3(-0.10452544552113772, 0.43864725489574524, -0.8925598114474093); //new chaospace.Vector3(rand(), rand(), rand()).inplaceNormalize();
+    const axis = new Vector3(-0.10452544552113772, 0.43864725489574524, -0.8925598114474093); //new Vector3(rand(), rand(), rand()).inplaceNormalize();
     const angle = 3.1390559093244788; //rand (0, Math.PI);
     const axisAngle = new Quaternion(Matrix3x3.rotation(axis, angle)).getAxisAngle();
     assert(
       axisAngle.xyz().equalsTo(axis) && numberEquals(axisAngle.w, angle),
-      'chaospace.Matrix3x3 constructor failed'
+      'Matrix3x3 constructor test failed'
     );
     const axisAngle2 = new Quaternion(Matrix4x4.rotation(axis, angle)).getAxisAngle();
     assert(
       axisAngle2.xyz().equalsTo(axis) && numberEquals(axisAngle2.w, angle),
-      'chaospace.Matrix4x4 constructor failed'
+      'Matrix4x4 constructor test failed'
     );
   })();
   (function testNormalize() {
