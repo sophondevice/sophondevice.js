@@ -776,8 +776,7 @@ export abstract class Device extends REventTarget {
     const noMipmapFlag = !!options?.noMipmap ? GPUResourceUsageFlags.TF_NO_MIPMAP : 0;
     const writableFlag = !!options?.writable ? GPUResourceUsageFlags.TF_WRITABLE : 0;
     const dynamicFlag = !!options?.dynamic ? GPUResourceUsageFlags.DYNAMIC : 0;
-    const managedFlag = !!options?.managed ? GPUResourceUsageFlags.MANAGED : 0;
-    return colorSpaceFlag | noMipmapFlag | writableFlag | dynamicFlag | managedFlag;
+    return colorSpaceFlag | noMipmapFlag | writableFlag | dynamicFlag;
   }
   /** @internal */
   protected parseBufferOptions(options: BufferCreationOptions, defaultUsage?: BufferUsage): number {

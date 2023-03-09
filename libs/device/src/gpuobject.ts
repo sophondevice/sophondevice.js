@@ -402,20 +402,45 @@ const vertexAttribNameRevMap = {
   [VERTEX_ATTRIB_CUSTOM1]: 'custom1'
 } as const;
 
+/**
+ * Options for creating vertex layout
+ */
 export type VertexLayoutOptions = {
+  /**
+   * vertex buffers in this vertex layout
+   */
   vertexBuffers: {
+    /**
+     * vertex buffer object created by device
+     */
     buffer: StructuredBuffer,
+    /**
+     * the vertex buffer step mode,
+     * value can be 'vertex' or 'instance', default is 'vertex'
+     */
     stepMode?: VertexStepMode
   }[],
+  /**
+   * optional index buffer in this vertex layout
+   */
   indexBuffer?: IndexBuffer
 };
 
 export type TextureColorSpace = 'srgb' | 'linear';
 export type BufferUsage = 'vertex' | 'index' | 'uniform' | 'read' | 'write';
+
+/**
+ * Common options for createing texture or buffer
+ */
 export interface BaseCreationOptions {
+  /**
+   * Whether the object should be dynamic, default is false
+   */
   dynamic?: boolean;
-  managed?: boolean;
 }
+/**
+ * Options for creating texture
+ */
 export interface TextureCreationOptions extends BaseCreationOptions {
   colorSpace?: TextureColorSpace;
   noMipmap?: boolean;
@@ -425,7 +450,12 @@ export interface TextureCreationOptions extends BaseCreationOptions {
 export interface BufferCreationOptions extends BaseCreationOptions {
   usage?: BufferUsage;
   storage?: boolean;
-}
+  /**
+   * Whether the object content should be managed
+   * the default value
+   */
+   managed?: boolean;
+  }
 
 /** @internal */
 export enum GPUResourceUsageFlags {

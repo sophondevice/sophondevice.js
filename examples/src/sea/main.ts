@@ -1,16 +1,29 @@
-import { ProgramBuilder, Device } from '@sophon/device';
+import { Vector4 } from '@sophon/base';
+import { createDevice, DeviceType } from '@sophon/device';
 
-export function createSeaProgram(device: Device) {
-  const pb = new ProgramBuilder(device);
-  return pb.buildRenderProgram({
+(async function () {
+  const canvas = document.querySelector<HTMLCanvasElement>('#canvas');
+  const deviceType = new URL(location.href).searchParams.get('dev') || 'webgl';
+  const device = await createDevice(canvas, deviceType as DeviceType);
+
+  const vertices = device.createVertexBuffer('position_f32x2', new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]));
+  const vertexLayout = device.createVertexLayout({
+    vertexBuffers: [{
+      buffer: vertices
+    }]
+  });
+
+  const program = device.createProgramBuilder().buildRenderProgram({
     label: 'seaMaterial',
     vertex() {
+      const pb = this.$builder;
       this.$inputs.pos = pb.vec2().attrib('position');
       this.$mainFunc(function () {
         this.$builtins.position = pb.vec4(this.$inputs.pos, 0, 1);
       });
     },
     fragment() {
+      const pb = this.$builder;
       this.uniforms = pb.vec4().uniform(0); // iTime, iMouseX, iResX, iResY
       this.$outputs.outColor = pb.vec4();
       this.NUM_STEPS = pb.int(8);
@@ -236,4 +249,25 @@ export function createSeaProgram(device: Device) {
       });
     }
   });
-}
+  const bindGroup = device.createBindGroup(program.bindGroupLayouts[0]);
+
+  const renderStates = device.createRenderStateSet();
+  renderStates.useDepthState().enableTest(false);
+
+  device.runLoop(device => {
+    bindGroup.setValue(
+      'uniforms',
+      new Vector4(
+        device.frameInfo.elapsedOverall * 0.001,
+        0,
+        device.getDrawingBufferWidth(),
+        device.getDrawingBufferHeight()
+      )
+    );
+    device.setRenderStates(renderStates);
+    device.setVertexLayout(vertexLayout);
+    device.setProgram(program);
+    device.setBindGroup(0, bindGroup);
+    device.draw('triangle-strip', 0, 4);
+  });
+})();

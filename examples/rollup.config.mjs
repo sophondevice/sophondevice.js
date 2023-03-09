@@ -8,7 +8,7 @@ import copy from 'rollup-plugin-copy';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const srcdir = path.join(__dirname, '.');
+const srcdir = path.join(__dirname, 'src');
 const destdir = path.join(__dirname, 'dist');
 const srcfiles = [];
 
@@ -68,7 +68,7 @@ function getTargetES6(input, output) {
       copy({
         targets: [
           {
-            src: [`${output}/**/*`, `!${output}/**/*.ts`],
+            src: [`src/${output}/**/*`, `!src/${output}/**/*.ts`],
             dest: `dist/${output}`
           }
         ],
