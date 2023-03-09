@@ -13,10 +13,9 @@ import {
     alert('WebGPU is not available');
     return;
   }
-  const pb = device.createProgramBuilder();
-  const spriteProgram = pb.buildRenderProgram({
+  const spriteProgram = device.createProgramBuilder().buildRenderProgram({
     label: 'spriteRender',
-    vertex() {
+    vertex(pb) {
       this.$inputs.pos = pb.vec2().attrib('position');
       this.$inputs.instPos = pb.vec2().attrib('texCoord0');
       this.$inputs.instVel = pb.vec2().attrib('texCoord1');
@@ -29,17 +28,17 @@ import {
         this.$builtins.position = pb.vec4(pb.add(this.$inputs.instPos, pb.vec2(this.x, this.y)), 0, 1);
       });
     },
-    fragment() {
+    fragment(pb) {
       this.$outputs.color = pb.vec4();
       this.$mainFunc(function () {
         this.$outputs.color = pb.vec4(1);
       });
     }
   });
-  const spriteUpdateProgram = pb.buildComputeProgram({
+  const spriteUpdateProgram = device.createProgramBuilder().buildComputeProgram({
     label: 'spriteUpdate',
     workgroupSize: [64, 1, 1],
-    compute() {
+    compute(pb) {
       const structParticle = pb.defineStruct('Particle', 'default', pb.vec2('pos'), pb.vec2('vel'));
       const structParams = pb.defineStruct(
         'SimParams',

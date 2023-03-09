@@ -854,9 +854,8 @@ export class TextureView {
     this._bindGroupDepth = this._device.createBindGroup(this._programDepth.bindGroupLayouts[0]);
   }
   private createDefaultShader(depth: boolean, unfilterableFloat: boolean): GPUProgram {
-    const pb = this._device.createProgramBuilder();
-    return pb.buildRenderProgram({
-      vertex() {
+    return this._device.createProgramBuilder().buildRenderProgram({
+      vertex(pb) {
         this.$inputs.pos = pb.vec2().attrib('position');
         this.$inputs.uv = pb.vec2().attrib('texCoord0');
         this.$outputs.uv = pb.vec2();
@@ -865,7 +864,7 @@ export class TextureView {
           this.$outputs.uv = this.$inputs.uv;
         });
       },
-      fragment() {
+      fragment(pb) {
         this.tex = depth
           ? pb.tex2DShadow().uniform(0)
           : pb.tex2D().sampleType(unfilterableFloat ? 'unfilterable-float' : null).uniform(0);
@@ -902,9 +901,8 @@ export class TextureView {
     });
   }
   private createBkShader(): GPUProgram {
-    const pb = this._device.createProgramBuilder();
-    return pb.buildRenderProgram({
-      vertex() {
+    return this._device.createProgramBuilder().buildRenderProgram({
+      vertex(pb) {
         this.$inputs.pos = pb.vec2().attrib('position');
         this.$inputs.uv = pb.vec2().attrib('texCoord0');
         this.$outputs.uv = pb.vec2();
@@ -913,7 +911,7 @@ export class TextureView {
           this.$outputs.uv = pb.mul(this.$inputs.uv, 16);
         });
       },
-      fragment() {
+      fragment(pb) {
         this.$outputs.color = pb.vec4();
         this.$mainFunc(function () {
           this.color0 = pb.vec4(1, 1, 1, 1);

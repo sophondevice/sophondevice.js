@@ -276,9 +276,8 @@ function getBlitProgram(device: Device, type: BlitType, filter: Blitter): BlitPr
 }
 
 function createBlitProgram(device: Device, type: BlitType, filter: Blitter): BlitProgramInfo {
-  const pb = device.createProgramBuilder();
-  const program = pb.buildRenderProgram({
-    vertex() {
+  const program = device.createProgramBuilder().buildRenderProgram({
+    vertex(pb) {
       this.$inputs.pos = pb.vec2().attrib('position');
       this.$outputs.uv = pb.vec2();
       filter.setup(this, type);
@@ -293,7 +292,7 @@ function createBlitProgram(device: Device, type: BlitType, filter: Blitter): Bli
         }
       });
     },
-    fragment() {
+    fragment(pb) {
       switch (type) {
         case '2d':
           this.srcTex = pb.tex2D().uniform(0);

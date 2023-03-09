@@ -81,7 +81,7 @@ export class WebGPUClearQuad {
     const uniformStruct = pb.defineStruct(null, 'std140', pb.vec4('color'), pb.float('depth'));
     return pb.buildRenderProgram({
       label: 'ClearQuad',
-      vertex() {
+      vertex(pb) {
         this.clearValues = uniformStruct().uniform(0);
         this.coords = [pb.vec2(-1, 1), pb.vec2(1, 1), pb.vec2(-1, -1), pb.vec2(1, -1)];
         this.$mainFunc(function () {
@@ -92,7 +92,7 @@ export class WebGPUClearQuad {
           );
         });
       },
-      fragment() {
+      fragment(pb) {
         this.clearValues = uniformStruct().uniform(0);
         colorOutputNames.forEach((name) => (this.$outputs[name] = pb.vec4()));
         this.$mainFunc(function () {
@@ -277,10 +277,9 @@ export class WebGPUMipmapGenerator {
     return levelGroup;
   }
   private static initMipmapGeneration(device: WebGPUDevice): void {
-    const pb = new ProgramBuilder(device);
-    this._mipmapGenerationProgram = pb.buildRenderProgram({
+    this._mipmapGenerationProgram = device.createProgramBuilder().buildRenderProgram({
       label: 'MipmapGeneration',
-      vertex() {
+      vertex(pb) {
         this.$outputs.outUV = pb.vec2();
         this.coords = [pb.vec2(-1, 1), pb.vec2(1, 1), pb.vec2(-1, -1), pb.vec2(1, -1)];
         this.uv = [pb.vec2(0, 0), pb.vec2(1, 0), pb.vec2(0, 1), pb.vec2(1, 1)];
@@ -289,7 +288,7 @@ export class WebGPUMipmapGenerator {
           this.$outputs.outUV = this.uv.at(this.$builtins.vertexIndex);
         });
       },
-      fragment() {
+      fragment(pb) {
         this.$outputs.color = pb.vec4();
         this.tex = pb.tex2D().uniform(0);
         this.$mainFunc(function () {

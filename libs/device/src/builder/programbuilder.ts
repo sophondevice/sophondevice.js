@@ -83,13 +83,13 @@ export namespace ProgramBuilder {
   export type BuildComputeResult = [string, BindGroupLayout[]];
   export type RenderOptions = {
     label?: string;
-    vertex: (this: PBGlobalScope) => void;
-    fragment: (this: PBGlobalScope) => void;
+    vertex: (this: PBGlobalScope, pb: ProgramBuilder) => void;
+    fragment: (this: PBGlobalScope, pb: ProgramBuilder) => void;
   };
   export type ComputeOptions = {
     label?: string;
     workgroupSize: [number, number, number];
-    compute: (this: PBGlobalScope) => void;
+    compute: (this: PBGlobalScope, pb: ProgramBuilder) => void;
   };
 }
 
@@ -1553,12 +1553,12 @@ export class ProgramBuilder {
     }
   }
   /** @internal */
-  private generate(body?: (this: PBGlobalScope) => void): void {
+  private generate(body?: (this: PBGlobalScope, pb: ProgramBuilder) => void): void {
     this.pushScope(this._globalScope);
     if (this._emulateDepthClamp && this._shaderType === ShaderType.Vertex) {
       this._globalScope.$outputs.clamppedDepth = this.float().tag('CLAMPPED_DEPTH');
     }
-    body && body.call(this._globalScope);
+    body && body.call(this._globalScope, this);
     this.popScope();
   }
   /** @internal */

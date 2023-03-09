@@ -8,7 +8,6 @@ import {
   TextureVideo,
   BindGroup,
   RenderStateSet,
-  ProgramBuilder
 } from '@sophon/device';
 import { AssetManager, BoxShape } from '@sophon/scene';
 import { projectCubemapCPU } from './sh';
@@ -62,10 +61,9 @@ export class TestTexture2D extends TextureTestCase {
     ).inplaceInverseAffine();
   }
   protected createProgram(): GPUProgram {
-    const pb = new ProgramBuilder(this.device);
-    return pb.buildRenderProgram({
+    return this.device.createProgramBuilder().buildRenderProgram({
       label: '2d',
-      vertex() {
+      vertex(pb) {
         this.$inputs.pos = pb.vec3().attrib('position');
         this.$inputs.uv = pb.vec2().attrib('texCoord0');
         this.$outputs.texcoord = pb.vec2();
@@ -75,7 +73,7 @@ export class TestTexture2D extends TextureTestCase {
           this.$outputs.texcoord = this.$inputs.uv;
         });
       },
-      fragment() {
+      fragment(pb) {
         this.tex = pb.tex2D().uniform(0);
         this.$outputs.color = pb.vec4();
         this.$mainFunc(function () {
@@ -120,10 +118,9 @@ export class TestTextureVideo extends TextureTestCase {
     this.el.play();
   }
   protected createProgram(): GPUProgram {
-    const pb = new ProgramBuilder(this.device);
-    return pb.buildRenderProgram({
+    return this.device.createProgramBuilder().buildRenderProgram({
       label: '2d',
-      vertex() {
+      vertex(pb) {
         this.$inputs.pos = pb.vec3().attrib('position');
         this.$inputs.uv = pb.vec2().attrib('texCoord0');
         this.$outputs.texcoord = pb.vec2();
@@ -133,7 +130,7 @@ export class TestTextureVideo extends TextureTestCase {
           this.$outputs.texcoord = this.$inputs.uv;
         });
       },
-      fragment() {
+      fragment(pb) {
         this.tex = pb.texExternal().uniform(0);
         this.$outputs.color = pb.vec4();
         this.$mainFunc(function () {
@@ -171,10 +168,9 @@ export class TestTexture2DArray extends TextureTestCase {
     ).inplaceInverseAffine();
   }
   protected createProgram(): GPUProgram {
-    const pb = new ProgramBuilder(this.device);
-    return pb.buildRenderProgram({
+    return this.device.createProgramBuilder().buildRenderProgram({
       label: '2d-array',
-      vertex() {
+      vertex(pb) {
         this.$inputs.pos = pb.vec3().attrib('position');
         this.$outputs.texcoord = pb.vec3();
         this.mvpMatrix = pb.mat4().uniform(0);
@@ -183,7 +179,7 @@ export class TestTexture2DArray extends TextureTestCase {
           this.$outputs.texcoord = pb.add(pb.mul(this.$inputs.pos, 0.5), pb.vec3(0.5));
         });
       },
-      fragment() {
+      fragment(pb) {
         this.tex = pb.tex2DArray().uniform(0);
         this.$outputs.color = pb.vec4();
         this.$mainFunc(function () {
@@ -308,10 +304,9 @@ export class TestTexture3D extends TextureTestCase {
     ).inplaceInverseAffine();
   }
   protected createProgram(): GPUProgram {
-    const pb = new ProgramBuilder(this.device);
-    return pb.buildRenderProgram({
+    return this.device.createProgramBuilder().buildRenderProgram({
       label: '3d',
-      vertex() {
+      vertex(pb) {
         this.$inputs.pos = pb.vec3().attrib('position');
         this.$outputs.texcoord = pb.vec3();
         this.mvpMatrix = pb.mat4().uniform(0);
@@ -320,7 +315,7 @@ export class TestTexture3D extends TextureTestCase {
           this.$outputs.texcoord = pb.add(pb.mul(this.$inputs.pos, 0.5), pb.vec3(0.5));
         });
       },
-      fragment() {
+      fragment(pb) {
         this.tex = pb.tex3D().uniform(0);
         this.$outputs.color = pb.vec4();
         this.$mainFunc(function () {
@@ -442,10 +437,9 @@ export class TestTextureCube extends TextureTestCase {
     ).inplaceInverseAffine();
   }
   protected createProgram(): GPUProgram {
-    const pb = new ProgramBuilder(this.device);
-    return pb.buildRenderProgram({
+    return this.device.createProgramBuilder().buildRenderProgram({
       label: 'cube',
-      vertex() {
+      vertex(pb) {
         this.$inputs.pos = pb.vec3().attrib('position');
         this.$outputs.texcoord = pb.vec3();
         this.mvpMatrix = pb.mat4().uniform(0);
@@ -454,7 +448,7 @@ export class TestTextureCube extends TextureTestCase {
           this.$outputs.texcoord = this.$inputs.pos;
         });
       },
-      fragment() {
+      fragment(pb) {
         this.tex = pb.texCube().uniform(0);
         this.$outputs.color = pb.vec4();
         this.$mainFunc(function () {
@@ -497,10 +491,9 @@ export class TestTextureCubeSH extends TextureTestCase {
     this.shCoeff = Array.from({ length: 9 }).map(() => Vector3.zero());
   }
   protected createProgram(): GPUProgram {
-    const pb = new ProgramBuilder(this.device);
-    return pb.buildRenderProgram({
+    return this.device.createProgramBuilder().buildRenderProgram({
       label: 'cube',
-      vertex() {
+      vertex(pb) {
         this.$inputs.pos = pb.vec3().attrib('position');
         this.$outputs.texcoord = pb.vec3();
         this.mvpMatrix = pb.mat4().uniform(0);
@@ -509,7 +502,7 @@ export class TestTextureCubeSH extends TextureTestCase {
           this.$outputs.texcoord = this.$inputs.pos;
         });
       },
-      fragment() {
+      fragment(pb) {
         const structSH = pb.defineStruct(
           'SH',
           'std140',

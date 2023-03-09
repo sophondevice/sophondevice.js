@@ -107,8 +107,8 @@ this.$mainFunc(function(){
     try {
       const isCompute = selectDeviceType.selectedIndex === 3;
       const src = isCompute
-        ? `return pb.buildCompute({workgroupSize:[${workgroupX.value},${workgroupY.value},${workgroupZ.value}],compute(){${vscode.value}}});`
-        : `return pb.buildRender({vertex(){${vscode.value}},fragment(){${fscode.value}}});`;
+        ? `return pb.buildCompute({workgroupSize:[${workgroupX.value},${workgroupY.value},${workgroupZ.value}],compute(pb){${vscode.value}}});`
+        : `return pb.buildRender({vertex(pb){${vscode.value}},fragment(pb){${fscode.value}}});`;
       const fn = new Function('pb', src);
       const ret = fn(pb) as any;
       if (ret) {

@@ -53,8 +53,7 @@ import { createDevice, DeviceType } from "@sophon/device";
 
   // create shader program
   const program = device.createProgramBuilder().buildRenderProgram({
-    vertex() {
-      const pb = this.$builder;
+    vertex(pb) {
       this.projMatrix = pb.mat4().uniform(0);
       this.worldMatrix = pb.mat4().uniform(0);
       this.$inputs.position = pb.vec3().attrib('position');
@@ -66,8 +65,7 @@ import { createDevice, DeviceType } from "@sophon/device";
         this.$outputs.normal = this.$inputs.normal;
       });
     },
-    fragment() {
-      const pb = this.$builder;
+    fragment(pb) {
       this.$outputs.color = pb.vec4();
       this.$mainFunc(function() {
         this.normal = pb.add(pb.mul(pb.normalize(this.$inputs.normal), 0.5), pb.vec3(0.5));

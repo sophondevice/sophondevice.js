@@ -15,15 +15,13 @@ import { createDevice, DeviceType } from '@sophon/device';
 
   const program = device.createProgramBuilder().buildRenderProgram({
     label: 'seaMaterial',
-    vertex() {
-      const pb = this.$builder;
+    vertex(pb) {
       this.$inputs.pos = pb.vec2().attrib('position');
       this.$mainFunc(function () {
         this.$builtins.position = pb.vec4(this.$inputs.pos, 0, 1);
       });
     },
-    fragment() {
-      const pb = this.$builder;
+    fragment(pb) {
       this.uniforms = pb.vec4().uniform(0); // iTime, iMouseX, iResX, iResY
       this.$outputs.outColor = pb.vec4();
       this.NUM_STEPS = pb.int(8);

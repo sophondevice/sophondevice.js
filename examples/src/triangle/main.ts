@@ -20,8 +20,7 @@ import { createDevice, DeviceType } from "@sophon/device";
 
   // create shader program
   const program = device.createProgramBuilder().buildRenderProgram({
-    vertex() {
-      const pb = this.$builder;
+    vertex(pb) {
       // define the vertex input streams
       this.$inputs.position = pb.vec2().attrib('position');
       this.$inputs.color = pb.vec4().attrib('diffuse');
@@ -33,8 +32,7 @@ import { createDevice, DeviceType } from "@sophon/device";
         this.$outputs.color = this.$inputs.color;
       });
     },
-    fragment() {
-      const pb = this.$builder;
+    fragment(pb) {
       // define the fragment color output
       this.$outputs.color = pb.vec4();
       // define the fragment shader entry function

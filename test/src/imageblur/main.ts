@@ -12,10 +12,9 @@ import { GUI, ScrollBar, RValueChangeEvent, RElement } from '@sophon/dom';
 
   const assetManager = new AssetManager(device);
 
-  const pb = new ProgramBuilder(device);
-  const fullScreenQuadProgram = pb.buildRenderProgram({
+  const fullScreenQuadProgram = device.createProgramBuilder().buildRenderProgram({
     label: 'fullScreenQuad',
-    vertex() {
+    vertex(pb) {
       this.pos = [
         pb.vec2(1, 1),
         pb.vec2(1, -1),
@@ -31,7 +30,7 @@ import { GUI, ScrollBar, RValueChangeEvent, RElement } from '@sophon/dom';
         this.$outputs.fragUV = this.uv.at(this.$builtins.vertexIndex);
       });
     },
-    fragment() {
+    fragment(pb) {
       this.texture = pb.tex2D().uniform(0);
       this.$outputs.color = pb.vec4();
       this.$mainFunc(function () {
@@ -39,9 +38,9 @@ import { GUI, ScrollBar, RValueChangeEvent, RElement } from '@sophon/dom';
       });
     }
   });
-  const blurProgram = pb.buildComputeProgram({
+  const blurProgram = device.createProgramBuilder().buildComputeProgram({
     workgroupSize: [32, 1, 1],
-    compute() {
+    compute(pb) {
       const structParams = pb.defineStruct(null, 'default', pb.uint('filterDim'), pb.uint('blockDim'));
       const structFlip = pb.defineStruct(null, 'default', pb.uint('value'));
       this.params = structParams().uniform(0);

@@ -319,7 +319,7 @@ export class GUIRenderer extends REventTarget {
     const structUniform = pb.defineStruct('UIMaterialUniforms', 'std140', pb.mat4('mvpMatrix'));
     return pb.buildRenderProgram({
       label: 'UI',
-      vertex() {
+      vertex(pb) {
         this.$inputs.pos = pb.vec3().attrib('position');
         this.$inputs.diffuse = pb.vec4().attrib('diffuse');
         this.$outputs.outDiffuse = pb.vec4();
@@ -336,7 +336,7 @@ export class GUIRenderer extends REventTarget {
           }
         });
       },
-      fragment() {
+      fragment(pb) {
         this.$outputs.outColor = pb.vec4();
         if (diffuseMap) {
           this.tex = pb.tex2D().uniform(0);

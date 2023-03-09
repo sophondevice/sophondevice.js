@@ -79,10 +79,9 @@ import { createDevice, DeviceType } from "@sophon/device";
 
   // create shader program
   const program = device.createProgramBuilder().buildRenderProgram({
-    vertex() {
-      const pb = this.$builder;
-      this.projMatrix = pb.mat4().uniform(0);
-      this.worldMatrix = pb.mat4().uniform(0);
+    vertex(pb) {
+      this.projMatrix = pb.mat4().uniform(1);
+      this.worldMatrix = pb.mat4().uniform(1);
       this.$inputs.position = pb.vec3().attrib('position');
       this.$inputs.normal = pb.vec3().attrib('normal');
       this.$inputs.uv = pb.vec2().attrib('texCoord0');
@@ -95,8 +94,7 @@ import { createDevice, DeviceType } from "@sophon/device";
         this.$outputs.uv = this.$inputs.uv;
       });
     },
-    fragment() {
-      const pb = this.$builder;
+    fragment(pb) {
       this.tex = pb.tex2D().uniform(0);
       this.lightdir = pb.vec3().uniform(0);
       this.lightcolor = pb.vec3().uniform(0);
@@ -111,31 +109,29 @@ import { createDevice, DeviceType } from "@sophon/device";
     }
   });
 
-  // create bind group
-  const bindGroup = device.createBindGroup(program.bindGroupLayouts[0]);
+  // create bind groups
 
-  // light color
-  const lightColor = Vector3.one();
-  // light direction
-  const lightDir = new Vector3(1, -1, -1).inplaceNormalize();
-  // ambient lighting
-  const ambient = new Vector3(0.01, 0.01, 0.01);
+  // bind group 0 holds the shader uniforms which will be never changed
+  const bindGroup0 = device.createBindGroup(program.bindGroupLayouts[0]);
+  bindGroup0.setValue('lightdir', new Vector3(1, -1, -1).inplaceNormalize());
+  bindGroup0.setValue('lightcolor', Vector3.one());
+  bindGroup0.setValue('ambient', new Vector3(0.01, 0.01, 0.01));
+  bindGroup0.setTexture('tex', texture);
+  // bind group 1 holds the shader uniforms which will be changed every frame
+  const bindGroup1 = device.createBindGroup(program.bindGroupLayouts[1]);
 
   // start render loop
   device.runLoop(device => {
     const t = device.frameInfo.elapsedOverall * 0.002;
     const rotateMatrix = Quaternion.fromEulerAngle(t, t, 0, 'XYZ').toMatrix4x4();
-    bindGroup.setValue('worldMatrix', Matrix4x4.translateLeft(rotateMatrix, new Vector3(0, 0, -4)));
-    bindGroup.setValue('projMatrix', Matrix4x4.perspective(1.5, device.getDrawingBufferWidth()/device.getDrawingBufferHeight(), 1, 50));
-    bindGroup.setValue('lightdir', lightDir);
-    bindGroup.setValue('lightcolor', lightColor);
-    bindGroup.setValue('ambient', ambient);
-    bindGroup.setTexture('tex', texture);
-
+    bindGroup1.setValue('projMatrix', Matrix4x4.perspective(1.5, device.getDrawingBufferWidth()/device.getDrawingBufferHeight(), 1, 50));
+    bindGroup1.setValue('worldMatrix', Matrix4x4.translateLeft(rotateMatrix, new Vector3(0, 0, -4)));
+  
     device.clearFrameBuffer(new Vector4(0, 0, 0.5, 1), 1, 0);
     device.setProgram(program);
     device.setVertexLayout(vertexLayout);
-    device.setBindGroup(0, bindGroup);
+    device.setBindGroup(0, bindGroup0);
+    device.setBindGroup(1, bindGroup1);
     device.draw('triangle-list', 0, 36);    
   });
 })();

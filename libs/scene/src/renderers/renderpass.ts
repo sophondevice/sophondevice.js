@@ -219,13 +219,12 @@ export abstract class RenderPass {
     let bindGroup = this._globalBindGroups[hash];
     if (!bindGroup) {
       const that = this;
-      const pb = this.device.createProgramBuilder();
-      const ret = pb.buildRender({
-        vertex() {
+      const ret = this.device.createProgramBuilder().buildRender({
+        vertex(pb) {
           that.setGlobalBindings(this, ctx);
           this.$mainFunc(function () {});
         },
-        fragment() {
+        fragment(pb) {
           that.setGlobalBindings(this, ctx);
           this.$mainFunc(function () {});
         }
