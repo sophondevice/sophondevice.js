@@ -1,8 +1,6 @@
 import { Font, FontCanvas } from './font';
 import { GUIRenderer } from './renderer';
-import { AtlasManager } from './atlas_manager';
-import type { ColorRGBA } from '@sophon/base';
-import type { Texture2D } from '@sophon/device';
+import { TextureAtlasManager, Texture2D } from '@sophon/device';
 
 export interface GlyphInfo {
   atlasIndex: number;
@@ -14,11 +12,11 @@ export interface GlyphInfo {
   vMax: number;
 }
 
-export class GlyphManager extends AtlasManager {
-  constructor(renderer: GUIRenderer, cacheWidth?: number, cacheHeight?: number, cachePadding?: number) {
-    super(renderer, Math.max(cacheWidth || 0, 0), cacheHeight, cachePadding, true);
-    this._atlasRestoreHandler = async (tex) => {
-      if (this._atlasList.length > 0) {
+export class GlyphManager extends TextureAtlasManager {
+  constructor(renderer: GUIRenderer, binWidth: number, binHeight: number, border: number) {
+    super(renderer.device, binWidth, binHeight, border, true);
+    this.atlasTextureRestoreHandler = async () => {
+      if (!this.isEmpty()) {
         this.clear();
       }
     };
@@ -26,13 +24,13 @@ export class GlyphManager extends AtlasManager {
   getGlyphTexture(index: number): Texture2D {
     return this.getAtlasTexture(index);
   }
-  getGlyphInfo(char: string, font: Font, color: ColorRGBA): GlyphInfo {
-    if (!char || !font || !color) {
+  getGlyphInfo(char: string, font: Font): GlyphInfo {
+    if (!char || !font) {
       return null;
     }
-    let glyphInfo = this.getAtlasInfo(this._hash(char, font, color));
+    let glyphInfo = this.getAtlasInfo(this._hash(char, font));
     if (!glyphInfo) {
-      glyphInfo = this._cacheGlyph(char, font, color);
+      glyphInfo = this._cacheGlyph(char, font);
       glyphInfo.width = Math.round(glyphInfo.width * (font.maxHeight / font.maxHeightScaled));
       glyphInfo.height = font.maxHeight;
     }
@@ -57,21 +55,13 @@ export class GlyphManager extends AtlasManager {
     return i - start;
   }
   /** @internal */
-  private _normalizeColor(color: ColorRGBA): string {
-    const r = `0${(Math.round(color.r * 255) & 0xff).toString(16)}`.slice(-2);
-    const g = `0${(Math.round(color.g * 255) & 0xff).toString(16)}`.slice(-2);
-    const b = `0${(Math.round(color.b * 255) & 0xff).toString(16)}`.slice(-2);
-    return `#${r}${g}${b}`;
+  private _hash(char: string, font: Font) {
+    return `${font.family}@${font.size}&${char}`;
   }
   /** @internal */
-  private _hash(char: string, font: Font, color: ColorRGBA) {
-    const clr = this._renderer.supportColorComposition() ? '' : `@${this._normalizeColor(color)}`;
-    return `${font.family}@${font.size}${clr}&${char}`;
-  }
-  /** @internal */
-  private _cacheGlyph(char: string, font: Font, color: ColorRGBA): GlyphInfo {
-    const bitmap = this._getGlyphBitmap(char, font, color) as ImageData;
-    return this.pushBitmap(this._hash(char, font, color), bitmap);
+  private _cacheGlyph(char: string, font: Font): GlyphInfo {
+    const bitmap = this._getGlyphBitmap(char, font) as ImageData;
+    return this.pushBitmap(this._hash(char, font), bitmap);
   }
   getCharWidth(char: string, font: Font): number {
     if (!font) {
@@ -90,11 +80,7 @@ export class GlyphManager extends AtlasManager {
     return w;
   }
   /** @internal */
-  private _getGlyphBitmap(
-    char: string,
-    font: Font,
-    color: ColorRGBA
-  ): ImageData | { x: number; y: number; w: number; h: number } {
+  private _getGlyphBitmap(char: string, font: Font): ImageData | { x: number; y: number; w: number; h: number } {
     if (!font) {
       return null;
     }
@@ -108,9 +94,7 @@ export class GlyphManager extends AtlasManager {
       w = Math.floor(Math.max(w, metric.actualBoundingBoxRight) + 0.8);
     }
     const h = font.maxHeightScaled;
-    FontCanvas.context.fillStyle = this._renderer.supportColorComposition()
-      ? '#fff'
-      : this._normalizeColor(color);
+    FontCanvas.context.fillStyle = '#fff';
     FontCanvas.context.clearRect(0, 0, w + 2, h);
     FontCanvas.context.fillText(char, 0, -font.topScaled);
     return FontCanvas.context.getImageData(0, 0, w, h);

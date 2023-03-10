@@ -226,13 +226,6 @@ function getBlitPrimitive2D(device: Device): Primitive {
   if (!blitPrimitive2D) {
     blitPrimitive2D = new Primitive(device);
     const vb = device.createVertexBuffer('position_f32x2', new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]));
-    /*
-    const vb = device.createStructuredBuffer(
-      makeVertexBufferType(4, 'position_f32x2'),
-      { usage: 'vertex', managed: true },
-      new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1])
-    );
-    */
     blitPrimitive2D.setVertexBuffer(vb);
     blitPrimitive2D.indexCount = 4;
     blitPrimitive2D.indexStart = 0;

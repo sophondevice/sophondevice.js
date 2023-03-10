@@ -1,7 +1,6 @@
 export * from './types';
 export * from './values';
 export * from './renderer';
-export * from './atlas_manager';
 export * from './glyph_manager';
 export * from './layout';
 export * from './style';

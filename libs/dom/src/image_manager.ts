@@ -1,12 +1,12 @@
 import { TextureAtlas } from './texture_atlas';
-import { AtlasManager, AtlasInfo } from './atlas_manager';
+import { TextureAtlasManager, AtlasInfo } from '@sophon/device';
 import type { GUIRenderer } from './renderer';
 
 export class ImageManager {
   /** @internal */
   protected _renderer: GUIRenderer;
   /** @internal */
-  protected _atlasManager: AtlasManager;
+  protected _atlasManager: TextureAtlasManager;
   /** @internal */
   protected _cachedImages: { [name: string]: TextureAtlas };
   /** @internal */
@@ -15,7 +15,7 @@ export class ImageManager {
     this._renderer = renderer;
     this._cachedImages = {};
     this._urlImages = {};
-    this._atlasManager = new AtlasManager(this._renderer, 1024, 1024, 0, false);
+    this._atlasManager = new TextureAtlasManager(this._renderer.device, 1024, 1024, 1, false);
     this._atlasManager.atlasTextureRestoreHandler = async (tex) => {
       if (!this._atlasManager.isEmpty()) {
         this._atlasManager.clear();

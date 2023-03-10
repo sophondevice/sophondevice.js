@@ -263,7 +263,7 @@ export class RText extends RNode {
                 )
               : line.length;
             for (let i = start; i < start + n; i++) {
-              const glyph = this._uiscene._getGlyphInfo(line[i], font, fontColor);
+              const glyph = this._uiscene._getGlyphInfo(line[i], font);
               if (glyph) {
                 const tex = this._uiscene._getGlyphTexture(glyph.atlasIndex);
                 uvMin.x = glyph.uMin;

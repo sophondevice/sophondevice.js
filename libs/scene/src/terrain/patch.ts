@@ -182,16 +182,8 @@ export class TerrainPatch {
       t = setNormalAndHeight(heights, normals, t, x, z, w, h, -skirtLength);
     }
     t = setNormalAndHeight(heights, normals, t, x - this._step, z, w, h, -skirtLength);
-    const heightArray = device.createStructuredBuffer(
-      makeVertexBufferType(numVerts, 'custom0_f32'),
-      { usage: 'vertex', managed: true },
-      heights
-    );
-    const normalArray = device.createStructuredBuffer(
-      makeVertexBufferType(numVerts, 'normal_f32x3'),
-      { usage: 'vertex', managed: true },
-      normals
-    );
+    const heightArray = device.createVertexBuffer('custom0_f32', heights);
+    const normalArray = device.createVertexBuffer('normal_f32x3', normals);
     this._geometry.setVertexBuffer(baseVertices);
     this._geometry.setVertexBuffer(normalArray);
     this._geometry.setVertexBuffer(heightArray);

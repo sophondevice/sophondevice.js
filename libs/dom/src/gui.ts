@@ -419,7 +419,7 @@ export class GUI extends REventTarget {
     this._renderer = new GUIRenderer(device);
     this._drawVisitor = new DrawVisitor(this);
     this._imageManager = new ImageManager(this._renderer);
-    this._glyphManager = new GlyphManager(this._renderer);
+    this._glyphManager = new GlyphManager(this._renderer, 1024, 1024, 1);
     this._httpRequest = new HttpRequest();
     this._document = null;
     this._focusElement = null;
@@ -1045,8 +1045,8 @@ export class GUI extends REventTarget {
     return this._glyphManager.getGlyphTexture(index);
   }
   /** @internal */
-  _getGlyphInfo(char: string, font: Font, color: ColorRGBA): GlyphInfo {
-    return this._glyphManager.getGlyphInfo(char, font, color);
+  _getGlyphInfo(char: string, font: Font): GlyphInfo {
+    return this._glyphManager.getGlyphInfo(char, font);
   }
   /** @internal */
   _getCharWidth(char: string, font: Font): number {

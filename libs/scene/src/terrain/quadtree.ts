@@ -222,11 +222,7 @@ export class Quadtree {
     vertices[offset + (dimension - 1) * 3 + 0] = dimension - 3;
     vertices[offset + (dimension - 1) * 3 + 1] = 0;
     vertices[offset + (dimension - 1) * 3 + 2] = dimension - 3;
-    this._baseVertices = device.createStructuredBuffer(
-      makeVertexBufferType(dimension * dimension, 'position_f32x3'),
-      { usage: 'vertex', managed: true },
-      vertices
-    );
+    this._baseVertices = device.createVertexBuffer('position_f32x3', vertices);
     // Create base index buffer
     const indices = this.strip(vertexCacheSize);
     this._indices = device.createIndexBuffer(indices, { managed: true });

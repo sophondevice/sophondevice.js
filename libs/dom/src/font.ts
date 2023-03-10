@@ -23,7 +23,7 @@ export class FontCanvas {
       this._canvas.height = 512;
       this._canvas.style.left = '-10000px';
       this._canvas.style.position = 'absolute';
-      document.body.appendChild(this._canvas);
+      //document.body.appendChild(this._canvas);
       this._context = this._canvas.getContext('2d', {
         willReadFrequently: true
       });

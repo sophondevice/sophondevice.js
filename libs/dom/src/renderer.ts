@@ -125,9 +125,6 @@ export class GUIRenderer extends REventTarget {
   deviceToScreen(val: number): number {
     return this._device.deviceToScreen(val);
   }
-  supportColorComposition(): boolean {
-    return true;
-  }
   createTexture(width: number, height: number, color: ColorRGBA, linear: boolean): Texture2D {
     const tex = this._device.createTexture2D('rgba8unorm', width, height, {
       colorSpace: linear ? 'linear' : 'srgb',
@@ -308,7 +305,7 @@ export class GUIRenderer extends REventTarget {
   /** @internal */
   private createStateSet(): RenderStateSet {
     const rs = this._device.createRenderStateSet();
-    rs.useBlendingState().enable(true).setBlendFunc('one', 'inv-src-alpha');
+    rs.useBlendingState().enable(true).setBlendFuncRGB('one', 'inv-src-alpha').setBlendFuncAlpha('zero', 'one');
     rs.useDepthState().enableTest(false).enableWrite(false);
     rs.useRasterizerState().setCullMode('none');
     return rs;
