@@ -1,6 +1,6 @@
 import { RectsPacker } from '@sophon/base';
-import type { Device } from './device';
-import type { BaseTexture, Texture2D } from './gpuobject';
+import type { Device } from '../device';
+import type { BaseTexture, Texture2D } from '../gpuobject';
 
 export interface AtlasInfo {
   atlasIndex: number;

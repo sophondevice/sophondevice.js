@@ -1,5 +1,5 @@
-import { Vector4 } from '@sophon/base';
-import { createDevice, DeviceType } from "@sophon/device";
+import { Vector3, Vector4 } from '@sophon/base';
+import { createDevice, DeviceType, DrawText } from "@sophon/device";
 
 (async function() {
   // create render device
@@ -43,11 +43,15 @@ import { createDevice, DeviceType } from "@sophon/device";
     }
   });
 
+  DrawText.setFont(device, '16px Arial');
+
   // start render loop
   device.runLoop(device => {
     device.clearFrameBuffer(new Vector4(0, 0, 0.5, 1), 1, 0);
     device.setProgram(program);
     device.setVertexLayout(vertexLayout);
     device.draw('triangle-list', 0, 3);
+    DrawText.drawText(device, `Device: ${device.type}`, 'rgba(255, 255, 0, 0.3)', 30, 30);
+    DrawText.drawText(device, `FPS: ${device.frameInfo.FPS.toFixed(2)}`, '#ffff00', 30, 50);
   });
 })();

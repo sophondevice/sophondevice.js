@@ -344,10 +344,7 @@ export class GUIRenderer extends REventTarget {
           } else {
             this.$l.color = this.$inputs.outDiffuse;
           }
-          this.$outputs.outColor = pb.vec4(
-            pb.pow(pb.mul(this.color.xyz, this.color.w), pb.vec3(1 / 2.2)),
-            this.color.w
-          );
+          this.$outputs.outColor = pb.vec4(pb.mul(pb.pow(this.color.rgb, pb.vec3(1/2.2)), this.color.a), this.color.a);
         });
       }
     });

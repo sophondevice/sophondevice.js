@@ -1,8 +1,8 @@
-import { REvent, REventTarget, HttpRequest, ColorRGBA, Tuple4 } from '@sophon/base';
+import { REvent, REventTarget, HttpRequest, Tuple4 } from '@sophon/base';
+import { Device, Texture2D, GlyphManager, AtlasInfo, Font } from '@sophon/device';
 import * as Yoga from './typeflex/api';
 import { injectGUIEvents, GUIRenderer } from './renderer';
 import { GUIEventPathBuilder } from './types';
-import { GlyphManager, GlyphInfo } from './glyph_manager';
 import { ImageManager } from './image_manager';
 import { GUIHitTestVisitor } from './hittest_visitor';
 import { UILayout } from './layout';
@@ -21,8 +21,6 @@ import { Button } from './components/button';
 import { ScrollBar } from './components/scrollbar';
 import { Option, Select } from './components/select';
 import { Slider } from './components/slider';
-import type { Device, Texture2D } from '@sophon/device';
-import type { Font } from './font';
 import type { RPrimitiveBatchList } from './primitive';
 
 interface ElementConstructor {
@@ -419,7 +417,7 @@ export class GUI extends REventTarget {
     this._renderer = new GUIRenderer(device);
     this._drawVisitor = new DrawVisitor(this);
     this._imageManager = new ImageManager(this._renderer);
-    this._glyphManager = new GlyphManager(this._renderer, 1024, 1024, 1);
+    this._glyphManager = new GlyphManager(device, 1024, 1024, 1);
     this._httpRequest = new HttpRequest();
     this._document = null;
     this._focusElement = null;
@@ -1045,7 +1043,7 @@ export class GUI extends REventTarget {
     return this._glyphManager.getGlyphTexture(index);
   }
   /** @internal */
-  _getGlyphInfo(char: string, font: Font): GlyphInfo {
+  _getGlyphInfo(char: string, font: Font): AtlasInfo {
     return this._glyphManager.getGlyphInfo(char, font);
   }
   /** @internal */

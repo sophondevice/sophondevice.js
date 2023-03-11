@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { REventTarget, REvent, REventListener, REventHandlerOptions, Tuple2, Tuple4, ColorRGBA } from '@sophon/base';
+import { Font } from '@sophon/device';
 import { GUIEventPathBuilder } from './types';
 import { RRectPrimitive, RPolygonPrimitive, RPrimitiveBatchList } from './primitive';
 import { RNodeList, RLiveNodeList } from './nodelist';
@@ -15,7 +16,6 @@ import {
   RMouseEvent
 } from './events';
 import { NodeType } from './values';
-import { Font } from './font';
 import type { RText } from './components/text';
 import type { RElement } from './element';
 import type { RDocument } from './document';

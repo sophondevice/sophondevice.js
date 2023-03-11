@@ -420,6 +420,9 @@ export class WebGLDevice extends Device {
     this._currentBindGroups[index] = bindGroup as WebGLBindGroup;
     this._currentBindGroupOffsets[index] = bindGroupOffsets || null;
   }
+  getBindGroup(index: number): [BindGroup, Iterable<number>] {
+    return [this._currentBindGroups[index], this._currentBindGroupOffsets[index]];
+  }
   // render related
   setViewport(vp?: number[]);
   setViewport(x: number, y: number, w: number, h: number);
@@ -488,7 +491,7 @@ export class WebGLDevice extends Device {
   setVertexLayout(vertexData: VertexLayout) {
     this._currentVertexData = vertexData as WebGLVertexLayout;
   }
-  getVertexData(): VertexLayout {
+  getVertexLayout(): VertexLayout {
     return this._currentVertexData;
   }
   setRenderStates(stateSet: RenderStateSet) {
@@ -524,6 +527,9 @@ export class WebGLDevice extends Device {
   }
   setRenderStatesOverridden(renderStates: RenderStateSet) {
     this._renderStatesOverridden = renderStates;
+  }
+  getRenderStatesOverridden(): RenderStateSet {
+    return this._renderStatesOverridden;
   }
   flush(): void {
     this.context.flush();

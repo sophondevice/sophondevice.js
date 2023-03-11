@@ -1,20 +1,11 @@
 import { Font, FontCanvas } from './font';
-import { GUIRenderer } from './renderer';
-import { TextureAtlasManager, Texture2D } from '@sophon/device';
-
-export interface GlyphInfo {
-  atlasIndex: number;
-  width: number;
-  height: number;
-  uMin: number;
-  vMin: number;
-  uMax: number;
-  vMax: number;
-}
+import { TextureAtlasManager, AtlasInfo } from './textureatlas';
+import type { Device } from '../device';
+import type { Texture2D } from '../gpuobject';
 
 export class GlyphManager extends TextureAtlasManager {
-  constructor(renderer: GUIRenderer, binWidth: number, binHeight: number, border: number) {
-    super(renderer.device, binWidth, binHeight, border, true);
+  constructor(device: Device, binWidth: number, binHeight: number, border: number) {
+    super(device, binWidth, binHeight, border, true);
     this.atlasTextureRestoreHandler = async () => {
       if (!this.isEmpty()) {
         this.clear();
@@ -24,7 +15,7 @@ export class GlyphManager extends TextureAtlasManager {
   getGlyphTexture(index: number): Texture2D {
     return this.getAtlasTexture(index);
   }
-  getGlyphInfo(char: string, font: Font): GlyphInfo {
+  getGlyphInfo(char: string, font: Font): AtlasInfo {
     if (!char || !font) {
       return null;
     }
@@ -59,7 +50,7 @@ export class GlyphManager extends TextureAtlasManager {
     return `${font.family}@${font.size}&${char}`;
   }
   /** @internal */
-  private _cacheGlyph(char: string, font: Font): GlyphInfo {
+  private _cacheGlyph(char: string, font: Font): AtlasInfo {
     const bitmap = this._getGlyphBitmap(char, font) as ImageData;
     return this.pushBitmap(this._hash(char, font), bitmap);
   }

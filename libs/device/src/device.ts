@@ -351,6 +351,7 @@ export abstract class Device extends REventTarget {
   abstract reverseVertexWindingOrder(reverse: boolean): void;
   abstract isWindingOrderReversed(): boolean;
   abstract setRenderStatesOverridden(renderStates: RenderStateSet);
+  abstract getRenderStatesOverridden(): RenderStateSet;
   // program
   abstract createGPUProgram(params: GPUProgramConstructParams): GPUProgram;
   abstract createBindGroup(layout: BindGroupLayout): BindGroup;
@@ -373,12 +374,13 @@ export abstract class Device extends REventTarget {
   abstract setProgram(program: GPUProgram): void;
   abstract getProgram(): GPUProgram;
   abstract setVertexLayout(vertexData: VertexLayout): void;
-  abstract getVertexData(): VertexLayout;
+  abstract getVertexLayout(): VertexLayout;
   abstract setRenderStates(renderStates: RenderStateSet): void;
   abstract getRenderStates(): RenderStateSet;
   abstract setFramebuffer(rt: FrameBuffer): void;
   abstract getFramebuffer(): FrameBuffer;
   abstract setBindGroup(index: number, bindGroup: BindGroup, dynamicOffsets?: Iterable<number>);
+  abstract getBindGroup(index: number): [BindGroup, Iterable<number>];
   abstract flush(): void;
   // misc
   abstract readPixels(x: number, y: number, w: number, h: number, buffer: TypedArray): Promise<void>;
@@ -802,9 +804,9 @@ export abstract class Device extends REventTarget {
         usageFlag = 0;
         break;
     }
-    const storageFlag = !!options?.storage ? GPUResourceUsageFlags.BF_STORAGE : 0;
-    const dynamicFlag = !!options?.dynamic ? GPUResourceUsageFlags.DYNAMIC : 0;
-    const managedFlag = !!options?.managed ? GPUResourceUsageFlags.MANAGED : 0;
+    const storageFlag = (options?.storage ?? false) ? GPUResourceUsageFlags.BF_STORAGE : 0;
+    const dynamicFlag = (options?.dynamic ?? false) ? GPUResourceUsageFlags.DYNAMIC : 0;
+    const managedFlag = dynamicFlag === 0 && (options?.managed ?? true) ? GPUResourceUsageFlags.MANAGED : 0;
     return usageFlag | storageFlag | dynamicFlag | managedFlag;
   }
 }

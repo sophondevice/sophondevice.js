@@ -399,6 +399,9 @@ export class WebGPUDevice extends Device {
     this._currentBindGroups[index] = bindGroup as WebGPUBindGroup;
     this._currentBindGroupOffsets[index] = dynamicOffsets || null;
   }
+  getBindGroup(index: number): [BindGroup, Iterable<number>] {
+    return [this._currentBindGroups[index], this._currentBindGroupOffsets[index]];
+  }
   // render related
   setViewport(vp?: number[]);
   setViewport(x: number, y: number, w: number, h: number);
@@ -437,7 +440,7 @@ export class WebGPUDevice extends Device {
   setVertexLayout(vertexData: VertexLayout) {
     this._currentVertexData = vertexData as WebGPUVertexLayout;
   }
-  getVertexData(): VertexLayout {
+  getVertexLayout(): VertexLayout {
     return this._currentVertexData;
   }
   setRenderStates(stateSet: RenderStateSet) {
@@ -461,6 +464,9 @@ export class WebGPUDevice extends Device {
   setRenderStatesOverridden(renderStates: RenderStateSet) {
     this._renderStatesOverridden = renderStates as WebGPURenderStateSet;
   }
+  getRenderStatesOverridden(): RenderStateSet {
+    return this._renderStatesOverridden;
+  }
   /** @internal */
   isBufferUploading(buffer: WebGPUBuffer): boolean {
     return this._commandQueue.isBufferUploading(buffer);
@@ -468,10 +474,6 @@ export class WebGPUDevice extends Device {
   /** @internal */
   isTextureUploading(tex: WebGPUBaseTexture): boolean {
     return this._commandQueue.isTextureUploading(tex);
-  }
-  /** @internal */
-  getRenderStatesOverridden() {
-    return this._renderStatesOverridden;
   }
   /** @internal */
   getFramebufferInfo(): {

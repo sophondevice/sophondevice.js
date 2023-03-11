@@ -5,4 +5,4 @@ export * from './gpuobject';
 export * from './createDevice';
 export * from './device';
 export * from './builder';
-export * from './textureatlas';
+export * from './helpers';
