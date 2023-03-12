@@ -51,7 +51,7 @@ import { createDevice, DeviceType, DrawText } from "@sophon/device";
     device.setProgram(program);
     device.setVertexLayout(vertexLayout);
     device.draw('triangle-list', 0, 3);
-    DrawText.drawText(device, `Device: ${device.type}`, 'rgba(255, 255, 0, 0.3)', 30, 30);
+    DrawText.drawText(device, `Device: ${device.type}`, '#ffffff', 30, 30);
     DrawText.drawText(device, `FPS: ${device.frameInfo.FPS.toFixed(2)}`, '#ffff00', 30, 50);
   });
 })();
