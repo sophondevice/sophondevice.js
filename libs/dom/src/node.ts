@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { REventTarget, REvent, REventListener, REventHandlerOptions, Tuple2, Tuple4, ColorRGBA } from '@sophon/base';
+import { REventTarget, REvent, REventListener, REventHandlerOptions, Tuple2, Tuple4, ColorRGBA, parseColor } from '@sophon/base';
 import { Font } from '@sophon/device';
 import { GUIEventPathBuilder } from './types';
 import { RRectPrimitive, RPolygonPrimitive, RPrimitiveBatchList } from './primitive';
@@ -762,7 +762,7 @@ export class RNode extends REventTarget {
   /** @internal */
   _updateFontColor(val: string): void {
     if (this.style.color === val) {
-      this._fontColor = val ? this.style.parseColor(val) : null;
+      this._fontColor = val ? parseColor(val) : null;
     }
     this._invalidateContent();
     for (const child of this._childNodes) {

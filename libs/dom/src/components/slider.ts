@@ -1,4 +1,4 @@
-import { REvent, ColorRGBA, Tuple4 } from '@sophon/base';
+import { REvent, ColorRGBA, Tuple4, parseColor } from '@sophon/base';
 import { RRectPrimitive } from '../primitive';
 import { RElement } from '../element';
 import { RAttributeChangeEvent, RMouseEvent, RValueChangeEvent, RElementLayoutEvent } from '../events';
@@ -31,7 +31,7 @@ export class Slider extends RElement {
     this._lastRectY = 0;
     this._draggingBlock = false;
     this._blockPos = 0;
-    this._blockColor = this.style.parseColor('#555555');
+    this._blockColor = parseColor('#555555');
     this.addDefaultEventListener(RMouseEvent.NAME_MOUSEDOWN, function (this: Slider, evt: REvent) {
       const data: RMouseEvent = evt as RMouseEvent;
       if (
@@ -152,7 +152,7 @@ export class Slider extends RElement {
   }
   set blockColor(val: string) {
     this._setStringAttribute('blockColor', val);
-    this._blockColor = this.style.parseColor(this.blockColor) || this.style.parseColor('#555555');
+    this._blockColor = parseColor(this.blockColor) || parseColor('#555555');
     this._invalidateContent();
   }
   get blockImage(): string {

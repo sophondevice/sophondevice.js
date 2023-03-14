@@ -234,7 +234,7 @@ export class PipelineCache {
       writeMask: r | g | b | a
     };
     if (blendingState.enabled) {
-      state.blend = this.createBlendState(blendingState);
+      state.blend = this.createBlendState(blendingState as rs.WebGPUBlendingState);
     }
     return state;
   }
@@ -281,7 +281,7 @@ export class PipelineCache {
     const programHash = program.hash;
     const vertexHash = vertexData?.getLayouts(program.vertexAttributes).layoutHash || '';
     const stateHash = stateSet?.hash || '';
-    const stateOverriddenHash = this._device.getRenderStatesOverridden()?.hash || '';
+    const stateOverriddenHash = (this._device.getRenderStatesOverridden() as WebGPURenderStateSet)?.hash || '';
     return `${programHash}:${vertexHash}:${fbHash}:${primitiveType}:${stateHash}:${stateOverriddenHash}:${Number(
       this._device.isWindingOrderReversed()
     )}`;
